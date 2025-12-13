@@ -637,7 +637,7 @@ $grants_url = get_post_type_archive_link('grant');
 
     .ji-mega-column-title {
         font-family: var(--h-font-mono);
-        font-size: 11px;
+        font-size: 12px; /* SEO: 11px → 12px for legible font sizes */
         font-weight: 700;
         letter-spacing: 0.1em;
         color: var(--h-gov-navy-500);
@@ -746,7 +746,8 @@ $grants_url = get_post_type_archive_link('grant');
         border-radius: var(--h-radius);
         transition: all var(--h-transition);
         text-align: center;
-        min-height: 40px;
+        min-height: 44px; /* SEO: 40px → 44px for tap target size */
+        min-width: 44px; /* SEO: Added for tap target size */
         display: flex;
         align-items: center;
         justify-content: center;
@@ -1047,7 +1048,7 @@ $grants_url = get_post_type_archive_link('grant');
 
     .ji-search-suggestion-label {
         font-family: var(--h-font-mono);
-        font-size: 11px;
+        font-size: 12px; /* SEO: 11px → 12px for legible font sizes */
         font-weight: 700;
         letter-spacing: 0.1em;
         color: var(--h-gov-navy-500);
@@ -1063,8 +1064,11 @@ $grants_url = get_post_type_archive_link('grant');
         font-weight: 600;
         transition: all var(--h-transition);
         cursor: pointer;
-        min-height: 36px;
+        min-height: 44px; /* SEO: 36px → 44px for tap target size */
         border: 1px solid var(--h-gray-200);
+        text-decoration: none; /* SEO: Added for link styling */
+        display: inline-flex; /* SEO: Added for proper alignment */
+        align-items: center; /* SEO: Added for vertical centering */
     }
 
     .ji-search-suggestion:hover {
@@ -1465,7 +1469,7 @@ $grants_url = get_post_type_archive_link('grant');
         padding: 8px 14px;
         border-radius: var(--h-radius);
         font-family: var(--h-font-mono);
-        font-size: 11px;
+        font-size: 12px; /* SEO: 11px → 12px for legible font sizes */
         font-weight: 700;
         letter-spacing: 0.05em;
         display: flex;
@@ -1481,7 +1485,7 @@ $grants_url = get_post_type_archive_link('grant');
     .ji-mobile-copyright {
         color: var(--h-gov-navy-400);
         font-family: var(--h-font-mono);
-        font-size: 11px;
+        font-size: 12px; /* SEO: 11px → 12px for legible font sizes */
         letter-spacing: 0.05em;
     }
 
@@ -1754,7 +1758,7 @@ $grants_url = get_post_type_archive_link('grant');
                     <div class="ji-search-suggestions" role="group" aria-label="人気の検索キーワード">
                         <span class="ji-search-suggestion-label">人気:</span>
                         <?php foreach ($header_data['popular_searches'] as $search): ?>
-                        <button type="button" class="ji-search-suggestion" data-search="<?php echo esc_attr($search); ?>"><?php echo esc_html($search); ?></button>
+                        <a href="<?php echo esc_url(add_query_arg('search', $search, $grants_url)); ?>" class="ji-search-suggestion"><?php echo esc_html($search); ?></a>
                         <?php endforeach; ?>
                     </div>
                 </div>

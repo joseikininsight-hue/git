@@ -799,3 +799,161 @@ $image_optimization_file = get_template_directory() . '/inc/image-optimization.p
 if (file_exists($image_optimization_file)) {
     require_once $image_optimization_file;
 }
+
+/**
+ * ============================================================================
+ * PHASE 4: SEO 100点達成のための追加最適化
+ * Lighthouse SEO Score 100/100 を目指す
+ * @since 11.0.3
+ * ============================================================================
+ */
+
+/**
+ * 画像のalt属性を自動補完
+ * Lighthouse SEO Audit: "Image elements have [alt] attributes"
+ * 
+ * @param array $attr 画像属性
+ * @param WP_Post $attachment 添付ファイルオブジェクト
+ * @param string $size 画像サイズ
+ * @return array 修正された属性
+ */
+add_filter('wp_get_attachment_image_attributes', 'gi_ensure_alt_attribute', 10, 3);
+function gi_ensure_alt_attribute($attr, $attachment, $size) {
+    if (empty($attr['alt'])) {
+        // タイトルから取得
+        $alt = get_the_title($attachment->ID);
+        
+        // タイトルも空の場合はファイル名から生成
+        if (empty($alt)) {
+            $file = basename(get_attached_file($attachment->ID));
+            $alt = pathinfo($file, PATHINFO_FILENAME);
+            $alt = str_replace(['-', '_'], ' ', $alt);
+            $alt = ucwords($alt);
+        }
+        
+        $attr['alt'] = $alt;
+    }
+    return $attr;
+}
+
+/**
+ * コンテンツ内の画像にalt属性を自動追加
+ * Lighthouse SEO Audit: "Image elements have [alt] attributes"
+ * 
+ * @param string $content 投稿コンテンツ
+ * @return string 修正されたコンテンツ
+ */
+add_filter('the_content', 'gi_add_alt_to_content_images', 20);
+function gi_add_alt_to_content_images($content) {
+    if (empty($content)) return $content;
+    
+    // alt=""（空のalt）を検出して修正
+    $content = preg_replace_callback(
+        '/<img([^>]*)\s+alt=[\'\"]{2}([^>]*)>/i',
+        function($matches) {
+            // src属性からファイル名を抽出
+            preg_match('/src=[\'"]([^\'"]+)[\'"]/i', $matches[0], $src);
+            if (!empty($src[1])) {
+                $filename = pathinfo(parse_url($src[1], PHP_URL_PATH), PATHINFO_FILENAME);
+                $alt = ucwords(str_replace(['-', '_'], ' ', $filename));
+                return '<img' . $matches[1] . ' alt="' . esc_attr($alt) . '"' . $matches[2] . '>';
+            }
+            return $matches[0];
+        },
+        $content
+    );
+    
+    // alt属性がない画像を検出して追加
+    $content = preg_replace_callback(
+        '/<img((?![^>]*alt=)[^>]*)>/i',
+        function($matches) {
+            preg_match('/src=[\'"]([^\'"]+)[\'"]/i', $matches[0], $src);
+            if (!empty($src[1])) {
+                $filename = pathinfo(parse_url($src[1], PHP_URL_PATH), PATHINFO_FILENAME);
+                $alt = ucwords(str_replace(['-', '_'], ' ', $filename));
+                return '<img' . $matches[1] . ' alt="' . esc_attr($alt) . '">';
+            }
+            return $matches[0];
+        },
+        $content
+    );
+    
+    return $content;
+}
+
+/**
+ * Organization Schema（サイト全体の構造化データ）
+ * Google検索でのリッチリザルト表示を強化
+ */
+add_action('wp_head', 'gi_add_organization_schema', 10);
+function gi_add_organization_schema() {
+    if (is_front_page()) {
+        $schema = array(
+            '@context' => 'https://schema.org',
+            '@type' => 'Organization',
+            'name' => '助成金インサイト',
+            'url' => home_url('/'),
+            'logo' => 'https://joseikin-insight.com/wp-content/uploads/2025/05/cropped-logo3.webp',
+            'description' => '中小企業・個人事業主のための補助金・助成金検索サイト。最新の補助金情報を専門家監修のもとわかりやすく解説。',
+            'sameAs' => array(
+                'https://twitter.com/joseikininsight',
+                'https://facebook.com/joseikin.insight',
+                'https://www.youtube.com/channel/UCbfjOrG3nSPI3GFzKnGcspQ',
+                'https://note.com/joseikin_insight'
+            ),
+            'contactPoint' => array(
+                '@type' => 'ContactPoint',
+                'contactType' => 'customer service',
+                'url' => home_url('/contact/'),
+                'availableLanguage' => 'Japanese'
+            )
+        );
+        echo '<script type="application/ld+json">' . wp_json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . '</script>' . "\n";
+    }
+}
+
+/**
+ * WebSite Schema with SearchAction（サイト内検索機能の構造化データ）
+ * Google検索結果にサイト内検索ボックスを表示
+ */
+add_action('wp_head', 'gi_add_website_schema', 10);
+function gi_add_website_schema() {
+    if (is_front_page()) {
+        $schema = array(
+            '@context' => 'https://schema.org',
+            '@type' => 'WebSite',
+            'name' => '助成金インサイト',
+            'url' => home_url('/'),
+            'description' => '全国の補助金・助成金を簡単検索。中小企業診断士監修のもと毎日更新。',
+            'potentialAction' => array(
+                '@type' => 'SearchAction',
+                'target' => array(
+                    '@type' => 'EntryPoint',
+                    'urlTemplate' => home_url('/grant/?search={search_term_string}')
+                ),
+                'query-input' => 'required name=search_term_string'
+            )
+        );
+        echo '<script type="application/ld+json">' . wp_json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . '</script>' . "\n";
+    }
+}
+
+/**
+ * robots.txt の確認用デバッグ関数
+ * （本番環境では使用しない）
+ */
+function gi_check_robots_txt() {
+    if (defined('WP_DEBUG') && WP_DEBUG && current_user_can('manage_options') && isset($_GET['debug_robots'])) {
+        header('Content-Type: text/plain');
+        echo "=== robots.txt Debug ===\n\n";
+        echo "Site URL: " . home_url('/') . "\n";
+        echo "robots.txt URL: " . home_url('/robots.txt') . "\n\n";
+        echo "Expected Content:\n";
+        echo "User-agent: *\n";
+        echo "Allow: /\n";
+        echo "Disallow: /wp-admin/\n";
+        echo "Disallow: /wp-includes/\n";
+        echo "Sitemap: " . home_url('/sitemap_index.xml') . "\n";
+        exit;
+    }
+}
