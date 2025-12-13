@@ -1,0 +1,497 @@
+/* ==========================================================================
+   Final CTA Section - Government Official Design v12.0
+   官公庁風デザイン - 濃紺×金カラースキーム
+   ========================================================================== */
+
+.gov-cta {
+    /* 官公庁カラーパレット */
+    --cta-gov-navy-900: #0d1b2a;
+    --cta-gov-navy-800: #1b263b;
+    --cta-gov-navy-700: #2c3e50;
+    --cta-gov-navy-600: #34495e;
+    --cta-gov-navy-500: #415a77;
+    --cta-gov-navy-400: #778da9;
+    --cta-gov-navy-300: #a3b1c6;
+    --cta-gov-navy-200: #cfd8e3;
+    --cta-gov-navy-100: #e8ecf1;
+    --cta-gov-navy-50: #f4f6f8;
+    
+    /* アクセントカラー - 金 */
+    --cta-gov-gold: #c9a227;
+    --cta-gov-gold-light: #d4b77a;
+    --cta-gov-gold-pale: #f0e6c8;
+    
+    /* セマンティックカラー */
+    --cta-gov-green: #2e7d32;
+    --cta-gov-green-light: #e8f5e9;
+    
+    /* ニュートラル */
+    --cta-white: #ffffff;
+    --cta-black: #1a1a1a;
+    
+    /* タイポグラフィ */
+    --cta-font-serif: "Shippori Mincho", "Yu Mincho", "YuMincho", "Hiragino Mincho ProN", serif;
+    --cta-font-sans: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --cta-font-mono: 'SF Mono', 'Monaco', 'Consolas', monospace;
+    
+    /* エフェクト */
+    --cta-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --cta-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --cta-shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.2);
+    --cta-radius: 4px;
+    --cta-radius-lg: 8px;
+    
+    /* レイアウト */
+    position: relative;
+    background: linear-gradient(135deg, var(--cta-gov-navy-800) 0%, var(--cta-gov-navy-900) 100%);
+    padding: 100px 24px;
+    overflow: hidden;
+    font-family: var(--cta-font-sans);
+}
+
+/* 背景パターン */
+.gov-cta::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+}
+
+/* ==========================================================================
+   Container
+   ========================================================================== */
+.gov-cta__container {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* ==========================================================================
+   アクセントライン
+   ========================================================================== */
+.gov-cta__accent-line {
+    width: 120px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--cta-gov-gold) 0%, var(--cta-gov-gold-light) 100%);
+    margin: 0 auto 48px;
+    border-radius: 2px;
+}
+
+/* ==========================================================================
+   Content
+   ========================================================================== */
+.gov-cta__content {
+    text-align: center;
+    color: var(--cta-white);
+}
+
+/* ==========================================================================
+   Icon
+   ========================================================================== */
+.gov-cta__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    margin-bottom: 24px;
+    background: rgba(201, 162, 39, 0.15);
+    border: 2px solid var(--cta-gov-gold);
+    border-radius: 50%;
+    color: var(--cta-gov-gold);
+}
+
+/* ==========================================================================
+   Subtitle
+   ========================================================================== */
+.gov-cta__subtitle {
+    font-family: var(--cta-font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--cta-gov-gold);
+    margin: 0 0 16px 0;
+    text-transform: uppercase;
+}
+
+/* ==========================================================================
+   Title
+   ========================================================================== */
+.gov-cta__title {
+    font-family: var(--cta-font-serif);
+    font-size: clamp(26px, 5vw, 38px);
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: 0.02em;
+    color: var(--cta-white);
+    margin: 0 0 24px 0;
+}
+
+.gov-cta__br-sp {
+    display: none;
+}
+
+.gov-cta__br-pc {
+    display: inline;
+}
+
+/* ==========================================================================
+   Description
+   ========================================================================== */
+.gov-cta__description {
+    font-size: 15px;
+    line-height: 1.9;
+    color: var(--cta-gov-navy-200);
+    margin: 0 0 32px 0;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ==========================================================================
+   Features
+   ========================================================================== */
+.gov-cta__features {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    list-style: none;
+    margin: 0 0 40px 0;
+    padding: 0;
+    flex-wrap: wrap;
+}
+
+.gov-cta__feature {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--cta-white);
+}
+
+.gov-cta__feature-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    background: var(--cta-gov-green);
+    border-radius: 50%;
+    color: var(--cta-white);
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+.gov-cta__buttons {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+}
+
+.gov-cta__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    height: 56px;
+    padding: 0 32px;
+    border-radius: var(--cta-radius);
+    font-family: var(--cta-font-sans);
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all var(--cta-transition);
+    border: 2px solid transparent;
+    min-width: 220px;
+}
+
+/* Primary Button */
+.gov-cta__btn--primary {
+    background: var(--cta-white);
+    color: var(--cta-gov-navy-900);
+    border-color: var(--cta-white);
+    box-shadow: var(--cta-shadow);
+}
+
+.gov-cta__btn--primary:hover {
+    background: var(--cta-gov-gold-pale);
+    border-color: var(--cta-gov-gold);
+    transform: translateY(-3px);
+    box-shadow: var(--cta-shadow-lg);
+}
+
+.gov-cta__btn--primary:focus-visible {
+    outline: 3px solid var(--cta-gov-gold);
+    outline-offset: 3px;
+}
+
+.gov-cta__btn--primary:active {
+    transform: translateY(-1px);
+}
+
+/* Secondary Button */
+.gov-cta__btn--secondary {
+    background: transparent;
+    color: var(--cta-white);
+    border-color: var(--cta-gov-navy-400);
+}
+
+.gov-cta__btn--secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--cta-white);
+    transform: translateY(-3px);
+}
+
+.gov-cta__btn--secondary:focus-visible {
+    outline: 3px solid var(--cta-gov-gold);
+    outline-offset: 3px;
+}
+
+/* Button Icon */
+.gov-cta__btn-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: transform var(--cta-transition);
+}
+
+.gov-cta__btn--primary:hover .gov-cta__btn-icon {
+    transform: translateX(4px);
+}
+
+/* ==========================================================================
+   Note
+   ========================================================================== */
+.gov-cta__note {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--cta-gov-navy-300);
+    margin: 0;
+    padding: 12px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--cta-radius);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.gov-cta__note-icon {
+    display: flex;
+    align-items: center;
+    color: var(--cta-gov-gold);
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Responsive - Tablet
+   ========================================================================== */
+@media (max-width: 768px) {
+    .gov-cta {
+        padding: 80px 20px;
+    }
+    
+    .gov-cta__accent-line {
+        width: 80px;
+        margin-bottom: 40px;
+    }
+    
+    .gov-cta__icon {
+        width: 70px;
+        height: 70px;
+        margin-bottom: 20px;
+    }
+    
+    .gov-cta__icon svg {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .gov-cta__description {
+        font-size: 14px;
+        margin-bottom: 28px;
+    }
+    
+    .gov-cta__features {
+        gap: 16px;
+        margin-bottom: 32px;
+    }
+    
+    .gov-cta__feature {
+        font-size: 13px;
+    }
+    
+    .gov-cta__buttons {
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .gov-cta__btn {
+        width: 100%;
+        max-width: 320px;
+        min-width: auto;
+    }
+}
+
+/* ==========================================================================
+   Responsive - Mobile
+   ========================================================================== */
+@media (max-width: 480px) {
+    .gov-cta {
+        padding: 60px 16px;
+    }
+    
+    .gov-cta__accent-line {
+        width: 60px;
+        height: 3px;
+        margin-bottom: 32px;
+    }
+    
+    .gov-cta__icon {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .gov-cta__icon svg {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .gov-cta__subtitle {
+        font-size: 10px;
+        margin-bottom: 12px;
+    }
+    
+    .gov-cta__br-sp {
+        display: inline;
+    }
+    
+    .gov-cta__br-pc {
+        display: none;
+    }
+    
+    .gov-cta__description {
+        font-size: 13px;
+        line-height: 1.8;
+    }
+    
+    .gov-cta__features {
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .gov-cta__btn {
+        height: 52px;
+        font-size: 14px;
+        padding: 0 24px;
+    }
+    
+    .gov-cta__note {
+        font-size: 12px;
+        padding: 10px 16px;
+        flex-direction: column;
+        gap: 6px;
+        text-align: center;
+    }
+}
+
+/* ==========================================================================
+   Accessibility
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+    .gov-cta__btn,
+    .gov-cta__btn-icon {
+        transition: none;
+    }
+    
+    .gov-cta__btn:hover {
+        transform: none;
+    }
+}
+
+@media (prefers-contrast: high) {
+    .gov-cta__btn--primary {
+        border: 3px solid var(--cta-black);
+    }
+    
+    .gov-cta__btn--secondary {
+        border: 3px solid var(--cta-white);
+    }
+    
+    .gov-cta__note {
+        border: 2px solid var(--cta-white);
+    }
+}
+
+/* Focus styles */
+.gov-cta a:focus-visible {
+    outline: 3px solid var(--cta-gov-gold);
+    outline-offset: 3px;
+}
+
+/* ==========================================================================
+   Print Styles
+   ========================================================================== */
+@media print {
+    .gov-cta {
+        background: white;
+        color: black;
+        padding: 40px 24px;
+    }
+    
+    .gov-cta::before {
+        display: none;
+    }
+    
+    .gov-cta__content {
+        color: black;
+    }
+    
+    .gov-cta__title,
+    .gov-cta__description,
+    .gov-cta__feature,
+    .gov-cta__note {
+        color: black;
+    }
+    
+    .gov-cta__btn {
+        border: 2px solid black;
+        color: black;
+        background: white;
+    }
+    
+    .gov-cta__accent-line {
+        background: black;
+    }
+}
+
+/* ==========================================================================
+   強制表示
+   ========================================================================== */
+.gov-cta,
+.gov-cta__container,
+.gov-cta__content {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.gov-cta__buttons,
+.gov-cta__features {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}

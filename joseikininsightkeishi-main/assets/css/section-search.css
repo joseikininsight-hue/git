@@ -1,0 +1,1181 @@
+/* ==========================================================================
+   Search Section v54.0 - Government Official Design
+   官公庁風デザイン - 濃紺×金カラースキーム
+   ========================================================================== */
+
+.search {
+    /* 官公庁カラーパレット */
+    --s-gov-navy-900: #0d1b2a;
+    --s-gov-navy-800: #1b263b;
+    --s-gov-navy-700: #2c3e50;
+    --s-gov-navy-600: #34495e;
+    --s-gov-navy-500: #415a77;
+    --s-gov-navy-400: #778da9;
+    --s-gov-navy-300: #a3b1c6;
+    --s-gov-navy-200: #cfd8e3;
+    --s-gov-navy-100: #e8ecf1;
+    --s-gov-navy-50: #f4f6f8;
+    
+    /* アクセントカラー - 金 */
+    --s-gov-gold: #c9a227;
+    --s-gov-gold-light: #d4b77a;
+    --s-gov-gold-pale: #f0e6c8;
+    
+    /* セマンティックカラー */
+    --s-gov-green: #2e7d32;
+    --s-gov-green-light: #e8f5e9;
+    
+    /* ニュートラル */
+    --s-white: #ffffff;
+    --s-black: #1a1a1a;
+    --s-gray-900: #212529;
+    --s-gray-800: #343a40;
+    --s-gray-700: #495057;
+    --s-gray-600: #6c757d;
+    --s-gray-500: #adb5bd;
+    --s-gray-400: #ced4da;
+    --s-gray-300: #dee2e6;
+    --s-gray-200: #e9ecef;
+    --s-gray-100: #f8f9fa;
+    
+    /* タイポグラフィ */
+    --s-font-serif: "Shippori Mincho", "Yu Mincho", "YuMincho", "Hiragino Mincho ProN", serif;
+    --s-font-sans: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --s-font-mono: 'SF Mono', 'Monaco', 'Consolas', monospace;
+    
+    /* エフェクト */
+    --s-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    --s-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --s-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --s-shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
+    --s-radius: 4px;
+    --s-radius-lg: 8px;
+    
+    font-family: var(--s-font-sans);
+    color: var(--s-gray-900);
+    line-height: 1.7;
+}
+
+.search__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+@media (max-width: 640px) {
+    .search__container {
+        padding: 0 16px;
+    }
+}
+
+/* ==========================================================================
+   Stats Bar - 官公庁風統計バー
+   ========================================================================== */
+.search__stats-bar {
+    background: linear-gradient(135deg, var(--s-gov-navy-800) 0%, var(--s-gov-navy-900) 100%);
+    color: var(--s-white);
+    padding: 16px 0;
+    border-bottom: 3px solid var(--s-gov-gold);
+}
+
+.search__stats-inner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 32px;
+}
+
+.search__stat-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.search__stat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--s-gov-gold);
+}
+
+.search__stat-label {
+    font-family: var(--s-font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.search__stat-value {
+    font-family: var(--s-font-mono);
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--s-white);
+}
+
+.search__stat-unit {
+    font-size: 13px;
+    color: var(--s-gov-gold);
+    font-weight: 600;
+}
+
+.search__stat-date {
+    font-family: var(--s-font-mono);
+    font-size: 15px;
+    color: var(--s-white);
+    font-weight: 700;
+}
+
+.search__stat-divider {
+    width: 1px;
+    height: 28px;
+    background: linear-gradient(180deg, transparent 0%, rgba(197, 160, 89, 0.4) 50%, transparent 100%);
+}
+
+@media (max-width: 640px) {
+    .search__stats-bar {
+        padding: 12px 0;
+    }
+    
+    .search__stats-inner {
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+    
+    .search__stat-value {
+        font-size: 16px;
+    }
+    
+    .search__stat-unit,
+    .search__stat-date {
+        font-size: 12px;
+    }
+    
+    .search__stat-icon {
+        display: none;
+    }
+    
+    .search__stat-divider {
+        height: 20px;
+    }
+}
+
+/* ==========================================================================
+   Main Search Form
+   ========================================================================== */
+.search__main {
+    background: linear-gradient(180deg, var(--s-gov-navy-50) 0%, var(--s-white) 100%);
+    padding: 80px 0;
+    border-bottom: 1px solid var(--s-gray-200);
+}
+
+.search__header {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.search__header-sub {
+    font-family: var(--s-font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--s-gov-navy-500);
+    margin: 0 0 12px 0;
+}
+
+.search__header-title {
+    font-family: var(--s-font-serif);
+    font-size: clamp(24px, 5vw, 32px);
+    font-weight: 700;
+    color: var(--s-gov-navy-900);
+    margin: 0;
+    letter-spacing: 0.02em;
+}
+
+.search__form {
+    max-width: 900px;
+    margin: 0 auto;
+    background: var(--s-white);
+    padding: 40px;
+    border: 1px solid var(--s-gray-200);
+    border-radius: var(--s-radius-lg);
+    box-shadow: var(--s-shadow);
+}
+
+@media (max-width: 640px) {
+    .search__form {
+        padding: 24px 20px;
+    }
+}
+
+.search__form-row {
+    margin-bottom: 24px;
+}
+
+.search__form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.search__field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.search__label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--s-gov-navy-800);
+}
+
+.search__label--center {
+    text-align: center;
+}
+
+/* Radio Group */
+.search__radio-group {
+    display: flex;
+    gap: 12px;
+}
+
+.search__radio {
+    flex: 1;
+    cursor: pointer;
+}
+
+.search__radio-input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.search__radio-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 48px;
+    background: var(--s-white);
+    border: 1px solid var(--s-gray-300);
+    border-radius: var(--s-radius);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--s-gray-700);
+    transition: all var(--s-transition);
+}
+
+.search__radio-input:checked + .search__radio-label {
+    background: var(--s-gov-navy-800);
+    border-color: var(--s-gov-navy-800);
+    color: var(--s-white);
+}
+
+.search__radio-label:hover {
+    border-color: var(--s-gov-navy-400);
+}
+
+.search__radio-input:focus-visible + .search__radio-label {
+    outline: 3px solid var(--s-gov-gold);
+    outline-offset: 2px;
+}
+
+/* Select */
+.search__select-wrap {
+    position: relative;
+}
+
+.search__select-wrap::after {
+    content: '';
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    border: 5px solid transparent;
+    border-top-color: var(--s-gov-navy-700);
+    transform: translateY(-25%);
+    pointer-events: none;
+}
+
+.search__select {
+    width: 100%;
+    height: 56px;
+    padding: 0 40px 0 16px;
+    background: var(--s-white);
+    border: 1px solid var(--s-gray-300);
+    border-radius: var(--s-radius);
+    font-family: var(--s-font-sans);
+    font-size: 15px;
+    color: var(--s-gray-900);
+    cursor: pointer;
+    appearance: none;
+    transition: border-color var(--s-transition), box-shadow var(--s-transition);
+}
+
+.search__select:hover {
+    border-color: var(--s-gov-navy-400);
+}
+
+.search__select:focus {
+    outline: none;
+    border-color: var(--s-gov-navy-700);
+    box-shadow: 0 0 0 3px rgba(27, 38, 59, 0.1);
+}
+
+.search__select--lg {
+    height: 64px;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.search__select-wrap--lg {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* Spinner */
+.search__spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--s-gray-200);
+    border-top-color: var(--s-gov-navy-700);
+    border-radius: 50%;
+    animation: searchSpin 0.8s linear infinite;
+    position: absolute;
+    right: 40px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.search__spinner--lg {
+    width: 32px;
+    height: 32px;
+    border-width: 3px;
+    position: static;
+    transform: none;
+}
+
+@keyframes searchSpin {
+    to { transform: rotate(360deg); }
+}
+
+/* Input */
+.search__input {
+    width: 100%;
+    height: 56px;
+    padding: 0 16px;
+    background: var(--s-gov-navy-50);
+    border: 1px solid var(--s-gray-300);
+    border-radius: var(--s-radius);
+    font-family: var(--s-font-sans);
+    font-size: 15px;
+    color: var(--s-gray-900);
+    transition: all var(--s-transition);
+}
+
+.search__input::placeholder {
+    color: var(--s-gray-600);
+}
+
+.search__input:hover {
+    background: var(--s-white);
+    border-color: var(--s-gov-navy-400);
+}
+
+.search__input:focus {
+    outline: none;
+    background: var(--s-white);
+    border-color: var(--s-gov-navy-700);
+    box-shadow: 0 0 0 3px rgba(27, 38, 59, 0.1);
+}
+
+/* Actions */
+.search__actions {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 16px;
+    margin: 32px 0 24px;
+}
+
+@media (max-width: 480px) {
+    .search__actions {
+        grid-template-columns: 1fr;
+    }
+}
+
+.search__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 56px;
+    padding: 0 32px;
+    border-radius: var(--s-radius);
+    font-family: var(--s-font-sans);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--s-transition);
+    border: 2px solid transparent;
+}
+
+.search__btn--outline {
+    background: transparent;
+    border-color: var(--s-gray-300);
+    color: var(--s-gray-700);
+}
+
+.search__btn--outline:hover {
+    background: var(--s-gov-navy-50);
+    border-color: var(--s-gov-navy-400);
+    color: var(--s-gov-navy-800);
+}
+
+.search__btn--solid {
+    background: linear-gradient(135deg, var(--s-gov-navy-800) 0%, var(--s-gov-navy-900) 100%);
+    border-color: var(--s-gov-navy-800);
+    color: var(--s-white);
+}
+
+.search__btn--solid:hover {
+    background: linear-gradient(135deg, var(--s-gov-navy-900) 0%, var(--s-gov-navy-800) 100%);
+    transform: translateY(-2px);
+    box-shadow: var(--s-shadow-lg);
+}
+
+.search__btn:focus-visible {
+    outline: 3px solid var(--s-gov-gold);
+    outline-offset: 2px;
+}
+
+/* Sub Links */
+.search__sub-links {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.search__sub-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--s-gov-navy-600);
+    text-decoration: none;
+    transition: color var(--s-transition);
+}
+
+.search__sub-link:hover {
+    color: var(--s-gov-navy-900);
+}
+
+.search__sub-link:focus-visible {
+    outline: 2px solid var(--s-gov-gold);
+    outline-offset: 2px;
+}
+
+/* ==========================================================================
+   Sections
+   ========================================================================== */
+.search__section {
+    padding: 80px 0;
+}
+
+.search__section--alt {
+    background: var(--s-gov-navy-50);
+}
+
+.search__section-header {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.search__section-sub {
+    font-family: var(--s-font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--s-gov-navy-500);
+    margin: 0 0 8px 0;
+}
+
+.search__section-title {
+    font-family: var(--s-font-serif);
+    font-size: clamp(20px, 4vw, 26px);
+    font-weight: 700;
+    color: var(--s-gov-navy-900);
+    margin: 0;
+    position: relative;
+    display: inline-block;
+}
+
+.search__section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--s-gov-gold) 0%, var(--s-gov-gold-light) 100%);
+    border-radius: 2px;
+}
+
+/* ==========================================================================
+   Target Cards
+   ========================================================================== */
+.search__target-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.search__target-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 24px;
+    background: var(--s-white);
+    border: 1px solid var(--s-gray-200);
+    border-radius: var(--s-radius-lg);
+    text-decoration: none;
+    color: var(--s-gray-900);
+    transition: all var(--s-transition);
+}
+
+.search__target-card:hover {
+    border-color: var(--s-gov-navy-400);
+    transform: translateY(-4px);
+    box-shadow: var(--s-shadow-lg);
+}
+
+.search__target-card--featured {
+    border-left: 4px solid var(--s-gov-gold);
+}
+
+.search__target-icon {
+    flex-shrink: 0;
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--s-gov-navy-50);
+    border: 1px solid var(--s-gov-navy-100);
+    border-radius: 50%;
+    color: var(--s-gov-navy-700);
+    transition: all var(--s-transition);
+}
+
+.search__target-card:hover .search__target-icon {
+    background: var(--s-gov-navy-800);
+    border-color: var(--s-gov-navy-800);
+    color: var(--s-white);
+}
+
+.search__target-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.search__target-title {
+    font-family: var(--s-font-serif);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--s-gov-navy-900);
+    margin: 0 0 4px 0;
+}
+
+.search__target-desc {
+    font-size: 13px;
+    color: var(--s-gray-600);
+    margin: 0;
+}
+
+.search__target-arrow {
+    flex-shrink: 0;
+    color: var(--s-gray-400);
+    transition: all var(--s-transition);
+}
+
+.search__target-card:hover .search__target-arrow {
+    color: var(--s-gov-navy-700);
+    transform: translateX(4px);
+}
+
+/* ==========================================================================
+   Category Groups
+   ========================================================================== */
+.search__category-groups {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
+}
+
+.search__category-card {
+    background: var(--s-white);
+    border: 1px solid var(--s-gray-200);
+    border-radius: var(--s-radius-lg);
+    overflow: hidden;
+    transition: border-color var(--s-transition);
+}
+
+.search__category-card:hover {
+    border-color: var(--s-gov-navy-300);
+}
+
+.search__category-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px;
+    background: var(--s-gov-navy-50);
+    border-bottom: 2px solid var(--s-gov-navy-800);
+}
+
+.search__category-card-icon {
+    flex-shrink: 0;
+    color: var(--s-gov-navy-600);
+}
+
+.search__category-card-titles {
+    flex: 1;
+}
+
+.search__category-card-name {
+    font-family: var(--s-font-serif);
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--s-gov-navy-900);
+    margin: 0;
+    line-height: 1.3;
+}
+
+.search__category-card-name-en {
+    font-family: var(--s-font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--s-gov-navy-400);
+}
+
+.search__category-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.search__category-item {
+    border-bottom: 1px solid var(--s-gray-100);
+}
+
+.search__category-item:last-child {
+    border-bottom: none;
+}
+
+.search__category-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 20px;
+    text-decoration: none;
+    color: var(--s-gray-700);
+    font-size: 14px;
+    font-weight: 500;
+    transition: all var(--s-transition);
+}
+
+.search__category-link:hover {
+    background: var(--s-gov-navy-50);
+    padding-left: 24px;
+    color: var(--s-gov-navy-900);
+}
+
+.search__category-count {
+    font-family: var(--s-font-mono);
+    font-size: 12px;
+    color: var(--s-gray-500);
+    background: var(--s-gray-100);
+    padding: 2px 8px;
+    border-radius: 12px;
+}
+
+/* ==========================================================================
+   Pills & Filter
+   ========================================================================== */
+.search__filter-box {
+    max-width: 500px;
+    margin: 0 auto 40px;
+}
+
+.search__filter-input {
+    width: 100%;
+    height: 52px;
+    padding: 0 24px;
+    background: var(--s-white);
+    border: 1px solid var(--s-gray-300);
+    border-radius: 26px;
+    font-family: var(--s-font-sans);
+    font-size: 14px;
+    text-align: center;
+    transition: all var(--s-transition);
+}
+
+.search__filter-input:focus {
+    outline: none;
+    border-color: var(--s-gov-navy-700);
+    box-shadow: 0 0 0 3px rgba(27, 38, 59, 0.1);
+}
+
+.search__pill-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.search__pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: var(--s-white);
+    border: 1px solid var(--s-gray-200);
+    border-radius: var(--s-radius);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--s-gray-700);
+    text-decoration: none;
+    transition: all var(--s-transition);
+}
+
+.search__pill:hover {
+    background: var(--s-gov-navy-800);
+    border-color: var(--s-gov-navy-800);
+    color: var(--s-white);
+}
+
+.search__pill-text {
+    font-weight: 600;
+}
+
+.search__pill-count {
+    font-family: var(--s-font-mono);
+    font-size: 11px;
+    opacity: 0.7;
+}
+
+.search__pill--tag {
+    background: var(--s-gov-navy-50);
+    border-color: var(--s-gov-navy-100);
+}
+
+.search__pill--tag:hover {
+    background: var(--s-gov-navy-800);
+    border-color: var(--s-gov-navy-800);
+}
+
+/* Collapse */
+.search__collapse {
+    text-align: center;
+    margin-top: 32px;
+}
+
+.search__collapse-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    background: none;
+    border: none;
+    border-bottom: 2px solid var(--s-gov-navy-800);
+    font-family: var(--s-font-sans);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--s-gov-navy-800);
+    cursor: pointer;
+    transition: opacity var(--s-transition);
+}
+
+.search__collapse-btn:hover {
+    opacity: 0.7;
+}
+
+.search__collapse-btn[aria-expanded="true"] svg {
+    transform: rotate(180deg);
+}
+
+.search__collapse-content {
+    margin-top: 24px;
+    animation: searchSlideDown 0.3s ease-out;
+}
+
+@keyframes searchSlideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.search__no-result {
+    text-align: center;
+    padding: 24px;
+    color: var(--s-gray-600);
+    font-size: 14px;
+}
+
+/* ==========================================================================
+   Region Grid
+   ========================================================================== */
+.search__region-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.search__region-card {
+    background: var(--s-white);
+    border: 1px solid var(--s-gray-200);
+    border-radius: var(--s-radius-lg);
+    padding: 24px;
+    transition: border-color var(--s-transition);
+}
+
+.search__region-card:hover {
+    border-color: var(--s-gov-navy-300);
+}
+
+.search__region-header {
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--s-gov-navy-200);
+}
+
+.search__region-name {
+    font-family: var(--s-font-serif);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--s-gov-navy-900);
+    margin: 0 0 4px 0;
+}
+
+.search__region-name-en {
+    font-family: var(--s-font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--s-gov-navy-400);
+}
+
+.search__region-prefs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.search__region-pref {
+    padding: 8px 14px;
+    background: var(--s-gov-navy-50);
+    border: 1px solid var(--s-gov-navy-100);
+    border-radius: var(--s-radius);
+    font-size: 13px;
+    color: var(--s-gov-navy-700);
+    text-decoration: none;
+    transition: all var(--s-transition);
+}
+
+.search__region-pref:hover {
+    background: var(--s-gov-navy-800);
+    border-color: var(--s-gov-navy-800);
+    color: var(--s-white);
+}
+
+/* ==========================================================================
+   Municipality Search
+   ========================================================================== */
+.search__municipality-interface {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.search__municipality-control {
+    margin-bottom: 32px;
+    text-align: center;
+}
+
+.search__municipality-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 40px;
+    color: var(--s-gray-600);
+    font-size: 14px;
+}
+
+.search__municipality-grid {
+    min-height: 200px;
+}
+
+.search__municipality-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    background: var(--s-white);
+    border: 2px dashed var(--s-gray-300);
+    border-radius: var(--s-radius-lg);
+    text-align: center;
+}
+
+.search__placeholder-icon {
+    color: var(--s-gray-400);
+    margin-bottom: 16px;
+}
+
+.search__placeholder-text {
+    font-size: 14px;
+    color: var(--s-gray-600);
+    line-height: 1.7;
+    margin: 0;
+}
+
+.search__municipality-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+}
+
+.search__municipality-link {
+    display: block;
+    padding: 12px;
+    background: var(--s-white);
+    border: 1px solid var(--s-gray-200);
+    border-radius: var(--s-radius);
+    font-size: 13px;
+    color: var(--s-gray-700);
+    text-decoration: none;
+    text-align: center;
+    transition: all var(--s-transition);
+}
+
+.search__municipality-link:hover {
+    background: var(--s-gov-navy-800);
+    border-color: var(--s-gov-navy-800);
+    color: var(--s-white);
+}
+
+/* ==========================================================================
+   Trust Bar
+   ========================================================================== */
+.search__trust-bar {
+    background: var(--s-gov-navy-50);
+    padding: 20px 0;
+    border-top: 1px solid var(--s-gov-navy-100);
+    border-bottom: 1px solid var(--s-gov-navy-100);
+}
+
+.search__trust-text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--s-gov-navy-700);
+    margin: 0;
+    text-align: center;
+    line-height: 1.6;
+}
+
+.search__trust-text svg {
+    flex-shrink: 0;
+    color: var(--s-gov-gold);
+}
+
+@media (max-width: 640px) {
+    .search__trust-text {
+        flex-direction: column;
+        gap: 8px;
+    }
+}
+
+/* ==========================================================================
+   CTA Section
+   ========================================================================== */
+.search__cta {
+    background: linear-gradient(135deg, var(--s-gov-navy-800) 0%, var(--s-gov-navy-900) 100%);
+    padding: 100px 0;
+    position: relative;
+}
+
+.search__cta::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--s-gov-gold) 0%, var(--s-gov-gold-light) 50%, var(--s-gov-gold) 100%);
+}
+
+.search__cta-card {
+    max-width: 700px;
+    margin: 0 auto;
+    text-align: center;
+    color: var(--s-white);
+}
+
+.search__cta-icon {
+    margin-bottom: 24px;
+    color: var(--s-gov-gold);
+}
+
+.search__cta-title {
+    font-family: var(--s-font-serif);
+    font-size: clamp(24px, 5vw, 36px);
+    font-weight: 700;
+    margin: 0 0 16px 0;
+    letter-spacing: 0.02em;
+}
+
+.search__cta-desc {
+    font-size: 15px;
+    color: var(--s-gov-navy-200);
+    margin: 0 0 40px 0;
+    line-height: 1.9;
+}
+
+.search__cta-br {
+    display: none;
+}
+
+@media (min-width: 640px) {
+    .search__cta-br {
+        display: inline;
+    }
+}
+
+.search__cta-btns {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+}
+
+.search__cta-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    height: 56px;
+    padding: 0 32px;
+    border-radius: var(--s-radius);
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all var(--s-transition);
+    min-width: 220px;
+    border: 2px solid transparent;
+}
+
+.search__cta-btn--primary {
+    background: var(--s-white);
+    color: var(--s-gov-navy-900);
+    border-color: var(--s-white);
+}
+
+.search__cta-btn--primary:hover {
+    background: var(--s-gov-gold-pale);
+    border-color: var(--s-gov-gold);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.search__cta-btn--secondary {
+    background: transparent;
+    border-color: var(--s-gov-navy-400);
+    color: var(--s-white);
+}
+
+.search__cta-btn--secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--s-white);
+    transform: translateY(-3px);
+}
+
+.search__cta-note {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--s-gov-navy-300);
+    margin: 0;
+}
+
+.search__cta-note svg {
+    color: var(--s-gov-gold);
+}
+
+@media (max-width: 640px) {
+    .search__cta {
+        padding: 60px 0;
+    }
+    
+    .search__cta-btns {
+        flex-direction: column;
+    }
+    
+    .search__cta-btn {
+        width: 100%;
+    }
+}
+
+/* ==========================================================================
+   Accessibility
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+    .search *,
+    .search *::before,
+    .search *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+.search a:focus-visible,
+.search button:focus-visible,
+.search input:focus-visible,
+.search select:focus-visible {
+    outline: 3px solid var(--s-gov-gold);
+    outline-offset: 2px;
+}
+
+/* Print */
+@media print {
+    .search__stats-bar,
+    .search__cta,
+    .search__trust-bar,
+    .search__municipality-interface {
+        display: none !important;
+    }
+    
+    .search {
+        color: #000;
+    }
+    
+    .search__section {
+        padding: 24px 0;
+    }
+}
+
+/* 強制表示 */
+.search,
+.search__container,
+.search__form {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}

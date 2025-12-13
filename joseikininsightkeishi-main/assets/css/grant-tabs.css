@@ -1,0 +1,1100 @@
+/* ==========================================================================
+   Ultimate UI Grant & Column Section - Government Official Design v54.0
+   官公庁風デザイン - 濃紺×金カラースキーム
+   ========================================================================== */
+
+/* ==========================================================================
+   Design System - CSS Variables (官公庁統一)
+   ========================================================================== */
+:root {
+    /* 官公庁カラーパレット - メイン */
+    --ui-gov-navy-900: #0d1b2a;
+    --ui-gov-navy-800: #1b263b;
+    --ui-gov-navy-700: #2c3e50;
+    --ui-gov-navy-600: #34495e;
+    --ui-gov-navy-500: #415a77;
+    --ui-gov-navy-400: #778da9;
+    --ui-gov-navy-300: #a3b1c6;
+    --ui-gov-navy-200: #cfd8e3;
+    --ui-gov-navy-100: #e8ecf1;
+    --ui-gov-navy-50: #f4f6f8;
+    
+    /* アクセントカラー - 金 */
+    --ui-gov-gold: #c9a227;
+    --ui-gov-gold-light: #d4b77a;
+    --ui-gov-gold-pale: #f0e6c8;
+    
+    /* セマンティックカラー */
+    --ui-gov-green: #2e7d32;
+    --ui-gov-green-light: #e8f5e9;
+    --ui-gov-red: #c62828;
+    --ui-gov-red-light: #ffebee;
+    
+    /* ニュートラル */
+    --ui-white: #ffffff;
+    --ui-black: #1a1a1a;
+    --ui-gray-900: #212529;
+    --ui-gray-800: #343a40;
+    --ui-gray-700: #495057;
+    --ui-gray-600: #6c757d;
+    --ui-gray-500: #adb5bd;
+    --ui-gray-400: #ced4da;
+    --ui-gray-300: #dee2e6;
+    --ui-gray-200: #e9ecef;
+    --ui-gray-100: #f8f9fa;
+    
+    /* タイポグラフィ */
+    --ui-font-serif: "Shippori Mincho", "Yu Mincho", "YuMincho", "Hiragino Mincho ProN", serif;
+    --ui-font-sans: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --ui-font-mono: 'SF Mono', 'Monaco', 'Cascadia Code', 'Courier New', monospace;
+    
+    /* Font Sizes */
+    --ui-text-xs: 11px;
+    --ui-text-sm: 12px;
+    --ui-text-base: 14px;
+    --ui-text-md: 15px;
+    --ui-text-lg: 16px;
+    --ui-text-xl: 18px;
+    --ui-text-2xl: 20px;
+    --ui-text-3xl: 24px;
+    --ui-text-4xl: 32px;
+    
+    /* Spacing */
+    --ui-space-1: 4px;
+    --ui-space-2: 8px;
+    --ui-space-3: 12px;
+    --ui-space-4: 16px;
+    --ui-space-5: 20px;
+    --ui-space-6: 24px;
+    --ui-space-8: 32px;
+    --ui-space-10: 40px;
+    --ui-space-12: 48px;
+    --ui-space-15: 60px;
+    --ui-space-20: 80px;
+    --ui-space-25: 100px;
+    
+    /* Layout */
+    --ui-container-max: 1200px;
+    --ui-radius: 4px;
+    --ui-radius-lg: 8px;
+    
+    /* Shadows */
+    --ui-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --ui-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --ui-shadow-md: 0 6px 16px rgba(0, 0, 0, 0.12);
+    --ui-shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
+    
+    /* Transitions */
+    --ui-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    --ui-transition-slow: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ==========================================================================
+   Base Styles
+   ========================================================================== */
+.ui-section {
+    background: linear-gradient(180deg, var(--ui-gov-navy-50) 0%, var(--ui-white) 100%);
+    color: var(--ui-gray-900);
+    font-family: var(--ui-font-sans);
+    padding: var(--ui-space-25) 0;
+    line-height: 1.7;
+    font-size: var(--ui-text-base);
+    position: relative;
+    border-bottom: 1px solid var(--ui-gray-200);
+}
+
+/* 上部アクセントライン（官公庁風） */
+.ui-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--ui-gov-navy-800) 0%, var(--ui-gov-gold) 50%, var(--ui-gov-navy-800) 100%);
+    z-index: 10;
+}
+
+.ui-container {
+    max-width: var(--ui-container-max);
+    margin: 0 auto;
+    padding: 0 var(--ui-space-6);
+}
+
+/* Reset */
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+ul, ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+h2, h3, h4, p, dl, dt, dd {
+    margin: 0;
+}
+
+figure {
+    margin: 0;
+}
+
+/* ==========================================================================
+   Header
+   ========================================================================== */
+.ui-header {
+    text-align: center;
+    margin-bottom: var(--ui-space-15);
+}
+
+.ui-title {
+    font-family: var(--ui-font-mono);
+    font-size: var(--ui-text-xs);
+    letter-spacing: 0.15em;
+    font-weight: 700;
+    color: var(--ui-gov-navy-500);
+    margin-bottom: var(--ui-space-3);
+    text-transform: uppercase;
+}
+
+.ui-subtitle {
+    font-family: var(--ui-font-serif);
+    font-size: clamp(24px, 5vw, var(--ui-text-4xl));
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--ui-gov-navy-900);
+    margin-bottom: var(--ui-space-4);
+    position: relative;
+    display: inline-block;
+}
+
+.ui-subtitle::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--ui-gov-gold) 0%, var(--ui-gov-gold-light) 100%);
+    border-radius: 2px;
+}
+
+.ui-description {
+    font-size: var(--ui-text-md);
+    color: var(--ui-gray-700);
+    line-height: 1.9;
+    margin-top: var(--ui-space-6);
+}
+
+.ui-count-emphasis {
+    color: var(--ui-gov-navy-900);
+    font-weight: 700;
+}
+
+.ui-sp-only {
+    display: none;
+}
+
+/* ==========================================================================
+   Tabs Navigation
+   ========================================================================== */
+.ui-tabs-wrapper {
+    border-bottom: 2px solid var(--ui-gov-navy-800);
+    margin-bottom: var(--ui-space-10);
+    background: var(--ui-white);
+}
+
+.ui-tabs-nav {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+}
+
+.ui-tab-btn {
+    background: transparent;
+    border: none;
+    padding: var(--ui-space-5) var(--ui-space-10);
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--ui-gray-600);
+    transition: all var(--ui-transition);
+    font-family: inherit;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+}
+
+.ui-tab-btn:hover {
+    color: var(--ui-gov-navy-800);
+    background: var(--ui-gov-navy-50);
+}
+
+.ui-tab-btn:focus-visible {
+    outline: 3px solid var(--ui-gov-gold);
+    outline-offset: -3px;
+}
+
+.ui-tab-btn.active {
+    color: var(--ui-gov-navy-900);
+    background: var(--ui-gov-navy-50);
+    border-bottom-color: var(--ui-gov-gold);
+}
+
+.ui-tab-en {
+    font-family: var(--ui-font-mono);
+    font-weight: 700;
+    font-size: var(--ui-text-xs);
+    letter-spacing: 0.1em;
+    margin-bottom: var(--ui-space-1);
+}
+
+.ui-tab-ja {
+    font-family: var(--ui-font-serif);
+    font-size: var(--ui-text-md);
+    font-weight: 700;
+}
+
+.ui-tab-count {
+    position: absolute;
+    top: var(--ui-space-2);
+    right: var(--ui-space-5);
+    font-size: var(--ui-text-xs);
+    color: var(--ui-gov-navy-400);
+    font-family: var(--ui-font-mono);
+    background: var(--ui-gov-navy-100);
+    padding: 2px 6px;
+    border-radius: 10px;
+}
+
+.ui-tab-btn.active .ui-tab-count {
+    background: var(--ui-gov-gold);
+    color: var(--ui-gov-navy-900);
+}
+
+/* ==========================================================================
+   Panels
+   ========================================================================== */
+.ui-panels-container {
+    margin-bottom: var(--ui-space-20);
+}
+
+.ui-panel {
+    display: none;
+}
+
+.ui-panel.active {
+    display: block;
+    animation: fadeIn 0.5s var(--ui-transition-slow);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(var(--ui-space-2));
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==========================================================================
+   Sub Sections
+   ========================================================================== */
+.ui-sub-section {
+    margin-bottom: var(--ui-space-15);
+    background: var(--ui-white);
+    border: 1px solid var(--ui-gray-200);
+    border-radius: var(--ui-radius-lg);
+    padding: var(--ui-space-8);
+    box-shadow: var(--ui-shadow-sm);
+}
+
+.ui-sub-header {
+    margin-bottom: var(--ui-space-6);
+    padding-bottom: var(--ui-space-4);
+    border-bottom: 2px solid var(--ui-gov-navy-800);
+}
+
+.ui-sub-title {
+    font-family: var(--ui-font-serif);
+    font-size: var(--ui-text-xl);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: var(--ui-space-3);
+    color: var(--ui-gov-navy-900);
+    margin-bottom: var(--ui-space-2);
+}
+
+.ui-sub-description {
+    font-size: var(--ui-text-sm);
+    color: var(--ui-gray-600);
+    padding-left: calc(10px + var(--ui-space-3));
+}
+
+.ui-icon-dot {
+    width: 10px;
+    height: 10px;
+    background: linear-gradient(135deg, var(--ui-gov-gold) 0%, var(--ui-gov-gold-light) 100%);
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Layout Helpers
+   ========================================================================== */
+.ui-dual-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--ui-space-8);
+}
+
+.ui-dual-columns .ui-sub-section {
+    margin-bottom: 0;
+}
+
+.ui-grid-featured {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--ui-space-6);
+}
+
+.ui-grid-columns {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--ui-space-6);
+}
+
+/* ==========================================================================
+   Cards
+   ========================================================================== */
+.ui-card {
+    background: var(--ui-white);
+    border: 1px solid var(--ui-gray-200);
+    border-radius: var(--ui-radius-lg);
+    transition: all var(--ui-transition);
+    overflow: hidden;
+}
+
+.ui-card:hover {
+    border-color: var(--ui-gov-navy-400);
+    transform: translateY(-4px);
+    box-shadow: var(--ui-shadow-lg);
+}
+
+.ui-card-link {
+    display: block;
+    height: 100%;
+}
+
+.ui-card-link:focus-visible {
+    outline: 3px solid var(--ui-gov-gold);
+    outline-offset: 2px;
+}
+
+.ui-card-body {
+    padding: var(--ui-space-6);
+}
+
+/* Featured Card */
+.ui-card-featured {
+    border-left: 4px solid var(--ui-gov-gold);
+}
+
+.ui-card-featured .ui-card-labels {
+    display: flex;
+    gap: var(--ui-space-2);
+    margin-bottom: var(--ui-space-4);
+}
+
+.ui-label {
+    font-size: var(--ui-text-xs);
+    font-weight: 700;
+    padding: var(--ui-space-1) var(--ui-space-3);
+    border-radius: var(--ui-radius);
+}
+
+.ui-label-featured {
+    background: linear-gradient(135deg, var(--ui-gov-navy-800) 0%, var(--ui-gov-navy-900) 100%);
+    color: var(--ui-white);
+}
+
+.ui-label-urgent {
+    background: var(--ui-gov-red-light);
+    border: 1px solid var(--ui-gov-red);
+    color: var(--ui-gov-red);
+}
+
+.ui-card-title {
+    font-family: var(--ui-font-serif);
+    font-size: var(--ui-text-lg);
+    font-weight: 700;
+    line-height: 1.5;
+    margin-bottom: var(--ui-space-4);
+    color: var(--ui-gov-navy-900);
+    min-height: calc(var(--ui-text-lg) * 1.5 * 2);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.ui-card-meta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ui-space-2);
+}
+
+.ui-card-meta-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--ui-text-sm);
+    padding-bottom: var(--ui-space-2);
+    border-bottom: 1px dashed var(--ui-gray-300);
+}
+
+.ui-card-meta-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.ui-card-meta-item dt {
+    color: var(--ui-gray-600);
+}
+
+.ui-card-meta-item dd {
+    font-weight: 700;
+    font-family: var(--ui-font-mono);
+    color: var(--ui-gov-navy-900);
+}
+
+/* Column Card */
+.ui-card-column .ui-card-image {
+    aspect-ratio: 16/9;
+    background: var(--ui-gov-navy-50);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid var(--ui-gray-200);
+}
+
+.ui-card-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--ui-transition-slow);
+}
+
+.ui-card:hover .ui-card-thumb {
+    transform: scale(1.05);
+}
+
+.ui-card-no-image {
+    background: var(--ui-gov-navy-100);
+}
+
+.ui-no-image-text {
+    color: var(--ui-gov-navy-300);
+    font-size: var(--ui-text-sm);
+    font-weight: 700;
+    font-family: var(--ui-font-mono);
+}
+
+.ui-card-column .ui-card-body {
+    padding: var(--ui-space-5);
+}
+
+.ui-card-column .ui-card-title {
+    font-size: var(--ui-text-md);
+    min-height: calc(var(--ui-text-md) * 1.5 * 2);
+}
+
+.ui-card-date {
+    font-size: var(--ui-text-sm);
+    color: var(--ui-gray-600);
+    display: block;
+    margin-bottom: var(--ui-space-2);
+    font-family: var(--ui-font-mono);
+}
+
+/* ==========================================================================
+   List Items
+   ========================================================================== */
+.ui-list-group {
+    border-top: 2px solid var(--ui-gov-navy-200);
+}
+
+.ui-list-item {
+    border-bottom: 1px solid var(--ui-gray-200);
+    transition: background var(--ui-transition);
+}
+
+.ui-list-item:hover {
+    background: var(--ui-gov-navy-50);
+}
+
+.ui-list-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--ui-space-5) var(--ui-space-4);
+    gap: var(--ui-space-5);
+}
+
+.ui-list-link:focus-visible {
+    outline: 3px solid var(--ui-gov-gold);
+    outline-offset: -3px;
+}
+
+.ui-list-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.ui-list-title {
+    font-family: var(--ui-font-serif);
+    font-size: var(--ui-text-md);
+    font-weight: 600;
+    margin-bottom: var(--ui-space-2);
+    line-height: 1.5;
+    color: var(--ui-gov-navy-900);
+}
+
+.ui-list-date {
+    font-size: var(--ui-text-sm);
+    color: var(--ui-gray-600);
+    font-family: var(--ui-font-mono);
+}
+
+.ui-list-date-urgent {
+    color: var(--ui-gov-red);
+    font-weight: 700;
+    background: var(--ui-gov-red-light);
+    padding: var(--ui-space-1) var(--ui-space-2);
+    border-radius: var(--ui-radius);
+    display: inline-block;
+}
+
+.ui-list-date-urgent strong {
+    font-size: var(--ui-text-lg);
+}
+
+.ui-list-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--ui-space-3);
+    font-size: var(--ui-text-sm);
+}
+
+.ui-list-views {
+    color: var(--ui-gov-navy-600);
+    font-weight: 600;
+    font-family: var(--ui-font-mono);
+    background: var(--ui-gov-navy-100);
+    padding: var(--ui-space-1) var(--ui-space-2);
+    border-radius: var(--ui-radius);
+}
+
+.ui-list-header {
+    display: flex;
+    align-items: center;
+    gap: var(--ui-space-3);
+    margin-bottom: var(--ui-space-2);
+}
+
+.ui-list-category {
+    background: var(--ui-gov-navy-800);
+    color: var(--ui-white);
+    font-size: var(--ui-text-xs);
+    padding: var(--ui-space-1) var(--ui-space-3);
+    font-weight: 700;
+    border-radius: var(--ui-radius);
+}
+
+.ui-list-arrow {
+    font-family: var(--ui-font-sans);
+    font-weight: 300;
+    flex-shrink: 0;
+    transition: all var(--ui-transition);
+    font-size: var(--ui-text-xl);
+    color: var(--ui-gov-navy-400);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--ui-gov-navy-50);
+}
+
+.ui-list-link:hover .ui-list-arrow {
+    transform: translateX(var(--ui-space-1));
+    background: var(--ui-gov-navy-800);
+    color: var(--ui-white);
+}
+
+/* ==========================================================================
+   More Button
+   ========================================================================== */
+.ui-more-container {
+    margin-top: var(--ui-space-6);
+    text-align: right;
+    padding-top: var(--ui-space-4);
+    border-top: 1px solid var(--ui-gray-200);
+}
+
+.ui-btn-more {
+    font-family: var(--ui-font-mono);
+    font-size: var(--ui-text-sm);
+    font-weight: 700;
+    color: var(--ui-gov-navy-800);
+    border-bottom: 2px solid var(--ui-gov-gold);
+    padding-bottom: 4px;
+    transition: all var(--ui-transition);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--ui-space-2);
+    letter-spacing: 0.05em;
+}
+
+.ui-btn-more::after {
+    content: '→';
+    transition: transform var(--ui-transition);
+}
+
+.ui-btn-more:hover {
+    color: var(--ui-gov-navy-600);
+    border-color: var(--ui-gov-navy-600);
+}
+
+.ui-btn-more:hover::after {
+    transform: translateX(4px);
+}
+
+.ui-btn-more:focus-visible {
+    outline: 3px solid var(--ui-gov-gold);
+    outline-offset: 4px;
+}
+
+/* ==========================================================================
+   Ranking Section
+   ========================================================================== */
+.ui-ranking-section {
+    margin-top: var(--ui-space-20);
+    padding: var(--ui-space-15) 0;
+    background: linear-gradient(135deg, var(--ui-gov-navy-800) 0%, var(--ui-gov-navy-900) 100%);
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+    padding-left: calc(50vw - 50%);
+    padding-right: calc(50vw - 50%);
+    position: relative;
+}
+
+.ui-ranking-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--ui-gov-gold) 0%, var(--ui-gov-gold-light) 50%, var(--ui-gov-gold) 100%);
+}
+
+.ui-ranking-main-header {
+    text-align: center;
+    margin-bottom: var(--ui-space-12);
+    color: var(--ui-white);
+}
+
+.ui-ranking-main-title {
+    font-family: var(--ui-font-mono);
+    font-size: var(--ui-text-3xl);
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    margin-bottom: var(--ui-space-2);
+    color: var(--ui-white);
+}
+
+.ui-ranking-main-description {
+    font-size: var(--ui-text-base);
+    color: var(--ui-gov-navy-300);
+}
+
+.ui-ranking-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--ui-space-10);
+    max-width: var(--ui-container-max);
+    margin: 0 auto;
+}
+
+.ui-ranking-col {
+    background: var(--ui-white);
+    border-radius: var(--ui-radius-lg);
+    padding: var(--ui-space-8);
+    box-shadow: var(--ui-shadow-lg);
+}
+
+.ui-ranking-header {
+    margin-bottom: var(--ui-space-6);
+    padding-bottom: var(--ui-space-4);
+    border-bottom: 2px solid var(--ui-gov-gold);
+}
+
+.ui-ranking-title {
+    font-family: var(--ui-font-mono);
+    font-size: var(--ui-text-lg);
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    margin-bottom: var(--ui-space-1);
+    color: var(--ui-gov-navy-900);
+}
+
+.ui-ranking-subtitle {
+    font-size: var(--ui-text-sm);
+    color: var(--ui-gray-600);
+}
+
+.ui-ranking-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ui-space-3);
+    counter-reset: ranking;
+}
+
+.ui-ranking-item {
+    padding-bottom: var(--ui-space-3);
+    border-bottom: 1px solid var(--ui-gray-200);
+}
+
+.ui-ranking-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.ui-ranking-link {
+    display: flex;
+    align-items: center;
+    gap: var(--ui-space-4);
+    transition: all var(--ui-transition);
+    padding: var(--ui-space-2);
+    margin: calc(var(--ui-space-2) * -1);
+    border-radius: var(--ui-radius);
+}
+
+.ui-ranking-link:hover {
+    background: var(--ui-gov-navy-50);
+}
+
+.ui-ranking-link:focus-visible {
+    outline: 3px solid var(--ui-gov-gold);
+    outline-offset: 2px;
+}
+
+.ui-ranking-number {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--ui-font-mono);
+    font-size: var(--ui-text-lg);
+    font-weight: 900;
+    color: var(--ui-gov-navy-300);
+    background: var(--ui-gray-100);
+    border-radius: 50%;
+    transition: all var(--ui-transition);
+}
+
+.ui-ranking-link:hover .ui-ranking-number {
+    color: var(--ui-gov-navy-800);
+    background: var(--ui-gov-navy-200);
+}
+
+.rank-1 .ui-ranking-number {
+    background: linear-gradient(135deg, var(--ui-gov-gold) 0%, var(--ui-gov-gold-light) 100%);
+    color: var(--ui-gov-navy-900);
+}
+
+.rank-2 .ui-ranking-number {
+    background: var(--ui-gov-navy-300);
+    color: var(--ui-gov-navy-900);
+}
+
+.rank-3 .ui-ranking-number {
+    background: var(--ui-gov-navy-400);
+    color: var(--ui-white);
+}
+
+.ui-ranking-text {
+    flex: 1;
+    font-family: var(--ui-font-serif);
+    font-size: var(--ui-text-base);
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--ui-gov-navy-900);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+/* ==========================================================================
+   Empty State
+   ========================================================================== */
+.ui-empty-state {
+    text-align: center;
+    padding: var(--ui-space-12) var(--ui-space-6);
+    color: var(--ui-gray-600);
+    font-size: var(--ui-text-base);
+    background: var(--ui-gov-navy-50);
+    border: 2px dashed var(--ui-gov-navy-200);
+    border-radius: var(--ui-radius-lg);
+}
+
+.ui-empty-state-sm {
+    text-align: center;
+    padding: var(--ui-space-8) var(--ui-space-5);
+    color: var(--ui-gray-600);
+    font-size: var(--ui-text-sm);
+    background: var(--ui-gov-navy-50);
+    border: 2px dashed var(--ui-gov-navy-200);
+    border-radius: var(--ui-radius);
+}
+
+/* ==========================================================================
+   Responsive Design
+   ========================================================================== */
+
+/* Tablet (768px以下) */
+@media (max-width: 768px) {
+    .ui-section {
+        padding: var(--ui-space-15) 0;
+    }
+    
+    .ui-container {
+        padding: 0 var(--ui-space-4);
+    }
+    
+    .ui-sp-only {
+        display: inline;
+    }
+    
+    .ui-subtitle {
+        font-size: var(--ui-text-3xl);
+    }
+    
+    .ui-description {
+        font-size: var(--ui-text-base);
+    }
+    
+    /* Tabs - Horizontal Scroll */
+    .ui-tabs-wrapper {
+        margin: 0 calc(var(--ui-space-4) * -1) var(--ui-space-8);
+        padding: 0 var(--ui-space-4);
+    }
+    
+    .ui-tabs-nav {
+        justify-content: flex-start;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+    
+    .ui-tabs-nav::-webkit-scrollbar {
+        display: none;
+    }
+    
+    .ui-tab-btn {
+        padding: var(--ui-space-4) var(--ui-space-5);
+        flex-shrink: 0;
+    }
+    
+    /* Stack Columns */
+    .ui-dual-columns {
+        grid-template-columns: 1fr;
+        gap: var(--ui-space-6);
+    }
+    
+    .ui-ranking-grid {
+        grid-template-columns: 1fr;
+        gap: var(--ui-space-6);
+    }
+    
+    /* Sub Section */
+    .ui-sub-section {
+        padding: var(--ui-space-6);
+        margin-bottom: var(--ui-space-6);
+    }
+    
+    /* Horizontal Scroll for Cards */
+    .ui-grid-featured,
+    .ui-grid-columns {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        gap: var(--ui-space-4);
+        padding-bottom: var(--ui-space-4);
+        margin-right: calc(var(--ui-space-4) * -1);
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+    
+    .ui-grid-featured::-webkit-scrollbar,
+    .ui-grid-columns::-webkit-scrollbar {
+        display: none;
+    }
+    
+    .ui-grid-featured .ui-card,
+    .ui-grid-columns .ui-card {
+        min-width: 280px;
+        scroll-snap-align: start;
+    }
+    
+    .ui-ranking-section {
+        margin-top: var(--ui-space-10);
+        padding: var(--ui-space-10) var(--ui-space-4);
+    }
+    
+    .ui-ranking-col {
+        padding: var(--ui-space-6);
+    }
+    
+    .ui-list-title {
+        font-size: var(--ui-text-base);
+    }
+    
+    .ui-list-link {
+        padding: var(--ui-space-4) var(--ui-space-2);
+    }
+}
+
+/* Small Mobile (480px以下) */
+@media (max-width: 480px) {
+    .ui-subtitle {
+        font-size: var(--ui-text-2xl);
+    }
+    
+    .ui-subtitle::after {
+        width: 60px;
+        height: 3px;
+    }
+    
+    .ui-grid-featured .ui-card,
+    .ui-grid-columns .ui-card {
+        min-width: 260px;
+    }
+    
+    .ui-card-title {
+        font-size: var(--ui-text-md);
+    }
+    
+    .ui-ranking-main-title {
+        font-size: var(--ui-text-xl);
+    }
+    
+    .ui-ranking-number {
+        width: 32px;
+        height: 32px;
+        font-size: var(--ui-text-base);
+    }
+}
+
+/* ==========================================================================
+   Print Styles
+   ========================================================================== */
+@media print {
+    .ui-section::before,
+    .ui-tabs-wrapper,
+    .ui-ranking-section,
+    .ui-btn-more {
+        display: none;
+    }
+    
+    .ui-section {
+        background: white;
+        padding: 24px 0;
+    }
+    
+    .ui-panel {
+        display: block;
+    }
+    
+    .ui-card,
+    .ui-list-item {
+        page-break-inside: avoid;
+        border: 1px solid #000;
+    }
+    
+    .ui-sub-section {
+        box-shadow: none;
+        border: 1px solid #000;
+    }
+}
+
+/* ==========================================================================
+   Accessibility
+   ========================================================================== */
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    .ui-card,
+    .ui-list-item,
+    .ui-sub-section {
+        border-width: 2px;
+    }
+    
+    .ui-label-featured {
+        border: 2px solid var(--ui-white);
+    }
+    
+    .ui-tab-btn.active {
+        border-bottom-width: 4px;
+    }
+}
+
+/* Focus Visible for all interactive elements */
+.ui-section a:focus-visible,
+.ui-section button:focus-visible {
+    outline: 3px solid var(--ui-gov-gold);
+    outline-offset: 2px;
+}
+
+/* ==========================================================================
+   強制表示
+   ========================================================================== */
+.ultimate-section,
+.tabs-container,
+.tab-content,
+.ui-section,
+.ui-container,
+.ui-panels-container {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.ui-panel.active {
+    display: block !important;
+}

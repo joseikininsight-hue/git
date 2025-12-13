@@ -1,0 +1,621 @@
+/* ==========================================================================
+   Hero Section - Government Official Design System v54.0
+   官公庁風デザイン - 濃紺×金カラースキーム（統計バー・装飾削除版）
+   ========================================================================== */
+
+.hero {
+    /* 官公庁カラーパレット - メイン */
+    --hero-gov-navy-900: #0d1b2a;
+    --hero-gov-navy-800: #1b263b;
+    --hero-gov-navy-700: #2c3e50;
+    --hero-gov-navy-600: #34495e;
+    --hero-gov-navy-500: #415a77;
+    --hero-gov-navy-400: #778da9;
+    --hero-gov-navy-300: #a3b1c6;
+    --hero-gov-navy-200: #cfd8e3;
+    --hero-gov-navy-100: #e8ecf1;
+    --hero-gov-navy-50: #f4f6f8;
+    
+    /* アクセントカラー - 金 */
+    --hero-gov-gold: #c9a227;
+    --hero-gov-gold-light: #d4b77a;
+    --hero-gov-gold-pale: #f0e6c8;
+    
+    /* セマンティックカラー */
+    --hero-gov-green: #2e7d32;
+    --hero-gov-green-light: #e8f5e9;
+    
+    /* ニュートラル */
+    --hero-color-white: #ffffff;
+    --hero-color-black: #1a1a1a;
+    --hero-color-gray-900: #212529;
+    --hero-color-gray-800: #343a40;
+    --hero-color-gray-700: #495057;
+    --hero-color-gray-600: #6c757d;
+    --hero-color-gray-500: #adb5bd;
+    --hero-color-gray-400: #ced4da;
+    --hero-color-gray-300: #dee2e6;
+    --hero-color-gray-200: #e9ecef;
+    --hero-color-gray-100: #f8f9fa;
+    
+    /* タイポグラフィ */
+    --hero-font-serif: "Shippori Mincho", "Yu Mincho", "YuMincho", "Hiragino Mincho ProN", serif;
+    --hero-font-sans: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --hero-font-mono: 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
+    
+    /* スペーシング */
+    --hero-space-1: 4px;
+    --hero-space-2: 8px;
+    --hero-space-3: 12px;
+    --hero-space-4: 16px;
+    --hero-space-5: 20px;
+    --hero-space-6: 24px;
+    --hero-space-8: 32px;
+    --hero-space-10: 40px;
+    --hero-space-12: 48px;
+    --hero-space-16: 64px;
+    --hero-space-20: 80px;
+    
+    /* レイアウト */
+    --hero-container-max: 1200px;
+    --hero-header-height: 56px;
+    
+    /* エフェクト */
+    --hero-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --hero-transition-slow: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    --hero-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --hero-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --hero-shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
+    --hero-shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.15);
+    
+    /* ボーダー */
+    --hero-border-radius: 4px;
+    --hero-border-radius-lg: 8px;
+}
+
+/* ==========================================================================
+   ベーススタイル
+   ========================================================================== */
+.hero {
+    position: relative;
+    min-height: calc(100vh - var(--hero-header-height));
+    min-height: calc(100dvh - var(--hero-header-height));
+    display: flex;
+    align-items: center;
+    background: linear-gradient(180deg, var(--hero-gov-navy-50) 0%, var(--hero-color-white) 100%);
+    font-family: var(--hero-font-sans);
+    color: var(--hero-color-gray-900);
+    overflow: hidden;
+    padding: var(--hero-space-16) 0;
+    border-bottom: 1px solid var(--hero-color-gray-200);
+}
+
+/* ==========================================================================
+   背景パターン
+   ========================================================================== */
+.hero__bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.hero__grid-pattern {
+    position: absolute;
+    inset: 0;
+    background-image: 
+        linear-gradient(to right, var(--hero-gov-navy-100) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--hero-gov-navy-100) 1px, transparent 1px);
+    background-size: 48px 48px;
+    opacity: 0.4;
+}
+
+
+
+/* ==========================================================================
+   コンテナ
+   ========================================================================== */
+.hero__container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: var(--hero-container-max);
+    margin: 0 auto;
+    padding: 0 var(--hero-space-6);
+}
+
+.hero__content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--hero-space-12);
+    align-items: center;
+}
+
+@media (min-width: 1024px) {
+    .hero__content {
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: var(--hero-space-16);
+    }
+}
+
+/* ==========================================================================
+   テキストエリア
+   ========================================================================== */
+.hero__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hero-space-6);
+}
+
+/* タグライン */
+.hero__tagline {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--hero-space-2);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--hero-gov-navy-600);
+    margin: 0;
+    padding: var(--hero-space-2) var(--hero-space-4);
+    background-color: var(--hero-gov-navy-100);
+    border-left: 3px solid var(--hero-gov-gold);
+    border-radius: 0 var(--hero-border-radius) var(--hero-border-radius) 0;
+}
+
+/* メインタイトル */
+.hero__title {
+    margin: 0;
+    line-height: 1.2;
+}
+
+.hero__title-main {
+    display: block;
+    font-family: var(--hero-font-sans);
+    font-size: clamp(20px, 4vw, 28px);
+    font-weight: 500;
+    color: var(--hero-gov-navy-700);
+    margin-bottom: var(--hero-space-2);
+    letter-spacing: 0.02em;
+}
+
+.hero__title-accent {
+    display: block;
+    font-family: var(--hero-font-serif);
+    font-size: clamp(32px, 7vw, 52px);
+    font-weight: 700;
+    color: var(--hero-gov-navy-900);
+    letter-spacing: 0.01em;
+    line-height: 1.15;
+    position: relative;
+}
+
+.hero__title-accent::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--hero-gov-gold) 0%, var(--hero-gov-gold-light) 100%);
+    border-radius: 2px;
+}
+
+/* 説明文 */
+.hero__description {
+    font-size: 15px;
+    line-height: 1.9;
+    color: var(--hero-color-gray-700);
+    margin: var(--hero-space-4) 0 0 0;
+    max-width: 540px;
+}
+
+/* ==========================================================================
+   特徴リスト
+   ========================================================================== */
+.hero__features {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hero-space-3);
+    list-style: none;
+    margin: var(--hero-space-4) 0 0 0;
+    padding: 0;
+}
+
+.hero__feature {
+    display: flex;
+    align-items: center;
+    gap: var(--hero-space-3);
+    font-size: 14px;
+    color: var(--hero-color-gray-700);
+    font-weight: 500;
+    padding: var(--hero-space-2) 0;
+}
+
+.hero__feature--emphasis {
+    color: var(--hero-gov-navy-900);
+    font-weight: 700;
+}
+
+.hero__feature-icon {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--hero-gov-green-light);
+    border-radius: 50%;
+    color: var(--hero-gov-green);
+}
+
+.hero__feature-icon svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* ==========================================================================
+   CTAエリア
+   ========================================================================== */
+.hero__cta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hero-space-4);
+    margin-top: var(--hero-space-6);
+}
+
+/* プライマリボタン */
+.hero__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--hero-space-3);
+    padding: var(--hero-space-5) var(--hero-space-10);
+    border: 2px solid transparent;
+    border-radius: var(--hero-border-radius);
+    font-family: var(--hero-font-sans);
+    font-size: 16px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: 
+        background var(--hero-transition),
+        border-color var(--hero-transition),
+        transform var(--hero-transition),
+        box-shadow var(--hero-transition);
+}
+
+.hero__btn--primary {
+    background: linear-gradient(135deg, var(--hero-gov-navy-800) 0%, var(--hero-gov-navy-900) 100%);
+    color: var(--hero-color-white);
+    border-color: var(--hero-gov-navy-800);
+    box-shadow: var(--hero-shadow);
+}
+
+.hero__btn--primary:hover {
+    background: linear-gradient(135deg, var(--hero-gov-navy-900) 0%, var(--hero-gov-navy-800) 100%);
+    transform: translateY(-2px);
+    box-shadow: var(--hero-shadow-lg);
+}
+
+.hero__btn--primary:focus-visible {
+    outline: 3px solid var(--hero-gov-gold);
+    outline-offset: 3px;
+}
+
+.hero__btn--primary:active {
+    transform: translateY(0);
+}
+
+.hero__btn-icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+}
+
+.hero__btn-arrow {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    transition: transform var(--hero-transition);
+}
+
+.hero__btn:hover .hero__btn-arrow {
+    transform: translateX(4px);
+}
+
+/* セカンダリCTA（テキストリンク） */
+.hero__sub-cta {
+    font-size: 14px;
+    color: var(--hero-color-gray-600);
+    margin: 0;
+}
+
+.hero__sub-cta-link {
+    color: var(--hero-gov-navy-800);
+    font-weight: 700;
+    text-decoration: none;
+    border-bottom: 2px solid var(--hero-gov-gold);
+    padding-bottom: 2px;
+    transition: 
+        color var(--hero-transition),
+        border-color var(--hero-transition);
+}
+
+.hero__sub-cta-link:hover {
+    color: var(--hero-gov-navy-600);
+    border-color: var(--hero-gov-navy-600);
+}
+
+.hero__sub-cta-link:focus-visible {
+    outline: 2px solid var(--hero-gov-gold);
+    outline-offset: 3px;
+}
+
+/* ==========================================================================
+   統計バー - 非表示
+   ========================================================================== */
+.hero__stats {
+    display: none !important;
+}
+
+/* ==========================================================================
+   ビジュアルエリア
+   ========================================================================== */
+.hero__visual {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hero__image-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 520px;
+    margin: 0;
+}
+
+.hero__image {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: var(--hero-border-radius-lg);
+    box-shadow: var(--hero-shadow-xl);
+    border: 1px solid var(--hero-color-gray-200);
+}
+
+/* ==========================================================================
+   画像装飾 - 非表示（ドット・ライン削除）
+   ========================================================================== */
+.hero__image-decoration {
+    display: none !important;
+}
+
+.hero__decoration-dot,
+.hero__decoration-dot--1,
+.hero__decoration-dot--2,
+.hero__decoration-line {
+    display: none !important;
+}
+
+/* 画像オーバーレイバッジ - 非表示 */
+.hero__image-badge {
+    display: none !important;
+}
+
+/* ==========================================================================
+   スクロールインジケーター
+   ========================================================================== */
+.hero__scroll {
+    position: absolute;
+    bottom: var(--hero-space-8);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--hero-space-2);
+}
+
+.hero__scroll-text {
+    font-family: var(--hero-font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: var(--hero-gov-navy-400);
+    text-transform: uppercase;
+}
+
+.hero__scroll-line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--hero-gov-navy-400), transparent);
+    animation: hero-scroll-pulse 2s ease-in-out infinite;
+}
+
+@keyframes hero-scroll-pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scaleY(1);
+    }
+    50% {
+        opacity: 0.4;
+        transform: scaleY(0.7);
+    }
+}
+
+/* ==========================================================================
+   レスポンシブ - タブレット
+   ========================================================================== */
+@media (max-width: 1023px) {
+    .hero {
+        min-height: auto;
+        padding: var(--hero-space-12) 0;
+    }
+    
+    .hero__content {
+        text-align: center;
+    }
+    
+    .hero__text {
+        align-items: center;
+    }
+    
+    .hero__tagline {
+        border-left: none;
+        border-radius: var(--hero-border-radius);
+    }
+    
+    .hero__title-accent::after {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    .hero__description {
+        max-width: 100%;
+    }
+    
+    .hero__features {
+        align-items: center;
+    }
+    
+    .hero__cta {
+        align-items: center;
+    }
+    
+    .hero__visual {
+        order: -1;
+    }
+    
+    .hero__image-wrapper {
+        max-width: 400px;
+    }
+    
+    .hero__scroll {
+        display: none;
+    }
+}
+
+/* ==========================================================================
+   レスポンシブ - モバイル
+   ========================================================================== */
+@media (max-width: 640px) {
+    .hero {
+        padding: var(--hero-space-10) 0;
+    }
+    
+    .hero__container {
+        padding: 0 var(--hero-space-4);
+    }
+    
+    .hero__tagline {
+        font-size: 11px;
+        padding: var(--hero-space-1) var(--hero-space-3);
+    }
+    
+    .hero__title-accent::after {
+        width: 60px;
+        height: 3px;
+    }
+    
+    .hero__description {
+        font-size: 14px;
+        line-height: 1.8;
+    }
+    
+    .hero__feature {
+        font-size: 13px;
+    }
+    
+    .hero__feature-icon {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .hero__btn {
+        width: 100%;
+        padding: var(--hero-space-4) var(--hero-space-6);
+        font-size: 15px;
+    }
+    
+    .hero__image-wrapper {
+        max-width: 300px;
+    }
+}
+
+/* ==========================================================================
+   アクセシビリティ
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+    .hero__btn,
+    .hero__btn-arrow,
+    .hero__sub-cta-link {
+        transition: none;
+    }
+    
+    .hero__scroll-line {
+        animation: none;
+    }
+}
+
+@media (prefers-contrast: high) {
+    .hero__btn--primary {
+        border: 3px solid var(--hero-color-white);
+    }
+    
+    .hero__feature-icon {
+        border: 2px solid var(--hero-gov-green);
+    }
+}
+
+.hero a:focus-visible,
+.hero button:focus-visible {
+    outline: 3px solid var(--hero-gov-gold);
+    outline-offset: 3px;
+}
+
+/* ==========================================================================
+   印刷スタイル
+   ========================================================================== */
+@media print {
+    .hero {
+        min-height: auto;
+        padding: 24px 0;
+        background: white;
+    }
+    
+    .hero::before,
+    .hero__bg,
+    .hero__scroll {
+        display: none;
+    }
+    
+    .hero__btn--primary {
+        border: 2px solid black;
+        background: white;
+        color: black;
+        box-shadow: none;
+    }
+}
+
+/* ==========================================================================
+   強制表示 - レイアウト維持
+   ========================================================================== */
+.hero {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.hero__container {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.hero__content {
+    display: grid !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
