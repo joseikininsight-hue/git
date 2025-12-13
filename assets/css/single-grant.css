@@ -2954,16 +2954,19 @@ ul, ol {
 
 .gi-onboarding-highlight {
     position: relative;
-    z-index: 9999;
-    box-shadow: 0 0 0 9999px rgba(13, 27, 42, 0.65);
+    z-index: 9999 !important;
+    background: var(--gi-white) !important;
     border-radius: var(--gi-radius-lg);
-    transition: box-shadow 0.3s ease;
+    box-shadow: 0 0 0 4px var(--gi-gov-gold), 0 0 0 9999px rgba(13, 27, 42, 0.7) !important;
 }
 
-/* Fixed element highlight (e.g., mobile action bar) */
+/* Fixed element highlight (e.g., mobile action bar buttons) */
 .gi-onboarding-highlight-fixed {
-    position: fixed !important;
     z-index: 10001 !important;
+    background: var(--gi-gov-navy-800) !important;
+    border-radius: var(--gi-radius) !important;
+    box-shadow: 0 0 0 4px var(--gi-gov-gold), 0 4px 20px rgba(0,0,0,0.3) !important;
+    transform: scale(1.05);
 }
 
 .gi-onboarding-tooltip {
@@ -3089,27 +3092,10 @@ ul, ol {
     background: var(--gi-gov-navy-800);
 }
 
-/* Fade out animation for tooltip */
-.gi-onboarding-tooltip.fade-out {
-    opacity: 0 !important;
-    transform: translateY(-10px) !important;
-    transition: all 0.2s ease !important;
-}
-
-/* Highlight pulse animation */
-.gi-onboarding-highlight {
-    animation: gi-highlightPulse 2s ease-in-out infinite;
-}
-
-@keyframes gi-highlightPulse {
-    0%, 100% { box-shadow: 0 0 0 9999px rgba(13, 27, 42, 0.65), 0 0 0 4px rgba(197, 160, 89, 0.5); }
-    50% { box-shadow: 0 0 0 9999px rgba(13, 27, 42, 0.65), 0 0 0 8px rgba(197, 160, 89, 0.3); }
-}
-
 /* Next button click feedback */
-.gi-onboarding-next.clicked {
+.gi-onboarding-next:active {
     transform: scale(0.95);
-    opacity: 0.8;
+    opacity: 0.9;
 }
 
 /* ==========================================================================

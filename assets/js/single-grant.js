@@ -348,8 +348,8 @@
     const OnboardingManager = {
         steps: [
             { target: '.gi-metrics', title: '重要な数字を確認', text: '補助金額、締切、難易度などの重要情報はここでチェックできます。', position: 'bottom' },
-            { target: '.gi-checklist', title: '申請資格をセルフチェック', text: 'チェックリストで申請要件を確認しましょう。進捗は自動保存されます。', position: 'bottom' },
-            { target: '.gi-mobile-action-bar', title: 'AIに質問できます', text: '下部の「AI相談」ボタンから質問できます。', position: 'top', isFixed: true }
+            { target: '.gi-checklist-header', title: '申請資格をセルフチェック', text: 'チェックリストで申請要件を確認しましょう。進捗は自動保存されます。', position: 'bottom' },
+            { target: '#mobileAiQuickBtn', title: 'AIに質問できます', text: '下部の「AI相談」ボタンから質問できます。', position: 'top', isFixed: true }
         ],
         currentStep: 0,
         
@@ -388,27 +388,29 @@
             
             this.currentStep = index;
             
+            // Remove previous highlights first
+            document.querySelectorAll('.gi-onboarding-highlight, .gi-onboarding-highlight-fixed').forEach(el => {
+                el.classList.remove('gi-onboarding-highlight', 'gi-onboarding-highlight-fixed');
+                el.style.boxShadow = '';
+            });
+            
             // Show overlay
             const overlay = document.getElementById('onboardingOverlay');
             if (overlay) overlay.classList.add('active');
             
-            // Remove existing tooltip with fade out animation
+            // Remove existing tooltip
             const existingTooltip = document.querySelector('.gi-onboarding-tooltip');
-            if (existingTooltip) {
-                existingTooltip.classList.add('fade-out');
-                setTimeout(() => existingTooltip.remove(), 200);
-            }
+            if (existingTooltip) existingTooltip.remove();
             
-            // Highlight target element
-            target.classList.add('gi-onboarding-highlight');
-            
-            // For fixed elements (like mobile action bar), don't scroll
+            // For fixed elements, use different highlight approach
             if (step.isFixed) {
-                // Fixed element - no scrolling needed, highlight in place
                 target.classList.add('gi-onboarding-highlight-fixed');
+                this.createTooltip(target, step, index, true);
             } else {
-                // Scroll target into view with offset for better visibility
-                const headerOffset = 100;
+                // Highlight and scroll to target
+                target.classList.add('gi-onboarding-highlight');
+                
+                const headerOffset = 120;
                 const elementPosition = target.getBoundingClientRect().top;
                 const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
                 
@@ -416,92 +418,73 @@
                     top: offsetPosition,
                     behavior: 'smooth'
                 });
+                
+                // Wait for scroll then create tooltip
+                setTimeout(() => this.createTooltip(target, step, index, false), 500);
+            }
+        },
+        
+        createTooltip: function(target, step, index, isFixed) {
+            const tooltip = document.createElement('div');
+            tooltip.className = 'gi-onboarding-tooltip';
+            tooltip.innerHTML = `
+                <div class="gi-onboarding-step">STEP ${index + 1} / ${this.steps.length}</div>
+                <div class="gi-onboarding-title">${step.title}</div>
+                <div class="gi-onboarding-text">${step.text}</div>
+                <div class="gi-onboarding-actions">
+                    <button class="gi-onboarding-skip" id="onboardingSkip">スキップ</button>
+                    <button class="gi-onboarding-next" id="onboardingNext">${index < this.steps.length - 1 ? '次へ' : '完了'}</button>
+                </div>
+                <div class="gi-onboarding-progress">
+                    ${this.steps.map((_, i) => `<div class="gi-onboarding-dot ${i <= index ? 'active' : ''} ${i < index ? 'completed' : ''}"></div>`).join('')}
+                </div>
+            `;
+            
+            const rect = target.getBoundingClientRect();
+            
+            if (isFixed) {
+                // Fixed element - position tooltip above it
+                tooltip.style.position = 'fixed';
+                tooltip.style.bottom = (window.innerHeight - rect.top + 16) + 'px';
+                tooltip.style.left = '50%';
+                tooltip.style.marginLeft = '-160px';
+                tooltip.style.zIndex = '10002';
+            } else {
+                // Regular positioning
+                tooltip.style.position = 'absolute';
+                if (step.position === 'bottom') {
+                    tooltip.style.top = (rect.bottom + window.scrollY + 16) + 'px';
+                } else {
+                    tooltip.style.top = (rect.top + window.scrollY - 180) + 'px';
+                }
+                tooltip.style.left = Math.max(16, Math.min(window.innerWidth - 336, rect.left)) + 'px';
             }
             
-            // Create tooltip after scroll completes
-            setTimeout(() => {
-                // Remove highlight from previous target
-                document.querySelectorAll('.gi-onboarding-highlight').forEach(el => {
-                    if (el !== target) el.classList.remove('gi-onboarding-highlight');
-                });
-                
-                const tooltip = document.createElement('div');
-                tooltip.className = 'gi-onboarding-tooltip ' + step.position;
-                tooltip.innerHTML = `
-                    <div class="gi-onboarding-step">STEP ${index + 1} / ${this.steps.length}</div>
-                    <div class="gi-onboarding-title">${step.title}</div>
-                    <div class="gi-onboarding-text">${step.text}</div>
-                    <div class="gi-onboarding-actions">
-                        <button class="gi-onboarding-skip" id="onboardingSkip">スキップ</button>
-                        <button class="gi-onboarding-next" id="onboardingNext">${index < this.steps.length - 1 ? '次へ' : '完了'}</button>
-                    </div>
-                    <div class="gi-onboarding-progress">
-                        ${this.steps.map((_, i) => `<div class="gi-onboarding-dot ${i <= index ? 'active' : ''} ${i < index ? 'completed' : ''}"></div>`).join('')}
-                    </div>
-                `;
-                
-                // Position tooltip near target
-                const rect = target.getBoundingClientRect();
-                if (step.isFixed) {
-                    // Fixed positioning for fixed elements
-                    tooltip.style.position = 'fixed';
-                    tooltip.style.top = (rect.top - 180) + 'px';
-                    tooltip.style.left = '50%';
-                    tooltip.style.transform = 'translateX(-50%)';
-                } else if (step.position === 'bottom') {
-                    tooltip.style.top = (rect.bottom + window.scrollY + 16) + 'px';
-                    tooltip.style.left = Math.max(20, Math.min(window.innerWidth - 340, rect.left)) + 'px';
-                } else {
-                    tooltip.style.top = (rect.top + window.scrollY - 200) + 'px';
-                    tooltip.style.left = Math.max(20, Math.min(window.innerWidth - 340, rect.left)) + 'px';
-                }
-                
-                // Animate tooltip entrance
-                tooltip.style.opacity = '0';
-                tooltip.style.transform = 'translateY(10px)';
-                document.body.appendChild(tooltip);
-                
-                requestAnimationFrame(() => {
-                    tooltip.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-                    tooltip.style.opacity = '1';
-                    tooltip.style.transform = 'translateY(0)';
-                });
-                
-                // Event listeners
-                document.getElementById('onboardingSkip').addEventListener('click', () => this.completeTour());
-                document.getElementById('onboardingNext').addEventListener('click', () => {
-                    // Add pulse animation to button feedback
-                    const btn = document.getElementById('onboardingNext');
-                    btn.classList.add('clicked');
-                    setTimeout(() => this.showStep(index + 1), 150);
-                });
-            }, 600);
+            document.body.appendChild(tooltip);
+            
+            // Event listeners
+            document.getElementById('onboardingSkip').addEventListener('click', () => this.completeTour());
+            document.getElementById('onboardingNext').addEventListener('click', () => {
+                this.showStep(index + 1);
+            });
         },
         
         completeTour: function() {
             localStorage.setItem('gi_onboarding_done', 'true');
             
-            const overlay = document.getElementById('onboardingOverlay');
-            const tooltip = document.querySelector('.gi-onboarding-tooltip');
-            
-            // Remove all highlights FIRST (to prevent white flash)
-            document.querySelectorAll('.gi-onboarding-highlight').forEach(el => {
-                el.style.transition = 'box-shadow 0.3s ease';
-                el.style.boxShadow = 'none';
-                setTimeout(() => {
-                    el.classList.remove('gi-onboarding-highlight');
-                    el.classList.remove('gi-onboarding-highlight-fixed');
-                }, 300);
+            // Remove all highlights immediately
+            document.querySelectorAll('.gi-onboarding-highlight, .gi-onboarding-highlight-fixed').forEach(el => {
+                el.classList.remove('gi-onboarding-highlight', 'gi-onboarding-highlight-fixed');
+                el.style.boxShadow = '';
+                el.style.zIndex = '';
             });
             
-            // Fade out tooltip
-            if (tooltip) {
-                tooltip.style.opacity = '0';
-                tooltip.style.transform = 'translateY(10px)';
-                setTimeout(() => tooltip.remove(), 300);
-            }
+            // Remove tooltip
+            const tooltip = document.querySelector('.gi-onboarding-tooltip');
+            if (tooltip) tooltip.remove();
             
-            // Fade out overlay
+            // Remove overlay
+            const overlay = document.getElementById('onboardingOverlay');
             if (overlay) {
                 overlay.classList.remove('active');
                 setTimeout(() => overlay.remove(), 300);
