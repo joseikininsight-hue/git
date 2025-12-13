@@ -349,7 +349,7 @@
         steps: [
             { target: '.gi-metrics', title: '重要な数字を確認', text: '補助金額、締切、難易度などの重要情報はここでチェックできます。', position: 'bottom' },
             { target: '.gi-checklist', title: '申請資格をセルフチェック', text: 'チェックリストで申請要件を確認しましょう。進捗は自動保存されます。', position: 'bottom' },
-            { target: '.gi-ai-section, .gi-mobile-fab', title: 'AIに質問できます', text: '不明点があればAIアシスタントに質問してください。', position: 'top' }
+            { target: '.gi-mobile-action-bar', title: 'AIに質問できます', text: '下部の「AI相談」ボタンから質問できます。', position: 'top', isFixed: true }
         ],
         currentStep: 0,
         
@@ -402,15 +402,21 @@
             // Highlight target element
             target.classList.add('gi-onboarding-highlight');
             
-            // Scroll target into view with offset for better visibility
-            const headerOffset = 100;
-            const elementPosition = target.getBoundingClientRect().top;
-            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-            
-            window.scrollTo({
-                top: offsetPosition,
-                behavior: 'smooth'
-            });
+            // For fixed elements (like mobile action bar), don't scroll
+            if (step.isFixed) {
+                // Fixed element - no scrolling needed, highlight in place
+                target.classList.add('gi-onboarding-highlight-fixed');
+            } else {
+                // Scroll target into view with offset for better visibility
+                const headerOffset = 100;
+                const elementPosition = target.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+            }
             
             // Create tooltip after scroll completes
             setTimeout(() => {
@@ -436,12 +442,19 @@
                 
                 // Position tooltip near target
                 const rect = target.getBoundingClientRect();
-                if (step.position === 'bottom') {
+                if (step.isFixed) {
+                    // Fixed positioning for fixed elements
+                    tooltip.style.position = 'fixed';
+                    tooltip.style.top = (rect.top - 180) + 'px';
+                    tooltip.style.left = '50%';
+                    tooltip.style.transform = 'translateX(-50%)';
+                } else if (step.position === 'bottom') {
                     tooltip.style.top = (rect.bottom + window.scrollY + 16) + 'px';
+                    tooltip.style.left = Math.max(20, Math.min(window.innerWidth - 340, rect.left)) + 'px';
                 } else {
                     tooltip.style.top = (rect.top + window.scrollY - 200) + 'px';
+                    tooltip.style.left = Math.max(20, Math.min(window.innerWidth - 340, rect.left)) + 'px';
                 }
-                tooltip.style.left = Math.max(20, Math.min(window.innerWidth - 340, rect.left)) + 'px';
                 
                 // Animate tooltip entrance
                 tooltip.style.opacity = '0';
@@ -471,21 +484,28 @@
             const overlay = document.getElementById('onboardingOverlay');
             const tooltip = document.querySelector('.gi-onboarding-tooltip');
             
-            // Fade out animations
+            // Remove all highlights FIRST (to prevent white flash)
+            document.querySelectorAll('.gi-onboarding-highlight').forEach(el => {
+                el.style.transition = 'box-shadow 0.3s ease';
+                el.style.boxShadow = 'none';
+                setTimeout(() => {
+                    el.classList.remove('gi-onboarding-highlight');
+                    el.classList.remove('gi-onboarding-highlight-fixed');
+                }, 300);
+            });
+            
+            // Fade out tooltip
             if (tooltip) {
                 tooltip.style.opacity = '0';
                 tooltip.style.transform = 'translateY(10px)';
                 setTimeout(() => tooltip.remove(), 300);
             }
+            
+            // Fade out overlay
             if (overlay) {
-                overlay.style.opacity = '0';
+                overlay.classList.remove('active');
                 setTimeout(() => overlay.remove(), 300);
             }
-            
-            // Remove all highlights
-            document.querySelectorAll('.gi-onboarding-highlight').forEach(el => {
-                el.classList.remove('gi-onboarding-highlight');
-            });
             
             UI.showToast('ツアーを完了しました');
         }

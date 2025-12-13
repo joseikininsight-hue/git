@@ -1568,14 +1568,6 @@ if ($grant['ai_summary']) {
     </div>
 </div>
 
-<!-- モバイルFAB -->
-<div class="gi-mobile-fab">
-    <button class="gi-fab-btn" id="mobileAiBtn" type="button" aria-label="AIアシスタントを開く">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        <span>AI相談</span>
-    </button>
-</div>
-
 <!-- モバイルパネル -->
 <div class="gi-mobile-overlay" id="mobileOverlay"></div>
 <div class="gi-mobile-panel" id="mobilePanel">
