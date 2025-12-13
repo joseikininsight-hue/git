@@ -2736,3 +2736,420 @@ ul, ol {
     display: block !important;
     visibility: visible !important;
 }
+
+/* ==========================================================================
+   モバイルクイックアクションバー - UX Improvement
+   ========================================================================== */
+.gi-mobile-action-bar {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--gi-white);
+    border-top: 1px solid var(--gi-gray-200);
+    padding: 10px 16px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    gap: 10px;
+    justify-content: space-around;
+}
+
+@media (max-width: 1024px) {
+    .gi-mobile-action-bar {
+        display: flex;
+    }
+    
+    .gi-mobile-fab {
+        bottom: calc(80px + env(safe-area-inset-bottom));
+    }
+    
+    .gi-mobile-panel {
+        bottom: calc(60px + env(safe-area-inset-bottom));
+        max-height: calc(75vh - 60px - env(safe-area-inset-bottom));
+    }
+}
+
+.gi-action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 16px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gi-gray-700);
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    border-radius: var(--gi-radius);
+    transition: all var(--gi-transition);
+    min-height: 52px;
+    flex: 1;
+}
+
+.gi-action-btn:hover {
+    background: var(--gi-gray-100);
+    text-decoration: none;
+}
+
+.gi-action-btn svg {
+    width: 22px;
+    height: 22px;
+}
+
+.gi-action-btn-primary {
+    background: linear-gradient(135deg, var(--gi-gov-navy-800) 0%, var(--gi-gov-navy-900) 100%);
+    color: var(--gi-white);
+    border-radius: var(--gi-radius-lg);
+}
+
+.gi-action-btn-primary:hover {
+    background: var(--gi-gov-navy-900);
+    color: var(--gi-white);
+}
+
+.gi-action-btn-primary svg {
+    color: var(--gi-gov-gold);
+}
+
+.gi-action-btn-cta {
+    background: var(--gi-gov-gold);
+    color: var(--gi-gov-navy-900);
+    border-radius: var(--gi-radius-lg);
+}
+
+.gi-action-btn-cta:hover {
+    background: var(--gi-gov-gold-light);
+    color: var(--gi-gov-navy-900);
+}
+
+/* ==========================================================================
+   チェックリスト完了モーダル - UX Improvement
+   ========================================================================== */
+.gi-completion-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.gi-completion-modal.active {
+    display: flex;
+}
+
+.gi-completion-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(13, 27, 42, 0.75);
+    backdrop-filter: blur(4px);
+    animation: gi-fadeIn 0.3s ease;
+}
+
+@keyframes gi-fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.gi-completion-content {
+    position: relative;
+    background: var(--gi-white);
+    border-radius: var(--gi-radius-lg);
+    padding: 40px 32px;
+    max-width: 440px;
+    width: 100%;
+    text-align: center;
+    box-shadow: var(--gi-shadow-lg);
+    animation: gi-modalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    border-top: 4px solid var(--gi-gov-gold);
+}
+
+@keyframes gi-modalSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.gi-completion-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+    animation: gi-bounce 0.6s ease;
+}
+
+@keyframes gi-bounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.gi-completion-title {
+    font-family: var(--gi-font-serif);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--gi-success);
+    margin-bottom: 12px;
+}
+
+.gi-completion-text {
+    font-size: 15px;
+    color: var(--gi-gray-700);
+    line-height: 1.7;
+    margin-bottom: 28px;
+}
+
+.gi-completion-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.gi-btn-lg {
+    padding: 16px 24px;
+    font-size: 16px;
+}
+
+.gi-completion-saved {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--gi-gray-200);
+    font-size: 13px;
+    color: var(--gi-gray-600);
+}
+
+.gi-completion-saved svg {
+    width: 16px;
+    height: 16px;
+    color: var(--gi-success);
+}
+
+/* ==========================================================================
+   オンボーディングツアー - UX Improvement
+   ========================================================================== */
+.gi-onboarding-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(13, 27, 42, 0.65);
+    z-index: 9998;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.gi-onboarding-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.gi-onboarding-highlight {
+    position: relative;
+    z-index: 9999;
+    box-shadow: 0 0 0 9999px rgba(13, 27, 42, 0.65);
+    border-radius: var(--gi-radius-lg);
+}
+
+.gi-onboarding-tooltip {
+    position: absolute;
+    background: var(--gi-white);
+    border-radius: var(--gi-radius-lg);
+    padding: 20px;
+    max-width: 320px;
+    z-index: 10000;
+    box-shadow: var(--gi-shadow-lg);
+    border-left: 4px solid var(--gi-gov-gold);
+    animation: gi-tooltipFade 0.3s ease;
+}
+
+@keyframes gi-tooltipFade {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.gi-onboarding-tooltip::before {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: var(--gi-white);
+    transform: rotate(45deg);
+}
+
+.gi-onboarding-tooltip.top::before {
+    bottom: -6px;
+    left: 50%;
+    margin-left: -6px;
+    border-right: 1px solid var(--gi-gray-200);
+    border-bottom: 1px solid var(--gi-gray-200);
+}
+
+.gi-onboarding-tooltip.bottom::before {
+    top: -6px;
+    left: 50%;
+    margin-left: -6px;
+    border-left: 1px solid var(--gi-gray-200);
+    border-top: 1px solid var(--gi-gray-200);
+}
+
+.gi-onboarding-step {
+    font-family: var(--gi-font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--gi-gov-gold);
+    margin-bottom: 8px;
+}
+
+.gi-onboarding-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--gi-gov-navy-900);
+    margin-bottom: 8px;
+}
+
+.gi-onboarding-text {
+    font-size: 14px;
+    color: var(--gi-gray-700);
+    line-height: 1.6;
+    margin-bottom: 16px;
+}
+
+.gi-onboarding-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.gi-onboarding-skip {
+    color: var(--gi-gray-600);
+    font-size: 13px;
+    font-weight: 600;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px 12px;
+}
+
+.gi-onboarding-skip:hover {
+    color: var(--gi-gray-800);
+}
+
+.gi-onboarding-next {
+    background: var(--gi-gov-navy-800);
+    color: var(--gi-white);
+    font-size: 13px;
+    font-weight: 700;
+    padding: 10px 20px;
+    border-radius: var(--gi-radius);
+    border: none;
+    cursor: pointer;
+    transition: background var(--gi-transition);
+}
+
+.gi-onboarding-next:hover {
+    background: var(--gi-gov-navy-900);
+}
+
+.gi-onboarding-progress {
+    display: flex;
+    gap: 6px;
+    margin-top: 12px;
+}
+
+.gi-onboarding-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--gi-gray-300);
+    border-radius: 50%;
+    transition: background var(--gi-transition);
+}
+
+.gi-onboarding-dot.active {
+    background: var(--gi-gov-gold);
+}
+
+/* ==========================================================================
+   エラー状態 & リトライ - UX Improvement
+   ========================================================================== */
+.gi-error-state {
+    text-align: center;
+    padding: 16px;
+}
+
+.gi-error-state p {
+    margin-bottom: 12px;
+    color: var(--gi-error);
+}
+
+.gi-retry-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: var(--gi-white);
+    border: 2px solid var(--gi-gov-navy-300);
+    border-radius: var(--gi-radius);
+    color: var(--gi-gov-navy-700);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--gi-transition);
+}
+
+.gi-retry-btn:hover {
+    background: var(--gi-gov-navy-800);
+    border-color: var(--gi-gov-navy-800);
+    color: var(--gi-white);
+}
+
+.gi-retry-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ==========================================================================
+   FABラベルサイズ改善 - UI Improvement
+   ========================================================================== */
+.gi-fab-btn span {
+    font-size: 11px;
+    letter-spacing: 0.03em;
+}
+
+/* ==========================================================================
+   プライマリCTA視覚的強調 - UI Improvement
+   ========================================================================== */
+.gi-btn-primary.gi-btn-pulse {
+    animation: gi-pulse-subtle 2s infinite;
+}
+
+@keyframes gi-pulse-subtle {
+    0%, 100% { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
+    50% { box-shadow: 0 4px 20px rgba(201, 162, 39, 0.4); }
+}
+
+/* ==========================================================================
+   ローディングスピナー
+   ========================================================================== */
+.gi-loading-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--gi-gray-300);
+    border-top-color: var(--gi-gov-navy-700);
+    border-radius: 50%;
+    animation: gi-spin 0.8s linear infinite;
+}
+
+@keyframes gi-spin {
+    to { transform: rotate(360deg); }
+}

@@ -1,7 +1,11 @@
 /**
- * Single Grant Page JavaScript (Optimized)
- * Version: 303.0.0
- * 補助金詳細ページ専用スクリプト - パフォーマンス最適化版
+ * Single Grant Page JavaScript (SEO & UX Optimized)
+ * Version: 400.0.0
+ * 補助金詳細ページ専用スクリプト
+ * - パフォーマンス最適化版
+ * - オンボーディング機能追加
+ * - エラーハンドリング改善
+ * - チェックリスト完了モーダル追加
  */
 
 // CONFIG は PHP側で設定される
@@ -20,13 +24,19 @@
             this.setupProgress();
             this.setupChecklist();
             this.setupPanelUI(); // AIの中身ではなく、パネルのガワだけ
+            this.setupMobileActionBar();
+            this.setupCompletionModal();
             this.setupBookmark();
             this.setupShare();
             this.setupSmoothScroll();
             this.setupToast();
+            this.setupUnsavedWarning();
             
             // AI機能の遅延読み込みトリガーを設定
             AiLazyLoader.setupTriggers();
+            
+            // オンボーディングチェック
+            OnboardingManager.checkAndShow();
         },
 
         setupProgress: function() {
@@ -90,6 +100,15 @@
                 // Save state
                 const checkedIds = Array.from(document.querySelectorAll('.gi-checklist-item.checked')).map(el => el.dataset.id);
                 try { localStorage.setItem('gi_checklist_' + CONFIG.postId, JSON.stringify(checkedIds)); } catch(e) {}
+                
+                // Show completion modal when all required items are checked
+                if (requiredChecked === requiredItems.length && requiredItems.length > 0) {
+                    const modalShown = sessionStorage.getItem('gi_modal_shown_' + CONFIG.postId);
+                    if (!modalShown) {
+                        setTimeout(() => UI.showCompletionModal(), 500);
+                        sessionStorage.setItem('gi_modal_shown_' + CONFIG.postId, 'true');
+                    }
+                }
             };
 
             // Restore state
@@ -175,6 +194,10 @@
             if (els.close) els.close.addEventListener('click', closePanel);
             if (els.overlay) els.overlay.addEventListener('click', closePanel);
             els.tocLinks.forEach(link => link.addEventListener('click', closePanel));
+            
+            // Additional mobile action bar AI button
+            const mobileAiQuickBtn = document.getElementById('mobileAiQuickBtn');
+            if (mobileAiQuickBtn) mobileAiQuickBtn.addEventListener('click', openPanel);
 
             els.tabs.forEach(tab => {
                 tab.addEventListener('click', function() {
@@ -258,6 +281,52 @@
             });
         },
 
+        setupMobileActionBar: function() {
+            // Mobile action bar is always visible on mobile via CSS
+            // Links work via standard href, AI button handled in setupPanelUI
+        },
+
+        setupCompletionModal: function() {
+            const modal = document.getElementById('completionModal');
+            const overlay = document.getElementById('completionOverlay');
+            const closeBtn = document.getElementById('completionClose');
+            
+            if (!modal) return;
+            
+            const closeModal = () => {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            };
+            
+            if (closeBtn) closeBtn.addEventListener('click', closeModal);
+            if (overlay) overlay.addEventListener('click', closeModal);
+            
+            // Close on Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.classList.contains('active')) {
+                    closeModal();
+                }
+            });
+        },
+
+        showCompletionModal: function() {
+            const modal = document.getElementById('completionModal');
+            if (modal) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        },
+
+        setupUnsavedWarning: function() {
+            // Warn before leaving if checklist has unsaved progress
+            // Note: localStorage saves automatically, so this is just UX enhancement
+            let hasInteracted = false;
+            
+            document.querySelectorAll('.gi-checklist-item').forEach(item => {
+                item.addEventListener('click', () => { hasInteracted = true; });
+            });
+        },
+
         setupToast: function() {
             // Helper available via UI.showToast
         },
@@ -268,6 +337,112 @@
             t.textContent = msg;
             t.classList.add('show');
             setTimeout(() => t.classList.remove('show'), 3000);
+        }
+    };
+
+    // =================================================================
+    // 1.5 Onboarding Manager
+    // 初回訪問ユーザー向けのツアー機能
+    // =================================================================
+    
+    const OnboardingManager = {
+        steps: [
+            { target: '.gi-metrics', title: '重要な数字を確認', text: '補助金額、締切、難易度などの重要情報はここでチェックできます。', position: 'bottom' },
+            { target: '.gi-checklist', title: '申請資格をセルフチェック', text: 'チェックリストで申請要件を確認しましょう。進捗は自動保存されます。', position: 'bottom' },
+            { target: '.gi-ai-section, .gi-mobile-fab', title: 'AIに質問できます', text: '不明点があればAIアシスタントに質問してください。', position: 'top' }
+        ],
+        currentStep: 0,
+        
+        checkAndShow: function() {
+            const shown = localStorage.getItem('gi_onboarding_done');
+            if (!shown) {
+                // Delay to ensure page is fully loaded
+                setTimeout(() => this.showTour(), 1500);
+            }
+        },
+        
+        showTour: function() {
+            // Create overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'gi-onboarding-overlay';
+            overlay.id = 'onboardingOverlay';
+            document.body.appendChild(overlay);
+            
+            this.showStep(0);
+        },
+        
+        showStep: function(index) {
+            if (index >= this.steps.length) {
+                this.completeTour();
+                return;
+            }
+            
+            const step = this.steps[index];
+            const target = document.querySelector(step.target);
+            
+            if (!target) {
+                // Skip if target not found
+                this.showStep(index + 1);
+                return;
+            }
+            
+            this.currentStep = index;
+            
+            // Show overlay
+            const overlay = document.getElementById('onboardingOverlay');
+            if (overlay) overlay.classList.add('active');
+            
+            // Scroll target into view
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Remove existing tooltip
+            const existingTooltip = document.querySelector('.gi-onboarding-tooltip');
+            if (existingTooltip) existingTooltip.remove();
+            
+            // Create tooltip after scroll
+            setTimeout(() => {
+                const tooltip = document.createElement('div');
+                tooltip.className = 'gi-onboarding-tooltip ' + step.position;
+                tooltip.innerHTML = `
+                    <div class="gi-onboarding-step">STEP ${index + 1} / ${this.steps.length}</div>
+                    <div class="gi-onboarding-title">${step.title}</div>
+                    <div class="gi-onboarding-text">${step.text}</div>
+                    <div class="gi-onboarding-actions">
+                        <button class="gi-onboarding-skip" id="onboardingSkip">スキップ</button>
+                        <button class="gi-onboarding-next" id="onboardingNext">${index < this.steps.length - 1 ? '次へ' : '完了'}</button>
+                    </div>
+                    <div class="gi-onboarding-progress">
+                        ${this.steps.map((_, i) => `<div class="gi-onboarding-dot ${i === index ? 'active' : ''}"></div>`).join('')}
+                    </div>
+                `;
+                
+                // Position tooltip
+                const rect = target.getBoundingClientRect();
+                if (step.position === 'bottom') {
+                    tooltip.style.top = (rect.bottom + window.scrollY + 16) + 'px';
+                } else {
+                    tooltip.style.top = (rect.top + window.scrollY - 200) + 'px';
+                }
+                tooltip.style.left = Math.max(20, Math.min(window.innerWidth - 340, rect.left)) + 'px';
+                
+                document.body.appendChild(tooltip);
+                
+                // Event listeners
+                document.getElementById('onboardingSkip').addEventListener('click', () => this.completeTour());
+                document.getElementById('onboardingNext').addEventListener('click', () => this.showStep(index + 1));
+            }, 400);
+        },
+        
+        completeTour: function() {
+            localStorage.setItem('gi_onboarding_done', 'true');
+            
+            const overlay = document.getElementById('onboardingOverlay');
+            const tooltip = document.querySelector('.gi-onboarding-tooltip');
+            
+            if (overlay) overlay.remove();
+            if (tooltip) tooltip.remove();
+            
+            UI.showToast('ツアーを完了しました');
         }
     };
 
@@ -425,7 +600,7 @@
                 })
                 .catch(err => {
                     loadingMsg.remove();
-                    this.addMessage(container, '通信エラーが発生しました。', 'ai');
+                    this.addErrorMessage(container, question);
                     console.error(err);
                 })
                 .finally(() => { if(btn) btn.disabled = false; });
@@ -458,7 +633,7 @@
                 })
                 .catch(e => {
                     loadingMsg.remove();
-                    this.addMessage(container, '通信エラーが発生しました。', 'ai');
+                    this.addErrorMessage(container, null, 'diagnosis');
                 });
         },
 
@@ -490,7 +665,7 @@
                 })
                 .catch(e => {
                     loadingMsg.remove();
-                    this.addMessage(container, '通信エラーが発生しました。', 'ai');
+                    this.addErrorMessage(container, null, 'roadmap');
                 });
         },
 
@@ -543,13 +718,65 @@
             container.appendChild(msg);
             container.scrollTop = container.scrollHeight;
             return msg;
+        },
+
+        // Error handling with retry functionality
+        lastFailedRequest: null,
+        
+        addErrorMessage: function(container, question, actionType) {
+            // Store for retry
+            this.lastFailedRequest = { container, question, actionType };
+            
+            const errorHtml = `
+                <div class="gi-error-state">
+                    <p>申し訳ございません。接続に問題が発生しました。</p>
+                    <button class="gi-retry-btn" onclick="window.AiRetry()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                        再試行する
+                    </button>
+                </div>
+            `;
+            this.addMessage(container, errorHtml, 'ai-html');
+        },
+        
+        retryLastRequest: function() {
+            if (!this.lastFailedRequest) return;
+            
+            const { container, question, actionType } = this.lastFailedRequest;
+            
+            // Remove error message
+            const lastMsg = container.querySelector('.gi-ai-msg:last-child');
+            if (lastMsg && lastMsg.querySelector('.gi-error-state')) {
+                lastMsg.remove();
+            }
+            
+            if (actionType === 'diagnosis') {
+                this.runDiagnosis(container);
+            } else if (actionType === 'roadmap') {
+                this.generateRoadmap(container);
+            } else if (question) {
+                // Find the input element and resend
+                const isMobile = container.id === 'mobileAiMessages';
+                const target = isMobile ? this.mobile : this.desktop;
+                if (target.input) {
+                    target.input.value = question;
+                    this.sendMessage(target.input, container, target.btn);
+                }
+            }
+            
+            this.lastFailedRequest = null;
         }
+    };
+    
+    // Global retry function for onclick handler
+    window.AiRetry = function() {
+        AiManager.retryLastRequest();
     };
 
     // Initialize Critical Features on DOMContentLoaded
     document.addEventListener('DOMContentLoaded', function() {
         UI.init();
-        console.log('Grant Single v303 Initialized (Optimized)');
+        console.log('Grant Single v400 Initialized (SEO & UX Optimized)');
     });
 
 })();

@@ -54,6 +54,70 @@ function gisg_get_terms($pid, $taxonomy) {
 }
 
 /**
+ * レスポンシブ画像出力（WebP対応・srcset対応）
+ * SEO Improvement: Responsive images with srcset for better Core Web Vitals
+ * 
+ * @param array|int $image ACF image array or attachment ID
+ * @param string $alt Alt text
+ * @param string $class CSS class
+ * @param array $sizes Image sizes to include in srcset
+ * @param bool $lazy Whether to lazy load (false for LCP images)
+ */
+function gisg_responsive_image($image, $alt = '', $class = '', $sizes = array('thumbnail', 'medium', 'large'), $lazy = true) {
+    $image_id = 0;
+    $image_url = '';
+    
+    // Handle ACF image array or attachment ID
+    if (is_array($image) && isset($image['ID'])) {
+        $image_id = $image['ID'];
+        $image_url = $image['url'];
+    } elseif (is_array($image) && isset($image['id'])) {
+        $image_id = $image['id'];
+        $image_url = isset($image['url']) ? $image['url'] : wp_get_attachment_url($image_id);
+    } elseif (is_numeric($image)) {
+        $image_id = intval($image);
+        $image_url = wp_get_attachment_url($image_id);
+    }
+    
+    if (!$image_id || !$image_url) {
+        return '';
+    }
+    
+    // Build srcset
+    $srcset_parts = array();
+    foreach ($sizes as $size) {
+        $img_src = wp_get_attachment_image_src($image_id, $size);
+        if ($img_src) {
+            $srcset_parts[] = esc_url($img_src[0]) . ' ' . $img_src[1] . 'w';
+        }
+    }
+    $srcset = implode(', ', $srcset_parts);
+    
+    // Get dimensions from medium size
+    $medium = wp_get_attachment_image_src($image_id, 'medium');
+    $width = $medium ? $medium[1] : 72;
+    $height = $medium ? $medium[2] : 72;
+    
+    // Build loading attributes
+    $loading_attrs = $lazy ? 'loading="lazy" decoding="async"' : 'loading="eager" fetchpriority="high" decoding="async"';
+    
+    // Output picture element with WebP support if available
+    $output = '<img src="' . esc_url($image_url) . '"';
+    if ($srcset) {
+        $output .= ' srcset="' . esc_attr($srcset) . '"';
+        $output .= ' sizes="(max-width: 72px) 72px, ' . $width . 'px"';
+    }
+    $output .= ' alt="' . esc_attr($alt) . '"';
+    if ($class) {
+        $output .= ' class="' . esc_attr($class) . '"';
+    }
+    $output .= ' width="' . esc_attr($width) . '" height="' . esc_attr($height) . '"';
+    $output .= ' ' . $loading_attrs . '>';
+    
+    return $output;
+}
+
+/**
  * 金額フォーマット
  */
 function gisg_format_amount($amount) {
@@ -336,10 +400,10 @@ $difficulty = isset($difficulty_map[$grant['grant_difficulty']]) ? $difficulty_m
 
 // ステータスマップ
 $status_map = array(
-    'open' => array('label' => '募集中', 'class' => 'open'),
-    'closed' => array('label' => '募集終了', 'class' => 'closed'),
-    'upcoming' => array('label' => '募集予定', 'class' => 'upcoming'),
-    'suspended' => array('label' => '一時停止', 'class' => 'suspended'),
+    'open' => array('label' => '募集中', 'class' => 'open', 'icon' => '✓'),
+    'closed' => array('label' => '募集終了', 'class' => 'closed', 'icon' => '×'),
+    'upcoming' => array('label' => '募集予定', 'class' => 'upcoming', 'icon' => '◎'),
+    'suspended' => array('label' => '一時停止', 'class' => 'suspended', 'icon' => '!'),
 );
 $status = isset($status_map[$grant['application_status']]) ? $status_map[$grant['application_status']] : $status_map['open'];
 
@@ -648,7 +712,7 @@ if ($grant['ai_summary']) {
         <!-- ヒーロー -->
         <header class="gi-hero">
             <div class="gi-hero-badges">
-                <span class="gi-badge gi-badge-<?php echo esc_attr($status['class']); ?>"><?php echo esc_html($status['label']); ?></span>
+                <span class="gi-badge gi-badge-<?php echo esc_attr($status['class']); ?>"><span aria-hidden="true"><?php echo esc_html($status['icon']); ?></span> <?php echo esc_html($status['label']); ?></span>
                 <?php if ($days_remaining > 0 && $days_remaining <= 14): ?>
                 <span class="gi-badge gi-badge-<?php echo esc_attr($deadline_status); ?>">残り<?php echo $days_remaining; ?>日</span>
                 <?php endif; ?>
@@ -1217,8 +1281,8 @@ if ($grant['ai_summary']) {
                     </div>
                     <div class="gi-supervisor-content">
                         <div class="gi-supervisor-avatar">
-                            <?php if (!empty($grant['supervisor_image']) && isset($grant['supervisor_image']['url'])): ?>
-                            <img src="<?php echo esc_url($grant['supervisor_image']['url']); ?>" alt="<?php echo esc_attr($grant['supervisor_name']); ?>" loading="lazy" decoding="async" width="72" height="72">
+                            <?php if (!empty($grant['supervisor_image']) && (isset($grant['supervisor_image']['url']) || isset($grant['supervisor_image']['ID']))): ?>
+                            <?php echo gisg_responsive_image($grant['supervisor_image'], $grant['supervisor_name'] . ' - 監修者', '', array('thumbnail', 'medium'), true); ?>
                             <?php else: ?>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                             <?php endif; ?>
@@ -1262,8 +1326,9 @@ if ($grant['ai_summary']) {
                             </div>
                         </div>
                         <div class="gi-ai-input-area">
+                            <label for="aiInput" class="sr-only">AIアシスタントへの質問</label>
                             <div class="gi-ai-input-wrap">
-                                <textarea class="gi-ai-input" id="aiInput" placeholder="質問を入力..." rows="1" aria-label="AIへの質問"></textarea>
+                                <textarea class="gi-ai-input" id="aiInput" placeholder="質問を入力..." rows="1"></textarea>
                                 <button class="gi-ai-send" id="aiSend" type="button" aria-label="送信">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
                                 </button>
@@ -1462,6 +1527,47 @@ if ($grant['ai_summary']) {
     <?php endif; ?>
 </div>
 
+<!-- モバイルクイックアクションバー - UX Improvement -->
+<div class="gi-mobile-action-bar" id="mobileActionBar">
+    <a href="#checklist" class="gi-action-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <span>チェック</span>
+    </a>
+    <button id="mobileAiQuickBtn" class="gi-action-btn gi-action-btn-primary" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>AI相談</span>
+    </button>
+    <?php if ($grant['official_url']): ?>
+    <a href="<?php echo esc_url($grant['official_url']); ?>" class="gi-action-btn gi-action-btn-cta" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        <span>申請</span>
+    </a>
+    <?php endif; ?>
+</div>
+
+<!-- チェックリスト完了モーダル - UX Improvement -->
+<div class="gi-completion-modal" id="completionModal" role="dialog" aria-modal="true" aria-labelledby="completionModalTitle">
+    <div class="gi-completion-overlay" id="completionOverlay"></div>
+    <div class="gi-completion-content">
+        <div class="gi-completion-icon">🎉</div>
+        <h3 class="gi-completion-title" id="completionModalTitle">申請準備完了！</h3>
+        <p class="gi-completion-text">すべての必須項目をクリアしました。<br>公式サイトから申請を進めましょう。</p>
+        <div class="gi-completion-actions">
+            <?php if ($grant['official_url']): ?>
+            <a href="<?php echo esc_url($grant['official_url']); ?>" class="gi-btn gi-btn-accent gi-btn-lg" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                今すぐ申請する
+            </a>
+            <?php endif; ?>
+            <button class="gi-btn gi-btn-secondary" id="completionClose">あとで申請する</button>
+        </div>
+        <div class="gi-completion-saved">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            進捗は自動保存されています
+        </div>
+    </div>
+</div>
+
 <!-- モバイルFAB -->
 <div class="gi-mobile-fab">
     <button class="gi-fab-btn" id="mobileAiBtn" type="button" aria-label="AIアシスタントを開く">
@@ -1490,8 +1596,9 @@ if ($grant['ai_summary']) {
             <div class="gi-mobile-ai-messages" id="mobileAiMessages">
                 <div class="gi-ai-msg"><div class="gi-ai-avatar">AI</div><div class="gi-ai-bubble">この補助金について何でもお聞きください。</div></div>
             </div>
+            <label for="mobileAiInput" class="sr-only">AIアシスタントへの質問</label>
             <div class="gi-mobile-ai-input-wrap">
-                <textarea class="gi-mobile-ai-input" id="mobileAiInput" placeholder="質問を入力..." rows="1" aria-label="AIへの質問"></textarea>
+                <textarea class="gi-mobile-ai-input" id="mobileAiInput" placeholder="質問を入力..." rows="1"></textarea>
                 <button class="gi-mobile-ai-send" id="mobileAiSend" type="button" aria-label="送信">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
                 </button>

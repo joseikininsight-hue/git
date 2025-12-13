@@ -3,10 +3,10 @@
  * JOSEIKIN INSIGHT - Perfect Header
  * 官公庁風デザイン - 完全統合版
  * CSS・PHP・JavaScript一体型ファイル
- * スキップリンクなしバージョン
+ * SEO・アクセシビリティ最適化版（スキップリンク対応）
  * 
  * @package Joseikin_Insight_Header
- * @version 14.1.0 (Government Official Edition - No Skip Link)
+ * @version 15.0.0 (SEO & Accessibility Optimized Edition)
  */
 
 if (!defined('ABSPATH')) {
@@ -192,11 +192,43 @@ if (!function_exists('ji_generate_seo_meta')) {
             $seo['og_description'] = $seo['description'];
         }
         
-        // Truncate descriptions to recommended length
-        $seo['description'] = mb_substr($seo['description'], 0, 160, 'UTF-8');
-        $seo['og_description'] = mb_substr($seo['og_description'], 0, 200, 'UTF-8');
+        // Smart truncation - avoid cutting mid-sentence
+        $seo['description'] = ji_smart_truncate($seo['description'], 160);
+        $seo['og_description'] = ji_smart_truncate($seo['og_description'], 200);
         
         return $seo;
+    }
+}
+
+/**
+ * Smart text truncation - Preserves sentence boundaries where possible
+ * SEO Improvement: Avoids cutting text mid-sentence for better snippet display
+ * 
+ * @since 15.0.0
+ * @param string $text Text to truncate
+ * @param int $limit Character limit
+ * @return string Truncated text
+ */
+if (!function_exists('ji_smart_truncate')) {
+    function ji_smart_truncate($text, $limit) {
+        if (mb_strlen($text, 'UTF-8') <= $limit) {
+            return $text;
+        }
+        
+        $truncated = mb_substr($text, 0, $limit - 1, 'UTF-8');
+        
+        // Try to find a sentence boundary (。 or . followed by space)
+        $last_period_ja = mb_strrpos($truncated, '。', 0, 'UTF-8');
+        $last_period_en = mb_strrpos($truncated, '. ', 0, 'UTF-8');
+        $last_period = max($last_period_ja ?: 0, $last_period_en ?: 0);
+        
+        // If sentence boundary found in the last 30% of text, use it
+        if ($last_period > $limit * 0.7) {
+            return mb_substr($truncated, 0, $last_period + 1, 'UTF-8');
+        }
+        
+        // Otherwise, add ellipsis
+        return $truncated . '…';
     }
 }
 
@@ -1501,6 +1533,35 @@ $grants_url = get_post_type_archive_link('grant');
         border: 0;
     }
 
+    /* Skip Link - Accessibility Improvement */
+    .ji-skip-to-main {
+        position: absolute;
+        top: -100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--h-gov-navy-900);
+        color: var(--h-white);
+        padding: 14px 28px;
+        border-radius: 0 0 var(--h-radius-lg) var(--h-radius-lg);
+        font-weight: 700;
+        font-size: 14px;
+        z-index: 100000;
+        transition: top 0.3s ease;
+        text-decoration: none;
+        box-shadow: var(--h-shadow-lg);
+        border: 2px solid var(--h-gov-gold);
+        border-top: none;
+    }
+    
+    .ji-skip-to-main:focus {
+        top: 0;
+        outline: none;
+    }
+    
+    .ji-skip-to-main:hover {
+        background: var(--h-gov-navy-800);
+    }
+
     body.menu-open {
         overflow: hidden;
         position: fixed;
@@ -1562,6 +1623,11 @@ $grants_url = get_post_type_archive_link('grant');
 
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
+
+<!-- Skip Link for Accessibility - SEO Improvement -->
+<a href="#main-content" class="ji-skip-to-main">
+    <span>メインコンテンツへスキップ</span>
+</a>
 
 <header id="ji-header" class="ji-header" role="banner">
     <div class="ji-header-main">
