@@ -775,7 +775,10 @@ if (!function_exists('gi_get_cached_stats')) {
 
     <?php 
     // グローバルスティッキーCTAバナーを表示
-    get_template_part('template-parts/global-sticky-cta'); 
+    // single-grant ページでは独自のモバイルパネルがあるため非表示
+    if (!is_singular('grant')) {
+        get_template_part('template-parts/global-sticky-cta'); 
+    }
     ?>
 
     <?php wp_footer(); ?>

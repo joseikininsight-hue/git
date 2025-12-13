@@ -392,15 +392,33 @@
             const overlay = document.getElementById('onboardingOverlay');
             if (overlay) overlay.classList.add('active');
             
-            // Scroll target into view
-            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            
-            // Remove existing tooltip
+            // Remove existing tooltip with fade out animation
             const existingTooltip = document.querySelector('.gi-onboarding-tooltip');
-            if (existingTooltip) existingTooltip.remove();
+            if (existingTooltip) {
+                existingTooltip.classList.add('fade-out');
+                setTimeout(() => existingTooltip.remove(), 200);
+            }
             
-            // Create tooltip after scroll
+            // Highlight target element
+            target.classList.add('gi-onboarding-highlight');
+            
+            // Scroll target into view with offset for better visibility
+            const headerOffset = 100;
+            const elementPosition = target.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+            
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+            
+            // Create tooltip after scroll completes
             setTimeout(() => {
+                // Remove highlight from previous target
+                document.querySelectorAll('.gi-onboarding-highlight').forEach(el => {
+                    if (el !== target) el.classList.remove('gi-onboarding-highlight');
+                });
+                
                 const tooltip = document.createElement('div');
                 tooltip.className = 'gi-onboarding-tooltip ' + step.position;
                 tooltip.innerHTML = `
@@ -412,11 +430,11 @@
                         <button class="gi-onboarding-next" id="onboardingNext">${index < this.steps.length - 1 ? '次へ' : '完了'}</button>
                     </div>
                     <div class="gi-onboarding-progress">
-                        ${this.steps.map((_, i) => `<div class="gi-onboarding-dot ${i === index ? 'active' : ''}"></div>`).join('')}
+                        ${this.steps.map((_, i) => `<div class="gi-onboarding-dot ${i <= index ? 'active' : ''} ${i < index ? 'completed' : ''}"></div>`).join('')}
                     </div>
                 `;
                 
-                // Position tooltip
+                // Position tooltip near target
                 const rect = target.getBoundingClientRect();
                 if (step.position === 'bottom') {
                     tooltip.style.top = (rect.bottom + window.scrollY + 16) + 'px';
@@ -425,12 +443,26 @@
                 }
                 tooltip.style.left = Math.max(20, Math.min(window.innerWidth - 340, rect.left)) + 'px';
                 
+                // Animate tooltip entrance
+                tooltip.style.opacity = '0';
+                tooltip.style.transform = 'translateY(10px)';
                 document.body.appendChild(tooltip);
+                
+                requestAnimationFrame(() => {
+                    tooltip.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    tooltip.style.opacity = '1';
+                    tooltip.style.transform = 'translateY(0)';
+                });
                 
                 // Event listeners
                 document.getElementById('onboardingSkip').addEventListener('click', () => this.completeTour());
-                document.getElementById('onboardingNext').addEventListener('click', () => this.showStep(index + 1));
-            }, 400);
+                document.getElementById('onboardingNext').addEventListener('click', () => {
+                    // Add pulse animation to button feedback
+                    const btn = document.getElementById('onboardingNext');
+                    btn.classList.add('clicked');
+                    setTimeout(() => this.showStep(index + 1), 150);
+                });
+            }, 600);
         },
         
         completeTour: function() {
@@ -439,8 +471,21 @@
             const overlay = document.getElementById('onboardingOverlay');
             const tooltip = document.querySelector('.gi-onboarding-tooltip');
             
-            if (overlay) overlay.remove();
-            if (tooltip) tooltip.remove();
+            // Fade out animations
+            if (tooltip) {
+                tooltip.style.opacity = '0';
+                tooltip.style.transform = 'translateY(10px)';
+                setTimeout(() => tooltip.remove(), 300);
+            }
+            if (overlay) {
+                overlay.style.opacity = '0';
+                setTimeout(() => overlay.remove(), 300);
+            }
+            
+            // Remove all highlights
+            document.querySelectorAll('.gi-onboarding-highlight').forEach(el => {
+                el.classList.remove('gi-onboarding-highlight');
+            });
             
             UI.showToast('ツアーを完了しました');
         }

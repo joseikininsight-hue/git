@@ -3078,6 +3078,33 @@ ul, ol {
     background: var(--gi-gov-gold);
 }
 
+.gi-onboarding-dot.completed {
+    background: var(--gi-gov-navy-800);
+}
+
+/* Fade out animation for tooltip */
+.gi-onboarding-tooltip.fade-out {
+    opacity: 0 !important;
+    transform: translateY(-10px) !important;
+    transition: all 0.2s ease !important;
+}
+
+/* Highlight pulse animation */
+.gi-onboarding-highlight {
+    animation: gi-highlightPulse 2s ease-in-out infinite;
+}
+
+@keyframes gi-highlightPulse {
+    0%, 100% { box-shadow: 0 0 0 9999px rgba(13, 27, 42, 0.65), 0 0 0 4px rgba(197, 160, 89, 0.5); }
+    50% { box-shadow: 0 0 0 9999px rgba(13, 27, 42, 0.65), 0 0 0 8px rgba(197, 160, 89, 0.3); }
+}
+
+/* Next button click feedback */
+.gi-onboarding-next.clicked {
+    transform: scale(0.95);
+    opacity: 0.8;
+}
+
 /* ==========================================================================
    エラー状態 & リトライ - UX Improvement
    ========================================================================== */
