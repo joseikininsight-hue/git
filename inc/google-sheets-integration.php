@@ -29,7 +29,11 @@ if (!defined('GI_SHEETS_VERSION')) {
 }
 
 if (!defined('GI_SHEETS_BATCH_SIZE')) {
-    define('GI_SHEETS_BATCH_SIZE', 50); // 一度に処理する件数
+    define('GI_SHEETS_BATCH_SIZE', 25); // 一度に処理する件数（メモリ節約のため小さく）
+}
+
+if (!defined('GI_SHEETS_READ_CHUNK_SIZE')) {
+    define('GI_SHEETS_READ_CHUNK_SIZE', 100); // シートから一度に読み込む行数
 }
 
 if (!defined('GI_SHEETS_API_DELAY')) {
@@ -722,12 +726,13 @@ class GoogleSheetsSync {
     /**
      * スプレッドシートからWordPressへの同期（メイン）
      * 
-     * バッチ処理による大規模データ対応版
+     * チャンク読み込み＋バッチ処理による大規模データ対応版
+     * メモリ効率を最大限に高めた実装
      * 
      * @return array 同期結果
      */
     public function syncFromSheets() {
-        gi_log_info('Starting sync from sheets');
+        gi_log_info('Starting sync from sheets (chunked version)');
         
         // 実行環境の設定
         $this->setupExecutionEnvironment();
@@ -736,22 +741,29 @@ class GoogleSheetsSync {
         $this->initSyncProgress('sheets_to_wp');
         
         try {
-            // シートデータの読み取り
-            $sheet_data = $this->readSheetData();
-            if ($sheet_data === false || empty($sheet_data)) {
-                throw new Exception('シートデータの読み取りに失敗しました');
+            // まず総行数を取得（ヘッダー行のみ読み込み＋行数カウント）
+            $total_rows = $this->getSheetRowCount();
+            if ($total_rows === false) {
+                throw new Exception('シートの行数取得に失敗しました');
             }
             
-            // ヘッダー行を除去
-            $headers = array_shift($sheet_data);
-            $total_rows = count($sheet_data);
+            if ($total_rows <= 1) {
+                return array(
+                    'success' => true,
+                    'stats' => array('created' => 0, 'updated' => 0, 'deleted' => 0, 'skipped' => 0, 'errors' => 0),
+                    'message' => '同期するデータがありません'
+                );
+            }
+            
+            // ヘッダー行を除いた実データ数
+            $data_rows = $total_rows - 1;
             
             $this->updateSyncProgress(array(
-                'total' => $total_rows,
+                'total' => $data_rows,
                 'status' => 'processing'
             ));
             
-            gi_log_info('Sheet data loaded', array('total_rows' => $total_rows));
+            gi_log_info('Sheet row count retrieved', array('total_rows' => $total_rows, 'data_rows' => $data_rows));
             
             // 統計初期化
             $stats = array(
@@ -762,24 +774,60 @@ class GoogleSheetsSync {
                 'errors' => 0
             );
             
-            // 新規投稿のID更新用
+            // 新規投稿のID更新用（チャンクごとに処理して解放）
             $new_post_ids = array();
             
-            // バッチ処理
-            $batch_size = GI_SHEETS_BATCH_SIZE;
-            $batches = array_chunk($sheet_data, $batch_size, true);
+            // チャンク単位でシートを読み込み処理
+            $chunk_size = GI_SHEETS_READ_CHUNK_SIZE;
             $processed = 0;
+            $start_row = 2; // ヘッダー行の次から開始
             
-            foreach ($batches as $batch_index => $batch) {
+            while ($start_row <= $total_rows) {
                 // キャンセルチェック
                 if ($this->isSyncCancelled()) {
                     gi_log_info('Sync cancelled by user');
                     break;
                 }
                 
-                foreach ($batch as $row_index => $row) {
+                // メモリチェック - 使用量が高すぎる場合は警告
+                $memory_usage = memory_get_usage(true);
+                $memory_limit = $this->getMemoryLimitBytes();
+                if ($memory_usage > $memory_limit * 0.8) {
+                    gi_log_info('Memory usage high, forcing cleanup', array(
+                        'usage' => $this->formatBytes($memory_usage),
+                        'limit' => $this->formatBytes($memory_limit)
+                    ));
+                    $this->aggressiveMemoryCleanup();
+                }
+                
+                $end_row = min($start_row + $chunk_size - 1, $total_rows);
+                
+                // このチャンクのデータを読み込み
+                $range = $this->sheet_name . '!A' . $start_row . ':AE' . $end_row;
+                $chunk_data = $this->readSheetData($range);
+                
+                if ($chunk_data === false) {
+                    gi_log_error('Failed to read chunk', array('range' => $range));
+                    $start_row = $end_row + 1;
+                    continue;
+                }
+                
+                gi_log_debug('Processing chunk', array(
+                    'start_row' => $start_row,
+                    'end_row' => $end_row,
+                    'rows_in_chunk' => count($chunk_data),
+                    'memory' => $this->getMemoryUsage()
+                ));
+                
+                // チャンク内のデータをさらにバッチに分けて処理
+                $batch_size = GI_SHEETS_BATCH_SIZE;
+                $chunk_offset = 0;
+                
+                foreach ($chunk_data as $row_index => $row) {
+                    $actual_row_number = $start_row + $row_index;
+                    
                     try {
-                        $result = $this->processSheetRow($row, $row_index + 2); // +2 はヘッダー行と0-indexed調整
+                        $result = $this->processSheetRow($row, $actual_row_number);
                         
                         switch ($result['action']) {
                             case 'created':
@@ -802,12 +850,31 @@ class GoogleSheetsSync {
                     } catch (Exception $e) {
                         $stats['errors']++;
                         gi_log_error('Row processing error', array(
-                            'row' => $row_index + 2,
+                            'row' => $actual_row_number,
                             'error' => $e->getMessage()
                         ));
                     }
                     
                     $processed++;
+                    $chunk_offset++;
+                    
+                    // バッチサイズごとにメモリクリアとプログレス更新
+                    if ($chunk_offset % $batch_size === 0) {
+                        $this->updateSyncProgress(array(
+                            'processed' => $processed,
+                            'stats' => $stats
+                        ));
+                        $this->cleanupMemory();
+                    }
+                }
+                
+                // チャンクデータを明示的に解放
+                unset($chunk_data);
+                
+                // 新規投稿IDをシートに書き戻し（チャンクごと）
+                if (!empty($new_post_ids) && count($new_post_ids) >= 50) {
+                    $this->updateSheetPostIds($new_post_ids);
+                    $new_post_ids = array(); // 解放
                 }
                 
                 // プログレス更新
@@ -819,16 +886,20 @@ class GoogleSheetsSync {
                 // メモリクリア
                 $this->cleanupMemory();
                 
-                gi_log_debug('Batch processed', array(
-                    'batch' => $batch_index + 1,
+                gi_log_debug('Chunk processed', array(
+                    'chunk_end_row' => $end_row,
                     'processed' => $processed,
                     'memory' => $this->getMemoryUsage()
                 ));
+                
+                // 次のチャンクへ
+                $start_row = $end_row + 1;
             }
             
-            // 新規投稿IDをシートに書き戻し
+            // 残りの新規投稿IDをシートに書き戻し
             if (!empty($new_post_ids)) {
                 $this->updateSheetPostIds($new_post_ids);
+                unset($new_post_ids);
             }
             
             // 完了
@@ -864,7 +935,133 @@ class GoogleSheetsSync {
     }
     
     /**
+     * シートの総行数を取得
+     * 
+     * @return int|false 行数またはfalse
+     */
+    private function getSheetRowCount() {
+        $access_token = $this->getAccessToken();
+        if (!$access_token) {
+            return false;
+        }
+        
+        // A列のみを取得して行数をカウント（メモリ効率が良い）
+        $range = $this->sheet_name . '!A:A';
+        $url = self::SHEETS_API_URL . $this->spreadsheet_id . '/values/' . urlencode($range);
+        
+        $response = wp_remote_get($url, array(
+            'headers' => array(
+                'Authorization' => 'Bearer ' . $access_token,
+                'Content-Type' => 'application/json'
+            ),
+            'timeout' => 60
+        ));
+        
+        if (is_wp_error($response)) {
+            $this->setError('行数取得に失敗しました', array(
+                'error' => $response->get_error_message()
+            ));
+            return false;
+        }
+        
+        $response_code = wp_remote_retrieve_response_code($response);
+        $body = wp_remote_retrieve_body($response);
+        
+        if ($response_code !== 200) {
+            $this->setError('行数取得エラー', array(
+                'response_code' => $response_code,
+                'response' => $body
+            ));
+            return false;
+        }
+        
+        $data = json_decode($body, true);
+        
+        // レスポンスを即座に解放
+        unset($response);
+        unset($body);
+        
+        return isset($data['values']) ? count($data['values']) : 0;
+    }
+    
+    /**
+     * メモリ制限をバイト単位で取得
+     * 
+     * @return int
+     */
+    private function getMemoryLimitBytes() {
+        $limit = ini_get('memory_limit');
+        if ($limit == -1) {
+            return PHP_INT_MAX;
+        }
+        
+        $unit = strtolower(substr($limit, -1));
+        $value = intval($limit);
+        
+        switch ($unit) {
+            case 'g':
+                $value *= 1024 * 1024 * 1024;
+                break;
+            case 'm':
+                $value *= 1024 * 1024;
+                break;
+            case 'k':
+                $value *= 1024;
+                break;
+        }
+        
+        return $value;
+    }
+    
+    /**
+     * バイト数をフォーマット
+     * 
+     * @param int $bytes
+     * @return string
+     */
+    private function formatBytes($bytes) {
+        if ($bytes >= 1073741824) {
+            return round($bytes / 1073741824, 2) . 'GB';
+        } elseif ($bytes >= 1048576) {
+            return round($bytes / 1048576, 2) . 'MB';
+        } elseif ($bytes >= 1024) {
+            return round($bytes / 1024, 2) . 'KB';
+        }
+        return $bytes . 'B';
+    }
+    
+    /**
+     * 積極的なメモリクリーンアップ
+     */
+    private function aggressiveMemoryCleanup() {
+        global $wpdb, $wp_object_cache;
+        
+        // WordPressのキャッシュをクリア
+        wp_cache_flush();
+        
+        // WPDBのクエリログをクリア（デバッグモード時に肥大化する）
+        $wpdb->queries = array();
+        
+        // オブジェクトキャッシュをクリア
+        if (isset($wp_object_cache) && is_object($wp_object_cache)) {
+            if (method_exists($wp_object_cache, 'flush')) {
+                $wp_object_cache->flush();
+            }
+        }
+        
+        // PHPのガベージコレクションを強制実行
+        if (function_exists('gc_collect_cycles')) {
+            gc_collect_cycles();
+        }
+        
+        // 一時的に処理を停止してGCを動作させる
+        usleep(10000); // 10ms
+    }
+    
+    /**
      * シートの1行を処理
+     * 
+     * メモリ効率を考慮した実装
      * 
      * @param array $row 行データ
      * @param int $row_number 行番号
@@ -885,7 +1082,7 @@ class GoogleSheetsSync {
         }
         
         // ステータス取得
-        $status = isset($row[4]) ? sanitize_text_field($row[4]) : 'draft';
+        $status = isset($row[4]) ? strtolower(trim($row[4])) : 'draft';
         $valid_statuses = array('draft', 'publish', 'private', 'pending', 'deleted');
         if (!in_array($status, $valid_statuses)) {
             $status = 'draft';
@@ -893,14 +1090,22 @@ class GoogleSheetsSync {
         
         // 削除処理
         if ($status === 'deleted') {
-            if ($post_id && get_post($post_id)) {
-                wp_delete_post($post_id, true);
-                return array('action' => 'deleted', 'post_id' => $post_id);
+            if ($post_id) {
+                // 存在チェックを軽量に行う
+                global $wpdb;
+                $exists = $wpdb->get_var($wpdb->prepare(
+                    "SELECT ID FROM {$wpdb->posts} WHERE ID = %d AND post_type = 'grant' LIMIT 1",
+                    $post_id
+                ));
+                if ($exists) {
+                    wp_delete_post($post_id, true);
+                    return array('action' => 'deleted', 'post_id' => $post_id);
+                }
             }
             return array('action' => 'skipped', 'reason' => 'already_deleted');
         }
         
-        // 投稿データを準備
+        // 投稿データを準備（必要最小限のデータのみ）
         $post_data = array(
             'post_title' => $title,
             'post_content' => isset($row[2]) ? $row[2] : '',
@@ -910,28 +1115,45 @@ class GoogleSheetsSync {
         );
         
         // 既存投稿の更新または新規作成
-        $existing_post = null;
+        $action = 'skipped';
         
-        if ($post_id && get_post($post_id)) {
-            // IDで既存投稿を更新
-            $post_data['ID'] = $post_id;
-            $result_id = wp_update_post($post_data, true);
+        if ($post_id) {
+            // IDで既存投稿を直接更新（存在チェックを軽量に）
+            global $wpdb;
+            $exists = $wpdb->get_var($wpdb->prepare(
+                "SELECT ID FROM {$wpdb->posts} WHERE ID = %d AND post_type = 'grant' LIMIT 1",
+                $post_id
+            ));
             
-            if (is_wp_error($result_id)) {
-                throw new Exception($result_id->get_error_message());
-            }
-            
-            $action = 'updated';
-            
-        } else {
-            // タイトルで既存投稿を検索
-            $existing_post = $this->findPostByTitle($title);
-            
-            if ($existing_post) {
-                // 既存投稿を更新
-                $post_data['ID'] = $existing_post->ID;
+            if ($exists) {
+                $post_data['ID'] = $post_id;
                 $result_id = wp_update_post($post_data, true);
-                $post_id = $existing_post->ID;
+                
+                if (is_wp_error($result_id)) {
+                    throw new Exception($result_id->get_error_message());
+                }
+                
+                $action = 'updated';
+            } else {
+                // IDが指定されているが存在しない場合は新規作成
+                $result_id = wp_insert_post($post_data, true);
+                
+                if (is_wp_error($result_id)) {
+                    throw new Exception($result_id->get_error_message());
+                }
+                
+                $post_id = $result_id;
+                $action = 'created';
+            }
+        } else {
+            // タイトルで既存投稿を検索（軽量クエリ）
+            $existing_post_id = $this->findPostIdByTitle($title);
+            
+            if ($existing_post_id) {
+                // 既存投稿を更新
+                $post_data['ID'] = $existing_post_id;
+                $result_id = wp_update_post($post_data, true);
+                $post_id = $existing_post_id;
                 $action = 'updated';
             } else {
                 // 新規投稿を作成
@@ -945,6 +1167,9 @@ class GoogleSheetsSync {
             }
         }
         
+        // post_dataを解放
+        unset($post_data);
+        
         // ACFフィールドとタクソノミーを更新
         $this->updatePostMeta($post_id, $row);
         $this->updatePostTaxonomies($post_id, $row);
@@ -957,15 +1182,15 @@ class GoogleSheetsSync {
     }
     
     /**
-     * タイトルで投稿を検索
+     * タイトルで投稿IDを検索（軽量版）
      * 
      * @param string $title タイトル
-     * @return WP_Post|null 投稿オブジェクトまたはnull
+     * @return int|null 投稿IDまたはnull
      */
-    private function findPostByTitle($title) {
+    private function findPostIdByTitle($title) {
         global $wpdb;
         
-        $post_id = $wpdb->get_var($wpdb->prepare(
+        return $wpdb->get_var($wpdb->prepare(
             "SELECT ID FROM {$wpdb->posts} 
              WHERE post_type = 'grant' 
              AND post_status IN ('publish', 'draft', 'private', 'pending')
@@ -973,19 +1198,32 @@ class GoogleSheetsSync {
              LIMIT 1",
             $title
         ));
-        
+    }
+    
+    /**
+     * タイトルで投稿を検索
+     * 
+     * 後方互換性のために残す（内部では軽量版を推奨）
+     * 
+     * @param string $title タイトル
+     * @return WP_Post|null 投稿オブジェクトまたはnull
+     */
+    private function findPostByTitle($title) {
+        $post_id = $this->findPostIdByTitle($title);
         return $post_id ? get_post($post_id) : null;
     }
     
     /**
      * 投稿のメタ情報（ACFフィールド）を更新
      * 
+     * メモリ効率を考慮し、バッチ更新を行う
+     * 
      * @param int $post_id 投稿ID
      * @param array $row シートの行データ
      */
     private function updatePostMeta($post_id, $row) {
         // ACFフィールドマッピング（列インデックス => フィールド名）
-        $acf_fields = array(
+        static $acf_fields = array(
             7  => 'max_amount',
             8  => 'max_amount_numeric',
             9  => 'deadline',
@@ -1007,41 +1245,49 @@ class GoogleSheetsSync {
             29 => 'subsidy_rate_detailed',
         );
         
+        static $numeric_fields = array('max_amount_numeric', 'adoption_rate');
+        static $use_acf = null;
+        
+        // ACF関数の存在チェックは一度だけ
+        if ($use_acf === null) {
+            $use_acf = function_exists('update_field');
+        }
+        
         foreach ($acf_fields as $col_index => $field_name) {
-            if (isset($row[$col_index])) {
-                $value = $row[$col_index];
-                
-                // 数値フィールドの処理
-                if (in_array($field_name, array('max_amount_numeric', 'adoption_rate'))) {
-                    $value = is_numeric($value) ? floatval($value) : 0;
-                }
-                
-                // 日付フィールドの処理
-                if ($field_name === 'deadline_date' && !empty($value) && $value !== '0000-00-00') {
-                    $timestamp = strtotime($value);
-                    if ($timestamp !== false) {
-                        $value = date('Y-m-d', $timestamp);
-                    }
-                }
-                
-                if (function_exists('update_field')) {
-                    update_field($field_name, $value, $post_id);
-                } else {
-                    update_post_meta($post_id, $field_name, $value);
+            if (!isset($row[$col_index]) || $row[$col_index] === '') {
+                continue;
+            }
+            
+            $value = $row[$col_index];
+            
+            // 数値フィールドの処理
+            if (in_array($field_name, $numeric_fields, true)) {
+                $value = is_numeric($value) ? floatval($value) : 0;
+            }
+            // 日付フィールドの処理
+            elseif ($field_name === 'deadline_date' && !empty($value) && $value !== '0000-00-00') {
+                $timestamp = strtotime($value);
+                if ($timestamp !== false) {
+                    $value = date('Y-m-d', $timestamp);
                 }
             }
+            
+            // update_post_meta を直接使用（ACFより高速）
+            update_post_meta($post_id, $field_name, $value);
         }
     }
     
     /**
      * 投稿のタクソノミーを更新
      * 
+     * メモリ効率を考慮した実装
+     * 
      * @param int $post_id 投稿ID
      * @param array $row シートの行データ
      */
     private function updatePostTaxonomies($post_id, $row) {
         // タクソノミーマッピング（列インデックス => タクソノミー名）
-        $taxonomy_fields = array(
+        static $taxonomy_fields = array(
             19 => 'grant_prefecture',
             20 => 'grant_municipality',
             21 => 'grant_category',
@@ -1049,10 +1295,19 @@ class GoogleSheetsSync {
         );
         
         foreach ($taxonomy_fields as $col_index => $taxonomy) {
-            if (isset($row[$col_index]) && !empty($row[$col_index])) {
-                $terms = array_filter(array_map('trim', explode(',', $row[$col_index])));
+            if (!isset($row[$col_index]) || $row[$col_index] === '') {
+                // 空の場合はタームをクリア
+                wp_set_post_terms($post_id, array(), $taxonomy);
+                continue;
+            }
+            
+            $terms = array_filter(array_map('trim', explode(',', $row[$col_index])));
+            if (!empty($terms)) {
                 $this->setTermsWithAutoCreate($post_id, $terms, $taxonomy);
             }
+            
+            // 処理済みのterms配列を解放
+            unset($terms);
         }
     }
     
@@ -1109,18 +1364,24 @@ class GoogleSheetsSync {
     /**
      * WordPressからスプレッドシートへの全件エクスポート
      * 
+     * メモリ効率を最大限に高めた実装
+     * 
      * @return array エクスポート結果
      */
     public function exportAllPosts() {
-        gi_log_info('Starting export all posts');
+        gi_log_info('Starting export all posts (memory-optimized)');
         
         $this->setupExecutionEnvironment();
         $this->initSyncProgress('wp_to_sheets');
         
         try {
-            // 投稿数をカウント
-            $post_counts = wp_count_posts('grant');
-            $total = $post_counts->publish + $post_counts->draft + $post_counts->private;
+            // 投稿数をカウント（軽量クエリ）
+            global $wpdb;
+            $total = (int) $wpdb->get_var(
+                "SELECT COUNT(*) FROM {$wpdb->posts} 
+                 WHERE post_type = 'grant' 
+                 AND post_status IN ('publish', 'draft', 'private')"
+            );
             
             if ($total === 0) {
                 return array(
@@ -1135,43 +1396,63 @@ class GoogleSheetsSync {
                 'status' => 'processing'
             ));
             
+            gi_log_info('Export starting', array('total' => $total));
+            
             // シートをクリアしてヘッダーを設定
             $this->clearSheetRange('A:AE');
             $this->setupSheetHeaders();
             
-            // バッチ処理でエクスポート
+            // バッチ処理でエクスポート（より小さなバッチサイズ）
             $batch_size = GI_SHEETS_BATCH_SIZE;
-            $page = 1;
+            $offset = 0;
             $exported = 0;
             $current_row = 2; // ヘッダー行の次
             
-            while (true) {
+            while ($offset < $total) {
                 if ($this->isSyncCancelled()) {
                     gi_log_info('Export cancelled by user');
                     break;
                 }
                 
-                $posts = get_posts(array(
-                    'post_type' => 'grant',
-                    'post_status' => array('publish', 'draft', 'private'),
-                    'posts_per_page' => $batch_size,
-                    'paged' => $page,
-                    'orderby' => 'ID',
-                    'order' => 'ASC'
+                // メモリチェック
+                $memory_usage = memory_get_usage(true);
+                $memory_limit = $this->getMemoryLimitBytes();
+                if ($memory_usage > $memory_limit * 0.75) {
+                    gi_log_info('Memory usage high during export, forcing cleanup', array(
+                        'usage' => $this->formatBytes($memory_usage),
+                        'limit' => $this->formatBytes($memory_limit)
+                    ));
+                    $this->aggressiveMemoryCleanup();
+                }
+                
+                // IDのみを取得（メモリ効率が良い）
+                $post_ids = $wpdb->get_col($wpdb->prepare(
+                    "SELECT ID FROM {$wpdb->posts} 
+                     WHERE post_type = 'grant' 
+                     AND post_status IN ('publish', 'draft', 'private')
+                     ORDER BY ID ASC
+                     LIMIT %d OFFSET %d",
+                    $batch_size,
+                    $offset
                 ));
                 
-                if (empty($posts)) {
+                if (empty($post_ids)) {
                     break;
                 }
                 
                 // バッチデータを準備
                 $batch_data = array();
-                foreach ($posts as $post) {
-                    $row_data = $this->convertPostToRow($post->ID);
+                foreach ($post_ids as $post_id) {
+                    $row_data = $this->convertPostToRowLightweight((int)$post_id);
                     if ($row_data) {
                         $batch_data[] = $row_data;
                     }
+                    // 個別に解放
+                    unset($row_data);
                 }
+                
+                // post_ids を解放
+                unset($post_ids);
                 
                 // バッチを書き込み
                 if (!empty($batch_data)) {
@@ -1186,23 +1467,26 @@ class GoogleSheetsSync {
                     }
                 }
                 
+                // batch_data を解放
+                $batch_count = count($batch_data);
+                unset($batch_data);
+                
                 // プログレス更新
                 $this->updateSyncProgress(array(
                     'processed' => $exported
                 ));
                 
-                // 次のページへ
-                $posts_count = count($posts);
-                $page++;
+                // 次のバッチへ
+                $offset += $batch_size;
                 
                 // メモリクリア
-                unset($posts);
-                unset($batch_data);
                 $this->cleanupMemory();
                 
-                if ($posts_count < $batch_size) {
-                    break;
-                }
+                gi_log_debug('Export batch completed', array(
+                    'exported' => $exported,
+                    'offset' => $offset,
+                    'memory' => $this->getMemoryUsage()
+                ));
             }
             
             $this->updateSyncProgress(array(
@@ -1234,62 +1518,89 @@ class GoogleSheetsSync {
     }
     
     /**
-     * 投稿データをシート用の行に変換
+     * 投稿データをシート用の行に変換（軽量版）
+     * 
+     * get_post()を使わず直接DBから取得してメモリ使用量を削減
      * 
      * @param int $post_id 投稿ID
      * @return array|false 行データまたはfalse
      */
-    private function convertPostToRow($post_id) {
-        $post = get_post($post_id);
-        if (!$post || $post->post_type !== 'grant') {
+    private function convertPostToRowLightweight($post_id) {
+        global $wpdb;
+        
+        // 投稿の基本情報を直接取得
+        $post = $wpdb->get_row($wpdb->prepare(
+            "SELECT ID, post_title, post_content, post_excerpt, post_status, post_date, post_modified 
+             FROM {$wpdb->posts} 
+             WHERE ID = %d AND post_type = 'grant'",
+            $post_id
+        ));
+        
+        if (!$post) {
             return false;
         }
         
         // 基本データ
         $row = array(
-            $post_id,                    // A: ID
-            $post->post_title,           // B: タイトル
-            $post->post_content,         // C: 内容
-            $post->post_excerpt,         // D: 抜粋
-            $post->post_status,          // E: ステータス
-            $post->post_date,            // F: 作成日
-            $post->post_modified,        // G: 更新日
+            $post_id,
+            $post->post_title,
+            $post->post_content,
+            $post->post_excerpt,
+            $post->post_status,
+            $post->post_date,
+            $post->post_modified,
         );
         
-        // ACFフィールド（H-S列）
-        $acf_fields = array(
+        // postオブジェクトを解放
+        unset($post);
+        
+        // ACFフィールド（直接meta取得）
+        static $acf_fields = array(
             'max_amount', 'max_amount_numeric', 'deadline', 'deadline_date',
             'organization', 'organization_type', 'grant_target', 'application_method',
             'contact_info', 'official_url', 'regional_limitation', 'application_status'
         );
         
         foreach ($acf_fields as $field) {
-            $value = function_exists('get_field') ? get_field($field, $post_id, false) : get_post_meta($post_id, $field, true);
+            $value = get_post_meta($post_id, $field, true);
             $row[] = is_array($value) ? json_encode($value, JSON_UNESCAPED_UNICODE) : (string)$value;
         }
         
-        // タクソノミー（T-W列）
-        $taxonomies = array('grant_prefecture', 'grant_municipality', 'grant_category', 'grant_tag');
+        // タクソノミー
+        static $taxonomies = array('grant_prefecture', 'grant_municipality', 'grant_category', 'grant_tag');
         foreach ($taxonomies as $taxonomy) {
             $terms = wp_get_post_terms($post_id, $taxonomy, array('fields' => 'names'));
             $row[] = (is_array($terms) && !is_wp_error($terms)) ? implode(', ', $terms) : '';
+            unset($terms);
         }
         
-        // 追加フィールド（X-AD列）
-        $extra_fields = array(
+        // 追加フィールド
+        static $extra_fields = array(
             'external_link', 'area_notes', 'required_documents_detailed',
             'adoption_rate', 'difficulty_level', 'eligible_expenses_detailed', 'subsidy_rate_detailed'
         );
         
         foreach ($extra_fields as $field) {
-            $value = function_exists('get_field') ? get_field($field, $post_id, false) : get_post_meta($post_id, $field, true);
+            $value = get_post_meta($post_id, $field, true);
             $row[] = is_array($value) ? json_encode($value, JSON_UNESCAPED_UNICODE) : (string)$value;
         }
         
-        // シート更新日（AE列）
+        // シート更新日
         $row[] = current_time('mysql');
         
         return $row;
+    }
+    
+    /**
+     * 投稿データをシート用の行に変換
+     * 
+     * 後方互換性のために残す（内部では軽量版を使用）
+     * 
+     * @param int $post_id 投稿ID
+     * @return array|false 行データまたはfalse
+     */
+    private function convertPostToRow($post_id) {
+        return $this->convertPostToRowLightweight($post_id);
     }
     
     /**
@@ -1402,16 +1713,52 @@ class GoogleSheetsSync {
      * 実行環境の設定
      */
     private function setupExecutionEnvironment() {
+        // タイムアウト設定
         @set_time_limit(GI_SHEETS_MAX_EXECUTION_TIME);
+        
+        // メモリ制限設定
         @ini_set('memory_limit', GI_SHEETS_MEMORY_LIMIT);
+        
+        // WordPressのキャッシュ追加を一時停止（メモリ節約）
         wp_suspend_cache_addition(true);
+        
+        // WPDBのクエリログを無効化（デバッグ時のメモリ消費を防ぐ）
+        global $wpdb;
+        $wpdb->queries = array();
+        
+        // PHPのガベージコレクションを有効化
+        if (function_exists('gc_enable')) {
+            gc_enable();
+        }
+        
+        // 出力バッファリングをクリア（メモリ解放）
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+        
+        gi_log_debug('Execution environment setup', array(
+            'memory_limit' => ini_get('memory_limit'),
+            'max_execution_time' => ini_get('max_execution_time'),
+            'current_memory' => $this->getMemoryUsage()
+        ));
     }
     
     /**
      * メモリクリーンアップ
      */
     private function cleanupMemory() {
+        global $wpdb;
+        
+        // WordPressオブジェクトキャッシュをフラッシュ
         wp_cache_flush();
+        
+        // WPDBの内部キャッシュをクリア
+        $wpdb->flush();
+        
+        // クエリログをクリア
+        $wpdb->queries = array();
+        
+        // PHPのガベージコレクションを実行
         if (function_exists('gc_collect_cycles')) {
             gc_collect_cycles();
         }
