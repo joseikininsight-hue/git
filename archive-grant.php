@@ -813,8 +813,8 @@ $keywords_string = implode(',', $keywords);
             <!-- 検索結果セクション -->
             <section class="yahoo-results-section">
                 
-                <!-- 結果ヘッダー -->
-                <div class="results-header">
+                <!-- 結果ヘッダー（ページ遷移時のスクロール先） -->
+                <div class="results-header" id="results-header">
                     <div class="results-info">
                         <h2 class="results-title">検索結果</h2>
                         <div class="results-meta">
@@ -1630,7 +1630,9 @@ $keywords_string = implode(',', $keywords);
     border-radius: var(--gov-radius-lg);
     margin-bottom: 24px;
     box-shadow: var(--gov-shadow-sm);
-    overflow: hidden;
+    overflow: visible; /* UX改善: hidden → visible（ドロップダウンが領域外に出ても表示される） */
+    position: relative; /* ドロップダウンの基準位置 */
+    z-index: 100; /* フィルターセクション自体を上位に */
 }
 
 .filter-header {
@@ -1683,9 +1685,10 @@ $keywords_string = implode(',', $keywords);
 
 .yahoo-filters-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* UX改善: 160px → 180px */
+    gap: 20px; /* UX改善: 16px → 20px */
     padding: 24px;
+    overflow: visible; /* ドロップダウン表示のため */
 }
 
 .filter-dropdown-wrapper {
@@ -1784,9 +1787,9 @@ $keywords_string = implode(',', $keywords);
     border: 1px solid var(--gov-gray-300);
     border-radius: var(--gov-radius);
     box-shadow: var(--gov-shadow-lg);
-    max-height: 300px;
+    max-height: 400px; /* UX改善: 300px → 400px */
     overflow-y: auto;
-    z-index: 100;
+    z-index: 9990; /* UX改善: 100 → 9990（他の要素に隠れないように） */
 }
 
 .select-option {
@@ -1812,7 +1815,7 @@ $keywords_string = implode(',', $keywords);
 
 /* Multi Select */
 .multi-select-dropdown {
-    max-height: 380px;
+    max-height: 450px; /* UX改善: 380px → 450px */
 }
 
 .select-search-wrapper {
@@ -1840,7 +1843,7 @@ $keywords_string = implode(',', $keywords);
 }
 
 .select-options-wrapper {
-    max-height: 240px;
+    max-height: 320px; /* UX改善: 240px → 320px */
     overflow-y: auto;
 }
 
@@ -2730,6 +2733,16 @@ $keywords_string = implode(',', $keywords);
         grid-template-columns: 1fr;
         padding: 20px;
         padding-bottom: 100px;
+        gap: 24px; /* UX改善: モバイルでは間隔を広げる */
+    }
+    
+    /* UX改善: モバイルではドロップダウンを大きく表示 */
+    .select-dropdown {
+        max-height: 50vh !important;
+    }
+    
+    .multi-select-dropdown {
+        max-height: 55vh !important;
     }
     
     .yahoo-hero-section {
@@ -4014,8 +4027,15 @@ $keywords_string = implode(',', $keywords);
                     state.currentPage = page;
                     loadGrants();
                     
-                    // Scroll to top of results
-                    if (elements.grantsContainer) {
+                    // UX改善: ページ遷移時に検索結果ヘッダーにスクロール
+                    // 「検索結果 13,978件」が見えるようにする
+                    const resultsHeader = document.querySelector('.results-header');
+                    if (resultsHeader) {
+                        const headerHeight = 80; // 固定ヘッダーの高さ分オフセット
+                        const elementPosition = resultsHeader.getBoundingClientRect().top;
+                        const offsetPosition = elementPosition + window.pageYOffset - headerHeight;
+                        window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+                    } else if (elements.grantsContainer) {
                         elements.grantsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }
                 }
