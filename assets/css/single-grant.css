@@ -2735,4 +2735,21 @@ ul, ol {
 .gi-grant-page .gi-checklist-label {
     display: block !important;
     visibility: visible !important;
-}
+
+:root {
+    /* === 官公庁カラーパレット - メイン === */
+    --gi-gov-navy-900: #0d1b2a;
+    --gi-gov-navy-800: #1b263b;
+    --gi-gov-navy-700: #2c3e50;
+    --gi-gov-navy-600: #34495e;
+    --gi-gov-navy-500: #415a77;
+    --gi-gov-navy-400: #778da9;
+    --gi-gov-navy-300: #a3b1c6;
+    --gi-gov-navy-200: #cfd8e3;
+    --gi-gov-navy-100: #e8ecf1;
+    --gi-gov-navy-50: #f4f6f8;
+    
+    /* アクセントカラー - 金 */
+    --gi-gov-gold: #c9a227;
+    --gi-gov-gold-light: #d4b77a;
+    --gi-gov-gold-pale
