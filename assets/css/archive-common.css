@@ -70,6 +70,10 @@
    ========================================================================== */
 .grant-archive-yahoo-style,
 .grant-category-archive,
+.grant-prefecture-archive,
+.grant-municipality-archive,
+.grant-purpose-archive,
+.grant-tag-archive,
 .column-category-archive {
     font-family: var(--gov-font-sans);
     color: var(--gov-gray-900);
@@ -81,6 +85,10 @@
 /* 上部アクセントライン（官公庁風） */
 .grant-archive-yahoo-style::before,
 .grant-category-archive::before,
+.grant-prefecture-archive::before,
+.grant-municipality-archive::before,
+.grant-purpose-archive::before,
+.grant-tag-archive::before,
 .column-category-archive::before {
     content: '';
     position: fixed;

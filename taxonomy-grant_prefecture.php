@@ -17,6 +17,34 @@
  * - All archive functions preserved
  */
 
+// CSS/JS を直接エンキュー（functions.php の条件が効かない場合の対策）
+add_action('wp_enqueue_scripts', function() {
+    $template_dir = get_template_directory();
+    $template_uri = get_template_directory_uri();
+    
+    // Archive Common CSS
+    if (file_exists($template_dir . '/assets/css/archive-common.css')) {
+        wp_enqueue_style(
+            'gi-archive-common',
+            $template_uri . '/assets/css/archive-common.css',
+            array(),
+            filemtime($template_dir . '/assets/css/archive-common.css'),
+            'all'
+        );
+    }
+    
+    // Archive Common JavaScript
+    if (file_exists($template_dir . '/assets/js/archive-common.js')) {
+        wp_enqueue_script(
+            'gi-archive-common-js',
+            $template_uri . '/assets/js/archive-common.js',
+            array('jquery'),
+            filemtime($template_dir . '/assets/js/archive-common.js'),
+            true
+        );
+    }
+}, 5);
+
 get_header();
 
 // 現在の都道府県情報を取得
