@@ -230,7 +230,7 @@ $keywords_string = implode(',', $keywords);
     </nav>
 
     <!-- カテゴリーヒーローセクション -->
-    <header class="category-hero-section" 
+    <header class="yahoo-hero-section" 
             itemscope 
             itemtype="https://schema.org/WPHeader">
         <div class="yahoo-container">
@@ -264,20 +264,20 @@ $keywords_string = implode(',', $keywords);
                 </div>
 
                 <!-- メインタイトル -->
-                <h1 class="category-main-title" itemprop="headline">
+                <h1 class="yahoo-main-title" itemprop="headline">
                     <span class="category-name-highlight"><?php echo esc_html($category_name); ?></span>
                     <span class="title-text">の助成金・補助金</span>
                     <span class="year-badge"><?php echo $current_year; ?>年度版</span>
                 </h1>
 
                 <!-- カテゴリー説明文 -->
-                <div class="category-lead-section" itemprop="description">
+                <div class="yahoo-lead-section" itemprop="description">
                     <?php if ($category_description): ?>
                     <div class="category-description-rich">
                         <?php echo wpautop(wp_kses_post($category_description)); ?>
                     </div>
                     <?php endif; ?>
-                    <p class="category-lead-sub">
+                    <p class="yahoo-lead-text">
                         <?php echo esc_html($category_name); ?>に関する助成金・補助金を
                         <strong><?php echo number_format($category_count); ?>件</strong>掲載。
                         <?php echo $current_year; ?>年度の最新募集情報を毎日更新中。
@@ -286,7 +286,7 @@ $keywords_string = implode(',', $keywords);
                 </div>
 
                 <!-- メタ情報 -->
-                <div class="category-meta-info" role="group" aria-label="カテゴリー統計情報">
+                <div class="yahoo-meta-info" role="group" aria-label="カテゴリー統計情報">
                     <div class="meta-item" itemscope itemtype="https://schema.org/QuantitativeValue">
                         <svg class="meta-icon" 
                              width="18" 

@@ -242,7 +242,7 @@ $keywords_string = implode(',', $keywords);
     </nav>
 
     <!-- タグヒーローセクション -->
-    <header class="tag-hero-section" 
+    <header class="yahoo-hero-section" 
             itemscope 
             itemtype="https://schema.org/WPHeader">
         <div class="yahoo-container">
@@ -277,7 +277,7 @@ $keywords_string = implode(',', $keywords);
                 </div>
 
                 <!-- メインタイトル -->
-                <h1 class="tag-main-title" itemprop="headline">
+                <h1 class="yahoo-main-title" itemprop="headline">
                     <span class="tag-hash-symbol">#</span>
                     <span class="tag-name-highlight"><?php echo esc_html($tag_name); ?></span>
                     <span class="title-text">の助成金・補助金</span>

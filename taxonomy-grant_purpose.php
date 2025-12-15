@@ -239,7 +239,7 @@ $keywords_string = implode(',', $keywords);
     </nav>
 
     <!-- 用途ヒーローセクション -->
-    <header class="purpose-hero-section" 
+    <header class="yahoo-hero-section" 
             itemscope 
             itemtype="https://schema.org/WPHeader">
         <div class="yahoo-container">
@@ -273,7 +273,7 @@ $keywords_string = implode(',', $keywords);
                 </div>
 
                 <!-- メインタイトル -->
-                <h1 class="purpose-main-title" itemprop="headline">
+                <h1 class="yahoo-main-title" itemprop="headline">
                     <span class="purpose-name-highlight"><?php echo esc_html($purpose_name); ?></span>
                     <span class="title-text">の助成金・補助金</span>
                     <span class="year-badge"><?php echo $current_year; ?>年度版</span>

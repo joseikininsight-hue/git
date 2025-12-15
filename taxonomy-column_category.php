@@ -288,7 +288,7 @@ foreach ($breadcrumbs as $index => $breadcrumb) {
     </nav>
 
     <!-- Category Hero -->
-    <header class="category-hero-section"
+    <header class="yahoo-hero-section"
             itemscope
             itemtype="https://schema.org/WPHeader">
         <div class="yahoo-container">
@@ -319,20 +319,20 @@ foreach ($breadcrumbs as $index => $breadcrumb) {
                     <span><?php echo esc_html($category_name); ?>カテゴリー</span>
                 </div>
 
-                <h1 class="category-main-title" itemprop="headline">
+                <h1 class="yahoo-main-title" itemprop="headline">
                     <span class="category-name-highlight"><?php echo esc_html($category_name); ?></span>
                     <span class="title-text">の助成金・補助金</span>
                     <span class="year-badge"><?php echo esc_html($current_year); ?>年度版</span>
                 </h1>
 
-                <div class="category-lead-section" itemprop="description">
+                <div class="yahoo-lead-section" itemprop="description">
                     <?php if (!empty($category_description)): ?>
                         <div class="category-description-rich">
                             <?php echo wpautop(wp_kses_post($category_description)); ?>
                         </div>
                     <?php endif; ?>
 
-                    <p class="category-lead-sub">
+                    <p class="yahoo-lead-text">
                         <?php echo esc_html($category_name); ?>に関する助成金・補助金を
                         <strong><?php echo number_format($category_count); ?>件</strong>掲載。
                         <?php echo esc_html($current_year); ?>年度の最新募集情報を毎日更新中。
@@ -340,7 +340,7 @@ foreach ($breadcrumbs as $index => $breadcrumb) {
                     </p>
                 </div>
 
-                <div class="category-meta-info" role="group" aria-label="カテゴリー統計情報">
+                <div class="yahoo-meta-info" role="group" aria-label="カテゴリー統計情報">
                     <div class="meta-item" itemscope itemtype="https://schema.org/QuantitativeValue">
                         <svg class="meta-icon"
                              width="18" height="18"

@@ -267,7 +267,7 @@ $keywords_string = implode(',', $keywords);
     </nav>
 
     <!-- 市町村ヒーローセクション -->
-    <header class="category-hero-section municipality-hero" 
+    <header class="yahoo-hero-section" 
             itemscope 
             itemtype="https://schema.org/WPHeader">
         <div class="yahoo-container">
@@ -290,20 +290,20 @@ $keywords_string = implode(',', $keywords);
                 </div>
 
                 <!-- メインタイトル -->
-                <h1 class="category-main-title" itemprop="headline">
+                <h1 class="yahoo-main-title" itemprop="headline">
                     <span class="category-name-highlight"><?php echo esc_html($municipality_name); ?></span>
                     <span class="title-text">の助成金・補助金</span>
                     <span class="year-badge"><?php echo $current_year; ?>年度版</span>
                 </h1>
 
                 <!-- 市町村説明文 -->
-                <div class="category-lead-section" itemprop="description">
+                <div class="yahoo-lead-section" itemprop="description">
                     <?php if ($municipality_description): ?>
                     <div class="category-description-rich">
                         <?php echo wpautop(wp_kses_post($municipality_description)); ?>
                     </div>
                     <?php endif; ?>
-                    <p class="category-lead-sub">
+                    <p class="yahoo-lead-text">
                         <?php echo esc_html($municipality_name); ?>で利用できる助成金・補助金を
                         <strong><?php echo number_format($municipality_count); ?>件</strong>掲載。
                         <?php if ($parent_prefecture): ?>
@@ -314,7 +314,7 @@ $keywords_string = implode(',', $keywords);
                 </div>
 
                 <!-- メタ情報 -->
-                <div class="category-meta-info" role="group" aria-label="市町村統計情報">
+                <div class="yahoo-meta-info" role="group" aria-label="市町村統計情報">
                     <div class="meta-item" itemscope itemtype="https://schema.org/QuantitativeValue">
                         <svg class="meta-icon" 
                              width="18" 

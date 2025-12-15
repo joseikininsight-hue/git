@@ -265,7 +265,7 @@ $keywords_string = implode(',', $keywords);
     </nav>
 
     <!-- 都道府県ヒーローセクション -->
-    <header class="category-hero-section prefecture-hero" 
+    <header class="yahoo-hero-section" 
             itemscope 
             itemtype="https://schema.org/WPHeader">
         <div class="yahoo-container">
@@ -288,20 +288,20 @@ $keywords_string = implode(',', $keywords);
                 </div>
 
                 <!-- メインタイトル -->
-                <h1 class="category-main-title" itemprop="headline">
+                <h1 class="yahoo-main-title" itemprop="headline">
                     <span class="category-name-highlight"><?php echo esc_html($prefecture_name); ?></span>
                     <span class="title-text">の助成金・補助金</span>
                     <span class="year-badge"><?php echo $current_year; ?>年度版</span>
                 </h1>
 
                 <!-- 都道府県説明文 -->
-                <div class="category-lead-section" itemprop="description">
+                <div class="yahoo-lead-section" itemprop="description">
                     <?php if ($prefecture_description): ?>
                     <div class="category-description-rich">
                         <?php echo wpautop(wp_kses_post($prefecture_description)); ?>
                     </div>
                     <?php endif; ?>
-                    <p class="category-lead-sub">
+                    <p class="yahoo-lead-text">
                         <?php echo esc_html($prefecture_name); ?>で利用できる助成金・補助金を
                         <strong><?php echo number_format($prefecture_count); ?>件</strong>掲載。
                         <?php if ($current_region_name): ?>
@@ -312,7 +312,7 @@ $keywords_string = implode(',', $keywords);
                 </div>
 
                 <!-- メタ情報 -->
-                <div class="category-meta-info" role="group" aria-label="都道府県統計情報">
+                <div class="yahoo-meta-info" role="group" aria-label="都道府県統計情報">
                     <div class="meta-item" itemscope itemtype="https://schema.org/QuantitativeValue">
                         <svg class="meta-icon" 
                              width="18" 
@@ -874,20 +874,83 @@ $keywords_string = implode(',', $keywords);
             </div>
             <?php endif; ?>
 
-            <!-- ランキングウィジェット -->
-            <section class="sidebar-widget sidebar-ranking-widget">
+            <!-- アクセスランキング -->
+            <?php
+            $ranking_periods = array(
+                array('days' => 3, 'label' => '3日間', 'id' => 'ranking-3days'),
+                array('days' => 7, 'label' => '週間', 'id' => 'ranking-7days'),
+                array('days' => 0, 'label' => '総合', 'id' => 'ranking-all'),
+            );
+            
+            $default_period = 3;
+            $ranking_data = function_exists('ji_get_ranking') ? ji_get_ranking('grant', $default_period, 10) : array();
+            ?>
+            
+            <section class="sidebar-widget sidebar-ranking">
                 <h3 class="widget-title">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
                         <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
                         <polyline points="17 6 23 6 23 12"/>
                     </svg>
                     <?php echo esc_html($prefecture_name); ?>人気ランキング
                 </h3>
+                
+                <div class="ranking-tabs">
+                    <?php foreach ($ranking_periods as $index => $period): ?>
+                        <button 
+                            type="button" 
+                            class="ranking-tab <?php echo $index === 0 ? 'active' : ''; ?>" 
+                            data-period="<?php echo esc_attr($period['days']); ?>"
+                            data-target="#<?php echo esc_attr($period['id']); ?>">
+                            <?php echo esc_html($period['label']); ?>
+                        </button>
+                    <?php endforeach; ?>
+                </div>
+                
                 <div class="widget-content">
-                    <ul class="ranking-list" id="ranking-list">
-                        <!-- JavaScriptでAJAXロード -->
-                        <li class="ranking-loading">読み込み中...</li>
-                    </ul>
+                    <?php foreach ($ranking_periods as $index => $period): ?>
+                        <div 
+                            id="<?php echo esc_attr($period['id']); ?>" 
+                            class="ranking-content <?php echo $index === 0 ? 'active' : ''; ?>"
+                            data-period="<?php echo esc_attr($period['days']); ?>">
+                            
+                            <?php if ($index === 0): ?>
+                                <?php if (!empty($ranking_data)): ?>
+                                    <ol class="ranking-list">
+                                        <?php foreach ($ranking_data as $rank => $item): ?>
+                                            <li class="ranking-item rank-<?php echo $rank + 1; ?>">
+                                                <a href="<?php echo get_permalink($item->post_id); ?>" class="ranking-link">
+                                                    <span class="ranking-number"><?php echo $rank + 1; ?></span>
+                                                    <span class="ranking-title">
+                                                        <?php echo esc_html(get_the_title($item->post_id)); ?>
+                                                    </span>
+                                                    <span class="ranking-views">
+                                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                                            <circle cx="12" cy="12" r="3"/>
+                                                        </svg>
+                                                        <?php echo number_format($item->total_views); ?>
+                                                    </span>
+                                                </a>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ol>
+                                <?php else: ?>
+                                    <div class="ranking-empty" style="text-align: center; padding: 30px 20px; color: #666;">
+                                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto 10px; opacity: 0.3; display: block;">
+                                            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                                            <polyline points="17 6 23 6 23 12"/>
+                                        </svg>
+                                        <p style="margin: 0; font-size: 14px; font-weight: 500;">まだデータがありません</p>
+                                        <p style="margin: 5px 0 0; font-size: 12px; opacity: 0.7;">ページが閲覧されるとランキングが表示されます</p>
+                                    </div>
+                                <?php endif; ?>
+                            <?php else: ?>
+                                <div class="ranking-loading">読み込み中...</div>
+                            <?php endif; ?>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
             </section>
 
