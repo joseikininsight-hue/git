@@ -1,13 +1,14 @@
+/**
+ * Single Column Page JavaScript
+ * Version: 8.0.0
+ * コラム詳細ページ専用スクリプト（single-grantベース）
+ */
+
+// CONFIG は PHP側で設定される
+// var CONFIG = { postId, ajaxUrl, nonce, url, title };
+
 document.addEventListener('DOMContentLoaded', function() {
     'use strict';
-    
-    var CONFIG = {
-        postId: <?php echo $post_id; ?>,
-        ajaxUrl: '<?php echo admin_url("admin-ajax.php"); ?>',
-        nonce: '<?php echo wp_create_nonce("gic_ai_nonce"); ?>',
-        url: '<?php echo esc_js($canonical_url); ?>',
-        title: <?php echo json_encode($post_title, JSON_UNESCAPED_UNICODE); ?>
-    };
     
     // プログレスバー
     var progress = document.getElementById('progressBar');
@@ -18,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     window.addEventListener('scroll', updateProgress, { passive: true });
     
-    // 目次生成
+    // 目次生成（記事本文から自動生成）
     function generateTOC() {
         var content = document.querySelector('.gic-content');
         var tocNav = document.getElementById('tocNav');
@@ -27,32 +28,43 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!content) return;
         
         var headings = content.querySelectorAll('h2, h3');
-        if (headings.length === 0) {
-            if (tocNav) tocNav.innerHTML = '<p style="color: #888; font-size: 14px;">目次がありません</p>';
-            if (mobileTocNav) mobileTocNav.innerHTML = '<p style="color: #888; font-size: 14px;">目次がありません</p>';
-            return;
-        }
+        if (headings.length === 0) return;
         
-        var tocHTML = '<ul>';
+        // 既存の目次に記事内の見出しを追加
+        var existingList = tocNav ? tocNav.querySelector('ul') : null;
+        var existingMobileList = mobileTocNav ? mobileTocNav.querySelector('ul') : null;
+        
         headings.forEach(function(heading, index) {
             var id = 'heading-' + index;
             heading.id = id;
             var level = heading.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
-            tocHTML += '<li><a href="#' + id + '" class="' + level + '">' + heading.textContent + '</a></li>';
+            
+            if (existingList) {
+                var li = document.createElement('li');
+                var a = document.createElement('a');
+                a.href = '#' + id;
+                a.className = level;
+                a.textContent = heading.textContent;
+                li.appendChild(a);
+                existingList.appendChild(li);
+            }
+            
+            if (existingMobileList) {
+                var liMobile = document.createElement('li');
+                var aMobile = document.createElement('a');
+                aMobile.href = '#' + id;
+                aMobile.className = level + ' mobile-toc-link';
+                aMobile.textContent = heading.textContent;
+                liMobile.appendChild(aMobile);
+                existingMobileList.appendChild(liMobile);
+                
+                aMobile.addEventListener('click', closePanel);
+            }
         });
-        tocHTML += '</ul>';
-        
-        if (tocNav) tocNav.innerHTML = tocHTML;
-        if (mobileTocNav) {
-            mobileTocNav.innerHTML = tocHTML;
-            mobileTocNav.querySelectorAll('a').forEach(function(link) {
-                link.addEventListener('click', closePanel);
-            });
-        }
     }
     generateTOC();
     
-    // AI送信
+    // AI送信機能
     function sendAiMessage(input, container, btn) {
         var question = input.value.trim();
         if (!question) return;
@@ -69,23 +81,51 @@ document.addEventListener('DOMContentLoaded', function() {
         
         var formData = new FormData();
         formData.append('action', 'gic_ai_chat');
-        formData.append('nonce', CONFIG.nonce);
+        
+        // Try to use fresh nonce from global settings if available
+        var nonce = '';
+        if (typeof window.gic_ajax !== 'undefined' && window.gic_ajax.nonce) {
+            nonce = window.gic_ajax.nonce;
+        } else if (typeof window.ajaxSettings !== 'undefined' && window.ajaxSettings.nonce) {
+            nonce = window.ajaxSettings.nonce;
+        } else if (typeof window.wpApiSettings !== 'undefined' && window.wpApiSettings.nonce) {
+            nonce = window.wpApiSettings.nonce;
+        } else {
+            nonce = CONFIG.nonce;
+        }
+        formData.append('nonce', nonce);
         formData.append('post_id', CONFIG.postId);
         formData.append('question', question);
         
         fetch(CONFIG.ajaxUrl, { method: 'POST', body: formData })
-            .then(function(r) { return r.json(); })
+            .then(function(r) { 
+                if (!r.ok) {
+                    throw new Error('HTTP error! status: ' + r.status);
+                }
+                return r.json(); 
+            })
             .then(function(data) {
                 loadingMsg.remove();
+                console.log('AI Chat Response:', data);
+                
                 if (data.success && data.data && data.data.answer) {
                     addMessage(container, data.data.answer, 'ai');
                 } else {
-                    addMessage(container, generateFallback(question), 'ai');
+                    // Fallback response
+                    var errorMsg = 'エラーが発生しました。';
+                    if (data.data && data.data.message) {
+                        errorMsg = data.data.message;
+                    } else {
+                        errorMsg = generateFallback(question);
+                    }
+                    addMessage(container, errorMsg, 'ai');
+                    console.error('AI Chat Error:', data);
                 }
             })
-            .catch(function() {
+            .catch(function(err) {
                 loadingMsg.remove();
                 addMessage(container, generateFallback(question), 'ai');
+                console.error('AI Chat Network Error:', err);
             })
             .finally(function() { btn.disabled = false; });
     }
@@ -98,6 +138,14 @@ document.addEventListener('DOMContentLoaded', function() {
         container.scrollTop = container.scrollHeight;
     }
     
+    function addHtmlMessage(container, html, type) {
+        var msg = document.createElement('div');
+        msg.className = 'gic-ai-msg' + (type === 'user' ? ' user' : '');
+        msg.innerHTML = '<div class="gic-ai-avatar">' + (type === 'user' ? 'You' : 'AI') + '</div><div class="gic-ai-bubble">' + html + '</div>';
+        container.appendChild(msg);
+        container.scrollTop = container.scrollHeight;
+    }
+    
     function escapeHtml(text) {
         var div = document.createElement('div');
         div.textContent = text;
@@ -106,10 +154,92 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function generateFallback(question) {
         var q = question.toLowerCase();
-        if (q.indexOf('ポイント') !== -1) return 'この記事のポイントについては、「この記事のポイント」セクションをご確認ください。';
-        if (q.indexOf('補助金') !== -1) return '関連する補助金については、「関連する補助金」セクションをご確認ください。';
-        if (q.indexOf('申請') !== -1) return '補助金の申請方法については、各補助金の詳細ページでご確認いただけます。';
-        return 'ご質問ありがとうございます。記事の内容をご確認いただくか、より具体的な質問をお聞かせください。';
+        if (q.indexOf('ポイント') !== -1) {
+            return 'この記事のポイントについては、「この記事のポイント」セクションをご確認ください。主要な内容がまとめられています。';
+        }
+        if (q.indexOf('補助金') !== -1) {
+            return '関連する補助金については、「関連する補助金」セクションをご確認ください。募集中の補助金を中心にご紹介しています。また、AI診断機能を使えば、あなたの事業に最適な補助金を見つけることができます。';
+        }
+        if (q.indexOf('申請') !== -1) {
+            return '補助金の申請方法については、各補助金の詳細ページでご確認いただけます。一般的には、1. 事前準備（必要書類の収集）、2. 事業計画書の作成、3. オンラインまたは窓口での申請、4. 審査、5. 採択通知、の流れになります。';
+        }
+        if (q.indexOf('対象') !== -1) {
+            return '補助金の対象者は制度によって異なります。中小企業、個人事業主、NPO法人など、様々な対象者向けの補助金があります。AI診断機能で、あなたの事業に適した補助金を見つけることをおすすめします。';
+        }
+        if (q.indexOf('締切') !== -1 || q.indexOf('期限') !== -1) {
+            return '補助金の申請締切については、「締切間近の補助金」セクションをご確認ください。人気の補助金は締切前に予算が終了することもありますので、早めの申請をおすすめします。';
+        }
+        return 'ご質問ありがとうございます。記事の内容をご確認いただくか、より具体的な質問をお聞かせください。補助金に関するご相談は、AI診断機能もご活用いただけます。';
+    }
+    
+    function createLoadingMessage(container, text) {
+        var msg = document.createElement('div');
+        msg.className = 'gic-ai-msg';
+        msg.innerHTML = '<div class="gic-ai-avatar">AI</div><div class="gic-ai-bubble">' + text + '</div>';
+        container.appendChild(msg);
+        container.scrollTop = container.scrollHeight;
+        return msg;
+    }
+    
+    // 補助金診断機能
+    function runDiagnosis(container) {
+        addMessage(container, '補助金の診断をしてください', 'user');
+        
+        var loadingMsg = createLoadingMessage(container, '最適な補助金を診断中...');
+        
+        var formData = new FormData();
+        formData.append('action', 'gic_subsidy_diagnosis');
+        
+        var nonce = '';
+        if (typeof window.gic_ajax !== 'undefined' && window.gic_ajax.nonce) {
+            nonce = window.gic_ajax.nonce;
+        } else {
+            nonce = CONFIG.nonce;
+        }
+        formData.append('nonce', nonce);
+        formData.append('post_id', CONFIG.postId);
+
+        fetch(CONFIG.ajaxUrl, { method: 'POST', body: formData })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                loadingMsg.remove();
+                if (data.success && data.data) {
+                    var d = data.data;
+                    var html = '<div style="font-weight:bold;margin-bottom:12px;font-size:1.1em;">💡 おすすめの補助金</div>';
+                    
+                    if (d.grants && d.grants.length) {
+                        html += '<div style="display:flex;flex-direction:column;gap:10px;">';
+                        d.grants.forEach(function(grant) {
+                            html += '<div style="background:#f4f6f8;padding:12px;border-left:3px solid #c9a227;font-size:0.95em;">';
+                            html += '<div style="font-weight:bold;color:#1b263b;">' + grant.title + '</div>';
+                            if (grant.max_amount) {
+                                html += '<div style="color:#415a77;margin-top:4px;font-size:0.9em;">補助金額: ' + grant.max_amount + '</div>';
+                            }
+                            html += '</div>';
+                        });
+                        html += '</div>';
+                    } else {
+                        html += '<p>より詳しい診断のために、<a href="' + (window.location.origin + '/subsidy-diagnosis/') + '" style="color:#c9a227;text-decoration:underline;">AI診断ページ</a>をご利用ください。</p>';
+                    }
+                    
+                    if (d.tips) {
+                        html += '<div style="margin-top:12px;font-size:0.9em;color:#495057;"><strong>💡 ヒント:</strong> ' + d.tips + '</div>';
+                    }
+                    
+                    addHtmlMessage(container, html, 'ai');
+                } else {
+                    var fallbackHtml = '<div style="font-weight:bold;margin-bottom:12px;">💡 補助金診断</div>';
+                    fallbackHtml += '<p>より詳しい診断を行うために、<a href="' + (window.location.origin + '/subsidy-diagnosis/') + '" style="color:#c9a227;text-decoration:underline;">AI診断ページ</a>で質問にお答えください。</p>';
+                    fallbackHtml += '<p style="margin-top:8px;">事業内容や従業員数、希望する補助金額などをお聞きし、最適な補助金をご提案します。</p>';
+                    addHtmlMessage(container, fallbackHtml, 'ai');
+                }
+            })
+            .catch(function(e) {
+                loadingMsg.remove();
+                var fallbackHtml = '<div style="font-weight:bold;margin-bottom:12px;">💡 補助金診断</div>';
+                fallbackHtml += '<p>詳細な診断は<a href="' + (window.location.origin + '/subsidy-diagnosis/') + '" style="color:#c9a227;text-decoration:underline;">AI診断ページ</a>をご利用ください。</p>';
+                addHtmlMessage(container, fallbackHtml, 'ai');
+            });
     }
     
     // デスクトップAI
@@ -124,6 +254,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.preventDefault(); 
                 sendAiMessage(aiInput, aiMessages, aiSend); 
             } 
+        });
+        aiInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 88) + 'px';
         });
     }
     
@@ -140,27 +274,32 @@ document.addEventListener('DOMContentLoaded', function() {
                 sendAiMessage(mobileAiInput, mobileAiMessages, mobileAiSend); 
             } 
         });
+        mobileAiInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+        });
     }
     
     // AIチップ
     document.querySelectorAll('.gic-ai-chip').forEach(function(chip) {
         chip.addEventListener('click', function() {
-            var q = this.dataset.q;
-            if (!q) return;
-            
             var isDesktop = this.closest('.gic-sidebar-section');
             var input = isDesktop ? aiInput : mobileAiInput;
             var container = isDesktop ? aiMessages : mobileAiMessages;
             var btn = isDesktop ? aiSend : mobileAiSend;
             
-            if (input) {
-                input.value = q;
+            if (this.dataset.action) {
+                if (this.dataset.action === 'diagnosis') {
+                    runDiagnosis(container);
+                }
+            } else if (this.dataset.q && input) {
+                input.value = this.dataset.q;
                 sendAiMessage(input, container, btn);
             }
         });
     });
     
-     // モバイルパネル
+    // モバイルパネル
     var mobileAiBtn = document.getElementById('mobileAiBtn');
     var mobileOverlay = document.getElementById('mobileOverlay');
     var mobilePanel = document.getElementById('mobilePanel');
@@ -196,13 +335,11 @@ document.addEventListener('DOMContentLoaded', function() {
         tab.addEventListener('click', function() {
             var targetTab = this.dataset.tab;
             
-            // タブのアクティブ状態を切り替え
             panelTabs.forEach(function(t) { 
                 t.classList.remove('active'); 
             });
             this.classList.add('active');
             
-            // コンテンツを切り替え
             panelContents.forEach(function(c) { 
                 c.classList.remove('active'); 
             });
@@ -210,6 +347,11 @@ document.addEventListener('DOMContentLoaded', function() {
             var target = document.getElementById('tab' + targetTab.charAt(0).toUpperCase() + targetTab.slice(1));
             if (target) target.classList.add('active');
         });
+    });
+    
+    // モバイル目次リンク
+    document.querySelectorAll('.mobile-toc-link').forEach(function(link) {
+        link.addEventListener('click', closePanel);
     });
     
     // スワイプでパネルを閉じる
@@ -225,7 +367,6 @@ document.addEventListener('DOMContentLoaded', function() {
             touchEndY = e.touches[0].clientY;
             var diff = touchEndY - touchStartY;
             
-            // 下方向にスワイプした場合
             if (diff > 0) {
                 var content = mobilePanel.querySelector('.gic-panel-content');
                 if (content && content.scrollTop === 0) {
@@ -237,7 +378,6 @@ document.addEventListener('DOMContentLoaded', function() {
         mobilePanel.addEventListener('touchend', function() {
             var diff = touchEndY - touchStartY;
             
-            // 100px以上下にスワイプしたらパネルを閉じる
             if (diff > 100) {
                 var content = mobilePanel.querySelector('.gic-panel-content');
                 if (content && content.scrollTop === 0) {
@@ -245,12 +385,81 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             
-            // 位置をリセット
             mobilePanel.style.transform = '';
             touchStartY = 0;
             touchEndY = 0;
         }, { passive: true });
     }
+    
+    // ブックマーク
+    var bookmarkBtn = document.getElementById('bookmarkBtn');
+    var mobileBookmarkBtn = document.getElementById('mobileBookmarkBtn');
+    var bookmarkKey = 'gic_bookmarks';
+    
+    function getBookmarks() {
+        try {
+            return JSON.parse(localStorage.getItem(bookmarkKey) || '[]');
+        } catch(e) {
+            return [];
+        }
+    }
+    
+    function isBookmarked() {
+        return getBookmarks().indexOf(CONFIG.postId) !== -1;
+    }
+    
+    function updateBookmarkUI() {
+        var bookmarked = isBookmarked();
+        var text = bookmarked ? '保存済み' : '保存する';
+        
+        if (bookmarkBtn) {
+            var svg = bookmarkBtn.querySelector('svg');
+            if (svg) svg.style.fill = bookmarked ? 'currentColor' : 'none';
+            var span = bookmarkBtn.querySelector('span');
+            if (span) span.textContent = text;
+        }
+        if (mobileBookmarkBtn) {
+            var span = mobileBookmarkBtn.querySelector('span');
+            if (span) span.textContent = text;
+        }
+    }
+    
+    function toggleBookmark() {
+        var bookmarks = getBookmarks();
+        var index = bookmarks.indexOf(CONFIG.postId);
+        if (index !== -1) {
+            bookmarks.splice(index, 1);
+            showToast('ブックマークを解除しました');
+        } else {
+            bookmarks.push(CONFIG.postId);
+            showToast('ブックマークに追加しました');
+        }
+        try {
+            localStorage.setItem(bookmarkKey, JSON.stringify(bookmarks));
+        } catch(e) {}
+        updateBookmarkUI();
+    }
+    
+    if (bookmarkBtn) bookmarkBtn.addEventListener('click', toggleBookmark);
+    if (mobileBookmarkBtn) mobileBookmarkBtn.addEventListener('click', toggleBookmark);
+    updateBookmarkUI();
+    
+    // シェア
+    var mobileShareBtn = document.getElementById('mobileShareBtn');
+    
+    function handleShare() {
+        if (navigator.share) {
+            navigator.share({ title: CONFIG.title, url: CONFIG.url })
+                .then(function() { showToast('シェアしました'); })
+                .catch(function() {});
+        } else if (navigator.clipboard) {
+            navigator.clipboard.writeText(CONFIG.url)
+                .then(function() { showToast('URLをコピーしました'); })
+                .catch(function() {});
+        }
+    }
+    
+    if (mobileShareBtn) mobileShareBtn.addEventListener('click', handleShare);
     
     // スムーススクロール
     document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
@@ -405,26 +614,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // コードブロックのコピー機能
-    document.querySelectorAll('.gic-content pre').forEach(function(pre) {
-        var copyBtn = document.createElement('button');
-        copyBtn.textContent = 'コピー';
-        copyBtn.style.cssText = 'position: absolute; top: 8px; right: 8px; padding: 4px 10px; font-size: 12px; background: #555; color: #fff; border: none; cursor: pointer; border-radius: 3px;';
-        
-        pre.style.position = 'relative';
-        pre.appendChild(copyBtn);
-        
-        copyBtn.addEventListener('click', function() {
-            var code = pre.querySelector('code') || pre;
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(code.textContent).then(function() {
-                    copyBtn.textContent = 'コピー完了!';
-                    setTimeout(function() { copyBtn.textContent = 'コピー'; }, 2000);
-                });
-            }
-        });
-    });
-    
     // シェアボタンのクリックトラッキング
     document.querySelectorAll('.gic-share-btn').forEach(function(btn) {
         btn.addEventListener('click', function() {
@@ -497,7 +686,6 @@ document.addEventListener('DOMContentLoaded', function() {
         console.warn('[Network] Connection lost');
         var notice = document.createElement('div');
         notice.className = 'gic-offline-notice';
-        notice.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; background: #DC2626; color: white; padding: 12px 20px; text-align: center; font-size: 14px; font-weight: 600; z-index: 10000;';
         notice.innerHTML = '⚠️ インターネット接続が切断されました';
         document.body.appendChild(notice);
     });
@@ -507,6 +695,26 @@ document.addEventListener('DOMContentLoaded', function() {
         // 全てのdetailsを開く
         document.querySelectorAll('details').forEach(function(details) {
             details.setAttribute('open', '');
+        });
+    });
+    
+    // コードブロックのコピー機能
+    document.querySelectorAll('.gic-content pre').forEach(function(pre) {
+        var copyBtn = document.createElement('button');
+        copyBtn.textContent = 'コピー';
+        copyBtn.style.cssText = 'position: absolute; top: 8px; right: 8px; padding: 4px 10px; font-size: 12px; background: var(--gic-gov-navy-700); color: var(--gic-white); border: none; cursor: pointer; border-radius: 4px;';
+        
+        pre.style.position = 'relative';
+        pre.appendChild(copyBtn);
+        
+        copyBtn.addEventListener('click', function() {
+            var code = pre.querySelector('code') || pre;
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(code.textContent).then(function() {
+                    copyBtn.textContent = 'コピー完了!';
+                    setTimeout(function() { copyBtn.textContent = 'コピー'; }, 2000);
+                });
+            }
         });
     });
     
@@ -525,7 +733,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // 初期化完了ログ
-    console.log('[✓] Single Column v7.1 initialized');
+    console.log('[✓] Single Column v8.0 initialized (Government Style)');
     console.log('[✓] Post ID: ' + CONFIG.postId);
-    console.log('[✓] Features: AI Chat, TOC, Progress Bar, Analytics, Accessibility');
+    console.log('[✓] Features: AI Chat, TOC, Progress Bar, Bookmark, Share, Analytics, Accessibility');
 });
