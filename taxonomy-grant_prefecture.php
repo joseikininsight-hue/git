@@ -818,10 +818,15 @@ $keywords_string = implode(',', $keywords);
                 </div>
 
                 <!-- モバイル用フィルター適用ボタン -->
-                <div class="mobile-filter-apply-container">
-                    <button class="mobile-filter-apply-btn" 
-                            id="mobile-filter-apply"
-                            type="button">この条件で絞り込む</button>
+                <div class="mobile-filter-apply-section" id="mobile-filter-apply-section">
+                    <button class="mobile-apply-filters-btn" 
+                            id="mobile-apply-filters-btn" 
+                            type="button">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        フィルターを適用
+                    </button>
                 </div>
             </section>
 
@@ -850,18 +855,96 @@ $keywords_string = implode(',', $keywords);
             </div>
 
             <!-- 助成金一覧 -->
-            <div class="grants-container-yahoo" id="grants-container" role="feed" aria-busy="true">
-                <!-- JavaScriptで動的にロード -->
-                <div class="loading-indicator" id="loading-indicator">
-                    <div class="loading-spinner"></div>
-                    <p>助成金データを読み込み中...</p>
-                </div>
+            <div class="grants-container-yahoo" 
+                 id="grants-container" 
+                 data-view="single">
+                <?php
+                // 初期表示用WP_Query（都道府県固定）
+                $initial_query = new WP_Query([
+                    'post_type' => 'grant',
+                    'posts_per_page' => 12,
+                    'post_status' => 'publish',
+                    'paged' => get_query_var('paged') ? get_query_var('paged') : 1,
+                    'tax_query' => [
+                        [
+                            'taxonomy' => 'grant_prefecture',
+                            'field' => 'term_id',
+                            'terms' => $prefecture_id
+                        ]
+                    ],
+                    'orderby' => 'date',
+                    'order' => 'DESC'
+                ]);
+                
+                if ($initial_query->have_posts()) :
+                    while ($initial_query->have_posts()) : 
+                        $initial_query->the_post();
+                        include(get_template_directory() . '/template-parts/grant-card-unified.php');
+                    endwhile;
+                    wp_reset_postdata();
+                else :
+                    echo '<div class="no-results-message" style="text-align: center; padding: 60px 20px;">';
+                    echo '<p style="font-size: 1.125rem; color: #666; margin-bottom: 20px;">該当する助成金が見つかりませんでした。</p>';
+                    echo '<p style="color: #999;">検索条件を変更して再度お試しください。</p>';
+                    echo '</div>';
+                endif;
+                ?>
+            </div>
+
+            <!-- 結果なし -->
+            <div class="no-results" 
+                 id="no-results" 
+                 style="display: none;">
+                <svg class="no-results-icon" 
+                     width="64" 
+                     height="64" 
+                     viewBox="0 0 24 24" 
+                     fill="none" 
+                     stroke="currentColor" 
+                     stroke-width="2" 
+                     aria-hidden="true">
+                    <circle cx="11" cy="11" r="8"/>
+                    <path d="m21 21-4.35-4.35"/>
+                </svg>
+                <h3 class="no-results-title">該当する助成金が見つかりませんでした</h3>
+                <p class="no-results-message">
+                    検索条件を変更して再度お試しください。
+                </p>
             </div>
 
             <!-- ページネーション -->
-            <nav class="pagination-wrapper" id="pagination" aria-label="ページナビゲーション" style="display: none;">
-                <!-- JavaScriptで動的に生成 -->
-            </nav>
+            <div class="pagination-wrapper" 
+                 id="pagination-wrapper">
+                <?php
+                if (isset($initial_query) && $initial_query->max_num_pages > 1) {
+                    $big = 999999999;
+                    
+                    // すべての現在のクエリパラメータを保持
+                    $preserved_params = array();
+                    foreach ($_GET as $key => $value) {
+                        if (!empty($value) && $key !== 'paged') {
+                            $preserved_params[$key] = sanitize_text_field($value);
+                        }
+                    }
+                    
+                    // ベースURLにクエリパラメータを追加
+                    $base_url = add_query_arg($preserved_params, str_replace( $big, '%#%', esc_url( get_pagenum_link( $big ) ) ));
+                    
+                    echo paginate_links( array(
+                        'base' => $base_url,
+                        'format' => '&paged=%#%',
+                        'current' => max( 1, get_query_var('paged') ),
+                        'total' => $initial_query->max_num_pages,
+                        'type' => 'plain',
+                        'prev_text' => '前へ',
+                        'next_text' => '次へ',
+                        'mid_size' => 2,
+                        'end_size' => 1,
+                        'add_args' => $preserved_params,
+                    ) );
+                }
+                ?>
+            </div>
         </div>
 
         <!-- サイドバー (PCのみ) -->
