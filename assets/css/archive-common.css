@@ -226,6 +226,17 @@
     max-width: 700px;
 }
 
+.yahoo-description-rich {
+    font-size: 15px;
+    color: var(--gov-navy-200);
+    line-height: 1.8;
+    margin-bottom: 16px;
+}
+
+.yahoo-description-rich p {
+    margin: 0 0 12px 0;
+}
+
 .yahoo-meta-info {
     display: flex;
     align-items: center;

@@ -280,13 +280,13 @@ $keywords_string = implode(',', $keywords);
                 </h1>
 
                 <!-- 用途説明文 -->
-                <div class="purpose-lead-section" itemprop="description">
+                <div class="yahoo-lead-section" itemprop="description">
                     <?php if ($purpose_description): ?>
-                    <div class="purpose-description-rich">
+                    <div class="yahoo-description-rich">
                         <?php echo wpautop(wp_kses_post($purpose_description)); ?>
                     </div>
                     <?php endif; ?>
-                    <p class="purpose-lead-sub">
+                    <p class="yahoo-lead-text">
                         <?php echo esc_html($purpose_name); ?>を目的とした助成金・補助金を
                         <strong><?php echo number_format($purpose_count); ?>件</strong>掲載。
                         <?php echo $current_year; ?>年度の最新募集情報を毎日更新中。
@@ -295,7 +295,7 @@ $keywords_string = implode(',', $keywords);
                 </div>
 
                 <!-- メタ情報 -->
-                <div class="purpose-meta-info" role="group" aria-label="用途統計情報">
+                <div class="yahoo-meta-info" role="group" aria-label="用途統計情報">
                     <div class="meta-item" itemscope itemtype="https://schema.org/QuantitativeValue">
                         <svg class="meta-icon" 
                              width="18" 
