@@ -1800,7 +1800,7 @@ $grants_url = get_post_type_archive_link('grant');
     <div class="ji-mobile-menu-header">
         <div class="ji-mobile-logo">
             <div class="ji-mobile-logo-icon">
-                <img src="https://joseikin-insight.com/wp-content/uploads/2025/05/cropped-logo3.webp" alt="アイコン" width="32" height="32">
+                <img src="https://joseikin-insight.com/gemini_generated_image_19k6yi19k6yi19k6/" alt="アイコン" width="32" height="32">
             </div>
             <span class="ji-mobile-logo-text">助成金インサイト</span>
         </div>
