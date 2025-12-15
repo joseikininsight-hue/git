@@ -1397,30 +1397,29 @@ if ($grant['ai_summary']) {
                     </div>
                 </section>
                 <?php endif; ?>
-
-                <!-- 情報ソース -->
-                <div class="gi-source-card">
-                    <div class="gi-source-header">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                        <span class="gi-source-label">情報ソース</span>
-                    </div>
-                    <div class="gi-source-body">
-                        <div class="gi-source-info">
-                            <div class="gi-source-name"><?php echo esc_html($grant['source_name'] ? $grant['source_name'] : ($grant['organization'] ? $grant['organization'] : '公式情報')); ?></div>
-                            <div class="gi-source-verified">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                                <?php echo esc_html($last_verified_display); ?> 確認済み
-                            </div>
-                        </div>
-                        <?php if ($grant['source_url']): ?>
-                        <a href="<?php echo esc_url($grant['source_url']); ?>" class="gi-source-link" target="_blank" rel="noopener">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                            公式ページを確認
-                        </a>
-                        <?php endif; ?>
-                    </div>
-                    <div class="gi-source-footer">※最新情報は必ず公式サイトでご確認ください。本ページの情報は参考情報です。採択率等の統計情報はAIによる推定値であり、公式発表ではありません。</div>
-                </div>
+<!-- 情報ソース -->
+<div class="gi-source-card">
+    <div class="gi-source-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span class="gi-source-label">情報ソース</span>
+    </div>
+    <div class="gi-source-body">
+        <div class="gi-source-info">
+            <div class="gi-source-name"><?php echo esc_html($grant['source_name'] ? $grant['source_name'] : ($grant['organization'] ? $grant['organization'] : '公式情報')); ?></div>
+            <div class="gi-source-verified">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <?php echo esc_html($last_verified_display); ?> 確認済み
+            </div>
+        </div>
+        <?php if ($grant['source_url']): ?>
+        <a href="<?php echo esc_url($grant['source_url']); ?>" class="gi-source-link" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            公式ページを確認
+        </a>
+        <?php endif; ?>
+    </div>
+    <div class="gi-source-footer">※最新情報は必ず公式サイトでご確認ください。本ページの情報は参考情報です。</div>
+</div>
 
                 <!-- 監修者 -->
                 <aside class="gi-supervisor">
