@@ -376,14 +376,7 @@
     margin: 0;
 }
 
-.hero__image {
-    width: 100%;
-    height: auto;
-    display: block;
-    border-radius: var(--hero-border-radius-lg);
-    box-shadow: var(--hero-shadow-xl);
-    border: 1px solid var(--hero-color-gray-200);
-}
+
 
 /* ==========================================================================
    画像装飾 - 非表示（ドット・ライン削除）
