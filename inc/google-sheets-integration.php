@@ -29,11 +29,11 @@ if (!defined('GI_SHEETS_VERSION')) {
 }
 
 if (!defined('GI_SHEETS_BATCH_SIZE')) {
-    define('GI_SHEETS_BATCH_SIZE', 25); // 一度に処理する件数（メモリ節約のため小さく）
+    define('GI_SHEETS_BATCH_SIZE', 10); // 一度に処理する件数（メモリ節約のため極小）
 }
 
 if (!defined('GI_SHEETS_READ_CHUNK_SIZE')) {
-    define('GI_SHEETS_READ_CHUNK_SIZE', 100); // シートから一度に読み込む行数
+    define('GI_SHEETS_READ_CHUNK_SIZE', 50); // シートから一度に読み込む行数（縮小）
 }
 
 if (!defined('GI_SHEETS_API_DELAY')) {
@@ -819,11 +819,10 @@ class GoogleSheetsSync {
                     'memory' => $this->getMemoryUsage()
                 ));
                 
-                // チャンク内のデータをさらにバッチに分けて処理
-                $batch_size = GI_SHEETS_BATCH_SIZE;
-                $chunk_offset = 0;
-                
-                foreach ($chunk_data as $row_index => $row) {
+                // チャンク内のデータを1行ずつ処理（メモリ最適化）
+                $rows_in_chunk = count($chunk_data);
+                for ($row_index = 0; $row_index < $rows_in_chunk; $row_index++) {
+                    $row = $chunk_data[$row_index];
                     $actual_row_number = $start_row + $row_index;
                     
                     try {
@@ -847,6 +846,9 @@ class GoogleSheetsSync {
                                 break;
                         }
                         
+                        // 結果を解放
+                        unset($result);
+                        
                     } catch (Exception $e) {
                         $stats['errors']++;
                         gi_log_error('Row processing error', array(
@@ -855,27 +857,33 @@ class GoogleSheetsSync {
                         ));
                     }
                     
-                    $processed++;
-                    $chunk_offset++;
+                    // 行データを即座に解放
+                    unset($row);
+                    unset($chunk_data[$row_index]);
                     
-                    // バッチサイズごとにメモリクリアとプログレス更新
-                    if ($chunk_offset % $batch_size === 0) {
+                    $processed++;
+                    
+                    // 毎行メモリクリア（重要）
+                    $this->cleanupMemoryLight();
+                    
+                    // 10行ごとにより積極的なクリーンアップとプログレス更新
+                    if ($processed % GI_SHEETS_BATCH_SIZE === 0) {
                         $this->updateSyncProgress(array(
                             'processed' => $processed,
                             'stats' => $stats
                         ));
-                        $this->cleanupMemory();
+                        $this->aggressiveMemoryCleanup();
+                        
+                        // 新規投稿IDを書き戻し
+                        if (!empty($new_post_ids) && count($new_post_ids) >= 20) {
+                            $this->updateSheetPostIds($new_post_ids);
+                            $new_post_ids = array();
+                        }
                     }
                 }
                 
                 // チャンクデータを明示的に解放
                 unset($chunk_data);
-                
-                // 新規投稿IDをシートに書き戻し（チャンクごと）
-                if (!empty($new_post_ids) && count($new_post_ids) >= 50) {
-                    $this->updateSheetPostIds($new_post_ids);
-                    $new_post_ids = array(); // 解放
-                }
                 
                 // プログレス更新
                 $this->updateSyncProgress(array(
@@ -883,8 +891,8 @@ class GoogleSheetsSync {
                     'stats' => $stats
                 ));
                 
-                // メモリクリア
-                $this->cleanupMemory();
+                // チャンク完了時に積極的クリーンアップ
+                $this->aggressiveMemoryCleanup();
                 
                 gi_log_debug('Chunk processed', array(
                     'chunk_end_row' => $end_row,
@@ -1042,31 +1050,62 @@ class GoogleSheetsSync {
     }
     
     /**
+     * 軽量メモリクリーンアップ（毎行実行用）
+     */
+    private function cleanupMemoryLight() {
+        global $wpdb;
+        
+        // WPDBの内部キャッシュをクリア
+        $wpdb->flush();
+        
+        // クエリログをクリア（デバッグ時のメモリ消費を防ぐ）
+        $wpdb->queries = array();
+    }
+    
+    /**
      * 積極的なメモリクリーンアップ
      */
     private function aggressiveMemoryCleanup() {
-        global $wpdb, $wp_object_cache;
+        global $wpdb, $wp_object_cache, $wp_actions, $wp_filter;
         
-        // WordPressのキャッシュをクリア
+        // WPDBの完全クリア
+        $wpdb->flush();
+        $wpdb->queries = array();
+        
+        // 投稿キャッシュをクリア
         wp_cache_flush();
         
-        // WPDBのクエリログをクリア（デバッグモード時に肥大化する）
-        $wpdb->queries = array();
+        // グローバル投稿変数をクリア
+        if (isset($GLOBALS['post'])) {
+            unset($GLOBALS['post']);
+        }
+        if (isset($GLOBALS['posts'])) {
+            unset($GLOBALS['posts']);
+        }
         
         // オブジェクトキャッシュをクリア
         if (isset($wp_object_cache) && is_object($wp_object_cache)) {
             if (method_exists($wp_object_cache, 'flush')) {
                 $wp_object_cache->flush();
             }
+            // キャッシュデータを直接クリア
+            if (property_exists($wp_object_cache, 'cache')) {
+                $wp_object_cache->cache = array();
+            }
         }
+        
+        // 投稿メタキャッシュをクリア
+        wp_cache_delete_multiple(array(), 'post_meta');
+        wp_cache_delete_multiple(array(), 'posts');
+        wp_cache_delete_multiple(array(), 'terms');
         
         // PHPのガベージコレクションを強制実行
         if (function_exists('gc_collect_cycles')) {
             gc_collect_cycles();
         }
         
-        // 一時的に処理を停止してGCを動作させる
-        usleep(10000); // 10ms
+        // メモリ解放のための短い待機
+        usleep(5000); // 5ms
     }
     
     /**
@@ -1180,10 +1219,16 @@ class GoogleSheetsSync {
         
         // post_dataを解放
         unset($post_data);
+        unset($result_id);
         
         // ACFフィールドとタクソノミーを更新
         $this->updatePostMeta($post_id, $row);
         $this->updatePostTaxonomies($post_id, $row);
+        
+        // 投稿関連のキャッシュを即座にクリア（メモリ解放）
+        clean_post_cache($post_id);
+        wp_cache_delete($post_id, 'posts');
+        wp_cache_delete($post_id, 'post_meta');
         
         return array(
             'action' => $action,
@@ -1737,6 +1782,11 @@ class GoogleSheetsSync {
         global $wpdb;
         $wpdb->queries = array();
         
+        // SAVEQUERIES を無効化
+        if (!defined('SAVEQUERIES')) {
+            define('SAVEQUERIES', false);
+        }
+        
         // PHPのガベージコレクションを有効化
         if (function_exists('gc_enable')) {
             gc_enable();
@@ -1746,6 +1796,15 @@ class GoogleSheetsSync {
         while (ob_get_level() > 0) {
             ob_end_clean();
         }
+        
+        // 不要なWordPressフックを一時的に削除（メモリ節約）
+        remove_all_actions('save_post');
+        remove_all_actions('wp_insert_post');
+        remove_all_actions('edit_post');
+        remove_all_actions('transition_post_status');
+        remove_all_actions('added_post_meta');
+        remove_all_actions('updated_post_meta');
+        remove_all_actions('set_object_terms');
         
         gi_log_debug('Execution environment setup', array(
             'memory_limit' => ini_get('memory_limit'),
