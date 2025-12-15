@@ -937,6 +937,9 @@ class GoogleSheetsSync {
     /**
      * シートの総行数を取得
      * 
+     * B列（タイトル）を基準にカウント
+     * ※A列（ID）は新規データでは空のため、B列を使用
+     * 
      * @return int|false 行数またはfalse
      */
     private function getSheetRowCount() {
@@ -945,8 +948,9 @@ class GoogleSheetsSync {
             return false;
         }
         
-        // A列のみを取得して行数をカウント（メモリ効率が良い）
-        $range = $this->sheet_name . '!A:A';
+        // B列（タイトル）を取得して行数をカウント
+        // ※A列（ID）は新規データでは空のため使えない
+        $range = $this->sheet_name . '!B:B';
         $url = self::SHEETS_API_URL . $this->spreadsheet_id . '/values/' . urlencode($range);
         
         $response = wp_remote_get($url, array(
@@ -981,7 +985,14 @@ class GoogleSheetsSync {
         unset($response);
         unset($body);
         
-        return isset($data['values']) ? count($data['values']) : 0;
+        $row_count = isset($data['values']) ? count($data['values']) : 0;
+        
+        gi_log_debug('Sheet row count', array(
+            'total_rows' => $row_count,
+            'range' => $range
+        ));
+        
+        return $row_count;
     }
     
     /**
