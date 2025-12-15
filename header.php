@@ -1964,24 +1964,31 @@ $grants_url = get_post_type_archive_link('grant');
     function handleScroll() {
         const scrollY = window.scrollY;
         
+        // Add scrolled class for shadow effect
         if (scrollY > 50) {
             header?.classList.add('scrolled');
         } else {
             header?.classList.remove('scrolled');
         }
         
-        if (scrollY > 150) {
-            if (scrollY > lastScrollY + 5) {
+        // Hide/show header based on scroll direction (works on mobile & desktop)
+        if (scrollY > 100) {  // Lower threshold for mobile
+            // Scrolling down - hide header
+            if (scrollY > lastScrollY + 3) {  // More sensitive (was 5)
                 header?.classList.add('hidden');
+                // Close any open menus
                 navItems.forEach(item => {
                     item.classList.remove('menu-active');
                     const link = item.querySelector('.ji-nav-link');
                     if (link) link.setAttribute('aria-expanded', 'false');
                 });
-            } else if (scrollY < lastScrollY - 5) {
+            } 
+            // Scrolling up - show header
+            else if (scrollY < lastScrollY - 3) {  // More sensitive (was 5)
                 header?.classList.remove('hidden');
             }
         } else {
+            // Always show header at top of page
             header?.classList.remove('hidden');
         }
         

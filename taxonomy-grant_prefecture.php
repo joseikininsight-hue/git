@@ -1060,10 +1060,10 @@ $keywords_string = implode(',', $keywords);
                     <?php if ($recent_grants->have_posts()): ?>
                         <ul class="topics-list">
                             <?php while ($recent_grants->have_posts()): $recent_grants->the_post(); ?>
-                            <li class="topic-item">
-                                <a href="<?php the_permalink(); ?>" class="topic-link" title="<?php the_title_attribute(); ?>">
-                                    <span class="topic-date"><?php echo get_the_date('m/d'); ?></span>
-                                    <span class="topic-title"><?php the_title(); ?></span>
+                            <li class="topics-item">
+                                <a href="<?php the_permalink(); ?>" class="topics-link" title="<?php the_title_attribute(); ?>">
+                                    <span class="topics-date"><?php echo get_the_date('m/d'); ?></span>
+                                    <span class="topics-title"><?php the_title(); ?></span>
                                 </a>
                             </li>
                             <?php endwhile; wp_reset_postdata(); ?>
