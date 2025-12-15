@@ -256,20 +256,19 @@ $breadcrumbs = [
 
 <main class="grant-archive-optimized purpose-page" id="purpose-<?php echo esc_attr($purpose_slug); ?>" itemscope itemtype="https://schema.org/CollectionPage">
 
-    <!-- パンくずリスト -->
-    <nav class="breadcrumb-nav" aria-label="パンくずリスト" itemscope itemtype="https://schema.org/BreadcrumbList">
+    <!-- パンくずリスト（JSON-LDで構造化データ出力済みのため、HTMLはMicrodata属性なし） -->
+    <nav class="breadcrumb-nav" aria-label="パンくずリスト">
         <div class="container">
             <ol class="breadcrumb-list">
                 <?php foreach ($breadcrumbs as $index => $breadcrumb): ?>
-                <li class="breadcrumb-item" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+                <li class="breadcrumb-item">
                     <?php if (!empty($breadcrumb['url'])): ?>
-                        <a href="<?php echo esc_url($breadcrumb['url']); ?>" itemprop="item">
-                            <span itemprop="name"><?php echo esc_html($breadcrumb['name']); ?></span>
+                        <a href="<?php echo esc_url($breadcrumb['url']); ?>">
+                            <?php echo esc_html($breadcrumb['name']); ?>
                         </a>
                     <?php else: ?>
-                        <span itemprop="name"><?php echo esc_html($breadcrumb['name']); ?></span>
+                        <span><?php echo esc_html($breadcrumb['name']); ?></span>
                     <?php endif; ?>
-                    <meta itemprop="position" content="<?php echo $index + 1; ?>">
                 </li>
                 <?php endforeach; ?>
             </ol>

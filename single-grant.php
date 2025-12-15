@@ -732,9 +732,9 @@ if ($grant['ai_summary']) {
 }
 </style>
 
-<!-- Breadcrumb -->
+<!-- Breadcrumb（JSON-LDで構造化データ出力済みのため、HTMLはMicrodata属性なし） -->
 <nav class="gi-breadcrumb" aria-label="パンくずリスト">
-    <ol class="gi-breadcrumb-list" itemscope itemtype="https://schema.org/BreadcrumbList">
+    <ol class="gi-breadcrumb-list">
         <?php foreach ($breadcrumbs as $i => $crumb): ?>
         <li>
             <?php if ($i < count($breadcrumbs) - 1): ?>

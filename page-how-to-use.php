@@ -174,19 +174,15 @@ foreach ($faqs as $faq) {
 
 <main class="how-to-page">
     
-    <!-- パンくずリスト -->
+    <!-- パンくずリスト（JSON-LDで構造化データ出力済みのため、HTMLはMicrodata属性なし） -->
     <nav class="breadcrumb-nav" aria-label="パンくずリスト">
         <div class="container">
-            <ol class="breadcrumb" itemscope itemtype="https://schema.org/BreadcrumbList">
-                <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
-                    <a itemprop="item" href="<?php echo esc_url(home_url('/')); ?>">
-                        <span itemprop="name">ホーム</span>
-                    </a>
-                    <meta itemprop="position" content="1" />
+            <ol class="breadcrumb">
+                <li>
+                    <a href="<?php echo esc_url(home_url('/')); ?>">ホーム</a>
                 </li>
-                <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem" class="active">
-                    <span itemprop="name">使い方ガイド</span>
-                    <meta itemprop="position" content="2" />
+                <li class="active">
+                    <span>使い方ガイド</span>
                 </li>
             </ol>
         </div>
