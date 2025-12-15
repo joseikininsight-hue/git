@@ -134,14 +134,15 @@ $schema_breadcrumb = array(
 
     <?php 
     // 広告スペース - コンテンツがある場合のみ表示（空白問題対策）
+    // PHP 8.1+対応: null を空文字列に変換してからtrim()
     if (function_exists('ji_display_ad')) {
         $ad_hero_bottom = ji_display_ad('front_hero_bottom', 'front-page', true);
-        if (!empty(trim($ad_hero_bottom))): ?>
+        if (!empty(trim((string)$ad_hero_bottom))): ?>
         <div class="front-ad-space front-ad-hero-bottom"><?php echo $ad_hero_bottom; ?></div>
         <?php endif;
         
         $ad_column_top = ji_display_ad('front_column_zone_top', 'front-page', true);
-        if (!empty(trim($ad_column_top))): ?>
+        if (!empty(trim((string)$ad_column_top))): ?>
         <div class="front-ad-space front-ad-column-top"><?php echo $ad_column_top; ?></div>
         <?php endif;
     } ?>
@@ -153,7 +154,7 @@ $schema_breadcrumb = array(
     <?php 
     if (function_exists('ji_display_ad')) {
         $ad_search_top = ji_display_ad('front_search_top', 'front-page', true);
-        if (!empty(trim($ad_search_top))): ?>
+        if (!empty(trim((string)$ad_search_top))): ?>
         <div class="front-ad-space front-ad-search-top"><?php echo $ad_search_top; ?></div>
         <?php endif;
     } ?>
@@ -168,7 +169,7 @@ $schema_breadcrumb = array(
     <?php 
     if (function_exists('ji_display_ad')) {
         $ad_grant_news_top = ji_display_ad('front_grant_news_top', 'front-page', true);
-        if (!empty(trim($ad_grant_news_top))): ?>
+        if (!empty(trim((string)$ad_grant_news_top))): ?>
         <div class="front-ad-space front-ad-grant-news-top"><?php echo $ad_grant_news_top; ?></div>
         <?php endif;
     } ?>
@@ -185,12 +186,12 @@ $schema_breadcrumb = array(
     <?php 
     if (function_exists('ji_display_ad')) {
         $ad_grant_news_bottom = ji_display_ad('front_grant_news_bottom', 'front-page', true);
-        if (!empty(trim($ad_grant_news_bottom))): ?>
+        if (!empty(trim((string)$ad_grant_news_bottom))): ?>
         <div class="front-ad-space front-ad-grant-news-bottom"><?php echo $ad_grant_news_bottom; ?></div>
         <?php endif;
         
         $ad_cta_top = ji_display_ad('front_cta_top', 'front-page', true);
-        if (!empty(trim($ad_cta_top))): ?>
+        if (!empty(trim((string)$ad_cta_top))): ?>
         <div class="front-ad-space front-ad-cta-top"><?php echo $ad_cta_top; ?></div>
         <?php endif;
     } ?>
