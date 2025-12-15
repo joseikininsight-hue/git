@@ -78,15 +78,15 @@
    ========================================================================== */
 .hero {
     position: relative;
-    min-height: calc(100vh - var(--hero-header-height));
-    min-height: calc(100dvh - var(--hero-header-height));
+    /* ヒーローの最小高さ: コンテンツに応じて自動調整（空白問題対策） */
+    min-height: auto;
     display: flex;
     align-items: center;
     background: linear-gradient(180deg, var(--hero-gov-navy-50) 0%, var(--hero-color-white) 100%);
     font-family: var(--hero-font-sans);
     color: var(--hero-color-gray-900);
     overflow: hidden;
-    padding: var(--hero-space-16) 0;
+    padding: var(--hero-space-12) 0;
     border-bottom: 1px solid var(--hero-color-gray-200);
 }
 
@@ -444,7 +444,7 @@
 @media (max-width: 1023px) {
     .hero {
         min-height: auto;
-        padding: var(--hero-space-12) 0;
+        padding: var(--hero-space-10) 0;
     }
     
     .hero__content {
@@ -495,7 +495,7 @@
    ========================================================================== */
 @media (max-width: 640px) {
     .hero {
-        padding: var(--hero-space-10) 0;
+        padding: var(--hero-space-8) 0;
     }
     
     .hero__container {

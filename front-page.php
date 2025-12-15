@@ -132,21 +132,31 @@ $schema_breadcrumb = array(
         <?php get_template_part('template-parts/front-page/section', 'hero'); ?>
     </section>
 
-    <?php if (function_exists('ji_display_ad')) : ?>
-        <div class="front-ad-space front-ad-hero-bottom"><?php ji_display_ad('front_hero_bottom', 'front-page'); ?></div>
-    <?php endif; ?>
-
-    <?php if (function_exists('ji_display_ad')) : ?>
-        <div class="front-ad-space front-ad-column-top"><?php ji_display_ad('front_column_zone_top', 'front-page'); ?></div>
-    <?php endif; ?>
+    <?php 
+    // 広告スペース - コンテンツがある場合のみ表示（空白問題対策）
+    if (function_exists('ji_display_ad')) {
+        $ad_hero_bottom = ji_display_ad('front_hero_bottom', 'front-page', true);
+        if (!empty(trim($ad_hero_bottom))): ?>
+        <div class="front-ad-space front-ad-hero-bottom"><?php echo $ad_hero_bottom; ?></div>
+        <?php endif;
+        
+        $ad_column_top = ji_display_ad('front_column_zone_top', 'front-page', true);
+        if (!empty(trim($ad_column_top))): ?>
+        <div class="front-ad-space front-ad-column-top"><?php echo $ad_column_top; ?></div>
+        <?php endif;
+    } ?>
     
     <section class="front-page-section section-animate" id="column-section" aria-labelledby="column-heading">
         <?php get_template_part('template-parts/column/zone'); ?>
     </section>
 
-    <?php if (function_exists('ji_display_ad')) : ?>
-        <div class="front-ad-space front-ad-search-top"><?php ji_display_ad('front_search_top', 'front-page'); ?></div>
-    <?php endif; ?>
+    <?php 
+    if (function_exists('ji_display_ad')) {
+        $ad_search_top = ji_display_ad('front_search_top', 'front-page', true);
+        if (!empty(trim($ad_search_top))): ?>
+        <div class="front-ad-space front-ad-search-top"><?php echo $ad_search_top; ?></div>
+        <?php endif;
+    } ?>
     
     <section class="front-page-section section-animate" id="grant-zone-section" aria-labelledby="grant-zone-heading">
         <?php 
@@ -155,9 +165,13 @@ $schema_breadcrumb = array(
         ?>
     </section>
 
-    <?php if (function_exists('ji_display_ad')) : ?>
-        <div class="front-ad-space front-ad-grant-news-top"><?php ji_display_ad('front_grant_news_top', 'front-page'); ?></div>
-    <?php endif; ?>
+    <?php 
+    if (function_exists('ji_display_ad')) {
+        $ad_grant_news_top = ji_display_ad('front_grant_news_top', 'front-page', true);
+        if (!empty(trim($ad_grant_news_top))): ?>
+        <div class="front-ad-space front-ad-grant-news-top"><?php echo $ad_grant_news_top; ?></div>
+        <?php endif;
+    } ?>
     
     <section class="front-page-section section-animate" id="grant-news-section" aria-labelledby="grant-news-heading">
         <?php 
@@ -168,13 +182,18 @@ $schema_breadcrumb = array(
         ?>
     </section>
 
-    <?php if (function_exists('ji_display_ad')) : ?>
-        <div class="front-ad-space front-ad-grant-news-bottom"><?php ji_display_ad('front_grant_news_bottom', 'front-page'); ?></div>
-    <?php endif; ?>
-
-    <?php if (function_exists('ji_display_ad')) : ?>
-        <div class="front-ad-space front-ad-cta-top"><?php ji_display_ad('front_cta_top', 'front-page'); ?></div>
-    <?php endif; ?>
+    <?php 
+    if (function_exists('ji_display_ad')) {
+        $ad_grant_news_bottom = ji_display_ad('front_grant_news_bottom', 'front-page', true);
+        if (!empty(trim($ad_grant_news_bottom))): ?>
+        <div class="front-ad-space front-ad-grant-news-bottom"><?php echo $ad_grant_news_bottom; ?></div>
+        <?php endif;
+        
+        $ad_cta_top = ji_display_ad('front_cta_top', 'front-page', true);
+        if (!empty(trim($ad_cta_top))): ?>
+        <div class="front-ad-space front-ad-cta-top"><?php echo $ad_cta_top; ?></div>
+        <?php endif;
+    } ?>
     
     <section class="front-page-section section-animate" 
              id="final-cta-section"

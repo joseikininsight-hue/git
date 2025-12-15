@@ -397,5 +397,68 @@ main {
 /* Amount Fixer specific styles are loaded via /assets/css/amount-fixer.css */
 
 /* ==========================================================================
+   Front Page - 空白問題対策 v1.0
+   ========================================================================== */
+
+/* 広告スペース - コンテンツがない場合は非表示 */
+.front-ad-space:empty {
+    display: none !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* 広告スペース - コンテンツがある場合のスタイル */
+.front-ad-space {
+    min-height: 0;
+    padding: 0;
+    margin: 0;
+}
+
+.front-ad-space:not(:empty) {
+    padding: 16px 0;
+    text-align: center;
+}
+
+/* フロントページセクション - コンテンツがない場合は非表示 */
+.front-page-section:empty {
+    display: none !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* フロントページセクション - 基本スタイル（過剰な余白を削除） */
+.front-page-section {
+    padding: 0;
+    margin: 0;
+}
+
+/* ヘッダープレースホルダー - ヘッダー高さに正確に一致 */
+.ji-header-placeholder {
+    height: 64px;
+    height: var(--h-header-height, 64px);
+    min-height: 0;
+    max-height: 64px;
+}
+
+/* 追従CTA用の下部余白 - 適切な高さに制限 */
+body:not(.no-sticky-cta-padding) {
+    padding-bottom: 70px;
+    padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px));
+}
+
+/* WordPress管理バー対応 */
+.admin-bar .ji-header {
+    top: 32px;
+}
+
+@media screen and (max-width: 782px) {
+    .admin-bar .ji-header {
+        top: 46px;
+    }
+}
+
+/* ==========================================================================
    End of Grant Insight Perfect Main Stylesheet
    ========================================================================== */
