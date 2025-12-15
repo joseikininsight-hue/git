@@ -1,10 +1,10 @@
 <?php
 /**
- * Grant Single Page - Ultimate Edition v302
- * 補助金詳細ページ - 完全修正版
+ * Grant Single Page - Ultimate Edition v303
+ * 補助金詳細ページ - 採択率AI判断注意書き追加版
  * 
  * @package Grant_Insight_Ultimate
- * @version 302.0.0
+ * @version 303.0.0
  */
 
 if (!defined('ABSPATH')) exit;
@@ -626,6 +626,112 @@ if ($grant['ai_summary']) {
 }
 </script>
 
+<!-- 採択率AI推定に関するスタイル -->
+<style>
+.gi-ai-estimate-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #6366f1;
+    background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 6px;
+    border: 1px solid #c7d2fe;
+}
+.gi-ai-estimate-badge svg {
+    width: 12px;
+    height: 12px;
+}
+.gi-metric-ai-note {
+    font-size: 11px;
+    color: var(--gi-gray-500, #6b7280);
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.gi-metric-ai-note svg {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+}
+.gi-compare-ai-note {
+    display: block;
+    font-size: 10px;
+    color: #6366f1;
+    margin-top: 2px;
+}
+.gi-ai-disclaimer {
+    background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
+    border: 1px solid #fde047;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 16px 0;
+    font-size: 13px;
+    color: #854d0e;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+.gi-ai-disclaimer svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+.gi-ai-disclaimer-text {
+    line-height: 1.6;
+}
+.gi-ai-disclaimer-text strong {
+    color: #92400e;
+}
+.gi-tooltip-trigger {
+    display: inline-flex;
+    align-items: center;
+    cursor: help;
+    position: relative;
+}
+.gi-tooltip-trigger:hover .gi-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+.gi-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(8px);
+    background: #1f2937;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 400;
+    padding: 8px 12px;
+    border-radius: 6px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    z-index: 100;
+    margin-bottom: 8px;
+    max-width: 280px;
+    white-space: normal;
+    text-align: left;
+    line-height: 1.5;
+}
+.gi-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #1f2937;
+}
+</style>
+
 <!-- Breadcrumb -->
 <nav class="gi-breadcrumb" aria-label="パンくずリスト">
     <ol class="gi-breadcrumb-list" itemscope itemtype="https://schema.org/BreadcrumbList">
@@ -696,9 +802,24 @@ if ($grant['ai_summary']) {
                 </div>
             </div>
             <div class="gi-metric">
-                <div class="gi-metric-label">採択率</div>
+                <div class="gi-metric-label">
+                    採択率
+                    <span class="gi-tooltip-trigger">
+                        <span class="gi-ai-estimate-badge">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                            AI推定
+                        </span>
+                        <span class="gi-tooltip">この採択率はAIが過去のデータや類似補助金の傾向から推定した参考値です。公式発表の数値ではありません。</span>
+                    </span>
+                </div>
                 <div class="gi-metric-value"><?php echo $grant['adoption_rate'] > 0 ? number_format($grant['adoption_rate'], 1) . '%' : '—'; ?></div>
-                <?php if ($grant['adoption_count'] > 0): ?><div class="gi-metric-sub"><?php echo number_format($grant['adoption_count']); ?>社採択</div><?php endif; ?>
+                <?php if ($grant['adoption_count'] > 0): ?>
+                <div class="gi-metric-sub"><?php echo number_format($grant['adoption_count']); ?>社採択</div>
+                <?php endif; ?>
+                <div class="gi-metric-ai-note">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    参考値・公式発表ではありません
+                </div>
             </div>
         </section>
 
@@ -817,6 +938,67 @@ if ($grant['ai_summary']) {
                             <?php endif; ?>
                         </div>
                     </div>
+                    
+                    <!-- 採択率・統計情報（AI推定注意書き付き） -->
+                    <?php if ($grant['adoption_rate'] > 0 || $grant['adoption_count'] > 0 || $grant['application_count'] > 0): ?>
+                    <div class="gi-details-group">
+                        <div class="gi-details-group-header">
+                            <span class="gi-details-group-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+                            </span>
+                            採択率・統計情報
+                            <span class="gi-ai-estimate-badge" style="margin-left: 8px;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                                AI推定値
+                            </span>
+                        </div>
+                        
+                        <!-- AI推定に関する注意書き -->
+                        <div class="gi-ai-disclaimer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="8" x2="12" y2="12"/>
+                                <line x1="12" y1="16" x2="12.01" y2="16"/>
+                            </svg>
+                            <div class="gi-ai-disclaimer-text">
+                                <strong>ご注意：</strong>以下の採択率・統計情報は、AIが過去の公開データや類似補助金の傾向を分析して推定した<strong>参考値</strong>です。公式機関が発表した数値ではありません。実際の採択率は募集回や申請内容によって大きく異なる場合があります。正確な情報は公式サイトでご確認ください。
+                            </div>
+                        </div>
+                        
+                        <div class="gi-table">
+                            <?php if ($grant['adoption_rate'] > 0): ?>
+                            <div class="gi-table-row">
+                                <div class="gi-table-key">
+                                    推定採択率
+                                    <span class="gi-ai-estimate-badge">AI推定</span>
+                                </div>
+                                <div class="gi-table-value">
+                                    <strong style="font-size: 1.2em; color: var(--gi-success-text, #059669);"><?php echo number_format($grant['adoption_rate'], 1); ?>%</strong>
+                                    <span style="font-size: 12px; color: var(--gi-gray-500); margin-left: 8px;">（参考値）</span>
+                                </div>
+                            </div>
+                            <?php endif; ?>
+                            <?php if ($grant['adoption_count'] > 0): ?>
+                            <div class="gi-table-row">
+                                <div class="gi-table-key">
+                                    推定採択件数
+                                    <span class="gi-ai-estimate-badge">AI推定</span>
+                                </div>
+                                <div class="gi-table-value"><?php echo number_format($grant['adoption_count']); ?>件（参考値）</div>
+                            </div>
+                            <?php endif; ?>
+                            <?php if ($grant['application_count'] > 0): ?>
+                            <div class="gi-table-row">
+                                <div class="gi-table-key">
+                                    推定申請件数
+                                    <span class="gi-ai-estimate-badge">AI推定</span>
+                                </div>
+                                <div class="gi-table-value"><?php echo number_format($grant['application_count']); ?>件（参考値）</div>
+                            </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <?php endif; ?>
                     
                     <!-- 更新履歴 -->
                     <?php if (!empty($grant['update_history'])): ?>
@@ -1053,6 +1235,19 @@ if ($grant['ai_summary']) {
                         <h2 class="gi-section-title" id="compare-title">類似補助金との比較</h2>
                         <span class="gi-section-en">Comparison</span>
                     </header>
+                    
+                    <!-- 比較表のAI推定注意書き -->
+                    <div class="gi-ai-disclaimer">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="8" x2="12" y2="12"/>
+                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                        <div class="gi-ai-disclaimer-text">
+                            <strong>採択率について：</strong>比較表内の採択率はAIによる推定値であり、公式発表の数値ではありません。補助金選びの参考としてご活用ください。
+                        </div>
+                    </div>
+                    
                     <div class="gi-compare">
                         <table class="gi-compare-table">
                             <thead>
@@ -1082,7 +1277,7 @@ if ($grant['ai_summary']) {
                                     <td class="gi-compare-current"><span class="gi-compare-value highlight"><?php echo $amount_display ? esc_html($amount_display) : '要確認'; ?></span></td>
                                     <?php foreach ($similar_grants as $sg): ?><td><span class="gi-compare-value"><?php echo $sg['max_amount'] ? esc_html($sg['max_amount']) : '要確認'; ?></span></td><?php endforeach; ?>
                                 </tr>
-                                                                <tr>
+                                <tr>
                                     <th>補助率</th>
                                     <td class="gi-compare-current"><span class="gi-compare-value"><?php echo $subsidy_rate_display ? esc_html($subsidy_rate_display) : '—'; ?></span></td>
                                     <?php foreach ($similar_grants as $sg): ?><td><span class="gi-compare-value"><?php echo $sg['subsidy_rate'] ? esc_html($sg['subsidy_rate']) : '—'; ?></span></td><?php endforeach; ?>
@@ -1110,11 +1305,29 @@ if ($grant['ai_summary']) {
                                     <?php endforeach; ?>
                                 </tr>
                                 <tr>
-                                    <th>採択率</th>
-                                    <td class="gi-compare-current"><span class="gi-compare-value <?php echo $grant['adoption_rate'] >= 50 ? 'highlight' : ''; ?>"><?php echo $grant['adoption_rate'] > 0 ? number_format($grant['adoption_rate'], 1) . '%' : '—'; ?></span></td>
-                                    <?php foreach ($similar_grants as $sg): ?><td><span class="gi-compare-value <?php echo $sg['adoption_rate'] >= 50 ? 'highlight' : ''; ?>"><?php echo $sg['adoption_rate'] > 0 ? number_format($sg['adoption_rate'], 1) . '%' : '—'; ?></span></td><?php endforeach; ?>
+                                    <th>
+                                        採択率
+                                        <span class="gi-ai-estimate-badge" style="display: block; margin-top: 4px;">AI推定</span>
+                                    </th>
+                                    <td class="gi-compare-current">
+                                        <span class="gi-compare-value <?php echo $grant['adoption_rate'] >= 50 ? 'highlight' : ''; ?>">
+                                            <?php echo $grant['adoption_rate'] > 0 ? number_format($grant['adoption_rate'], 1) . '%' : '—'; ?>
+                                        </span>
+                                        <?php if ($grant['adoption_rate'] > 0): ?>
+                                        <span class="gi-compare-ai-note">※参考値</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <?php foreach ($similar_grants as $sg): ?>
+                                    <td>
+                                        <span class="gi-compare-value <?php echo $sg['adoption_rate'] >= 50 ? 'highlight' : ''; ?>">
+                                            <?php echo $sg['adoption_rate'] > 0 ? number_format($sg['adoption_rate'], 1) . '%' : '—'; ?>
+                                        </span>
+                                        <?php if ($sg['adoption_rate'] > 0): ?>
+                                        <span class="gi-compare-ai-note">※参考値</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <?php endforeach; ?>
                                 </tr>
-
                                 <tr>
                                     <th>準備目安</th>
                                     <td class="gi-compare-current"><span class="gi-compare-value">約<?php echo $grant['preparation_days']; ?>日</span></td>
@@ -1206,7 +1419,7 @@ if ($grant['ai_summary']) {
                         </a>
                         <?php endif; ?>
                     </div>
-                    <div class="gi-source-footer">※最新情報は必ず公式サイトでご確認ください。本ページの情報は参考情報です。</div>
+                    <div class="gi-source-footer">※最新情報は必ず公式サイトでご確認ください。本ページの情報は参考情報です。採択率等の統計情報はAIによる推定値であり、公式発表ではありません。</div>
                 </div>
 
                 <!-- 監修者 -->
@@ -1526,17 +1739,585 @@ if ($grant['ai_summary']) {
     </div>
 </div>
 
+<!-- トースト通知 -->
 <div class="gi-toast" id="giToast"></div>
+
+<!-- JavaScript設定 -->
 <script>
-// CONFIG をグローバルスコープで定義（デバッグ用にもアクセス可能）
+// CONFIG をグローバルスコープで定義
 var CONFIG = {
     postId: <?php echo $post_id; ?>,
     ajaxUrl: '<?php echo admin_url("admin-ajax.php"); ?>',
     nonce: '<?php echo wp_create_nonce("gi_ai_nonce"); ?>',
     url: '<?php echo esc_js($canonical_url); ?>',
     title: <?php echo json_encode(get_the_title(), JSON_UNESCAPED_UNICODE); ?>,
-    totalChecklist: <?php echo count($checklist_items); ?>
+    totalChecklist: <?php echo count($checklist_items); ?>,
+    grantData: {
+        organization: <?php echo json_encode($grant['organization'], JSON_UNESCAPED_UNICODE); ?>,
+        maxAmount: <?php echo json_encode($amount_display, JSON_UNESCAPED_UNICODE); ?>,
+        subsidyRate: <?php echo json_encode($subsidy_rate_display, JSON_UNESCAPED_UNICODE); ?>,
+        deadline: <?php echo json_encode($deadline_info, JSON_UNESCAPED_UNICODE); ?>,
+        daysRemaining: <?php echo $days_remaining; ?>,
+        target: <?php echo json_encode(strip_tags($grant['grant_target']), JSON_UNESCAPED_UNICODE); ?>,
+        documents: <?php echo json_encode(strip_tags($docs), JSON_UNESCAPED_UNICODE); ?>,
+        expenses: <?php echo json_encode(strip_tags($expenses), JSON_UNESCAPED_UNICODE); ?>,
+        difficulty: <?php echo json_encode($difficulty['label'], JSON_UNESCAPED_UNICODE); ?>,
+        adoptionRate: <?php echo $grant['adoption_rate']; ?>,
+        onlineApplication: <?php echo $grant['online_application'] ? 'true' : 'false'; ?>,
+        jgrantsAvailable: <?php echo $grant['jgrants_available'] ? 'true' : 'false'; ?>,
+        officialUrl: <?php echo json_encode($grant['official_url'], JSON_UNESCAPED_UNICODE); ?>
+    }
 };
+
+document.addEventListener('DOMContentLoaded', function() {
+    // ========================================
+    // チェックリスト機能
+    // ========================================
+    const checklistItems = document.querySelectorAll('.gi-checklist-item');
+    const checklistFill = document.getElementById('checklistFill');
+    const checklistCount = document.getElementById('checklistCount');
+    const checklistPercent = document.getElementById('checklistPercent');
+    const checklistResult = document.getElementById('checklistResult');
+    const checklistResultText = document.getElementById('checklistResultText');
+    const checklistResultSub = document.getElementById('checklistResultSub');
+    const checklistReset = document.getElementById('checklistReset');
+    const checklistPrint = document.getElementById('checklistPrint');
+    
+    // ローカルストレージからチェック状態を復元
+    const storageKey = 'gi_checklist_' + CONFIG.postId;
+    let checkedItems = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    
+    function updateChecklistUI() {
+        let checked = 0;
+        let requiredChecked = 0;
+        let requiredTotal = 0;
+        
+        checklistItems.forEach(function(item) {
+            const id = item.dataset.id;
+            const isRequired = item.dataset.required === 'true';
+            const checkbox = item.querySelector('.gi-checklist-checkbox');
+            
+            if (isRequired) requiredTotal++;
+            
+            if (checkedItems.includes(id)) {
+                item.classList.add('checked');
+                checkbox.setAttribute('aria-checked', 'true');
+                checked++;
+                if (isRequired) requiredChecked++;
+            } else {
+                item.classList.remove('checked');
+                checkbox.setAttribute('aria-checked', 'false');
+            }
+        });
+        
+        const total = CONFIG.totalChecklist;
+        const percent = Math.round((checked / total) * 100);
+        
+        if (checklistFill) checklistFill.style.width = percent + '%';
+        if (checklistCount) checklistCount.textContent = checked + ' / ' + total + ' 完了';
+        if (checklistPercent) checklistPercent.textContent = percent + '%';
+        
+        // 結果表示
+        if (checklistResult) {
+            if (requiredChecked === requiredTotal && requiredTotal > 0) {
+                checklistResult.classList.add('success');
+                checklistResult.classList.remove('warning');
+                if (checklistResultText) checklistResultText.textContent = '申請可能です！';
+                if (checklistResultSub) checklistResultSub.textContent = '必須項目をすべてクリアしました。公式サイトから申請を進めましょう。';
+            } else if (checked > 0) {
+                checklistResult.classList.add('warning');
+                checklistResult.classList.remove('success');
+                if (checklistResultText) checklistResultText.textContent = 'あと' + (requiredTotal - requiredChecked) + '項目';
+                if (checklistResultSub) checklistResultSub.textContent = '必須項目をすべてクリアすると申請可能です。';
+            } else {
+                checklistResult.classList.remove('success', 'warning');
+                if (checklistResultText) checklistResultText.textContent = 'チェックを入れて申請可否を確認しましょう';
+                if (checklistResultSub) checklistResultSub.textContent = '必須項目をすべてクリアすると申請可能です';
+            }
+        }
+    }
+    
+    // チェックリストアイテムのクリックイベント
+    checklistItems.forEach(function(item) {
+        const checkbox = item.querySelector('.gi-checklist-checkbox');
+        
+        function toggleCheck() {
+            const id = item.dataset.id;
+            const index = checkedItems.indexOf(id);
+            
+            if (index > -1) {
+                checkedItems.splice(index, 1);
+            } else {
+                checkedItems.push(id);
+            }
+            
+            localStorage.setItem(storageKey, JSON.stringify(checkedItems));
+            updateChecklistUI();
+        }
+        
+        if (checkbox) {
+            checkbox.addEventListener('click', toggleCheck);
+            checkbox.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleCheck();
+                }
+            });
+        }
+        
+        // ヘルプボタン
+        const helpBtn = item.querySelector('.gi-checklist-help-btn');
+        if (helpBtn) {
+            helpBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                item.classList.toggle('show-help');
+            });
+        }
+    });
+    
+    // リセットボタン
+    if (checklistReset) {
+        checklistReset.addEventListener('click', function() {
+            if (confirm('チェックリストをリセットしますか？')) {
+                checkedItems = [];
+                localStorage.removeItem(storageKey);
+                updateChecklistUI();
+                showToast('チェックリストをリセットしました');
+            }
+        });
+    }
+    
+    // 印刷ボタン
+    if (checklistPrint) {
+        checklistPrint.addEventListener('click', function() {
+            window.print();
+        });
+    }
+    
+    // 初期表示
+    updateChecklistUI();
+    
+    // ========================================
+    // ブックマーク機能
+    // ========================================
+    const bookmarkBtn = document.getElementById('bookmarkBtn');
+    const mobileBookmarkBtn = document.getElementById('mobileBookmarkBtn');
+    const bookmarkStorageKey = 'gi_bookmarks';
+    
+    function getBookmarks() {
+        return JSON.parse(localStorage.getItem(bookmarkStorageKey) || '[]');
+    }
+    
+    function isBookmarked() {
+        return getBookmarks().some(function(b) { return b.id === CONFIG.postId; });
+    }
+    
+    function updateBookmarkUI() {
+        const bookmarked = isBookmarked();
+        [bookmarkBtn, mobileBookmarkBtn].forEach(function(btn) {
+            if (btn) {
+                const span = btn.querySelector('span');
+                if (bookmarked) {
+                    btn.classList.add('bookmarked');
+                    if (span) span.textContent = '保存済み';
+                } else {
+                    btn.classList.remove('bookmarked');
+                    if (span) span.textContent = '保存する';
+                }
+            }
+        });
+    }
+    
+    function toggleBookmark() {
+        let bookmarks = getBookmarks();
+        const bookmarked = isBookmarked();
+        
+        if (bookmarked) {
+            bookmarks = bookmarks.filter(function(b) { return b.id !== CONFIG.postId; });
+            showToast('ブックマークを解除しました');
+        } else {
+            bookmarks.push({
+                id: CONFIG.postId,
+                title: CONFIG.title,
+                url: CONFIG.url,
+                date: new Date().toISOString()
+            });
+            showToast('ブックマークに保存しました');
+        }
+        
+        localStorage.setItem(bookmarkStorageKey, JSON.stringify(bookmarks));
+        updateBookmarkUI();
+    }
+    
+    if (bookmarkBtn) bookmarkBtn.addEventListener('click', toggleBookmark);
+    if (mobileBookmarkBtn) mobileBookmarkBtn.addEventListener('click', toggleBookmark);
+    updateBookmarkUI();
+    
+    // ========================================
+    // シェア機能
+    // ========================================
+    const shareBtn = document.getElementById('shareBtn');
+    const mobileShareBtn = document.getElementById('mobileShareBtn');
+    
+    function shareContent() {
+        if (navigator.share) {
+            navigator.share({
+                title: CONFIG.title,
+                url: CONFIG.url
+            }).catch(function() {});
+        } else {
+            // フォールバック: URLをコピー
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(CONFIG.url).then(function() {
+                    showToast('URLをコピーしました');
+                });
+            } else {
+                // 古いブラウザ用フォールバック
+                const textarea = document.createElement('textarea');
+                textarea.value = CONFIG.url;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showToast('URLをコピーしました');
+            }
+        }
+    }
+    
+    if (shareBtn) shareBtn.addEventListener('click', shareContent);
+    if (mobileShareBtn) mobileShareBtn.addEventListener('click', shareContent);
+    
+    // ========================================
+    // モバイルパネル機能
+    // ========================================
+    const mobileAiBtn = document.getElementById('mobileAiBtn');
+    const mobileOverlay = document.getElementById('mobileOverlay');
+    const mobilePanel = document.getElementById('mobilePanel');
+    const panelClose = document.getElementById('panelClose');
+    const panelTabs = document.querySelectorAll('.gi-panel-tab');
+    const panelContents = document.querySelectorAll('.gi-panel-content-tab');
+    const mobileTocLinks = document.querySelectorAll('.mobile-toc-link');
+    
+    function openPanel() {
+        if (mobileOverlay) mobileOverlay.classList.add('active');
+        if (mobilePanel) mobilePanel.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closePanel() {
+        if (mobileOverlay) mobileOverlay.classList.remove('active');
+        if (mobilePanel) mobilePanel.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    if (mobileAiBtn) mobileAiBtn.addEventListener('click', openPanel);
+    if (mobileOverlay) mobileOverlay.addEventListener('click', closePanel);
+    if (panelClose) panelClose.addEventListener('click', closePanel);
+    
+    // タブ切り替え
+    panelTabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            const targetTab = this.dataset.tab;
+            
+            panelTabs.forEach(function(t) { t.classList.remove('active'); });
+            panelContents.forEach(function(c) { c.classList.remove('active'); });
+            
+            this.classList.add('active');
+            const targetContent = document.getElementById('tab' + targetTab.charAt(0).toUpperCase() + targetTab.slice(1));
+            if (targetContent) targetContent.classList.add('active');
+        });
+    });
+    
+    // モバイル目次リンククリック時にパネルを閉じる
+    mobileTocLinks.forEach(function(link) {
+        link.addEventListener('click', function() {
+            closePanel();
+        });
+    });
+    
+    // ========================================
+    // AIアシスタント機能
+    // ========================================
+    const aiInput = document.getElementById('aiInput');
+    const aiSend = document.getElementById('aiSend');
+    const aiMessages = document.getElementById('aiMessages');
+    const mobileAiInput = document.getElementById('mobileAiInput');
+    const mobileAiSend = document.getElementById('mobileAiSend');
+    const mobileAiMessages = document.getElementById('mobileAiMessages');
+    const aiChips = document.querySelectorAll('.gi-ai-chip, .gi-mobile-ai-chip');
+    
+    // AI応答データ（ローカル処理用）
+    const aiResponses = {
+        '対象者': CONFIG.grantData.target || 'この補助金の対象者については、詳細情報セクションをご確認ください。',
+        '金額': CONFIG.grantData.maxAmount ? '補助金額は' + CONFIG.grantData.maxAmount + 'です。' + (CONFIG.grantData.subsidyRate ? '補助率は' + CONFIG.grantData.subsidyRate + 'となっています。' : '') : '補助金額については公式サイトでご確認ください。',
+        '書類': CONFIG.grantData.documents || '必要書類については、詳細情報セクションをご確認ください。',
+        '申請': (CONFIG.grantData.onlineApplication === 'true' ? 'オンライン申請に対応しています。' : '') + (CONFIG.grantData.jgrantsAvailable === 'true' ? 'jGrantsでの申請が可能です。' : '') + (CONFIG.grantData.officialUrl ? '詳細は公式サイトをご確認ください。' : ''),
+        '締切': CONFIG.grantData.deadline ? '申請締切は' + CONFIG.grantData.deadline + 'です。' + (CONFIG.grantData.daysRemaining > 0 ? '残り' + CONFIG.grantData.daysRemaining + '日です。' : '') : '申請締切については公式サイトでご確認ください。',
+        '経費': CONFIG.grantData.expenses || '対象経費については、詳細情報セクションをご確認ください。',
+        '難易度': '申請難易度は「' + CONFIG.grantData.difficulty + '」です。' + (CONFIG.grantData.adoptionRate > 0 ? '推定採択率は約' + CONFIG.grantData.adoptionRate + '%です（※AI推定値であり、公式発表ではありません）。' : '')
+    };
+    
+    function addAiMessage(message, isUser, container) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'gi-ai-msg' + (isUser ? ' user' : '');
+        
+        if (isUser) {
+            msgDiv.innerHTML = '<div class="gi-ai-bubble">' + escapeHtml(message) + '</div>';
+        } else {
+            msgDiv.innerHTML = '<div class="gi-ai-avatar">AI</div><div class="gi-ai-bubble">' + message + '</div>';
+        }
+        
+        container.appendChild(msgDiv);
+        container.scrollTop = container.scrollHeight;
+    }
+    
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    function processAiQuery(query, container) {
+        // ユーザーメッセージを追加
+        addAiMessage(query, true, container);
+        
+        // ローディング表示
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'gi-ai-msg loading';
+        loadingDiv.innerHTML = '<div class="gi-ai-avatar">AI</div><div class="gi-ai-bubble"><span class="gi-ai-typing">考え中...</span></div>';
+        container.appendChild(loadingDiv);
+        container.scrollTop = container.scrollHeight;
+        
+        // 応答を生成（簡易マッチング）
+        setTimeout(function() {
+            container.removeChild(loadingDiv);
+            
+            let response = '';
+            const queryLower = query.toLowerCase();
+            
+            if (queryLower.includes('対象') || queryLower.includes('誰')) {
+                response = aiResponses['対象者'];
+            } else if (queryLower.includes('金額') || queryLower.includes('いくら') || queryLower.includes('補助率')) {
+                response = aiResponses['金額'];
+            } else if (queryLower.includes('書類') || queryLower.includes('必要')) {
+                response = aiResponses['書類'];
+            } else if (queryLower.includes('申請') || queryLower.includes('方法') || queryLower.includes('オンライン')) {
+                response = aiResponses['申請'];
+            } else if (queryLower.includes('締切') || queryLower.includes('期限') || queryLower.includes('いつ')) {
+                response = aiResponses['締切'];
+            } else if (queryLower.includes('経費') || queryLower.includes('費用') || queryLower.includes('使える')) {
+                response = aiResponses['経費'];
+            } else if (queryLower.includes('難易度') || queryLower.includes('採択率') || queryLower.includes('難しい')) {
+                response = aiResponses['難易度'];
+            } else {
+                response = 'ご質問ありがとうございます。この補助金の詳細については、上記の「補助金詳細」セクションや公式サイトをご確認ください。具体的なご質問があれば、「対象者」「金額」「書類」「申請方法」「締切」などのキーワードでお聞きください。';
+            }
+            
+            addAiMessage(response, false, container);
+        }, 800);
+    }
+    
+    function handleDiagnosis(container) {
+        addAiMessage('資格診断をお願いします', true, container);
+        
+        setTimeout(function() {
+            let diagnosisHtml = '<strong>申請資格診断</strong><br><br>';
+            diagnosisHtml += '以下の項目をご確認ください：<br><br>';
+            diagnosisHtml += '✅ <strong>対象者要件</strong><br>' + (CONFIG.grantData.target || '詳細は公式サイトをご確認ください') + '<br><br>';
+            diagnosisHtml += '✅ <strong>補助金額</strong><br>' + (CONFIG.grantData.maxAmount || '要確認') + '<br><br>';
+            diagnosisHtml += '✅ <strong>申請締切</strong><br>' + (CONFIG.grantData.deadline || '要確認');
+            if (CONFIG.grantData.daysRemaining > 0) {
+                diagnosisHtml += '（残り' + CONFIG.grantData.daysRemaining + '日）';
+            }
+            diagnosisHtml += '<br><br>';
+            diagnosisHtml += '📋 詳しくは上部の「申請前チェックリスト」で確認できます。';
+            
+            addAiMessage(diagnosisHtml, false, container);
+        }, 600);
+    }
+    
+    function handleRoadmap(container) {
+        addAiMessage('申請ロードマップを教えてください', true, container);
+        
+        setTimeout(function() {
+            let roadmapHtml = '<strong>申請ロードマップ</strong><br><br>';
+            roadmapHtml += '📍 <strong>STEP 1</strong>: 申請要件の確認<br>';
+            roadmapHtml += '└ 対象者・対象経費を確認<br><br>';
+            roadmapHtml += '📍 <strong>STEP 2</strong>: 必要書類の準備<br>';
+            roadmapHtml += '└ ' + (CONFIG.grantData.documents ? CONFIG.grantData.documents.substring(0, 50) + '...' : '事業計画書、決算書など') + '<br><br>';
+            roadmapHtml += '📍 <strong>STEP 3</strong>: 申請書作成<br>';
+            if (CONFIG.grantData.jgrantsAvailable === 'true') {
+                roadmapHtml += '└ jGrantsでの電子申請<br><br>';
+            } else if (CONFIG.grantData.onlineApplication === 'true') {
+                roadmapHtml += '└ オンライン申請<br><br>';
+            } else {
+                roadmapHtml += '└ 申請書類の作成・提出<br><br>';
+            }
+            roadmapHtml += '📍 <strong>STEP 4</strong>: 審査・採択<br>';
+            roadmapHtml += '└ 審査期間を経て採択決定<br><br>';
+            roadmapHtml += '⏰ 締切: ' + (CONFIG.grantData.deadline || '要確認');
+            
+            addAiMessage(roadmapHtml, false, container);
+        }, 600);
+    }
+    
+    // AIチップのクリックイベント
+    aiChips.forEach(function(chip) {
+        chip.addEventListener('click', function() {
+            const action = this.dataset.action;
+            const query = this.dataset.q;
+            const isMobile = this.classList.contains('gi-mobile-ai-chip');
+            const container = isMobile ? mobileAiMessages : aiMessages;
+            
+            if (action === 'diagnosis') {
+                handleDiagnosis(container);
+            } else if (action === 'roadmap') {
+                handleRoadmap(container);
+            } else if (query) {
+                processAiQuery(query, container);
+            }
+        });
+    });
+    
+    // AI送信機能
+    function sendAiMessage(input, container) {
+        const query = input.value.trim();
+        if (!query) return;
+        
+        processAiQuery(query, container);
+        input.value = '';
+        input.style.height = 'auto';
+    }
+    
+    if (aiSend && aiInput && aiMessages) {
+        aiSend.addEventListener('click', function() {
+            sendAiMessage(aiInput, aiMessages);
+        });
+        
+        aiInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendAiMessage(aiInput, aiMessages);
+            }
+        });
+        
+        // テキストエリア自動リサイズ
+        aiInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+    }
+    
+    if (mobileAiSend && mobileAiInput && mobileAiMessages) {
+        mobileAiSend.addEventListener('click', function() {
+            sendAiMessage(mobileAiInput, mobileAiMessages);
+        });
+        
+        mobileAiInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendAiMessage(mobileAiInput, mobileAiMessages);
+            }
+        });
+        
+        mobileAiInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+        });
+    }
+    
+    // ========================================
+    // スムーズスクロール
+    // ========================================
+    document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+        anchor.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            if (href === '#') return;
+            
+            const target = document.querySelector(href);
+            if (target) {
+                e.preventDefault();
+                const headerOffset = 80;
+                const elementPosition = target.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+    
+    // ========================================
+    // トースト通知
+    // ========================================
+    window.showToast = function(message, duration) {
+        duration = duration || 3000;
+        const toast = document.getElementById('giToast');
+        if (!toast) return;
+        
+        toast.textContent = message;
+        toast.classList.add('show');
+        
+        setTimeout(function() {
+            toast.classList.remove('show');
+        }, duration);
+    };
+    
+    // ========================================
+    // FAQ アコーディオン アニメーション
+    // ========================================
+    document.querySelectorAll('.gi-faq-item').forEach(function(item) {
+        item.addEventListener('toggle', function() {
+            const icon = this.querySelector('.gi-faq-icon');
+            if (icon) {
+                if (this.open) {
+                    icon.style.transform = 'rotate(45deg)';
+                } else {
+                    icon.style.transform = 'rotate(0deg)';
+                }
+            }
+        });
+    });
+    
+    // ========================================
+    // サイドバー目次ハイライト
+    // ========================================
+    const tocLinks = document.querySelectorAll('.gi-sidebar-list-link[href^="#"]');
+    const sections = [];
+    
+    tocLinks.forEach(function(link) {
+        const href = link.getAttribute('href');
+        const section = document.querySelector(href);
+        if (section) {
+            sections.push({ link: link, section: section });
+        }
+    });
+    
+    function updateTocHighlight() {
+        const scrollPos = window.scrollY + 100;
+        
+        let currentSection = null;
+        sections.forEach(function(item) {
+            if (item.section.offsetTop <= scrollPos) {
+                currentSection = item;
+            }
+        });
+        
+        tocLinks.forEach(function(link) {
+            link.classList.remove('active');
+        });
+        
+        if (currentSection) {
+            currentSection.link.classList.add('active');
+        }
+    }
+    
+    window.addEventListener('scroll', updateTocHighlight);
+    updateTocHighlight();
+    
+}); // DOMContentLoaded end
 </script>
 
 <?php get_footer(); ?>
