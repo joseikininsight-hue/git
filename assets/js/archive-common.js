@@ -363,8 +363,13 @@
             const self = this;
             const trigger = el.categorySelect.querySelector('.select-trigger');
             const dropdown = el.categorySelect.querySelector('.select-dropdown');
-            const checkboxes = el.categoryOptions.querySelectorAll('.option-checkbox');
+            
+            // el.categoryOptions が null の場合は空配列を使用
+            const checkboxes = el.categoryOptions ? el.categoryOptions.querySelectorAll('.option-checkbox') : [];
             const allCheckbox = document.getElementById('cat-all');
+            
+            // trigger または dropdown が null の場合は終了
+            if (!trigger || !dropdown) return;
             
             trigger.addEventListener('click', function() {
                 const isActive = el.categorySelect.classList.contains('active');
@@ -378,12 +383,12 @@
                 }
             });
             
-            if (el.categorySearch) {
+            if (el.categorySearch && el.categoryOptions) {
                 el.categorySearch.addEventListener('input', function(e) {
                     const query = e.target.value.toLowerCase();
                     const options = el.categoryOptions.querySelectorAll('.select-option:not(.all-option)');
                     options.forEach(function(option) {
-                        const name = option.dataset.name.toLowerCase();
+                        const name = (option.dataset.name || '').toLowerCase();
                         option.style.display = name.includes(query) ? 'flex' : 'none';
                     });
                 });
@@ -454,8 +459,13 @@
             const self = this;
             const trigger = el.prefectureSelect.querySelector('.select-trigger');
             const dropdown = el.prefectureSelect.querySelector('.select-dropdown');
-            const checkboxes = el.prefectureOptions.querySelectorAll('.option-checkbox');
+            
+            // el.prefectureOptions が null の場合は空配列を使用
+            const checkboxes = el.prefectureOptions ? el.prefectureOptions.querySelectorAll('.option-checkbox') : [];
             const allCheckbox = document.getElementById('pref-all');
+            
+            // trigger または dropdown が null の場合は終了
+            if (!trigger || !dropdown) return;
             
             trigger.addEventListener('click', function() {
                 const isActive = el.prefectureSelect.classList.contains('active');
@@ -469,12 +479,12 @@
                 }
             });
             
-            if (el.prefectureSearch) {
+            if (el.prefectureSearch && el.prefectureOptions) {
                 el.prefectureSearch.addEventListener('input', function(e) {
                     const query = e.target.value.toLowerCase();
                     const options = el.prefectureOptions.querySelectorAll('.select-option:not(.all-option)');
                     options.forEach(function(option) {
-                        const name = option.dataset.name.toLowerCase();
+                        const name = (option.dataset.name || '').toLowerCase();
                         option.style.display = name.includes(query) ? 'flex' : 'none';
                     });
                 });
@@ -556,6 +566,9 @@
             const trigger = el.municipalitySelect.querySelector('.select-trigger');
             const dropdown = el.municipalitySelect.querySelector('.select-dropdown');
             
+            // trigger または dropdown が null の場合は終了
+            if (!trigger || !dropdown) return;
+            
             trigger.addEventListener('click', function() {
                 const isActive = el.municipalitySelect.classList.contains('active');
                 self.closeAllSelects();
@@ -566,7 +579,7 @@
                 }
             });
             
-            if (el.municipalitySearch) {
+            if (el.municipalitySearch && el.municipalityOptions) {
                 el.municipalitySearch.addEventListener('input', function(e) {
                     const query = e.target.value.toLowerCase();
                     const options = el.municipalityOptions.querySelectorAll('.select-option');
@@ -583,6 +596,8 @@
          */
         updateCategoryCheckboxes: function() {
             const el = this.elements;
+            if (!el.categoryOptions) return;
+            
             const checkboxes = el.categoryOptions.querySelectorAll('.option-checkbox');
             const allCheckbox = document.getElementById('cat-all');
             const self = this;
@@ -603,16 +618,20 @@
          */
         updateCategoryDisplay: function() {
             const el = this.elements;
+            if (!el.categorySelect) return;
+            
             const valueSpan = el.categorySelect.querySelector('.select-value');
             const count = this.state.filters.category.length;
             
             if (count === 0) {
-                valueSpan.textContent = '選択';
-                el.categoryCountBadge.style.display = 'none';
+                if (valueSpan) valueSpan.textContent = '選択';
+                if (el.categoryCountBadge) el.categoryCountBadge.style.display = 'none';
             } else {
-                valueSpan.textContent = count + '件選択';
-                el.categoryCountBadge.textContent = count;
-                el.categoryCountBadge.style.display = 'inline-flex';
+                if (valueSpan) valueSpan.textContent = count + '件選択';
+                if (el.categoryCountBadge) {
+                    el.categoryCountBadge.textContent = count;
+                    el.categoryCountBadge.style.display = 'inline-flex';
+                }
             }
         },
 
@@ -621,6 +640,8 @@
          */
         updatePrefectureCheckboxes: function() {
             const el = this.elements;
+            if (!el.prefectureOptions) return;
+            
             const checkboxes = el.prefectureOptions.querySelectorAll('.option-checkbox');
             const allCheckbox = document.getElementById('pref-all');
             const self = this;
@@ -641,16 +662,20 @@
          */
         updatePrefectureDisplay: function() {
             const el = this.elements;
+            if (!el.prefectureSelect) return;
+            
             const valueSpan = el.prefectureSelect.querySelector('.select-value');
             const count = this.state.filters.prefecture.length;
             
             if (count === 0) {
-                valueSpan.textContent = '選択';
-                el.prefectureCountBadge.style.display = 'none';
+                if (valueSpan) valueSpan.textContent = '選択';
+                if (el.prefectureCountBadge) el.prefectureCountBadge.style.display = 'none';
             } else {
-                valueSpan.textContent = count + '件選択';
-                el.prefectureCountBadge.textContent = count;
-                el.prefectureCountBadge.style.display = 'inline-flex';
+                if (valueSpan) valueSpan.textContent = count + '件選択';
+                if (el.prefectureCountBadge) {
+                    el.prefectureCountBadge.textContent = count;
+                    el.prefectureCountBadge.style.display = 'inline-flex';
+                }
             }
         },
 
@@ -753,7 +778,7 @@
          */
         renderMunicipalityOptions: function(municipalities) {
             const el = this.elements;
-            if (!el.municipalityOptions) return;
+            if (!el.municipalityOptions || !el.municipalitySelect) return;
             
             const self = this;
             let html = '<div class="select-option active" data-value="" role="option">すべて</div>';
@@ -767,6 +792,8 @@
             const options = el.municipalityOptions.querySelectorAll('.select-option');
             const valueSpan = el.municipalitySelect.querySelector('.select-value');
             const dropdown = el.municipalitySelect.querySelector('.select-dropdown');
+            
+            if (!valueSpan || !dropdown) return;
             
             options.forEach(function(option) {
                 option.addEventListener('click', function() {
