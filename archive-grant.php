@@ -1305,7 +1305,6 @@ if (defined('WP_DEBUG') && WP_DEBUG): ?>
 
 // CSS/JSは外部ファイルに移行済み (assets/css/archive-common.css, assets/js/archive-common.js)
 
-<?php 
 // モバイル検索モーダルを追加（一覧ページ用）
 get_template_part('template-parts/sidebar/mobile-search-modal'); 
 
