@@ -641,6 +641,47 @@ function gi_enqueue_external_assets() {
             );
         }
     }
+    
+    // Archive Pages (アーカイブページ共通 - archive-grant, taxonomy-*)
+    // 補助金アーカイブ、カテゴリ、都道府県、市町村、用途、タグアーカイブで使用
+    if (is_post_type_archive('grant') || 
+        is_post_type_archive('column') ||
+        is_tax('grant_category') || 
+        is_tax('grant_prefecture') || 
+        is_tax('grant_municipality') || 
+        is_tax('grant_purpose') || 
+        is_tax('grant_tag') ||
+        is_tax('column_category')) {
+        
+        // Archive Common CSS
+        if (file_exists($template_dir . '/assets/css/archive-common.css')) {
+            wp_enqueue_style(
+                'gi-archive-common',
+                $template_uri . '/assets/css/archive-common.css',
+                array('wp-block-library'),
+                filemtime($template_dir . '/assets/css/archive-common.css'),
+                'all'
+            );
+        }
+        
+        // Archive Common JavaScript
+        if (file_exists($template_dir . '/assets/js/archive-common.js')) {
+            wp_enqueue_script(
+                'gi-archive-common-js',
+                $template_uri . '/assets/js/archive-common.js',
+                array('jquery'),
+                filemtime($template_dir . '/assets/js/archive-common.js'),
+                true
+            );
+            
+            // Localize script with AJAX configuration
+            wp_localize_script('gi-archive-common-js', 'giArchiveConfig', array(
+                'ajaxUrl' => admin_url('admin-ajax.php'),
+                'nonce' => wp_create_nonce('gi_ajax_nonce'),
+                'postType' => is_post_type_archive('column') || is_tax('column_category') ? 'column' : 'grant'
+            ));
+        }
+    }
 }
 add_action('wp_enqueue_scripts', 'gi_enqueue_external_assets', 1);
 
@@ -682,7 +723,8 @@ function gi_add_defer_attribute($tag, $handle) {
         'gi-section-search-js',
         'gi-grant-tabs-js',
         'gi-single-column-js',
-        'gi-single-grant-js'
+        'gi-single-grant-js',
+        'gi-archive-common-js'
     );
     
     if (in_array($handle, $defer_scripts)) {
