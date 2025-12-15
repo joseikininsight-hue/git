@@ -841,7 +841,9 @@ if (file_exists($image_optimization_file)) {
  * @param string $size 画像サイズ
  * @return array 修正された属性
  */
-add_filter('wp_get_attachment_image_attributes', 'gi_ensure_alt_attribute', 10, 3);
+// DISABLED: ALT auto-generation harms accessibility (e.g. "Hero Bg" is meaningless)
+// Decorative images should have alt="" (empty), not filename-based text
+// add_filter('wp_get_attachment_image_attributes', 'gi_ensure_alt_attribute', 10, 3);
 function gi_ensure_alt_attribute($attr, $attachment, $size) {
     if (empty($attr['alt'])) {
         // タイトルから取得
@@ -867,7 +869,8 @@ function gi_ensure_alt_attribute($attr, $attachment, $size) {
  * @param string $content 投稿コンテンツ
  * @return string 修正されたコンテンツ
  */
-add_filter('the_content', 'gi_add_alt_to_content_images', 20);
+// DISABLED: ALT auto-generation from filename (same reason as above)
+// add_filter('the_content', 'gi_add_alt_to_content_images', 20);
 function gi_add_alt_to_content_images($content) {
     if (empty($content)) return $content;
     

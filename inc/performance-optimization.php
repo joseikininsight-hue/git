@@ -38,7 +38,8 @@ class GI_Performance_Optimizer {
         add_filter('widget_text', [$this, 'https_content']);
         
         // CSS/JS最適化
-        add_action('wp_head', [$this, 'inline_critical_css'], 1);
+        // DISABLED: inline_critical_css - outdated class names (.stylish-header etc) don't match current theme (.ji-header)
+        // add_action('wp_head', [$this, 'inline_critical_css'], 1);
         add_action('wp_head', [$this, 'optimize_google_fonts'], 3);
         add_action('wp_head', [$this, 'async_styles'], 5);
         add_action('wp_head', [$this, 'add_font_display_swap'], 2);
@@ -1069,7 +1070,8 @@ function gi_add_preconnect() {
  * 低品質ページのnoindex設定
  * 薄いコンテンツページを検索結果から除外
  */
-add_action('wp_head', 'gi_noindex_low_quality_pages', 5);
+// DISABLED: Duplicate robots meta tag logic - already handled in header.php
+// add_action('wp_head', 'gi_noindex_low_quality_pages', 5);
 function gi_noindex_low_quality_pages() {
     // 既にheader.phpでrobotsメタタグが出力されている場合はスキップ
     // この関数は追加の条件が必要な場合のみ使用
@@ -1115,10 +1117,9 @@ function gi_noindex_low_quality_pages() {
  */
 add_action('wp_head', 'gi_optimize_lcp', 2);
 function gi_optimize_lcp() {
-    // Hero image preload for front page
-    if (is_front_page() || is_home()) {
-        echo '<link rel="preload" as="image" href="https://joseikin-insight.com/wp-content/uploads/2025/05/hero-bg.webp" fetchpriority="high">' . "\n";
-    }
+    // Hero image preload: REMOVED hardcoded URL
+    // Hardcoded image URLs cause double-loading if hero image changes
+    // Use dynamic preload or let browser handle discovery instead
     
     // Single grant page - preload critical fonts
     if (is_singular('grant')) {
@@ -1295,7 +1296,7 @@ function gi_add_resource_hints() {
     // DNS Prefetch for less critical origins
     $dns_prefetch_origins = array(
         '//www.google-analytics.com',
-        '//pagead2.googlesyndication.com',
+        // REMOVED: pagead2.googlesyndication.com - not using AdSense, causes unnecessary DNS lookup
     );
     
     foreach ($dns_prefetch_origins as $origin) {

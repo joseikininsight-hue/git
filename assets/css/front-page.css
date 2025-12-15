@@ -479,19 +479,6 @@
 }
 
 /* ==========================================================================
-   強制表示
+   強制表示 - REMOVED
+   These !important rules prevent JavaScript control and cause maintenance issues
    ========================================================================== */
-.gov-cta,
-.gov-cta__container,
-.gov-cta__content {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-}
-
-.gov-cta__buttons,
-.gov-cta__features {
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-}

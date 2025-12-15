@@ -481,11 +481,8 @@ if (!function_exists('gi_get_cached_stats')) {
         }
         
         /* ===============================================
-           SCHEMA MARKUP (Hidden)
+           SCHEMA MARKUP - REMOVED (Now using JSON-LD only)
            =============================================== */
-        .gov-schema-data {
-            display: none !important;
-        }
         
         /* ===============================================
            JETPACK CAROUSEL FIX
@@ -545,24 +542,7 @@ if (!function_exists('gi_get_cached_stats')) {
     <!-- Government Style Footer -->
     <footer class="gov-footer" role="contentinfo" itemscope itemtype="https://schema.org/WPFooter">
         
-        <!-- Schema.org Organization Data -->
-        <div class="gov-schema-data" itemscope itemtype="https://schema.org/Organization">
-            <meta itemprop="name" content="<?php bloginfo('name'); ?>">
-            <meta itemprop="url" content="<?php echo esc_url(home_url('/')); ?>">
-            <meta itemprop="logo" content="https://joseikin-insight.com/gemini_generated_image_19k6yi19k6yi19k6/">
-            <meta itemprop="description" content="日本全国の補助金・助成金情報を網羅した検索プラットフォーム。専門家監修のもと、最新情報を毎日更新しています。">
-            <?php 
-            $sns_urls = gi_get_sns_urls();
-            foreach ($sns_urls as $url) {
-                if (!empty($url)) {
-                    echo '<link itemprop="sameAs" href="' . esc_url($url) . '" />';
-                }
-            }
-            ?>
-            <div itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
-                <meta itemprop="addressCountry" content="JP">
-            </div>
-        </div>
+        <!-- Schema.org Organization Data: REMOVED - Already output via JSON-LD in functions.php (gi_add_organization_schema) -->
         
         <div class="gov-footer-inner">
             
@@ -781,36 +761,8 @@ if (!function_exists('gi_get_cached_stats')) {
     <?php wp_footer(); ?>
     
     <?php
-    // Organization構造化データ（JSON-LD形式）- SEO強化
-    $sns_urls = gi_get_sns_urls();
-    $same_as_urls = array_filter(array_values($sns_urls));
-    
-    $organization_schema = array(
-        '@context' => 'https://schema.org',
-        '@type' => 'Organization',
-        'name' => get_bloginfo('name'),
-        'url' => home_url('/'),
-        'logo' => 'https://joseikin-insight.com/gemini_generated_image_19k6yi19k6yi19k6/',
-        'description' => '日本全国の補助金・助成金情報を網羅した検索プラットフォーム。専門家監修のもと、最新情報を毎日更新しています。',
-        'foundingDate' => '2024',
-        'areaServed' => array(
-            '@type' => 'Country',
-            'name' => 'Japan'
-        ),
-        'contactPoint' => array(
-            '@type' => 'ContactPoint',
-            'contactType' => 'customer service',
-            'url' => home_url('/contact/'),
-            'availableLanguage' => 'Japanese'
-        )
-    );
-    
-    if (!empty($same_as_urls)) {
-        $organization_schema['sameAs'] = $same_as_urls;
-    }
+    // Organization構造化データ: REMOVED - Already output via functions.php (gi_add_organization_schema)
+    // Duplicate JSON-LD causes Google Search Console warnings
     ?>
-    <script type="application/ld+json">
-    <?php echo wp_json_encode($organization_schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT); ?>
-    </script>
 </body>
 </html>

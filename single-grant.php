@@ -546,7 +546,10 @@ if (!empty($grant['application_tips'])) $toc_items[] = array('id' => 'tips', 'ti
 if (!empty($grant['success_cases'])) $toc_items[] = array('id' => 'cases', 'title' => '採択事例');
 if (!empty($similar_grants)) $toc_items[] = array('id' => 'compare', 'title' => '類似補助金比較');
 if (!empty($faq_items)) $toc_items[] = array('id' => 'faq', 'title' => 'よくある質問');
-if (!empty($grant['contact_info']) || !empty($grant['contact_phone'])) $toc_items[] = array('id' => 'contact', 'title' => 'お問い合わせ');
+// Match the actual display condition (phone, email, OR official URL)
+if (!empty($grant['contact_phone']) || !empty($grant['contact_email']) || !empty($grant['official_url'])) {
+    $toc_items[] = array('id' => 'contact', 'title' => 'お問い合わせ');
+}
 
 // メタ情報
 $meta_desc = '';
@@ -2313,7 +2316,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    window.addEventListener('scroll', updateTocHighlight);
+    // Add passive listener to improve scroll performance (INP optimization)
+    window.addEventListener('scroll', updateTocHighlight, { passive: true });
     updateTocHighlight();
     
 }); // DOMContentLoaded end
