@@ -539,8 +539,8 @@ if (count($faq_items) < 6) {
 $toc_items = array();
 if (!empty($grant['ai_summary'])) $toc_items[] = array('id' => 'summary', 'title' => 'AI要約');
 $toc_items[] = array('id' => 'details', 'title' => '詳細情報');
-$toc_items[] = array('id' => 'checklist', 'title' => '申請チェックリスト');
 $toc_items[] = array('id' => 'content', 'title' => '補助金概要');
+$toc_items[] = array('id' => 'checklist', 'title' => '申請チェックリスト');
 if (!empty($grant['application_flow']) || !empty($grant['application_flow_steps'])) $toc_items[] = array('id' => 'flow', 'title' => '申請の流れ');
 if (!empty($grant['application_tips'])) $toc_items[] = array('id' => 'tips', 'title' => '申請のコツ');
 if (!empty($grant['success_cases'])) $toc_items[] = array('id' => 'cases', 'title' => '採択事例');
@@ -1056,7 +1056,17 @@ if ($grant['ai_summary']) {
                     </div>
                 </section>
 
-                <!-- チェックリスト -->
+                <!-- 本文（補助金概要） -->
+                <section class="gi-section" id="content" aria-labelledby="content-title">
+                    <header class="gi-section-header">
+                        <svg class="gi-section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                        <h2 class="gi-section-title" id="content-title">補助金概要</h2>
+                        <span class="gi-section-en">Overview</span>
+                    </header>
+                    <div class="gi-content"><?php echo apply_filters('the_content', $content); ?></div>
+                </section>
+
+                <!-- チェックリスト（補助金概要の後に配置） -->
                 <section class="gi-section" id="checklist" aria-labelledby="checklist-title">
                     <div class="gi-checklist">
                         <header class="gi-checklist-header">
@@ -1126,16 +1136,6 @@ if ($grant['ai_summary']) {
                             </div>
                         </div>
                     </div>
-                </section>
-
-                <!-- 本文 -->
-                <section class="gi-section" id="content" aria-labelledby="content-title">
-                    <header class="gi-section-header">
-                        <svg class="gi-section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-                        <h2 class="gi-section-title" id="content-title">補助金概要</h2>
-                        <span class="gi-section-en">Overview</span>
-                    </header>
-                    <div class="gi-content"><?php echo apply_filters('the_content', $content); ?></div>
                 </section>
 
                 <!-- 申請フロー -->
