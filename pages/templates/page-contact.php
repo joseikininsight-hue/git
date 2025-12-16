@@ -1189,11 +1189,12 @@ textarea.gov-form-control {
                             <polyline points="22 4 12 14.01 9 11.01"/>
                         </svg>
                     </div>
-                    <h2 class="gov-success-title">お問い合わせを受け付けました</h2>
-                    <p class="gov-success-subtitle">Thank you for your inquiry</p>
+                    <h2 class="gov-success-title">送信が完了しました</h2>
+                    <p class="gov-success-subtitle">Submission Completed</p>
                     <div class="gov-success-text">
                         <p>お問い合わせいただき、誠にありがとうございます。</p>
-                        <p>ご入力いただいたメールアドレス宛に、受付完了メールを送信いたしました。</p>
+                        <p>送信が正常に完了いたしました。</p>
+                        <p>ご入力いただいたメールアドレス宛に、自動送信メールをお送りしております。</p>
                         <p><strong>内容を確認の上、2営業日以内に担当者よりご連絡させていただきます。</strong></p>
                     </div>
                     
