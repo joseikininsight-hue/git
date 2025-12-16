@@ -30,22 +30,34 @@ $disclaimer_schema = array(
 <?php echo wp_json_encode($disclaimer_schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT); ?>
 </script>
 
-<article class="disclaimer-page" itemscope itemtype="https://schema.org/WebPage">
+<article class="gov-disclaimer-page" itemscope itemtype="https://schema.org/WebPage">
+    
+    <!-- Breadcrumb -->
+    <nav class="gov-breadcrumb" aria-label="パンくずリスト">
+        <div class="gov-container">
+            <ol class="gov-breadcrumb-list">
+                <li class="gov-breadcrumb-item"><a href="<?php echo home_url('/'); ?>">ホーム</a></li>
+                <li class="gov-breadcrumb-item current" aria-current="page">免責事項</li>
+            </ol>
+        </div>
+    </nav>
     
     <!-- ページヘッダー -->
-    <header class="page-header">
-        <div class="container">
-            <h1 class="page-title" itemprop="headline">免責事項</h1>
-            <div class="page-meta">
-                <p class="meta-item">制定日：<time datetime="2025-10-09">2025年10月9日</time></p>
-                <p class="meta-item">最終改定日：<time datetime="2025-12-16">2025年12月16日</time></p>
+    <header class="gov-page-header">
+        <div class="gov-container">
+            <div class="gov-header-content">
+                <h1 class="gov-page-title" itemprop="headline">免責事項</h1>
+                <div class="gov-page-meta">
+                    <p class="gov-meta-item">制定日：<time datetime="2025-10-09">2025年10月9日</time></p>
+                    <p class="gov-meta-item">最終改定日：<time datetime="2025-12-16">2025年12月16日</time></p>
+                </div>
             </div>
         </div>
     </header>
     
     <!-- メインコンテンツ -->
-    <div class="page-content">
-        <div class="container">
+    <div class="gov-page-content">
+        <div class="gov-container">
             
             <!-- 前文 -->
             <section class="content-section preamble-section">
@@ -347,137 +359,213 @@ $disclaimer_schema = array(
 </article>
 
 <style>
+/* ==========================================================================
+   Official Government Design - Disclaimer Page CSS
+   官公庁デザイン - 免責事項ページ
+   ========================================================================== */
 :root {
-    --color-white: #ffffff;
-    --color-black: #000000;
-    --color-yellow: #ffeb3b;
-    --color-yellow-dark: #ffc107;
-    --color-gray-50: #fafafa;
-    --color-gray-100: #f5f5f5;
-    --color-gray-200: #eeeeee;
-    --color-gray-300: #e0e0e0;
-    --color-gray-400: #bdbdbd;
-    --color-gray-500: #9e9e9e;
-    --color-gray-600: #757575;
-    --color-gray-700: #616161;
-    --color-gray-800: #424242;
-    --color-gray-900: #212121;
-    --color-primary: var(--color-yellow);
-    --text-primary: var(--color-gray-900);
-    --text-secondary: var(--color-gray-600);
-    --bg-primary: var(--color-white);
-    --bg-secondary: var(--color-gray-50);
-    --bg-tertiary: var(--color-gray-100);
-    --border-light: var(--color-gray-200);
-    --border-medium: var(--color-gray-300);
-    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    --spacing-xs: 0.25rem;
-    --spacing-sm: 0.5rem;
-    --spacing-md: 1rem;
-    --spacing-lg: 1.5rem;
-    --spacing-xl: 2rem;
-    --spacing-2xl: 2.5rem;
-    --spacing-3xl: 3rem;
-    --spacing-4xl: 4rem;
-    --radius-sm: 0.25rem;
-    --radius-md: 0.375rem;
-    --radius-lg: 0.5rem;
-    --radius-xl: 0.75rem;
-    --font-size-xs: 0.75rem;
-    --font-size-sm: 0.875rem;
-    --font-size-base: 1rem;
-    --font-size-lg: 1.125rem;
-    --font-size-xl: 1.25rem;
-    --font-size-2xl: 1.5rem;
-    --font-size-3xl: 1.875rem;
-    --font-size-4xl: 2.25rem;
-    --font-weight-normal: 400;
-    --font-weight-medium: 500;
-    --font-weight-semibold: 600;
-    --font-weight-bold: 700;
-    --line-height-tight: 1.25;
-    --line-height-normal: 1.5;
-    --line-height-relaxed: 1.75;
+    --gov-navy-900: #0d1b2a;
+    --gov-navy-800: #1b263b;
+    --gov-navy-700: #2c3e50;
+    --gov-navy-600: #34495e;
+    --gov-navy-500: #415a77;
+    --gov-navy-400: #778da9;
+    --gov-navy-300: #a3b1c6;
+    --gov-navy-200: #cfd8e3;
+    --gov-navy-100: #e8ecf1;
+    --gov-navy-50: #f4f6f8;
+    --gov-gold: #c9a227;
+    --gov-gold-light: #d4b77a;
+    --gov-gold-pale: #f0e6c8;
+    --gov-green: #2e7d32;
+    --gov-red: #c62828;
+    --gov-white: #ffffff;
+    --gov-black: #1a1a1a;
+    --gov-gray-900: #212529;
+    --gov-gray-800: #343a40;
+    --gov-gray-700: #495057;
+    --gov-gray-600: #6c757d;
+    --gov-gray-500: #adb5bd;
+    --gov-gray-400: #ced4da;
+    --gov-gray-300: #dee2e6;
+    --gov-gray-200: #e9ecef;
+    --gov-gray-100: #f8f9fa;
+    --gov-font-serif: "Shippori Mincho", "Yu Mincho", serif;
+    --gov-font-sans: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+    --gov-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    --gov-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --gov-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --gov-radius: 4px;
+    --gov-radius-lg: 8px;
 }
 
-.disclaimer-page {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    color: var(--text-primary);
-    background: var(--bg-primary);
+* { box-sizing: border-box; }
+
+.gov-disclaimer-page {
+    font-family: var(--gov-font-sans);
+    color: var(--gov-gray-900);
+    background: linear-gradient(180deg, var(--gov-navy-50) 0%, var(--gov-white) 100%);
+    line-height: 1.7;
+    min-height: 100vh;
 }
 
-.container {
-    max-width: 900px;
+.gov-disclaimer-page::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--gov-navy-800) 0%, var(--gov-gold) 50%, var(--gov-navy-800) 100%);
+    z-index: 9999;
+}
+
+.gov-container {
+    max-width: 960px;
     margin: 0 auto;
-    padding: 0 var(--spacing-lg);
+    padding: 0 24px;
 }
 
-.page-header {
-    background: var(--bg-secondary);
-    padding: var(--spacing-4xl) 0 var(--spacing-3xl);
+/* Breadcrumb */
+.gov-breadcrumb {
+    background: var(--gov-white);
+    border-bottom: 1px solid var(--gov-gray-200);
+    padding: 16px 0;
+}
+
+.gov-breadcrumb-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 13px;
+}
+
+.gov-breadcrumb-item {
+    display: flex;
+    align-items: center;
+}
+
+.gov-breadcrumb-item:not(:last-child)::after {
+    content: '›';
+    margin-left: 8px;
+    color: var(--gov-gray-400);
+}
+
+.gov-breadcrumb-item a {
+    color: var(--gov-navy-600);
+    text-decoration: none;
+    transition: color var(--gov-transition);
+}
+
+.gov-breadcrumb-item a:hover {
+    color: var(--gov-navy-900);
+    text-decoration: underline;
+}
+
+.gov-breadcrumb-item.current {
+    color: var(--gov-gray-600);
+}
+
+/* Header */
+.gov-page-header {
+    background: linear-gradient(135deg, var(--gov-navy-900) 0%, var(--gov-navy-700) 100%);
+    padding: 60px 0 50px;
+    position: relative;
+}
+
+.gov-page-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--gov-gold) 0%, var(--gov-gold-light) 50%, var(--gov-gold) 100%);
+}
+
+.gov-header-content {
     text-align: center;
-    border-bottom: 1px solid var(--border-light);
 }
 
-.page-title {
-    font-size: var(--font-size-4xl);
-    font-weight: var(--font-weight-bold);
-    color: var(--text-primary);
-    margin: 0 0 var(--spacing-lg);
+.gov-page-title {
+    font-family: var(--gov-font-serif);
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: var(--gov-white);
+    margin: 0 0 20px;
+    letter-spacing: 0.1em;
 }
 
-.page-meta {
+.gov-page-meta {
     display: flex;
     justify-content: center;
-    gap: var(--spacing-xl);
+    gap: 32px;
     flex-wrap: wrap;
 }
 
-.meta-item {
-    font-size: var(--font-size-sm);
-    color: var(--text-secondary);
+.gov-meta-item {
+    font-size: 0.875rem;
+    color: var(--gov-gold-light);
     margin: 0;
 }
 
-.page-content {
-    padding: var(--spacing-4xl) 0;
+.gov-page-content {
+    padding: 60px 0 80px;
 }
 
 .content-section {
-    margin-bottom: var(--spacing-4xl);
+    margin-bottom: 48px;
+}
+
+/* Preamble */
+.preamble-content {
+    background: var(--gov-navy-50);
+    border-left: 4px solid var(--gov-gold);
+    padding: 24px 28px;
+    border-radius: var(--gov-radius);
 }
 
 .preamble-content p {
-    font-size: var(--font-size-base);
-    line-height: var(--line-height-relaxed);
-    color: var(--text-secondary);
+    margin: 0;
+    color: var(--gov-gray-800);
+    line-height: 1.9;
+    font-size: 1rem;
 }
 
 .section-title {
-    font-size: var(--font-size-2xl);
-    font-weight: var(--font-weight-bold);
-    color: var(--text-primary);
-    margin: 0 0 var(--spacing-xl);
-    padding-bottom: var(--spacing-md);
-    border-bottom: 2px solid var(--color-primary);
     display: flex;
     align-items: center;
-    gap: var(--spacing-md);
+    gap: 12px;
+    font-family: var(--gov-font-serif);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--gov-navy-900);
+    margin: 0 0 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--gov-navy-800);
 }
 
 .title-icon {
-    display: inline-flex;
-    width: 32px;
-    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: var(--gov-navy-800);
+    border-radius: var(--gov-radius);
+    color: var(--gov-gold);
 }
 
-/* 目次 */
+/* TOC */
 .toc-nav {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-xl);
+    background: var(--gov-white);
+    border: 1px solid var(--gov-gray-200);
+    border-radius: var(--gov-radius-lg);
+    padding: 24px;
 }
 
 .toc-list {
@@ -485,199 +573,212 @@ $disclaimer_schema = array(
     padding: 0;
     margin: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: var(--spacing-sm);
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 8px;
 }
 
 .toc-link {
     display: block;
-    padding: var(--spacing-sm) var(--spacing-md);
-    color: var(--text-primary);
+    padding: 10px 16px;
+    color: var(--gov-navy-800);
     text-decoration: none;
-    border-radius: var(--radius-md);
-    transition: all 0.2s ease;
-    font-size: var(--font-size-sm);
+    border-radius: var(--gov-radius);
+    transition: all var(--gov-transition);
+    font-size: 0.9375rem;
+    border-left: 3px solid transparent;
 }
 
 .toc-link:hover {
-    background: var(--bg-tertiary);
-    color: var(--text-primary);
+    background: var(--gov-navy-50);
+    border-left-color: var(--gov-gold);
     transform: translateX(4px);
 }
 
-/* 免責セクション */
+/* Disclaimer Sections */
 .disclaimer-section {
     scroll-margin-top: 80px;
 }
 
 .disclaimer-title {
-    font-size: var(--font-size-xl);
-    font-weight: var(--font-weight-bold);
-    color: var(--text-primary);
-    margin: 0 0 var(--spacing-lg);
-    padding: var(--spacing-md);
-    background: var(--bg-secondary);
-    border-left: 4px solid var(--color-primary);
-    border-radius: var(--radius-md);
+    font-family: var(--gov-font-serif);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--gov-white);
+    margin: 0 0 24px;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, var(--gov-navy-800) 0%, var(--gov-navy-700) 100%);
+    border-radius: var(--gov-radius);
 }
 
 .disclaimer-content {
-    padding-left: var(--spacing-lg);
+    padding: 0 8px;
 }
 
 .disclaimer-content p {
-    color: var(--text-secondary);
-    line-height: var(--line-height-relaxed);
-    margin-bottom: var(--spacing-lg);
+    color: var(--gov-gray-700);
+    line-height: 1.8;
+    margin-bottom: 20px;
 }
 
 .subsection-title {
-    font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-semibold);
-    color: var(--text-primary);
-    margin: var(--spacing-xl) 0 var(--spacing-md);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--gov-navy-900);
+    margin: 28px 0 16px;
+    padding-left: 12px;
+    border-left: 3px solid var(--gov-gold);
 }
 
 .info-list {
     list-style: none;
     padding: 0;
-    margin: var(--spacing-md) 0;
+    margin: 16px 0;
 }
 
 .info-list li {
     position: relative;
-    padding-left: var(--spacing-xl);
-    margin-bottom: var(--spacing-sm);
-    color: var(--text-secondary);
-    line-height: var(--line-height-normal);
+    padding-left: 24px;
+    margin-bottom: 10px;
+    color: var(--gov-gray-700);
+    line-height: 1.7;
 }
 
 .info-list li::before {
     content: '';
     position: absolute;
     left: 0;
-    top: 0.6em;
+    top: 0.65em;
     width: 6px;
     height: 6px;
-    background: var(--color-primary);
+    background: var(--gov-gold);
     border-radius: 50%;
 }
 
 .info-list li strong {
-    color: var(--text-primary);
+    color: var(--gov-navy-900);
 }
 
-/* ハイライトセクション */
+/* Highlight Section */
 .highlight-section {
-    background: var(--bg-secondary);
-    border: 2px solid var(--border-medium);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-xl);
+    background: var(--gov-navy-50);
+    border: 2px solid var(--gov-navy-200);
+    border-radius: var(--gov-radius-lg);
+    padding: 28px;
 }
 
-/* 重要なお知らせ */
+/* Important Notice */
 .important-notice {
-    background: #fffdf5;
-    border: 2px solid var(--color-primary);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-xl);
-    margin-top: var(--spacing-xl);
+    background: var(--gov-gold-pale);
+    border: 2px solid var(--gov-gold);
+    border-radius: var(--gov-radius-lg);
+    padding: 28px;
+    margin-top: 28px;
 }
 
 .notice-title {
-    font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-semibold);
-    color: var(--text-primary);
-    margin: 0 0 var(--spacing-md);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--gov-navy-900);
+    margin: 0 0 12px;
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
+    gap: 8px;
 }
 
 .notice-title svg {
-    color: var(--color-yellow-dark);
+    color: var(--gov-gold);
 }
 
 .important-notice p {
     margin-bottom: 0;
-    color: var(--text-primary);
-    font-weight: var(--font-weight-medium);
+    color: var(--gov-navy-800);
+    font-weight: 500;
 }
 
-/* 連絡先情報ボックス */
+/* Contact Info Box */
 .contact-info-box {
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-xl);
-    margin-top: var(--spacing-lg);
+    background: var(--gov-white);
+    border: 2px solid var(--gov-navy-200);
+    border-radius: var(--gov-radius-lg);
+    padding: 28px;
+    margin-top: 24px;
 }
 
 .contact-title {
-    font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-semibold);
-    color: var(--text-primary);
-    margin: 0 0 var(--spacing-lg);
-    padding-bottom: var(--spacing-sm);
-    border-bottom: 2px solid var(--color-primary);
+    font-family: var(--gov-font-serif);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--gov-navy-900);
+    margin: 0 0 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--gov-gold);
 }
 
 .contact-details {
     display: grid;
-    gap: var(--spacing-md);
+    gap: 16px;
 }
 
 .contact-details dt {
-    font-weight: var(--font-weight-semibold);
-    color: var(--text-primary);
-    margin-bottom: var(--spacing-xs);
+    font-weight: 600;
+    color: var(--gov-navy-800);
+    font-size: 0.9375rem;
 }
 
 .contact-details dd {
-    color: var(--text-secondary);
-    margin: 0 0 var(--spacing-md);
-    padding-left: var(--spacing-lg);
+    color: var(--gov-gray-700);
+    margin: 0 0 16px;
+    padding-left: 16px;
+    font-size: 0.9375rem;
 }
 
 .text-link {
-    color: var(--text-primary);
+    color: var(--gov-navy-700);
     text-decoration: underline;
-    font-weight: var(--font-weight-medium);
+    font-weight: 500;
+    transition: color var(--gov-transition);
 }
 
 .text-link:hover {
-    color: var(--color-gray-700);
+    color: var(--gov-gold);
 }
 
-/* 附則 */
+/* Supplementary */
+.supplementary-section .disclaimer-content {
+    background: var(--gov-gray-100);
+    border-left: 4px solid var(--gov-navy-600);
+    padding: 20px 24px;
+    border-radius: var(--gov-radius);
+}
+
 .supplementary-section .disclaimer-content p {
-    color: var(--text-secondary);
+    margin: 0;
+    color: var(--gov-gray-700);
 }
 
-/* 関連リンク */
+/* Related Links */
 .related-links-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: var(--spacing-lg);
+    gap: 20px;
 }
 
 .related-link-card {
     display: flex;
     align-items: flex-start;
-    gap: var(--spacing-md);
-    padding: var(--spacing-lg);
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-lg);
+    gap: 16px;
+    padding: 20px;
+    background: var(--gov-white);
+    border: 1px solid var(--gov-gray-200);
+    border-radius: var(--gov-radius);
     text-decoration: none;
-    transition: all 0.2s ease;
+    transition: all var(--gov-transition);
 }
 
 .related-link-card:hover {
-    background: var(--bg-tertiary);
-    border-color: var(--border-medium);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    background: var(--gov-navy-50);
+    border-color: var(--gov-navy-300);
+    transform: translateX(4px);
 }
 
 .link-card-icon {
@@ -686,68 +787,72 @@ $disclaimer_schema = array(
     justify-content: center;
     width: 48px;
     height: 48px;
-    background: var(--color-white);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-md);
-    color: var(--text-primary);
+    background: var(--gov-navy-100);
+    border-radius: var(--gov-radius);
+    color: var(--gov-navy-700);
     flex-shrink: 0;
+    transition: all var(--gov-transition);
 }
 
-.link-card-content {
-    flex: 1;
+.related-link-card:hover .link-card-icon {
+    background: var(--gov-gold-pale);
+    color: var(--gov-navy-900);
 }
+
+.link-card-content { flex: 1; }
 
 .link-card-title {
-    font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-semibold);
-    color: var(--text-primary);
-    margin: 0 0 var(--spacing-xs);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gov-navy-900);
+    margin: 0 0 4px;
 }
 
 .link-card-description {
-    font-size: var(--font-size-sm);
-    color: var(--text-secondary);
+    font-size: 0.8125rem;
+    color: var(--gov-gray-600);
     margin: 0;
 }
 
-/* ページトップボタン */
+/* Page Top Button */
 .page-top-btn-wrapper {
     text-align: center;
-    margin-top: var(--spacing-4xl);
+    margin-top: 60px;
 }
 
 .page-top-btn {
     display: inline-flex;
     align-items: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-md) var(--spacing-xl);
-    background: var(--color-primary);
-    color: var(--color-black);
+    gap: 8px;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, var(--gov-navy-800) 0%, var(--gov-navy-700) 100%);
+    color: var(--gov-white);
     text-decoration: none;
-    border-radius: var(--radius-xl);
-    font-weight: var(--font-weight-semibold);
-    transition: all 0.2s ease;
-    box-shadow: var(--shadow-md);
+    border-radius: var(--gov-radius);
+    font-weight: 600;
+    transition: all var(--gov-transition);
+    box-shadow: var(--gov-shadow-sm);
 }
 
 .page-top-btn:hover {
-    background: var(--color-yellow-dark);
+    background: linear-gradient(135deg, var(--gov-navy-900) 0%, var(--gov-navy-800) 100%);
     transform: translateY(-2px);
+    box-shadow: var(--gov-shadow);
 }
 
-/* レスポンシブ */
+/* Responsive */
 @media (max-width: 768px) {
-    .page-header {
-        padding: var(--spacing-3xl) 0 var(--spacing-2xl);
+    .gov-page-header {
+        padding: 48px 0 40px;
     }
     
-    .page-title {
-        font-size: var(--font-size-3xl);
+    .gov-page-title {
+        font-size: 1.875rem;
     }
     
-    .page-meta {
+    .gov-page-meta {
         flex-direction: column;
-        gap: var(--spacing-sm);
+        gap: 8px;
     }
     
     .toc-list {
@@ -755,7 +860,7 @@ $disclaimer_schema = array(
     }
     
     .disclaimer-content {
-        padding-left: 0;
+        padding: 0;
     }
     
     .related-links-grid {
@@ -764,22 +869,24 @@ $disclaimer_schema = array(
 }
 
 @media (max-width: 640px) {
-    .container {
-        padding: 0 var(--spacing-md);
+    .gov-container {
+        padding: 0 16px;
     }
     
-    .page-title {
-        font-size: var(--font-size-2xl);
+    .gov-page-title {
+        font-size: 1.5rem;
     }
     
     .section-title {
-        font-size: var(--font-size-xl);
+        font-size: 1.25rem;
         flex-direction: column;
         align-items: flex-start;
+        gap: 8px;
     }
     
     .disclaimer-title {
-        font-size: var(--font-size-lg);
+        font-size: 1.125rem;
+        padding: 14px 16px;
     }
 }
 
