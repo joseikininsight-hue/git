@@ -285,6 +285,42 @@ $about_schema = array(
                 </div>
             </section>
             
+            <!-- 運営者情報 -->
+            <section class="content-section" id="operator">
+                <h2 class="section-title">
+                    <span class="title-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    </span>
+                    運営者情報
+                </h2>
+                <div class="section-content">
+                    <div class="operator-info-box">
+                        <dl class="operator-details">
+                            <dt>サイト名</dt>
+                            <dd>補助金インサイト</dd>
+                            
+                            <dt>運営者</dt>
+                            <dd>中澤圭志</dd>
+                            
+                            <dt>所在地</dt>
+                            <dd>〒136-0073<br>東京都江東区北砂3-23-8　401</dd>
+                            
+                            <dt>メールアドレス</dt>
+                            <dd><a href="mailto:info@joseikin-insight.com" class="text-link">info@joseikin-insight.com</a></dd>
+                            
+                            <dt>サイトURL</dt>
+                            <dd><a href="https://joseikin-insight.com/" class="text-link">https://joseikin-insight.com/</a></dd>
+                            
+                            <dt>設立年</dt>
+                            <dd>2024年</dd>
+                        </dl>
+                    </div>
+                </div>
+            </section>
+            
             <!-- 関連ページへのリンク -->
             <section class="content-section" id="related-links">
                 <h2 class="section-title">
@@ -686,6 +722,31 @@ $about_schema = array(
     background: var(--bg-secondary);
     border-radius: var(--radius-md);
     font-size: var(--font-size-sm);
+}
+
+/* 運営者情報ボックス */
+.operator-info-box {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+}
+
+.operator-details {
+    display: grid;
+    gap: var(--spacing-md);
+}
+
+.operator-details dt {
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.operator-details dd {
+    color: var(--text-secondary);
+    margin: 0 0 var(--spacing-md);
+    padding-left: var(--spacing-lg);
 }
 
 /* テキストリンク */

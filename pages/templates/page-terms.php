@@ -1,4 +1,4 @@
-Copy<?php
+<?php
 /**
  * 補助金・助成金情報サイト - 利用規約ページ（完全版）
  * Grant & Subsidy Information Site - Terms of Service Page (Complete)
@@ -53,7 +53,7 @@ $terms_schema = array(
             <section class="content-section preamble-section">
                 <div class="preamble-content">
                     <p>
-                        [運営会社名]（以下「当社」といいます）が運営する「補助金インサイト」(https://joseikin-insight.com/ 以下「本サービス」といいます）の利用に関して、利用者（以下「ユーザー」といいます）との間で以下のとおり利用規約（以下「本規約」といいます）を定めます。
+                        補助金インサイト（以下「当サイト」といいます）の運営者である中澤圭志（以下「運営者」といいます）が提供する「補助金インサイト」（https://joseikin-insight.com/、以下「本サービス」といいます）の利用に関して、利用者（以下「ユーザー」といいます）との間で以下のとおり利用規約（以下「本規約」といいます）を定めます。
                     </p>
                 </div>
             </section>

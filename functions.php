@@ -984,3 +984,257 @@ function gi_check_robots_txt() {
         exit;
     }
 }
+
+/**
+ * ==================================================
+ * お問い合わせフォーム処理
+ * Contact Form Processing with admin_post hook
+ * ==================================================
+ * @since 11.0.3
+ */
+
+// フォーム送信処理（ログインユーザー）
+add_action('admin_post_contact_form', 'gi_handle_contact_form');
+// フォーム送信処理（非ログインユーザー）
+add_action('admin_post_nopriv_contact_form', 'gi_handle_contact_form');
+
+/**
+ * お問い合わせフォームの送信処理
+ */
+function gi_handle_contact_form() {
+    // ノンスチェック
+    if (!isset($_POST['contact_form_nonce']) || !wp_verify_nonce($_POST['contact_form_nonce'], 'contact_form_submit')) {
+        wp_redirect(add_query_arg(array(
+            'contact_error' => '1',
+            'error_msg' => urlencode('セキュリティチェックに失敗しました。ページを再読み込みして再度お試しください。')
+        ), home_url('/contact/')));
+        exit;
+    }
+    
+    // 入力データの検証とサニタイズ
+    $errors = array();
+    
+    // 必須フィールド
+    $inquiry_type = isset($_POST['inquiry_type']) ? sanitize_text_field($_POST['inquiry_type']) : '';
+    $name = isset($_POST['name']) ? sanitize_text_field($_POST['name']) : '';
+    $email = isset($_POST['email']) ? sanitize_email($_POST['email']) : '';
+    $subject = isset($_POST['subject']) ? sanitize_text_field($_POST['subject']) : '';
+    $message = isset($_POST['message']) ? sanitize_textarea_field($_POST['message']) : '';
+    $privacy_agree = isset($_POST['privacy_agree']) ? true : false;
+    
+    // 任意フィールド
+    $phone = isset($_POST['phone']) ? sanitize_text_field($_POST['phone']) : '';
+    $company = isset($_POST['company']) ? sanitize_text_field($_POST['company']) : '';
+    $industry = isset($_POST['industry']) ? sanitize_text_field($_POST['industry']) : '';
+    $employees = isset($_POST['employees']) ? sanitize_text_field($_POST['employees']) : '';
+    $contact_method = isset($_POST['contact_method']) ? sanitize_text_field($_POST['contact_method']) : 'email';
+    $contact_time = isset($_POST['contact_time']) ? array_map('sanitize_text_field', (array)$_POST['contact_time']) : array();
+    
+    // バリデーション
+    if (empty($inquiry_type)) {
+        $errors[] = 'お問い合わせ種別を選択してください';
+    }
+    if (empty($name)) {
+        $errors[] = 'お名前を入力してください';
+    }
+    if (empty($email)) {
+        $errors[] = 'メールアドレスを入力してください';
+    } elseif (!is_email($email)) {
+        $errors[] = '有効なメールアドレスを入力してください';
+    }
+    if (empty($subject)) {
+        $errors[] = '件名を入力してください';
+    }
+    if (empty($message)) {
+        $errors[] = 'お問い合わせ内容を入力してください';
+    } elseif (mb_strlen($message) > 500) {
+        $errors[] = 'お問い合わせ内容は500文字以内で入力してください';
+    }
+    if (!$privacy_agree) {
+        $errors[] = '個人情報の取り扱いに同意してください';
+    }
+    
+    // スパムチェック（ハニーポット）
+    if (isset($_POST['website_url']) && !empty($_POST['website_url'])) {
+        $errors[] = 'スパムと判定されました';
+    }
+    
+    // エラーがある場合はリダイレクト
+    if (!empty($errors)) {
+        wp_redirect(add_query_arg(array(
+            'contact_error' => '1',
+            'error_msg' => urlencode(implode('|', $errors))
+        ), home_url('/contact/')));
+        exit;
+    }
+    
+    // お問い合わせ種別のラベル変換
+    $inquiry_labels = array(
+        'usage' => 'サイトの使い方について',
+        'grant-info' => '補助金・助成金の制度について',
+        'update' => '掲載情報の修正・更新',
+        'media' => '媒体掲載・取材依頼',
+        'technical' => '技術的な問題・不具合',
+        'other' => 'その他'
+    );
+    $inquiry_label = isset($inquiry_labels[$inquiry_type]) ? $inquiry_labels[$inquiry_type] : $inquiry_type;
+    
+    // 業種のラベル変換
+    $industry_labels = array(
+        'manufacturing' => '製造業',
+        'retail' => '小売業',
+        'service' => 'サービス業',
+        'it' => 'IT・通信業',
+        'construction' => '建設業',
+        'transport' => '運輸業',
+        'healthcare' => '医療・福祉',
+        'education' => '教育・学習支援',
+        'agriculture' => '農林水産業',
+        'other' => 'その他'
+    );
+    $industry_label = !empty($industry) && isset($industry_labels[$industry]) ? $industry_labels[$industry] : '';
+    
+    // 連絡方法のラベル
+    $contact_method_labels = array(
+        'email' => 'メール',
+        'phone' => '電話',
+        'either' => 'どちらでも可'
+    );
+    $contact_method_label = isset($contact_method_labels[$contact_method]) ? $contact_method_labels[$contact_method] : '';
+    
+    // 連絡時間帯のラベル
+    $time_labels = array(
+        'morning' => '9:00-12:00',
+        'afternoon' => '13:00-17:00',
+        'evening' => '17:00-19:00',
+        'anytime' => '時間指定なし'
+    );
+    $contact_time_labels = array_map(function($time) use ($time_labels) {
+        return isset($time_labels[$time]) ? $time_labels[$time] : $time;
+    }, $contact_time);
+    
+    // 管理者宛メールの作成
+    $admin_email = get_option('admin_email');
+    $site_name = get_bloginfo('name');
+    $current_time = current_time('Y年n月j日 H:i');
+    
+    $admin_subject = "[{$site_name}] お問い合わせ: {$subject}";
+    
+    $admin_message = "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    $admin_message .= "　お問い合わせを受信しました\n";
+    $admin_message .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
+    $admin_message .= "受信日時: {$current_time}\n";
+    $admin_message .= "お問い合わせ種別: {$inquiry_label}\n\n";
+    $admin_message .= "──────────────────────────────────\n";
+    $admin_message .= "■ お客様情報\n";
+    $admin_message .= "──────────────────────────────────\n";
+    $admin_message .= "お名前: {$name}\n";
+    $admin_message .= "メールアドレス: {$email}\n";
+    if (!empty($phone)) {
+        $admin_message .= "電話番号: {$phone}\n";
+    }
+    if (!empty($company)) {
+        $admin_message .= "会社名・団体名: {$company}\n";
+    }
+    if (!empty($industry_label)) {
+        $admin_message .= "業種: {$industry_label}\n";
+    }
+    if (!empty($employees)) {
+        $admin_message .= "従業員数: {$employees}\n";
+    }
+    $admin_message .= "\n";
+    $admin_message .= "──────────────────────────────────\n";
+    $admin_message .= "■ 連絡先希望\n";
+    $admin_message .= "──────────────────────────────────\n";
+    $admin_message .= "ご希望の連絡方法: {$contact_method_label}\n";
+    if (!empty($contact_time_labels)) {
+        $admin_message .= "ご希望の連絡時間帯: " . implode(', ', $contact_time_labels) . "\n";
+    }
+    $admin_message .= "\n";
+    $admin_message .= "──────────────────────────────────\n";
+    $admin_message .= "■ お問い合わせ内容\n";
+    $admin_message .= "──────────────────────────────────\n";
+    $admin_message .= "件名: {$subject}\n\n";
+    $admin_message .= "{$message}\n\n";
+    $admin_message .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    $admin_message .= "このメールは {$site_name} のお問い合わせフォームから自動送信されました。\n";
+    $admin_message .= "返信はお客様のメールアドレス宛に直接お送りください。\n";
+    $admin_message .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    
+    // お客様宛自動返信メールの作成
+    $customer_subject = "[{$site_name}] お問い合わせありがとうございます";
+    
+    $customer_message = "{$name} 様\n\n";
+    $customer_message .= "この度は {$site_name} にお問い合わせいただき、誠にありがとうございます。\n";
+    $customer_message .= "下記の内容でお問い合わせを受け付けいたしました。\n\n";
+    $customer_message .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    $customer_message .= "　お問い合わせ内容の確認\n";
+    $customer_message .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
+    $customer_message .= "受付日時: {$current_time}\n";
+    $customer_message .= "お問い合わせ種別: {$inquiry_label}\n";
+    $customer_message .= "件名: {$subject}\n\n";
+    $customer_message .= "──────────────────────────────────\n";
+    $customer_message .= "■ お問い合わせ内容\n";
+    $customer_message .= "──────────────────────────────────\n";
+    $customer_message .= "{$message}\n\n";
+    $customer_message .= "──────────────────────────────────\n\n";
+    $customer_message .= "内容を確認の上、2営業日以内に担当者よりご連絡させていただきます。\n";
+    $customer_message .= "今しばらくお待ちくださいませ。\n\n";
+    $customer_message .= "※このメールは自動送信されています。\n";
+    $customer_message .= "※本メールにお心当たりがない場合は、お手数ですが削除してください。\n\n";
+    $customer_message .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    $customer_message .= "{$site_name}\n";
+    $customer_message .= "URL: " . home_url('/') . "\n";
+    $customer_message .= "お問い合わせ: " . home_url('/contact/') . "\n";
+    $customer_message .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    
+    // メールヘッダー
+    $headers = array(
+        'Content-Type: text/plain; charset=UTF-8',
+        'From: ' . $site_name . ' <' . $admin_email . '>',
+        'Reply-To: ' . $name . ' <' . $email . '>'
+    );
+    
+    $customer_headers = array(
+        'Content-Type: text/plain; charset=UTF-8',
+        'From: ' . $site_name . ' <' . $admin_email . '>'
+    );
+    
+    // メール送信
+    $admin_sent = wp_mail($admin_email, $admin_subject, $admin_message, $headers);
+    $customer_sent = wp_mail($email, $customer_subject, $customer_message, $customer_headers);
+    
+    // 送信結果に応じてリダイレクト
+    if ($admin_sent) {
+        // お問い合わせ内容をログに保存（オプション）
+        gi_log_contact_submission($name, $email, $inquiry_type, $subject, $message);
+        
+        wp_redirect(add_query_arg('contact_sent', '1', home_url('/contact/')));
+    } else {
+        wp_redirect(add_query_arg(array(
+            'contact_error' => '1',
+            'error_msg' => urlencode('メールの送信に失敗しました。しばらく経ってから再度お試しください。')
+        ), home_url('/contact/')));
+    }
+    exit;
+}
+
+/**
+ * お問い合わせ内容をログとして保存（デバッグ・管理用）
+ */
+function gi_log_contact_submission($name, $email, $type, $subject, $message) {
+    $log_data = array(
+        'date' => current_time('mysql'),
+        'name' => $name,
+        'email' => $email,
+        'type' => $type,
+        'subject' => $subject,
+        'message_preview' => mb_substr($message, 0, 100) . (mb_strlen($message) > 100 ? '...' : '')
+    );
+    
+    // オプションにログを追加（最大50件保持）
+    $logs = get_option('gi_contact_logs', array());
+    array_unshift($logs, $log_data);
+    $logs = array_slice($logs, 0, 50);
+    update_option('gi_contact_logs', $logs);
+}
