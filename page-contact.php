@@ -6,7 +6,7 @@
  * Grant & Subsidy Information Site - Contact Page
  * 
  * @package Grant_Insight_Perfect
- * @version 5.0-fixed-form-processing
+ * @version 6.0-fixed-variable-scope
  */
 
 // セキュリティチェック
@@ -16,7 +16,9 @@ if (!defined('ABSPATH')) {
 
 get_header();
 
-// メール送信処理
+// メール送信処理用の変数をグローバル宣言
+global $form_submitted, $form_success, $form_errors;
+
 $form_submitted = false;
 $form_success = false;
 $form_errors = array();
@@ -30,8 +32,12 @@ if (isset($_GET['contact_sent']) && $_GET['contact_sent'] == '1') {
 }
 
 // GET パラメータでエラーメッセージを表示
-if (isset($_GET['contact_error']) && $_GET['contact_error'] == '1' && isset($_GET['error_msg'])) {
-    $form_errors = explode('|', urldecode($_GET['error_msg']));
+if (isset($_GET['contact_error']) && $_GET['contact_error'] == '1') {
+    if (isset($_GET['error_msg'])) {
+        $form_errors = explode('|', urldecode($_GET['error_msg']));
+    } else {
+        $form_errors = array('フォームの送信中にエラーが発生しました。');
+    }
 }
 
 // pages/templates内の実際のテンプレートファイルを読み込み
@@ -40,11 +46,12 @@ $template_path = get_template_directory() . '/pages/templates/page-contact.php';
 if (file_exists($template_path)) {
     include $template_path;
 } else {
-    // フォールバック処理は削除し、直接レンダリング
+    // フォールバック処理
     ?>
-    <div class="container">
-        <h1>Contact Page</h1>
-        <p>Contact page template not found. Please check pages/templates/page-contact.php</p>
+    <div class="container" style="padding: 60px 20px; text-align: center;">
+        <h1>お問い合わせ</h1>
+        <p>お問い合わせページのテンプレートが見つかりませんでした。</p>
+        <p>管理者に連絡してください。</p>
     </div>
     <?php
     get_footer();

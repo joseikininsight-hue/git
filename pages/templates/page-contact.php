@@ -3,7 +3,7 @@
  * 補助金・助成金情報サイト - お問い合わせページ（表示テンプレート部分）
  * Grant & Subsidy Information Site - Contact Page (Display Template Part)
  * @package Grant_Insight_Contact
- * @version 6.0-government-design
+ * @version 7.0-fixed-success-page
  * 
  * 注意: このファイルは表示のみを担当します。POST処理は functions.php の admin_post フックで行われます。
  */
@@ -14,6 +14,19 @@ if (!defined('ABSPATH')) {
 }
 
 // このファイルは page-contact.php から include されるため、get_header() は不要
+// 親ファイルから変数を取得
+global $form_submitted, $form_success, $form_errors;
+
+// 変数が設定されていない場合のフォールバック
+if (!isset($form_success)) {
+    $form_success = isset($_GET['contact_sent']) && $_GET['contact_sent'] == '1';
+}
+if (!isset($form_errors)) {
+    $form_errors = array();
+    if (isset($_GET['contact_error']) && $_GET['contact_error'] == '1' && isset($_GET['error_msg'])) {
+        $form_errors = explode('|', urldecode($_GET['error_msg']));
+    }
+}
 
 // 構造化データ
 $contact_schema = array(
@@ -258,49 +271,137 @@ $contact_schema = array(
 }
 
 /* ==========================================================================
-   Success Message
+   Success Message - 送信完了画面
    ========================================================================== */
+.gov-success-section {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .gov-success-box {
     background: linear-gradient(135deg, var(--gov-green-light) 0%, #dcfce7 100%);
     border: 2px solid #86efac;
-    border-left: 4px solid var(--gov-green);
     border-radius: var(--gov-radius-lg);
-    padding: 48px;
+    padding: 60px 48px;
     text-align: center;
-    animation: slideDown 0.5s ease;
+    animation: successFadeIn 0.6s ease;
+    max-width: 720px;
+    margin: 0 auto;
+    box-shadow: 0 10px 40px rgba(46, 125, 50, 0.15);
 }
 
-@keyframes slideDown {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
+@keyframes successFadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(-30px) scale(0.98); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0) scale(1); 
+    }
 }
 
 .gov-success-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
     background: var(--gov-white);
-    border: 3px solid var(--gov-green);
+    border: 4px solid var(--gov-green);
     border-radius: 50%;
-    margin-bottom: 24px;
+    margin-bottom: 28px;
     color: var(--gov-green);
+    animation: successPulse 2s infinite;
+}
+
+@keyframes successPulse {
+    0%, 100% { 
+        box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.4); 
+    }
+    50% { 
+        box-shadow: 0 0 0 15px rgba(46, 125, 50, 0); 
+    }
 }
 
 .gov-success-title {
     font-family: var(--gov-font-serif);
-    font-size: 1.75rem;
+    font-size: 2rem;
     font-weight: 600;
     color: #166534;
-    margin: 0 0 16px;
+    margin: 0 0 8px;
+}
+
+.gov-success-subtitle {
+    font-size: 0.9375rem;
+    color: #22c55e;
+    font-weight: 500;
+    margin: 0 0 24px;
+    letter-spacing: 0.05em;
 }
 
 .gov-success-text {
     font-size: 1rem;
     color: #15803d;
-    line-height: 1.8;
+    line-height: 1.9;
     margin-bottom: 32px;
+}
+
+.gov-success-text p {
+    margin: 8px 0;
+}
+
+.gov-success-text strong {
+    color: #166534;
+}
+
+.gov-success-info {
+    display: grid;
+    gap: 16px;
+    margin-bottom: 36px;
+    text-align: left;
+}
+
+.gov-success-info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    background: rgba(255, 255, 255, 0.7);
+    padding: 16px 20px;
+    border-radius: var(--gov-radius);
+    border-left: 3px solid var(--gov-green);
+}
+
+.gov-success-info-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: var(--gov-white);
+    border-radius: 50%;
+    color: var(--gov-green);
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.gov-success-info-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.gov-success-info-content strong {
+    font-size: 0.9375rem;
+    color: #166534;
+}
+
+.gov-success-info-content span {
+    font-size: 0.875rem;
+    color: #15803d;
+    line-height: 1.6;
 }
 
 .gov-success-actions {
@@ -308,6 +409,22 @@ $contact_schema = array(
     gap: 16px;
     justify-content: center;
     flex-wrap: wrap;
+}
+
+.gov-success-actions .gov-btn-primary,
+.gov-success-actions .gov-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.gov-success-actions .gov-btn-primary {
+    background: linear-gradient(135deg, var(--gov-green) 0%, #16a34a 100%);
+    border-color: var(--gov-green);
+}
+
+.gov-success-actions .gov-btn-primary:hover {
+    background: linear-gradient(135deg, #166534 0%, var(--gov-green) 100%);
 }
 
 /* ==========================================================================
@@ -965,8 +1082,55 @@ textarea.gov-form-control {
         padding: 20px 16px;
     }
     
+    .gov-success-section {
+        min-height: auto;
+        padding: 40px 0;
+    }
+    
     .gov-success-box {
         padding: 32px 20px;
+    }
+    
+    .gov-success-icon {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .gov-success-icon svg {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .gov-success-title {
+        font-size: 1.5rem;
+    }
+    
+    .gov-success-subtitle {
+        font-size: 0.8125rem;
+    }
+    
+    .gov-success-info-item {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+    }
+    
+    .gov-success-info-icon {
+        margin: 0 auto;
+    }
+    
+    .gov-success-info-content {
+        text-align: center;
+    }
+    
+    .gov-success-actions {
+        flex-direction: column;
+    }
+    
+    .gov-success-actions .gov-btn-primary,
+    .gov-success-actions .gov-btn-secondary {
+        width: 100%;
+        justify-content: center;
     }
 }
 
@@ -1016,8 +1180,8 @@ textarea.gov-form-control {
         <div class="gov-container">
             
             <?php if ($form_success): ?>
-            <!-- Success Message -->
-            <section class="gov-content-section">
+            <!-- Success Message - 送信完了画面 -->
+            <section class="gov-content-section gov-success-section" id="success-message">
                 <div class="gov-success-box">
                     <div class="gov-success-icon">
                         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1026,14 +1190,55 @@ textarea.gov-form-control {
                         </svg>
                     </div>
                     <h2 class="gov-success-title">お問い合わせを受け付けました</h2>
-                    <p class="gov-success-text">
-                        お問い合わせいただき、誠にありがとうございます。<br>
-                        ご入力いただいたメールアドレス宛に、受付完了メールを送信いたしました。<br>
-                        内容を確認の上、2営業日以内に担当者よりご連絡させていただきます。
-                    </p>
+                    <p class="gov-success-subtitle">Thank you for your inquiry</p>
+                    <div class="gov-success-text">
+                        <p>お問い合わせいただき、誠にありがとうございます。</p>
+                        <p>ご入力いただいたメールアドレス宛に、受付完了メールを送信いたしました。</p>
+                        <p><strong>内容を確認の上、2営業日以内に担当者よりご連絡させていただきます。</strong></p>
+                    </div>
+                    
+                    <div class="gov-success-info">
+                        <div class="gov-success-info-item">
+                            <div class="gov-success-info-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                    <polyline points="22,6 12,13 2,6"/>
+                                </svg>
+                            </div>
+                            <div class="gov-success-info-content">
+                                <strong>自動返信メール</strong>
+                                <span>受付確認メールを送信しました。届かない場合は迷惑メールフォルダをご確認ください。</span>
+                            </div>
+                        </div>
+                        <div class="gov-success-info-item">
+                            <div class="gov-success-info-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <polyline points="12 6 12 12 16 14"/>
+                                </svg>
+                            </div>
+                            <div class="gov-success-info-content">
+                                <strong>回答予定</strong>
+                                <span>通常2営業日以内にご返信いたします。お急ぎの場合はお電話でご連絡ください。</span>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="gov-success-actions">
-                        <a href="<?php echo home_url('/'); ?>" class="gov-btn-primary">トップページへ戻る</a>
-                        <a href="<?php echo home_url('/contact/'); ?>" class="gov-btn-secondary">新しいお問い合わせ</a>
+                        <a href="<?php echo home_url('/'); ?>" class="gov-btn-primary">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                                <polyline points="9 22 9 12 15 12 15 22"/>
+                            </svg>
+                            トップページへ戻る
+                        </a>
+                        <a href="<?php echo home_url('/grant/'); ?>" class="gov-btn-secondary">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"/>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            </svg>
+                            補助金を検索
+                        </a>
                     </div>
                 </div>
             </section>
@@ -1474,6 +1679,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // Success message handling - scroll to top and show
+    const successSection = document.querySelector('.gov-success-section');
+    if (successSection) {
+        // Scroll to top smoothly
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        // Add confetti effect (optional visual feedback)
+        setTimeout(() => {
+            successSection.classList.add('is-visible');
+        }, 100);
+    }
+    
     // Scroll to error message
     const errorBox = document.querySelector('.gov-error-box');
     if (errorBox) {
@@ -1481,6 +1698,17 @@ document.addEventListener('DOMContentLoaded', function() {
             errorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 100);
     }
+    
+    // Smooth scroll for internal links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
 });
 </script>
 
