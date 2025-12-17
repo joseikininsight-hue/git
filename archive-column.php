@@ -399,11 +399,11 @@ if (!function_exists('gi_get_column_difficulty_svg_icon')) {
                                 <circle cx="11" cy="11" r="8"/>
                                 <path d="m21 21-4.35-4.35"/>
                             </svg>
-                            <input type="search" 
+                            <input type="text" 
                                    id="keyword-search" 
                                    name="s"
                                    class="search-input" 
-                                   placeholder="コラム記事を検索..."
+                                   placeholder="コラム記事を検索（スペース区切りでAND検索）..."
                                    value="<?php echo esc_attr($url_params['search']); ?>"
                                    aria-label="コラムを検索"
                                    autocomplete="off">
