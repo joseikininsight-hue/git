@@ -968,6 +968,79 @@
                     self.closeAllSelects();
                 }
             });
+            
+            // お気に入りボタン（イベント委譲でオプティミスティックUI対応）
+            document.addEventListener('click', function(e) {
+                const btn = e.target.closest('.favorite-btn');
+                if (btn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    self.toggleFavorite(btn);
+                }
+            });
+        },
+        
+        /**
+         * お気に入りをトグル（オプティミスティックUI）
+         */
+        toggleFavorite: function(btn) {
+            const self = this;
+            const postId = btn.dataset.postId;
+            if (!postId) return;
+            
+            const icon = btn.querySelector('.favorite-icon');
+            const isCurrentlyFavorite = icon && icon.classList.contains('active');
+            
+            // オプティミスティック更新（即座にUI更新）
+            if (icon) {
+                icon.classList.toggle('active');
+                btn.classList.toggle('is-favorite');
+            }
+            btn.title = isCurrentlyFavorite ? 'お気に入りに追加' : 'お気に入りから削除';
+            
+            // アニメーション効果
+            btn.style.transform = 'scale(1.2)';
+            setTimeout(function() { btn.style.transform = ''; }, 200);
+            
+            // AJAX送信
+            const formData = new FormData();
+            formData.append('action', 'gi_toggle_favorite');
+            formData.append('post_id', postId);
+            formData.append('nonce', this.config.nonce);
+            
+            fetch(this.config.ajaxUrl, {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin'
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    // 成功時のフィードバック
+                    self.showToast(data.data.message, 'success', null, 2000);
+                } else {
+                    // 失敗時はUIを元に戻す
+                    if (icon) {
+                        icon.classList.toggle('active');
+                        btn.classList.toggle('is-favorite');
+                    }
+                    btn.title = isCurrentlyFavorite ? 'お気に入りから削除' : 'お気に入りに追加';
+                    
+                    // エラーメッセージ
+                    var errorMsg = data.data && data.data.message ? data.data.message : 'お気に入りの更新に失敗しました';
+                    self.showToast(errorMsg, 'error');
+                }
+            })
+            .catch(function(err) {
+                console.error('Favorite toggle error:', err);
+                // 失敗時はUIを元に戻す
+                if (icon) {
+                    icon.classList.toggle('active');
+                    btn.classList.toggle('is-favorite');
+                }
+                btn.title = isCurrentlyFavorite ? 'お気に入りから削除' : 'お気に入りに追加';
+                self.showToast('通信エラーが発生しました', 'error');
+            });
         },
 
         /**
@@ -1601,12 +1674,59 @@
         },
 
         /**
-         * ローディング表示
+         * ローディング表示（スケルトンスクリーン対応）
          */
         showLoading: function(show) {
             const el = this.elements;
-            if (el.loadingOverlay) el.loadingOverlay.style.display = show ? 'flex' : 'none';
-            if (el.grantsContainer) el.grantsContainer.style.opacity = show ? '0.5' : '1';
+            const self = this;
+            
+            if (show) {
+                // スケルトンスクリーンを表示
+                if (el.grantsContainer) {
+                    const skeletonCount = 6;
+                    const view = this.state.view || 'single';
+                    let skeletonHtml = '<div class="skeleton-container" data-view="' + view + '">';
+                    
+                    for (let i = 0; i < skeletonCount; i++) {
+                        skeletonHtml += self.createSkeletonCard();
+                    }
+                    skeletonHtml += '</div>';
+                    
+                    // 既存コンテンツを保存し、スケルトンを表示
+                    el.grantsContainer._originalContent = el.grantsContainer.innerHTML;
+                    el.grantsContainer.innerHTML = skeletonHtml;
+                }
+            } else {
+                // スケルトンを削除（コンテンツは loadGrants で上書きされる）
+                const skeleton = el.grantsContainer ? el.grantsContainer.querySelector('.skeleton-container') : null;
+                if (skeleton) {
+                    skeleton.remove();
+                }
+            }
+            
+            // 従来のオーバーレイも念のため制御
+            if (el.loadingOverlay) el.loadingOverlay.style.display = 'none';
+        },
+        
+        /**
+         * スケルトンカードを生成
+         */
+        createSkeletonCard: function() {
+            return '<div class="skeleton-card">' +
+                '<div class="skeleton-element skeleton-badge"></div>' +
+                '<div class="skeleton-element skeleton-title"></div>' +
+                '<div class="skeleton-element skeleton-text"></div>' +
+                '<div class="skeleton-element skeleton-text-short"></div>' +
+                '<div class="skeleton-meta">' +
+                    '<div class="skeleton-element skeleton-meta-item"></div>' +
+                    '<div class="skeleton-element skeleton-meta-item"></div>' +
+                    '<div class="skeleton-element skeleton-meta-item"></div>' +
+                '</div>' +
+                '<div class="skeleton-tags">' +
+                    '<div class="skeleton-element skeleton-tag"></div>' +
+                    '<div class="skeleton-element skeleton-tag"></div>' +
+                '</div>' +
+            '</div>';
         },
 
         /**
