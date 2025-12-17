@@ -474,7 +474,7 @@ if (!function_exists('gi_get_column_difficulty_svg_icon')) {
                 
                 <!-- フィルターヘッダー -->
                 <div class="filter-header">
-                    <h2 class="filter-title">
+                    <h3 class="filter-title">
                         <svg class="title-icon" 
                              width="18" 
                              height="18" 
@@ -486,7 +486,7 @@ if (!function_exists('gi_get_column_difficulty_svg_icon')) {
                             <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
                         </svg>
                         絞り込み
-                    </h2>
+                    </h3>
                     <button class="mobile-filter-close" 
                             id="mobile-filter-close"
                             aria-label="フィルターを閉じる"

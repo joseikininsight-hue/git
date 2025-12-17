@@ -57,8 +57,10 @@ class GI_AI_Assistant_Core {
      * =================================================================
      */
     public function handle_ai_chat() {
-        // デバッグログ
-        error_log('=== AI Chat Request Started (Core) ===');
+        // FIX: Debug logs only in WP_DEBUG mode
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('=== AI Chat Request Started (Core) ===');
+        }
         
         // Nonce検証
         $nonce = isset($_POST['nonce']) ? $_POST['nonce'] : '';
@@ -78,7 +80,10 @@ class GI_AI_Assistant_Core {
         }
 
         if (!$nonce_verified) {
-            error_log('AI Chat Nonce Verification Failed. Received: ' . $nonce);
+            // FIX: Debug logs only in WP_DEBUG mode
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('AI Chat Nonce Verification Failed. Received: ' . $nonce);
+            }
             wp_send_json_error(array(
                 'message' => 'セキュリティチェックに失敗しました。ページを再読み込みしてください。',
                 'code' => 'NONCE_INVALID',
@@ -115,7 +120,10 @@ class GI_AI_Assistant_Core {
             ));
             
         } catch (Exception $e) {
-            error_log('AI Chat Error: ' . $e->getMessage());
+            // FIX: Debug logs only in WP_DEBUG mode
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('AI Chat Error: ' . $e->getMessage());
+            }
             
             // フォールバック応答
             wp_send_json_success(array(

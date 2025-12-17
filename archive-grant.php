@@ -104,7 +104,22 @@ $current_year = date('Y');
 $current_month = date('n');
 $popular_categories = array_slice($all_categories, 0, 6);
 $current_url = home_url(add_query_arg(array(), $_SERVER['REQUEST_URI']));
-$canonical_url = $current_url;
+
+// FIX: canonical URL excludes filter parameters to prevent duplicate content
+// フィルターパラメータを除外した正規URLを使用
+$canonical_url = get_post_type_archive_link('grant');
+if ($is_category_archive && $queried_object) {
+    $canonical_url = get_term_link($queried_object);
+}
+if ($is_prefecture_archive && $queried_object) {
+    $canonical_url = get_term_link($queried_object);
+}
+if ($is_municipality_archive && $queried_object) {
+    $canonical_url = get_term_link($queried_object);
+}
+if ($is_tag_archive && $queried_object) {
+    $canonical_url = get_term_link($queried_object);
+}
 
 // 都道府県データ
 $prefectures = gi_get_all_prefectures();
@@ -392,8 +407,9 @@ $keywords_string = implode(',', $keywords);
                      aria-label="助成金検索フィルター">
                 
                 <!-- フィルターヘッダー -->
+                <!-- FIX: Changed h2 to h3 for better heading hierarchy (h1: page title, h2: major sections, h3: subsections) -->
                 <div class="filter-header">
-                    <h2 class="filter-title">
+                    <h3 class="filter-title">
                         <svg class="title-icon" 
                              width="18" 
                              height="18" 
@@ -405,7 +421,7 @@ $keywords_string = implode(',', $keywords);
                             <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
                         </svg>
                         絞り込み
-                    </h2>
+                    </h3>
                     <button class="mobile-filter-close" 
                             id="mobile-filter-close"
                             aria-label="フィルターを閉じる"
@@ -1100,20 +1116,11 @@ $keywords_string = implode(',', $keywords);
         <!-- サイドバー（PC only） -->
         <aside class="yahoo-sidebar" role="complementary" aria-label="サイドバー">
             
-            <?php
-            // デバッグ: 関数の存在確認
-            error_log('🟣 archive-grant.php: ji_display_ad exists: ' . (function_exists('ji_display_ad') ? 'YES' : 'NO'));
-            error_log('🟣 archive-grant.php: JI_Affiliate_Ad_Manager class exists: ' . (class_exists('JI_Affiliate_Ad_Manager') ? 'YES' : 'NO'));
-            ?>
-            
             <!-- 広告枠1: サイドバー上部 -->
             <?php if (function_exists('ji_display_ad')): ?>
             <div class="sidebar-ad-space sidebar-ad-top">
                 <?php ji_display_ad('archive_grant_sidebar_top', 'archive-grant'); ?>
             </div>
-            <?php else: ?>
-            <!-- デバッグ: ji_display_ad関数が存在しません -->
-            <?php error_log('🔴 archive-grant.php: ji_display_ad function NOT FOUND at sidebar top'); ?>
             <?php endif; ?>
 
             <!-- 広告枠2: サイドバー中央 -->

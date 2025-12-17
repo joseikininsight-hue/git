@@ -387,12 +387,12 @@ $breadcrumbs = [
             
             <!-- フィルターヘッダー -->
             <div class="filter-header">
-                <h2 class="filter-title">
+                <h3 class="filter-title">
                     <svg class="title-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
                     </svg>
                     絞り込み検索
-                </h2>
+                </h3>
                 <button class="filter-reset-all" id="reset-all-filters-btn" style="display: none;" aria-label="すべてのフィルターをリセット">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <polyline points="1 4 1 10 7 10"/>

@@ -123,16 +123,23 @@ add_action('wp_ajax_nopriv_gi_get_search_suggestions', 'gi_ajax_get_search_sugge
  */
 function handle_ai_search() {
     try {
-        error_log('🔍 handle_ai_search called with: ' . json_encode($_POST));
+        // FIX: Debug logs only in WP_DEBUG mode
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('🔍 handle_ai_search called with: ' . json_encode($_POST));
+        }
         
         // セキュリティ検証
         if (!gi_verify_ajax_nonce()) {
-            error_log('❌ Security check failed');
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('❌ Security check failed');
+            }
             wp_send_json_error(['message' => 'セキュリティチェックに失敗しました', 'code' => 'SECURITY_ERROR']);
             return;
         }
         
-        error_log('✅ Security check passed');
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('✅ Security check passed');
+        }
         
         // パラメータ取得と検証
         $query = sanitize_text_field($_POST['query'] ?? '');
@@ -164,12 +171,17 @@ function handle_ai_search() {
         }
         
         // Enhanced検索実行
-        error_log("🔍 Starting search for query: {$query}, filter: {$filter}");
+        // FIX: Debug logs only in WP_DEBUG mode
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log("🔍 Starting search for query: {$query}, filter: {$filter}");
+        }
         $search_result = gi_enhanced_semantic_search($query, $filter, $page, $per_page);
-        error_log("🔍 Search result: " . json_encode([
-            'count' => $search_result['count'] ?? 'null',
-            'grants_count' => count($search_result['grants'] ?? [])
-        ]));
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log("🔍 Search result: " . json_encode([
+                'count' => $search_result['count'] ?? 'null',
+                'grants_count' => count($search_result['grants'] ?? [])
+            ]));
+        }
         
         // 検索結果の簡単な説明
         $ai_response = gi_generate_simple_search_summary($search_result['count'], $query);
@@ -204,8 +216,11 @@ function handle_ai_search() {
         ]);
         
     } catch (Exception $e) {
-        error_log("❌ Search error: " . $e->getMessage());
-        error_log("❌ Stack trace: " . $e->getTraceAsString());
+        // FIX: Debug logs only in WP_DEBUG mode
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log("❌ Search error: " . $e->getMessage());
+            error_log("❌ Stack trace: " . $e->getTraceAsString());
+        }
         
         wp_send_json_error([
             'message' => '検索中にエラーが発生しました。しばらく後でお試しください。',

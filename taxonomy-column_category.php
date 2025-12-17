@@ -531,7 +531,7 @@ foreach ($breadcrumbs as $index => $breadcrumb) {
                      aria-label="助成金検索フィルター">
 
                 <div class="filter-header">
-                    <h2 class="filter-title">
+                    <h3 class="filter-title">
                         <svg class="title-icon"
                              width="18" height="18"
                              viewBox="0 0 24 24"
@@ -542,7 +542,7 @@ foreach ($breadcrumbs as $index => $breadcrumb) {
                             <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
                         </svg>
                         絞り込み
-                    </h2>
+                    </h3>
 
                     <button class="mobile-filter-close"
                             id="mobile-filter-close"

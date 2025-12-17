@@ -1419,11 +1419,87 @@
         },
 
         /**
-         * エラー表示
+         * エラー表示 - トースト通知に変更 (FIX: alert() replaced)
          */
         showError: function(message) {
             console.error('Error:', message);
-            alert(message);
+            this.showToast(message, 'error', 'エラーが発生しました');
+        },
+
+        /**
+         * トースト通知表示 (FIX: alert() replacement)
+         * @param {string} message - 表示メッセージ
+         * @param {string} type - 'error', 'success', 'warning', 'info'
+         * @param {string} title - オプションのタイトル
+         * @param {number} duration - 表示時間(ms) デフォルト5000
+         */
+        showToast: function(message, type, title, duration) {
+            type = type || 'info';
+            duration = duration || 5000;
+            
+            // コンテナを取得または作成
+            var container = document.querySelector('.toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.className = 'toast-container';
+                document.body.appendChild(container);
+            }
+            
+            // アイコンSVG
+            var icons = {
+                error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+                success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+                warning: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+                info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'
+            };
+            
+            // トースト要素を作成
+            var toast = document.createElement('div');
+            toast.className = 'toast toast-' + type;
+            
+            var titleHtml = title ? '<p class="toast-title">' + this.escapeHtml(title) + '</p>' : '';
+            
+            toast.innerHTML = 
+                '<span class="toast-icon">' + icons[type] + '</span>' +
+                '<div class="toast-content">' +
+                    titleHtml +
+                    '<p class="toast-message">' + this.escapeHtml(message) + '</p>' +
+                '</div>' +
+                '<button class="toast-close" aria-label="閉じる">' +
+                    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+                '</button>';
+            
+            container.appendChild(toast);
+            
+            // 閉じるボタンのイベント
+            var closeBtn = toast.querySelector('.toast-close');
+            var self = this;
+            closeBtn.addEventListener('click', function() {
+                self.hideToast(toast);
+            });
+            
+            // アニメーションで表示
+            requestAnimationFrame(function() {
+                toast.classList.add('show');
+            });
+            
+            // 自動で非表示
+            setTimeout(function() {
+                self.hideToast(toast);
+            }, duration);
+        },
+
+        /**
+         * トースト非表示
+         */
+        hideToast: function(toast) {
+            if (!toast) return;
+            toast.classList.remove('show');
+            setTimeout(function() {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 300);
         },
 
         /**

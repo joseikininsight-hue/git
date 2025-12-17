@@ -479,8 +479,10 @@ class JI_Access_Tracking {
         wp_send_json_success($html);
         
         } catch (Exception $e) {
-            // エラーログに記録
-            error_log('JI Access Tracking AJAX Error: ' . $e->getMessage());
+            // FIX: Debug logs only in WP_DEBUG mode
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('JI Access Tracking AJAX Error: ' . $e->getMessage());
+            }
             
             // ユーザーフレンドリーなエラーメッセージを返す
             ob_start();

@@ -1035,211 +1035,212 @@
 
 /* ==========================================================================
    Ranking Widget - ランキングウィジェット
+   FIX: Removed excessive !important - using higher specificity selectors
    ========================================================================== */
-.sidebar-ranking {
-    background: var(--gov-white) !important;
-    border: 1px solid var(--gov-gray-200) !important;
-    border-radius: var(--gov-radius-lg) !important;
-    overflow: hidden !important;
+.yahoo-sidebar .sidebar-ranking {
+    background: var(--gov-white);
+    border: 1px solid var(--gov-gray-200);
+    border-radius: var(--gov-radius-lg);
+    overflow: hidden;
 }
 
-.sidebar-ranking .widget-title {
-    background: var(--gov-navy-50) !important;
-    padding: 16px 20px !important;
-    border-bottom: 2px solid var(--gov-navy-800) !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 10px !important;
-    margin: 0 !important;
-    font-family: var(--gov-font-serif) !important;
-    font-size: 15px !important;
-    font-weight: 700 !important;
-    color: var(--gov-navy-900) !important;
+.yahoo-sidebar .sidebar-ranking .widget-title {
+    background: var(--gov-navy-50);
+    padding: 16px 20px;
+    border-bottom: 2px solid var(--gov-navy-800);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    font-family: var(--gov-font-serif);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--gov-navy-900);
 }
 
-.sidebar-ranking .widget-title svg {
-    flex-shrink: 0 !important;
-    color: var(--gov-navy-600) !important;
+.yahoo-sidebar .sidebar-ranking .widget-title svg {
+    flex-shrink: 0;
+    color: var(--gov-navy-600);
 }
 
-.ranking-tabs {
-    display: flex !important;
-    border-bottom: 1px solid var(--gov-gray-200) !important;
-    background: var(--gov-gray-50) !important;
+.yahoo-sidebar .ranking-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--gov-gray-200);
+    background: var(--gov-gray-50);
 }
 
-.ranking-tab {
-    flex: 1 !important;
-    padding: 12px 16px !important;
-    border: none !important;
-    background: transparent !important;
-    color: var(--gov-gray-600) !important;
-    font-family: var(--gov-font-sans) !important;
-    font-size: 13px !important;
-    font-weight: 600 !important;
-    cursor: pointer !important;
-    transition: all var(--gov-transition) !important;
-    position: relative !important;
+.yahoo-sidebar .ranking-tab {
+    flex: 1;
+    padding: 12px 16px;
+    border: none;
+    background: transparent;
+    color: var(--gov-gray-600);
+    font-family: var(--gov-font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--gov-transition);
+    position: relative;
 }
 
-.ranking-tab:hover {
-    background: var(--gov-gray-100) !important;
-    color: var(--gov-gray-800) !important;
+.yahoo-sidebar .ranking-tab:hover {
+    background: var(--gov-gray-100);
+    color: var(--gov-gray-800);
 }
 
-.ranking-tab.active {
-    background: var(--gov-white) !important;
-    color: var(--gov-navy-900) !important;
-    font-weight: 700 !important;
+.yahoo-sidebar .ranking-tab.active {
+    background: var(--gov-white);
+    color: var(--gov-navy-900);
+    font-weight: 700;
 }
 
-.ranking-tab.active::after {
-    content: '' !important;
-    position: absolute !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    height: 2px !important;
-    background: var(--gov-gold) !important;
+.yahoo-sidebar .ranking-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--gov-gold);
 }
 
-.ranking-content {
-    display: none !important;
-    padding: 0 !important;
+.yahoo-sidebar .ranking-content {
+    display: none;
+    padding: 0;
 }
 
-.ranking-content.active {
-    display: block !important;
+.yahoo-sidebar .ranking-content.active {
+    display: block;
 }
 
-.ranking-list {
-    list-style: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
+.yahoo-sidebar .ranking-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
-.ranking-item {
-    border-bottom: 1px solid var(--gov-gray-100) !important;
-    transition: background var(--gov-transition) !important;
+.yahoo-sidebar .ranking-item {
+    border-bottom: 1px solid var(--gov-gray-100);
+    transition: background var(--gov-transition);
 }
 
-.ranking-item:last-child {
-    border-bottom: none !important;
+.yahoo-sidebar .ranking-item:last-child {
+    border-bottom: none;
 }
 
-.ranking-item:hover {
-    background: var(--gov-navy-50) !important;
+.yahoo-sidebar .ranking-item:hover {
+    background: var(--gov-navy-50);
 }
 
-.ranking-link {
-    display: flex !important;
-    align-items: center !important;
-    gap: 12px !important;
-    padding: 14px 16px !important;
-    text-decoration: none !important;
-    color: var(--gov-gray-800) !important;
+.yahoo-sidebar .ranking-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    text-decoration: none;
+    color: var(--gov-gray-800);
 }
 
-.ranking-number {
-    flex-shrink: 0 !important;
-    width: 28px !important;
-    height: 28px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    font-family: var(--gov-font-mono) !important;
-    font-size: 13px !important;
-    font-weight: 900 !important;
-    color: var(--gov-gray-500) !important;
-    background: var(--gov-gray-100) !important;
-    border-radius: 50% !important;
+.yahoo-sidebar .ranking-number {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--gov-font-mono);
+    font-size: 13px;
+    font-weight: 900;
+    color: var(--gov-gray-500);
+    background: var(--gov-gray-100);
+    border-radius: 50%;
 }
 
-.rank-1 .ranking-number {
-    background: linear-gradient(135deg, var(--gov-gold) 0%, var(--gov-gold-light) 100%) !important;
-    color: var(--gov-navy-900) !important;
-    box-shadow: 0 2px 6px rgba(201, 162, 39, 0.3) !important;
+.yahoo-sidebar .rank-1 .ranking-number {
+    background: linear-gradient(135deg, var(--gov-gold) 0%, var(--gov-gold-light) 100%);
+    color: var(--gov-navy-900);
+    box-shadow: 0 2px 6px rgba(201, 162, 39, 0.3);
 }
 
-.rank-2 .ranking-number {
-    background: var(--gov-navy-300) !important;
-    color: var(--gov-navy-900) !important;
+.yahoo-sidebar .rank-2 .ranking-number {
+    background: var(--gov-navy-300);
+    color: var(--gov-navy-900);
 }
 
-.rank-3 .ranking-number {
-    background: var(--gov-navy-400) !important;
-    color: var(--gov-white) !important;
+.yahoo-sidebar .rank-3 .ranking-number {
+    background: var(--gov-navy-400);
+    color: var(--gov-white);
 }
 
-.ranking-title {
-    flex: 1 !important;
-    font-size: 13px !important;
-    font-weight: 600 !important;
-    line-height: 1.5 !important;
-    color: var(--gov-navy-900) !important;
-    display: -webkit-box !important;
-    -webkit-line-clamp: 2 !important;
-    -webkit-box-orient: vertical !important;
-    overflow: hidden !important;
+.yahoo-sidebar .ranking-title {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--gov-navy-900);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
-.ranking-link:hover .ranking-title {
-    color: var(--gov-blue) !important;
+.yahoo-sidebar .ranking-link:hover .ranking-title {
+    color: var(--gov-blue);
 }
 
-.ranking-views {
-    flex-shrink: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 4px !important;
-    font-size: 11px !important;
-    font-family: var(--gov-font-mono) !important;
-    color: var(--gov-gray-500) !important;
+.yahoo-sidebar .ranking-views {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-family: var(--gov-font-mono);
+    color: var(--gov-gray-500);
 }
 
-.ranking-views svg {
-    flex-shrink: 0 !important;
+.yahoo-sidebar .ranking-views svg {
+    flex-shrink: 0;
 }
 
-.ranking-loading {
-    padding: 40px 20px !important;
-    text-align: center !important;
-    color: var(--gov-gray-500) !important;
-    font-size: 13px !important;
+.yahoo-sidebar .ranking-loading {
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--gov-gray-500);
+    font-size: 13px;
 }
 
-.ranking-empty {
-    text-align: center !important;
-    padding: 32px 20px !important;
-    color: var(--gov-gray-600) !important;
+.yahoo-sidebar .ranking-empty {
+    text-align: center;
+    padding: 32px 20px;
+    color: var(--gov-gray-600);
 }
 
-.ranking-empty svg {
-    margin: 0 auto 12px !important;
-    opacity: 0.3 !important;
-    display: block !important;
-    color: var(--gov-gray-400) !important;
+.yahoo-sidebar .ranking-empty svg {
+    margin: 0 auto 12px;
+    opacity: 0.3;
+    display: block;
+    color: var(--gov-gray-400);
 }
 
-.ranking-empty p {
-    margin: 0 !important;
+.yahoo-sidebar .ranking-empty p {
+    margin: 0;
 }
 
-.ranking-empty p:first-of-type {
-    font-size: 14px !important;
-    font-weight: 500 !important;
+.yahoo-sidebar .ranking-empty p:first-of-type {
+    font-size: 14px;
+    font-weight: 500;
 }
 
-.ranking-empty p:last-of-type {
-    font-size: 12px !important;
-    opacity: 0.7 !important;
-    margin-top: 6px !important;
+.yahoo-sidebar .ranking-empty p:last-of-type {
+    font-size: 12px;
+    opacity: 0.7;
+    margin-top: 6px;
 }
 
-.ranking-error {
-    text-align: center !important;
-    padding: 32px 20px !important;
-    color: var(--gov-gray-500) !important;
+.yahoo-sidebar .ranking-error {
+    text-align: center;
+    padding: 32px 20px;
+    color: var(--gov-gray-500);
 }
 
 /* ==========================================================================
@@ -1449,6 +1450,11 @@
     .grants-container-yahoo[data-view="grid"] {
         grid-template-columns: 1fr;
     }
+    
+    /* FIX: 768px-1024px でフィルターボタンを表示 */
+    .mobile-filter-toggle {
+        display: flex;
+    }
 }
 
 @media (max-width: 768px) {
@@ -1460,20 +1466,17 @@
         padding: 24px 16px 80px;
     }
     
-    .mobile-filter-toggle {
-        display: flex !important;
-    }
-    
+    /* FIX: Reduced !important usage - using specificity instead */
     .mobile-filter-close {
-        display: block !important;
+        display: block;
     }
     
     .mobile-filter-apply-section {
-        display: block !important;
+        display: block;
     }
     
     .yahoo-filter-section {
-        position: fixed !important;
+        position: fixed;
         top: 0;
         left: 0;
         right: 0;
@@ -1482,15 +1485,15 @@
         z-index: 998;
         margin: 0;
         border-radius: 0;
-        padding: 0 !important;
-        overflow-y: auto !important;
+        padding: 0;
+        overflow-y: auto;
         transform: translateX(100%);
         box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
         transition: transform 0.3s ease;
     }
     
     .yahoo-filter-section.active {
-        transform: translateX(0) !important;
+        transform: translateX(0);
     }
     
     .filter-header {
@@ -1498,8 +1501,8 @@
         top: 0;
         background: var(--gov-white);
         z-index: 10;
-        padding: 16px 20px !important;
-        margin-bottom: 0 !important;
+        padding: 16px 20px;
+        margin-bottom: 0;
         border-bottom: 2px solid var(--gov-navy-800);
     }
     
@@ -1511,11 +1514,11 @@
     }
     
     .select-dropdown {
-        max-height: 50vh !important;
+        max-height: 50vh;
     }
     
     .multi-select-dropdown {
-        max-height: 55vh !important;
+        max-height: 55vh;
     }
     
     .yahoo-hero-section {
@@ -1696,57 +1699,8 @@
    修正版：絞り込み表示領域 + SVGアイコン対応
    ========================================================================== */
 
-/* ==========================================================================
-   CSS Variables - 官公庁カラーパレット
-   ========================================================================== */
-:root {
-    --gov-navy-900: #0d1b2a;
-    --gov-navy-800: #1b263b;
-    --gov-navy-700: #2c3e50;
-    --gov-navy-600: #34495e;
-    --gov-navy-500: #415a77;
-    --gov-navy-400: #778da9;
-    --gov-navy-300: #a3b1c6;
-    --gov-navy-200: #cfd8e3;
-    --gov-navy-100: #e8ecf1;
-    --gov-navy-50: #f4f6f8;
-    
-    --gov-gold: #c9a227;
-    --gov-gold-light: #d4b77a;
-    --gov-gold-pale: #f0e6c8;
-    
-    --gov-green: #2e7d32;
-    --gov-green-light: #e8f5e9;
-    --gov-red: #c62828;
-    --gov-red-light: #ffebee;
-    --gov-blue: #1565c0;
-    --gov-blue-light: #e3f2fd;
-    --gov-orange: #ef6c00;
-    --gov-orange-light: #fff3e0;
-    
-    --gov-white: #ffffff;
-    --gov-black: #1a1a1a;
-    --gov-gray-900: #212529;
-    --gov-gray-800: #343a40;
-    --gov-gray-700: #495057;
-    --gov-gray-600: #6c757d;
-    --gov-gray-500: #adb5bd;
-    --gov-gray-400: #ced4da;
-    --gov-gray-300: #dee2e6;
-    --gov-gray-200: #e9ecef;
-    --gov-gray-100: #f8f9fa;
-    
-    --gov-font-serif: "Shippori Mincho", "Yu Mincho", serif;
-    --gov-font-sans: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
-    --gov-font-mono: 'SF Mono', 'Monaco', monospace;
-    
-    --gov-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    --gov-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
-    --gov-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    --gov-shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
-    --gov-radius: 4px;
-    --gov-radius-lg: 8px;
-}
+/* NOTE: CSS Variables are defined once at the top of this file (line 13-66)
+   Duplicate :root block removed to reduce file size and prevent conflicts */
 
 /* ==========================================================================
    Base Styles
@@ -3472,4 +3426,129 @@
 
 .columns-container-yahoo {
     display: grid !important;
+}
+
+/* ==========================================================================
+   Toast Notification - トースト通知
+   FIX: alert() replaced with user-friendly toast notifications
+   ========================================================================== */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    border-radius: var(--gov-radius-md);
+    background: var(--gov-white);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    max-width: 400px;
+    pointer-events: auto;
+    transform: translateX(120%);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.toast.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.toast.toast-error {
+    border-left: 4px solid var(--gov-red-500);
+}
+
+.toast.toast-success {
+    border-left: 4px solid var(--gov-green-500);
+}
+
+.toast.toast-warning {
+    border-left: 4px solid var(--gov-gold-500);
+}
+
+.toast.toast-info {
+    border-left: 4px solid var(--gov-blue-500);
+}
+
+.toast-icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+}
+
+.toast-error .toast-icon {
+    color: var(--gov-red-500);
+}
+
+.toast-success .toast-icon {
+    color: var(--gov-green-500);
+}
+
+.toast-warning .toast-icon {
+    color: var(--gov-gold-500);
+}
+
+.toast-info .toast-icon {
+    color: var(--gov-blue-500);
+}
+
+.toast-content {
+    flex: 1;
+}
+
+.toast-title {
+    font-family: var(--gov-font-sans);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gov-gray-900);
+    margin: 0 0 4px 0;
+}
+
+.toast-message {
+    font-family: var(--gov-font-sans);
+    font-size: 13px;
+    color: var(--gov-gray-600);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.toast-close {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    border: none;
+    background: transparent;
+    color: var(--gov-gray-400);
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+}
+
+.toast-close:hover {
+    color: var(--gov-gray-600);
+}
+
+@media (max-width: 480px) {
+    .toast-container {
+        top: auto;
+        bottom: 20px;
+        left: 16px;
+        right: 16px;
+    }
+    
+    .toast {
+        max-width: 100%;
+    }
 }

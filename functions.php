@@ -1222,7 +1222,10 @@ function gi_handle_contact_form() {
         // ※ 本番環境ではこの挙動は要検討だが、問い合わせが「機能しない」という報告への対応として
         // メールサーバーの問題で画面遷移しないのを防ぐ
         
-        error_log('Contact Form Mail Failed: ' . $email);
+        // FIX: Debug logs only in WP_DEBUG mode
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('Contact Form Mail Failed: ' . $email);
+        }
         gi_log_contact_submission($name, $email, $inquiry_type, $subject, $message . " [MAIL SEND FAILED]");
         
         // エラーとして扱うか、完了として扱うか。
