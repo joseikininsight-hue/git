@@ -563,7 +563,7 @@
     cursor: pointer;
     text-align: left;
     transition: all var(--gov-transition);
-    min-height: 52px;
+    min-height: 38px;
 }
 
 .select-trigger:hover {
@@ -594,31 +594,31 @@
     transform: rotate(180deg);
 }
 
-/* PC版: より見やすいドロップダウン */
+/* FIX: Compact dropdown */
 .select-dropdown {
     position: absolute;
-    top: calc(100% + 6px);
+    top: calc(100% + 4px);
     left: 0;
     right: 0;
-    min-width: 300px;
+    min-width: 220px;
     background: var(--gov-white);
-    border: 2px solid var(--gov-navy-200);
-    border-radius: var(--gov-radius-md);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-    max-height: 420px;
+    border: 1px solid var(--gov-gray-300);
+    border-radius: var(--gov-radius);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    max-height: 280px;
     overflow-y: auto;
     z-index: 9990;
 }
 
-/* PC版: より見やすいオプション */
+/* FIX: Compact options */
 .select-option {
-    padding: 14px 16px;
+    padding: 8px 12px;
     cursor: pointer;
-    font-size: 15px;
-    color: var(--gov-gray-800);
+    font-size: 13px;
+    color: var(--gov-gray-700);
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
     transition: all var(--gov-transition);
     border-bottom: 1px solid var(--gov-gray-100);
 }
@@ -637,14 +637,14 @@
     font-weight: 600;
 }
 
-/* Multi Select */
+/* Multi Select - Compact */
 .multi-select-dropdown {
-    max-height: 450px;
+    max-height: 280px;
 }
 
-/* PC版: より見やすい検索ラッパー */
+/* FIX: Compact search wrapper */
 .select-search-wrapper {
-    padding: 14px 16px;
+    padding: 8px 10px;
     border-bottom: 1px solid var(--gov-gray-200);
     position: sticky;
     top: 0;
@@ -652,14 +652,14 @@
     z-index: 1;
 }
 
-/* PC版: より見やすい検索入力 */
+/* FIX: Compact search input */
 .select-search-input {
     width: 100%;
-    padding: 12px 14px;
-    border: 2px solid var(--gov-gray-300);
-    border-radius: var(--gov-radius-md);
+    padding: 8px 10px;
+    border: 1px solid var(--gov-gray-300);
+    border-radius: var(--gov-radius);
     font-family: var(--gov-font-sans);
-    font-size: 14px;
+    font-size: 12px;
     outline: none;
     transition: border-color var(--gov-transition);
 }
@@ -670,14 +670,14 @@
 
 /* FIX: Reduced options wrapper height */
 .select-options-wrapper {
-    max-height: 320px;
+    max-height: 200px;
     overflow-y: auto;
 }
 
-/* PC版: より大きなチェックボックス */
+/* FIX: Compact checkbox */
 .select-option .option-checkbox {
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
     cursor: pointer;
     accent-color: var(--gov-navy-800);
     flex-shrink: 0;
@@ -686,15 +686,15 @@
 .select-option label {
     flex: 1;
     cursor: pointer;
-    font-size: 15px;
+    font-size: 13px;
 }
 
-/* PC版: より見やすいアクションボタン */
+/* FIX: Compact action buttons */
 .select-actions {
     display: flex;
-    gap: 10px;
-    padding: 14px 16px;
-    border-top: 2px solid var(--gov-gray-200);
+    gap: 6px;
+    padding: 8px 10px;
+    border-top: 1px solid var(--gov-gray-200);
     position: sticky;
     bottom: 0;
     background: var(--gov-gray-50);
@@ -702,10 +702,10 @@
 
 .select-action-btn {
     flex: 1;
-    padding: 12px 16px;
-    border-radius: var(--gov-radius-md);
+    padding: 6px 10px;
+    border-radius: var(--gov-radius);
     font-family: var(--gov-font-sans);
-    font-size: 14px;
+    font-size: 11px;
     font-weight: 600;
     cursor: pointer;
     transition: all var(--gov-transition);
