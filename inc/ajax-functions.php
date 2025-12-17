@@ -3592,33 +3592,83 @@ function gi_ajax_load_grants() {
         'post_status' => 'publish'
     ];
 
-    // ===== 検索クエリ（拡張版：ACFフィールドも検索対象） =====
+    // ===== 検索クエリ（拡張版：スペース区切りAND検索 + ACFフィールド検索対応） =====
     if (!empty($search)) {
-        $args['s'] = $search;
+        // スペース（全角・半角）で分割してAND検索用のキーワード配列を作成
+        $search_keywords = preg_split('/[\s　]+/u', trim($search), -1, PREG_SPLIT_NO_EMPTY);
         
-        // メタフィールドも検索対象に追加
-        add_filter('posts_search', function($search_sql, $wp_query) use ($search) {
-            global $wpdb;
+        if (count($search_keywords) > 1) {
+            // 複数キーワード: カスタムAND検索を実装
+            // WordPressのデフォルト検索を使わず、独自のWHERE句を追加
+            add_filter('posts_where', function($where, $wp_query) use ($search_keywords) {
+                global $wpdb;
+                
+                if (!$wp_query->is_main_query()) {
+                    return $where;
+                }
+                
+                $and_conditions = [];
+                $meta_fields = ['ai_summary', 'organization', 'grant_target', 'eligible_expenses', 'required_documents'];
+                
+                foreach ($search_keywords as $keyword) {
+                    $like = '%' . $wpdb->esc_like($keyword) . '%';
+                    
+                    // タイトル、本文、抜粋、メタフィールドのいずれかにキーワードが含まれる条件
+                    $keyword_conditions = [];
+                    $keyword_conditions[] = $wpdb->prepare("{$wpdb->posts}.post_title LIKE %s", $like);
+                    $keyword_conditions[] = $wpdb->prepare("{$wpdb->posts}.post_content LIKE %s", $like);
+                    $keyword_conditions[] = $wpdb->prepare("{$wpdb->posts}.post_excerpt LIKE %s", $like);
+                    
+                    // メタフィールド検索（各キーワードがいずれかのフィールドに存在すればOK）
+                    $meta_placeholders = array_fill(0, count($meta_fields), '%s');
+                    $keyword_conditions[] = $wpdb->prepare(
+                        "EXISTS (
+                            SELECT 1 FROM {$wpdb->postmeta} pm 
+                            WHERE pm.post_id = {$wpdb->posts}.ID 
+                            AND pm.meta_key IN (" . implode(',', $meta_placeholders) . ")
+                            AND pm.meta_value LIKE %s
+                        )",
+                        array_merge($meta_fields, [$like])
+                    );
+                    
+                    // 各キーワードは OR でマッチ（タイトル OR 本文 OR メタ）
+                    $and_conditions[] = '(' . implode(' OR ', $keyword_conditions) . ')';
+                }
+                
+                // すべてのキーワード条件を AND で結合
+                $where .= ' AND (' . implode(' AND ', $and_conditions) . ')';
+                
+                return $where;
+            }, 10, 2);
             
-            if (!$wp_query->is_main_query() || empty($search)) {
+        } else {
+            // 単一キーワード: 従来の検索（幅広く拾う）
+            $args['s'] = $search;
+            
+            // メタフィールドも検索対象に追加
+            add_filter('posts_search', function($search_sql, $wp_query) use ($search) {
+                global $wpdb;
+                
+                if (!$wp_query->is_main_query() || empty($search)) {
+                    return $search_sql;
+                }
+                
+                $search_term = '%' . $wpdb->esc_like($search) . '%';
+                
+                $meta_search = $wpdb->prepare("
+                    OR EXISTS (
+                        SELECT 1 FROM {$wpdb->postmeta} pm 
+                        WHERE pm.post_id = {$wpdb->posts}.ID 
+                        AND pm.meta_key IN ('ai_summary', 'organization', 'grant_target', 'eligible_expenses', 'required_documents')
+                        AND pm.meta_value LIKE %s
+                    )
+                ", $search_term);
+                
+                // 既存の検索SQLに追加
+                $search_sql = str_replace('))) AND', '))) ' . $meta_search . ' AND', $search_sql);
                 return $search_sql;
-            }
-            
-            $search_term = '%' . $wpdb->esc_like($search) . '%';
-            
-            $meta_search = $wpdb->prepare("
-                OR EXISTS (
-                    SELECT 1 FROM {$wpdb->postmeta} pm 
-                    WHERE pm.post_id = {$wpdb->posts}.ID 
-                    AND pm.meta_key IN ('ai_summary', 'organization', 'grant_target', 'eligible_expenses', 'required_documents')
-                    AND pm.meta_value LIKE %s
-                )
-            ", $search_term);
-            
-            // 既存の検索SQLに追加
-            $search_sql = str_replace('))) AND', '))) ' . $meta_search . ' AND', $search_sql);
-            return $search_sql;
-        }, 10, 2);
+            }, 10, 2);
+        }
     }
 
     // ===== タクソノミークエリ =====

@@ -40,7 +40,8 @@ $url_params = array(
 );
 
 // 各種データ取得
-$current_category = get_queried_object();
+$queried_object = get_queried_object();
+$current_category = $queried_object; // 互換性のため別名も保持
 $is_category_archive = is_tax('grant_category');
 $is_prefecture_archive = is_tax('grant_prefecture');
 $is_municipality_archive = is_tax('grant_municipality');
