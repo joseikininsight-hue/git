@@ -562,7 +562,16 @@ if ($grant['ai_summary']) {
 }
 ?>
 
-<!-- 構造化データ (SEO最適化版: Article型 + 監修者情報) -->
+<?php
+/**
+ * 構造化データ出力 (SEO最適化版: Article型 + 監修者情報)
+ * 
+ * ⚠️ SEOプラグイン（Rank Math等）が有効な場合は出力をスキップ
+ * プラグインが独自にスキーマを生成するため、重複を防止
+ */
+if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
+?>
+<!-- 構造化データ (Theme Generated - No SEO Plugin) -->
 <script type="application/ld+json">
 {
     "@context": "https://schema.org",
@@ -628,6 +637,7 @@ if ($grant['ai_summary']) {
     ]
 }
 </script>
+<?php endif; // End SEO plugin check ?>
 
 <!-- 採択率AI推定に関するスタイル -->
 <style>

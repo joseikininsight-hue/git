@@ -221,7 +221,14 @@ if ($is_prefecture_archive) {
 $keywords_string = implode(',', $keywords);
 ?>
 
-<!-- 構造化データ: CollectionPage -->
+<?php
+/**
+ * 構造化データ出力
+ * ⚠️ SEOプラグイン（Rank Math等）が有効な場合は出力をスキップ
+ */
+if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
+?>
+<!-- 構造化データ: CollectionPage (Theme Generated - No SEO Plugin) -->
 <script type="application/ld+json">
 <?php echo wp_json_encode($schema_collection, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT); ?>
 </script>
@@ -230,6 +237,7 @@ $keywords_string = implode(',', $keywords);
 <script type="application/ld+json">
 <?php echo wp_json_encode($breadcrumb_schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT); ?>
 </script>
+<?php endif; // End SEO plugin check ?>
 
 <main class="grant-archive-yahoo-style" 
       id="grant-archive" 

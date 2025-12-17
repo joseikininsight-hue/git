@@ -182,10 +182,15 @@ if (!function_exists('ji_generate_seo_meta')) {
             $seo['og_description'] = $seo['description'];
         }
         
-        // Paged archives - noindex to prevent duplicate content
-        if (is_paged()) {
-            $seo['robots'] = 'noindex, follow';
-        }
+        // ⚠️ REMOVED: Paged archives noindex
+        // 以前は is_paged() で noindex を設定していましたが、
+        // これは大規模データベースサイトでは悪影響があります。
+        // 2ページ目以降もインデックスさせ、canonical で正規化するのがベストプラクティス。
+        // Googleは「ページネーションの2ページ目以降もインデックスさせるべき」と推奨。
+        // 
+        // if (is_paged()) {
+        //     $seo['robots'] = 'noindex, follow';
+        // }
         
         // Set og_description from description if not set
         if (empty($seo['og_description'])) {
@@ -237,16 +242,22 @@ $grants_url = get_post_type_archive_link('grant');
     
     <?php
     /**
-     * SEO Meta Tags - Dynamic Generation
+     * SEO Meta Tags - Dynamic Generation (Conditional)
      * Phase 1 SEO Fix: Complete meta tags for all page types
-     * @since 11.0.3
+     * 
+     * ⚠️ CRITICAL FIX: SEOプラグイン（Rank Math等）が有効な場合は
+     * テーマ独自のメタタグ出力をスキップし、重複を防止
+     * 
+     * @since 11.0.3 - SEOプラグイン検出機能追加
      */
     
-    // Get current page information for SEO
-    $ji_seo = ji_generate_seo_meta();
+    // SEOプラグインがアクティブでない場合のみテーマ独自のSEOタグを出力
+    if (function_exists('gi_should_output_theme_seo') && gi_should_output_theme_seo()):
+        // Get current page information for SEO
+        $ji_seo = ji_generate_seo_meta();
     ?>
     
-    <!-- SEO Meta Tags -->
+    <!-- SEO Meta Tags (Theme Generated - No SEO Plugin Detected) -->
     <meta name="description" content="<?php echo esc_attr($ji_seo['description']); ?>">
     <link rel="canonical" href="<?php echo esc_url($ji_seo['canonical']); ?>">
     
@@ -277,6 +288,10 @@ $grants_url = get_post_type_archive_link('grant');
     <?php endif; ?>
     <?php if (!empty($ji_seo['keywords'])): ?>
     <meta name="keywords" content="<?php echo esc_attr($ji_seo['keywords']); ?>">
+    <?php endif; ?>
+    
+    <?php else: ?>
+    <!-- SEO Meta Tags: Handled by SEO Plugin (Rank Math, Yoast, etc.) -->
     <?php endif; ?>
     
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>

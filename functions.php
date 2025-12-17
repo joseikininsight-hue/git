@@ -95,6 +95,54 @@ function gi_fix_block_editor_errors() {
     ', 'before');
 }
 
+/**
+ * ============================================================================
+ * SEO PLUGIN DETECTION - Prevent duplicate meta tags
+ * ============================================================================
+ * 
+ * Rank Math、Yoast SEO、All in One SEO などの主要SEOプラグインを検出し、
+ * テーマ独自のSEOメタタグ出力を制御する
+ * 
+ * @since 11.0.3
+ * @return bool SEOプラグインがアクティブな場合はtrue
+ */
+function gi_is_seo_plugin_active() {
+    // 初回のみプラグインファイルを読み込み
+    if (!function_exists('is_plugin_active')) {
+        include_once(ABSPATH . 'wp-admin/includes/plugin.php');
+    }
+    
+    // 主要SEOプラグインのリスト
+    $seo_plugins = array(
+        'seo-by-rank-math/rank-math.php',           // Rank Math
+        'wordpress-seo/wp-seo.php',                  // Yoast SEO
+        'all-in-one-seo-pack/all_in_one_seo_pack.php', // All in One SEO
+        'wp-seopress/seopress.php',                  // SEOPress
+        'the-seo-framework/autodescription.php',     // The SEO Framework
+        'jekins-seo/jekins-seo.php',                 // Jekins SEO
+        'squirrly-seo/squirrly.php',                 // Squirrly SEO
+    );
+    
+    foreach ($seo_plugins as $plugin) {
+        if (is_plugin_active($plugin)) {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+/**
+ * テーマ独自のSEOメタタグを出力すべきかどうかを判定
+ * SEOプラグインがアクティブな場合は出力しない
+ * 
+ * @since 11.0.3
+ * @return bool 出力すべき場合はtrue
+ */
+function gi_should_output_theme_seo() {
+    return !gi_is_seo_plugin_active();
+}
+
 // Disable Jetpack modules that cause conflicts
 add_filter('jetpack_get_available_modules', 'gi_disable_problematic_jetpack_modules', 999);
 function gi_disable_problematic_jetpack_modules($modules) {
@@ -911,9 +959,17 @@ function gi_add_alt_to_content_images($content) {
 /**
  * Organization Schema（サイト全体の構造化データ）
  * Google検索でのリッチリザルト表示を強化
+ * 
+ * ⚠️ SEOプラグインが有効な場合は出力をスキップして重複を防止
+ * Rank Math、Yoast等のプラグインは独自にスキーマを出力するため
  */
 add_action('wp_head', 'gi_add_organization_schema', 10);
 function gi_add_organization_schema() {
+    // SEOプラグインがアクティブな場合はスキップ
+    if (function_exists('gi_is_seo_plugin_active') && gi_is_seo_plugin_active()) {
+        return;
+    }
+    
     if (is_front_page()) {
         $schema = array(
             '@context' => 'https://schema.org',
@@ -942,9 +998,16 @@ function gi_add_organization_schema() {
 /**
  * WebSite Schema with SearchAction（サイト内検索機能の構造化データ）
  * Google検索結果にサイト内検索ボックスを表示
+ * 
+ * ⚠️ SEOプラグインが有効な場合は出力をスキップして重複を防止
  */
 add_action('wp_head', 'gi_add_website_schema', 10);
 function gi_add_website_schema() {
+    // SEOプラグインがアクティブな場合はスキップ
+    if (function_exists('gi_is_seo_plugin_active') && gi_is_seo_plugin_active()) {
+        return;
+    }
+    
     if (is_front_page()) {
         $schema = array(
             '@context' => 'https://schema.org',
