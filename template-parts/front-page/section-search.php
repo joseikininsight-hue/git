@@ -208,40 +208,7 @@ function search_get_svg_icon($name) {
     role="search" 
     aria-labelledby="search-heading">
     
-    <!-- ========================================
-         統計バー - 官公庁風デザイン
-         ======================================== -->
-    <div class="search__stats-bar">
-        <div class="search__container">
-            <div class="search__stats-inner">
-                <div class="search__stat-item">
-                    <span class="search__stat-icon">
-                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <rect x="2" y="3" width="14" height="12" rx="1"/>
-                            <path d="M5 7h8M5 10h5"/>
-                        </svg>
-                    </span>
-                    <span class="search__stat-label">DATABASE</span>
-                    <span class="search__stat-value"><?php echo number_format($total_grants); ?></span>
-                    <span class="search__stat-unit">件掲載</span>
-                </div>
-                <div class="search__stat-divider" aria-hidden="true"></div>
-                <div class="search__stat-item">
-                    <span class="search__stat-icon">
-                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <circle cx="9" cy="9" r="7"/>
-                            <path d="M9 5v4l3 2"/>
-                        </svg>
-                    </span>
-                    <span class="search__stat-label">UPDATE</span>
-                    <time class="search__stat-date" datetime="<?php echo date('Y-m-d'); ?>">
-                        <?php echo date('Y.m.d'); ?>
-                    </time>
-                    <span class="search__stat-unit">更新</span>
-                </div>
-            </div>
-        </div>
-    </div>
+
     
     <!-- ========================================
          メイン検索フォーム
