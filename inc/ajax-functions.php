@@ -3911,82 +3911,20 @@ function gi_ajax_load_grants() {
         'post_status' => 'publish'
     ];
 
-    // ===== 検索クエリ（拡張版：スペース区切りAND検索 + ACFフィールド検索対応） =====
+    // ===== 検索クエリ（シンプル版：確実に動作する実装） =====
     if (!empty($search)) {
-        // スペース（全角・半角）で分割してAND検索用のキーワード配列を作成
+        // スペース（全角・半角）で分割してキーワード配列を作成
         $search_keywords = preg_split('/[\s　]+/u', trim($search), -1, PREG_SPLIT_NO_EMPTY);
         
         if (count($search_keywords) > 1) {
-            // 複数キーワード: カスタムAND検索を実装
-            // WordPressのデフォルト検索を使わず、独自のWHERE句を追加
-            add_filter('posts_where', function($where, $wp_query) use ($search_keywords) {
-                global $wpdb;
-                
-                if (!$wp_query->is_main_query()) {
-                    return $where;
-                }
-                
-                $and_conditions = [];
-                $meta_fields = ['ai_summary', 'organization', 'grant_target', 'eligible_expenses', 'required_documents'];
-                
-                foreach ($search_keywords as $keyword) {
-                    $like = '%' . $wpdb->esc_like($keyword) . '%';
-                    
-                    // タイトル、本文、抜粋、メタフィールドのいずれかにキーワードが含まれる条件
-                    $keyword_conditions = [];
-                    $keyword_conditions[] = $wpdb->prepare("{$wpdb->posts}.post_title LIKE %s", $like);
-                    $keyword_conditions[] = $wpdb->prepare("{$wpdb->posts}.post_content LIKE %s", $like);
-                    $keyword_conditions[] = $wpdb->prepare("{$wpdb->posts}.post_excerpt LIKE %s", $like);
-                    
-                    // メタフィールド検索（各キーワードがいずれかのフィールドに存在すればOK）
-                    $meta_placeholders = array_fill(0, count($meta_fields), '%s');
-                    $keyword_conditions[] = $wpdb->prepare(
-                        "EXISTS (
-                            SELECT 1 FROM {$wpdb->postmeta} pm 
-                            WHERE pm.post_id = {$wpdb->posts}.ID 
-                            AND pm.meta_key IN (" . implode(',', $meta_placeholders) . ")
-                            AND pm.meta_value LIKE %s
-                        )",
-                        array_merge($meta_fields, [$like])
-                    );
-                    
-                    // 各キーワードは OR でマッチ（タイトル OR 本文 OR メタ）
-                    $and_conditions[] = '(' . implode(' OR ', $keyword_conditions) . ')';
-                }
-                
-                // すべてのキーワード条件を AND で結合
-                $where .= ' AND (' . implode(' AND ', $and_conditions) . ')';
-                
-                return $where;
-            }, 10, 2);
+            // 複数キーワード: 最初のキーワードで基本検索、後でフィルタリング
+            $args['s'] = $search_keywords[0];
             
+            // 追加のキーワードでフィルタリングするフラグを設定
+            $GLOBALS['gi_additional_keywords'] = array_slice($search_keywords, 1);
         } else {
-            // 単一キーワード: 従来の検索（幅広く拾う）
+            // 単一キーワード: 通常の検索
             $args['s'] = $search;
-            
-            // メタフィールドも検索対象に追加
-            add_filter('posts_search', function($search_sql, $wp_query) use ($search) {
-                global $wpdb;
-                
-                if (!$wp_query->is_main_query() || empty($search)) {
-                    return $search_sql;
-                }
-                
-                $search_term = '%' . $wpdb->esc_like($search) . '%';
-                
-                $meta_search = $wpdb->prepare("
-                    OR EXISTS (
-                        SELECT 1 FROM {$wpdb->postmeta} pm 
-                        WHERE pm.post_id = {$wpdb->posts}.ID 
-                        AND pm.meta_key IN ('ai_summary', 'organization', 'grant_target', 'eligible_expenses', 'required_documents')
-                        AND pm.meta_value LIKE %s
-                    )
-                ", $search_term);
-                
-                // 既存の検索SQLに追加
-                $search_sql = str_replace('))) AND', '))) ' . $meta_search . ' AND', $search_sql);
-                return $search_sql;
-            }, 10, 2);
         }
     }
 
@@ -4353,11 +4291,45 @@ function gi_ajax_load_grants() {
     global $user_favorites, $current_view;
     $user_favorites = gi_get_user_favorites();
     $current_view = $view;
+    
+    // 追加キーワードフィルタリング用
+    $additional_keywords = isset($GLOBALS['gi_additional_keywords']) ? $GLOBALS['gi_additional_keywords'] : [];
+    unset($GLOBALS['gi_additional_keywords']);
 
     if ($query->have_posts()) {
         while ($query->have_posts()) {
             $query->the_post();
             $post_id = get_the_ID();
+            
+            // 複数キーワード検索の場合、追加キーワードでフィルタリング
+            if (!empty($additional_keywords)) {
+                $title = get_the_title($post_id);
+                $content = get_the_content();
+                $excerpt = get_the_excerpt();
+                $combined_text = $title . ' ' . $content . ' ' . $excerpt;
+                
+                // メタフィールドも含める
+                $meta_fields = ['ai_summary', 'organization', 'grant_target', 'eligible_expenses', 'required_documents'];
+                foreach ($meta_fields as $meta_key) {
+                    $meta_value = get_post_meta($post_id, $meta_key, true);
+                    if ($meta_value) {
+                        $combined_text .= ' ' . $meta_value;
+                    }
+                }
+                
+                // すべての追加キーワードが含まれているかチェック
+                $all_keywords_found = true;
+                foreach ($additional_keywords as $keyword) {
+                    if (mb_stripos($combined_text, $keyword) === false) {
+                        $all_keywords_found = false;
+                        break;
+                    }
+                }
+                
+                if (!$all_keywords_found) {
+                    continue; // このポストをスキップ
+                }
+            }
             
             // 統一カードレンダリングを使用
             $html = gi_render_card_unified($post_id, $view);
@@ -4373,13 +4345,18 @@ function gi_ajax_load_grants() {
     }
 
     // ===== 統計情報 =====
+    // フィルタリング後の実際の件数を使用
+    $actual_count = count($grants);
+    $total_found = !empty($additional_keywords) ? $actual_count : $query->found_posts;
+    $total_pages = !empty($additional_keywords) ? 1 : $query->max_num_pages;
+    
     $stats = [
-        'total_found' => $query->found_posts,
+        'total_found' => $total_found,
         'current_page' => $page,
-        'total_pages' => $query->max_num_pages,
+        'total_pages' => $total_pages,
         'posts_per_page' => $posts_per_page,
-        'showing_from' => (($page - 1) * $posts_per_page) + 1,
-        'showing_to' => min($page * $posts_per_page, $query->found_posts),
+        'showing_from' => $actual_count > 0 ? 1 : 0,
+        'showing_to' => $actual_count,
     ];
 
     // ===== レスポンス送信 =====
@@ -4387,8 +4364,8 @@ function gi_ajax_load_grants() {
         'grants' => $grants,
         'pagination' => [
             'current_page' => $page,
-            'total_pages' => $query->max_num_pages,
-            'total_posts' => $query->found_posts,
+            'total_pages' => $total_pages,
+            'total_posts' => $total_found,
             'posts_per_page' => $posts_per_page,
         ],
         'stats' => $stats,
