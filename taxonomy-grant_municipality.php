@@ -514,16 +514,12 @@ $keywords_string = implode(',', $keywords);
                 </div>
             </section>
 
-            <!-- モバイル用フローティングフィルターボタン -->
-            <button class="mobile-filter-toggle" 
-                    id="mobile-filter-toggle"
-                    aria-label="フィルターを開く"
-                    aria-expanded="false"
-                    type="button">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <!-- モバイル用フィルター開閉ボタン (archive-grant.php と統一) -->
+            <button class="mobile-filter-toggle" id="mobile-filter-toggle" type="button" aria-label="フィルターを開く">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
                 </svg>
-                <span class="filter-count-badge" id="mobile-filter-count" style="display: none;">0</span>
+                <span>絞り込み</span>
             </button>
 
             <!-- フィルターパネル背景オーバーレイ -->
