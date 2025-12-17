@@ -1172,12 +1172,32 @@
     flex-direction: column;
     gap: 16px;
     padding: 24px;
+    min-height: 400px;
 }
 
 .skeleton-container[data-view="grid"] {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
+}
+
+.skeleton-container[data-view="compact"] {
+    gap: 0;
+}
+
+.skeleton-container[data-view="compact"] .skeleton-card {
+    border-radius: 0;
+    border-bottom: 1px solid var(--gov-gray-200);
+    padding: 12px 16px;
+}
+
+.skeleton-container[data-view="compact"] .skeleton-card:first-child {
+    border-radius: var(--gov-radius-lg) var(--gov-radius-lg) 0 0;
+}
+
+.skeleton-container[data-view="compact"] .skeleton-card:last-child {
+    border-radius: 0 0 var(--gov-radius-lg) var(--gov-radius-lg);
+    border-bottom: none;
 }
 
 /* ==========================================================================

@@ -1675,15 +1675,23 @@
 
         /**
          * ローディング表示（スケルトンスクリーン対応）
+         * 全画面オーバーレイは廃止し、コンテナ内にスケルトンを表示
          */
         showLoading: function(show) {
             const el = this.elements;
             const self = this;
             
+            // 全画面オーバーレイは常に非表示
+            if (el.loadingOverlay) el.loadingOverlay.style.display = 'none';
+            
             if (show) {
+                // noResults を非表示
+                if (el.noResults) el.noResults.style.display = 'none';
+                
                 // スケルトンスクリーンを表示
                 if (el.grantsContainer) {
                     const skeletonCount = 6;
+                    // view: 'single' (リスト) / 'grid' (グリッド) / 'compact' (コンパクト)
                     const view = this.state.view || 'single';
                     let skeletonHtml = '<div class="skeleton-container" data-view="' + view + '">';
                     
@@ -1692,20 +1700,12 @@
                     }
                     skeletonHtml += '</div>';
                     
-                    // 既存コンテンツを保存し、スケルトンを表示
-                    el.grantsContainer._originalContent = el.grantsContainer.innerHTML;
+                    // コンテナをスケルトンで置き換え
                     el.grantsContainer.innerHTML = skeletonHtml;
-                }
-            } else {
-                // スケルトンを削除（コンテンツは loadGrants で上書きされる）
-                const skeleton = el.grantsContainer ? el.grantsContainer.querySelector('.skeleton-container') : null;
-                if (skeleton) {
-                    skeleton.remove();
+                    el.grantsContainer.style.display = view === 'single' ? 'flex' : 'grid';
                 }
             }
-            
-            // 従来のオーバーレイも念のため制御
-            if (el.loadingOverlay) el.loadingOverlay.style.display = 'none';
+            // show=false の場合は displayGrants() がコンテナを上書きするため処理不要
         },
         
         /**
