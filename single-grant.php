@@ -786,7 +786,17 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
     margin-bottom: 16px;
 }
 
+.gi-ad-upper {
+    border-radius: var(--gi-radius-lg, 12px);
+    margin: 16px 0;
+}
+
 .gi-ad-middle {
+    border-radius: var(--gi-radius-lg, 12px);
+    margin: 16px 0;
+}
+
+.gi-ad-lower {
     border-radius: var(--gi-radius-lg, 12px);
     margin: 16px 0;
 }
@@ -830,6 +840,173 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
     height: auto;
 }
 
+/* ==========================================================================
+   記事型広告スタイル - Article Ad Style
+   ========================================================================== */
+.ji-article-ad {
+    position: relative;
+    background: #fff;
+    border: 1px solid var(--gi-gray-200, #e5e7eb);
+    border-radius: var(--gi-radius-lg, 12px);
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.ji-article-ad:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.ji-article-ad-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+    z-index: 2;
+}
+
+.ji-article-ad-image-link {
+    display: block;
+    overflow: hidden;
+}
+
+.ji-article-ad-image {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.ji-article-ad:hover .ji-article-ad-image {
+    transform: scale(1.03);
+}
+
+.ji-article-ad-content {
+    padding: 16px 20px 20px;
+}
+
+.ji-article-ad-title {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin: 0 0 10px;
+    color: var(--gi-gray-900, #111827);
+}
+
+.ji-article-ad-title a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.ji-article-ad-title a:hover {
+    color: var(--gi-primary, #2563eb);
+}
+
+.ji-article-ad-desc {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--gi-gray-600, #6b7280);
+    margin: 0 0 12px;
+}
+
+.ji-article-ad-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 12px;
+}
+
+.ji-article-ad-features li {
+    font-size: 12px;
+    color: var(--gi-gray-700, #374151);
+    padding: 4px 0 4px 20px;
+    position: relative;
+}
+
+.ji-article-ad-features li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--gi-success, #10b981);
+    font-weight: 700;
+}
+
+.ji-article-ad-price {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gi-error, #ef4444);
+    margin-bottom: 12px;
+}
+
+.ji-article-ad-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, var(--gi-primary, #2563eb) 0%, #1d4ed8 100%);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.ji-article-ad-cta:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    transform: translateY(-1px);
+    color: #fff;
+}
+
+.ji-article-ad-cta svg {
+    transition: transform 0.2s ease;
+}
+
+.ji-article-ad-cta:hover svg {
+    transform: translateX(3px);
+}
+
+/* コンテンツ内記事型広告 */
+.gi-article-ad-section {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1px solid var(--gi-gray-200, #e5e7eb);
+    border-radius: var(--gi-radius-lg, 12px);
+    padding: 20px;
+    margin: 24px 0;
+}
+
+.gi-article-ad-section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed var(--gi-gray-300, #d1d5db);
+}
+
+.gi-article-ad-section-badge {
+    background: var(--gi-primary, #2563eb);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+}
+
+.gi-article-ad-section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gi-gray-600, #6b7280);
+    margin: 0;
+}
+
 /* モバイル対応 */
 @media (max-width: 768px) {
     .gi-ad-section {
@@ -843,6 +1020,25 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
     
     .gi-ad-sticky {
         position: static;
+    }
+    
+    /* 記事型広告モバイル */
+    .ji-article-ad-content {
+        padding: 12px 16px 16px;
+    }
+    
+    .ji-article-ad-title {
+        font-size: 15px;
+    }
+    
+    .ji-article-ad-cta {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .gi-article-ad-section {
+        padding: 16px;
+        margin: 16px 0;
     }
 }
 </style>
@@ -1171,6 +1367,20 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                     </div>
                 </section>
 
+                <!-- アフィリエイト記事欄（補助金詳細後） -->
+                <?php 
+                $ad_after_details = ji_display_ad('single_grant_article_after_details');
+                if (!empty($ad_after_details)): 
+                ?>
+                <aside class="gi-article-ad-section" aria-label="関連サービス紹介">
+                    <header class="gi-article-ad-section-header">
+                        <span class="gi-article-ad-section-badge">PR</span>
+                        <span class="gi-article-ad-section-title">申請に役立つサービス</span>
+                    </header>
+                    <?php echo $ad_after_details; ?>
+                </aside>
+                <?php endif; ?>
+
                 <!-- 本文（補助金概要） -->
                 <section class="gi-section" id="content" aria-labelledby="content-title">
                     <header class="gi-section-header">
@@ -1180,6 +1390,20 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                     </header>
                     <div class="gi-content"><?php echo apply_filters('the_content', $content); ?></div>
                 </section>
+
+                <!-- アフィリエイト記事欄（チェックリスト前） -->
+                <?php 
+                $ad_before_checklist = ji_display_ad('single_grant_article_before_checklist');
+                if (!empty($ad_before_checklist)): 
+                ?>
+                <aside class="gi-article-ad-section" aria-label="おすすめサービス">
+                    <header class="gi-article-ad-section-header">
+                        <span class="gi-article-ad-section-badge">PR</span>
+                        <span class="gi-article-ad-section-title">補助金申請をサポート</span>
+                    </header>
+                    <?php echo $ad_before_checklist; ?>
+                </aside>
+                <?php endif; ?>
 
                 <!-- チェックリスト（補助金概要の後に配置） -->
                 <section class="gi-section" id="checklist" aria-labelledby="checklist-title">
@@ -1634,6 +1858,16 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                     </div>
                 </section>
 
+                <!-- 広告枠（上部2） -->
+                <?php if (function_exists('ji_display_ad')): ?>
+                <section class="gi-sidebar-section gi-ad-section gi-ad-upper" aria-label="広告">
+                    <header class="gi-sidebar-header"><span class="gi-sidebar-title gi-pr-label">PR</span></header>
+                    <div class="gi-sidebar-body">
+                        <div class="gi-ad-slot" id="adSlotUpper"><?php ji_display_ad('single_grant_sidebar_upper'); ?></div>
+                    </div>
+                </section>
+                <?php endif; ?>
+
                 <!-- CTAボタン -->
                 <section class="gi-sidebar-section">
                     <div class="gi-sidebar-body gi-cta-buttons">
@@ -1727,12 +1961,22 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                 </section>
                 <?php endif; ?>
 
-                <!-- 広告枠（中部2）- スティッキー対応 -->
+                <!-- 広告枠（下部2） -->
+                <?php if (function_exists('ji_display_ad')): ?>
+                <section class="gi-sidebar-section gi-ad-section gi-ad-lower" aria-label="広告">
+                    <header class="gi-sidebar-header"><span class="gi-sidebar-title gi-pr-label">PR</span></header>
+                    <div class="gi-sidebar-body">
+                        <div class="gi-ad-slot" id="adSlotLower"><?php ji_display_ad('single_grant_sidebar_lower'); ?></div>
+                    </div>
+                </section>
+                <?php endif; ?>
+
+                <!-- 広告枠（スティッキー対応） -->
                 <?php if (function_exists('ji_display_ad')): ?>
                 <section class="gi-sidebar-section gi-ad-section gi-ad-sticky" aria-label="広告">
                     <header class="gi-sidebar-header"><span class="gi-sidebar-title gi-pr-label">PR</span></header>
                     <div class="gi-sidebar-body">
-                        <div class="gi-ad-slot" id="adSlotMiddle2"><?php ji_display_ad('single_grant_content_middle'); ?></div>
+                        <div class="gi-ad-slot" id="adSlotSticky"><?php ji_display_ad('single_grant_sidebar_sticky'); ?></div>
                     </div>
                 </section>
                 <?php endif; ?>

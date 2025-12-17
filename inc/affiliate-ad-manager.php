@@ -475,10 +475,67 @@ class JI_Affiliate_Ad_Manager {
         ?>
         <script>
         jQuery(document).ready(function($) {
+            // 広告タイプ説明
+            var adTypeHelp = {
+                'html': 'HTMLコードをそのまま入力',
+                'image': '画像URLを入力（リンクURLも設定可）',
+                'script': 'アフィリエイトタグなどのスクリプトコードを入力',
+                'article': '商品画像・説明文・CTAボタン付きの記事型広告'
+            };
+            
+            // 広告タイプ切り替え
+            function toggleAdTypeFields() {
+                var adType = $('#ad_type').val();
+                $('#ad_type_help').text(adTypeHelp[adType] || '');
+                
+                if (adType === 'article') {
+                    $('.ad-field-standard').hide();
+                    $('.ad-field-article').show();
+                    $('#content').removeAttr('required');
+                    $('#image_url').attr('required', 'required');
+                    $('#description').attr('required', 'required');
+                } else {
+                    $('.ad-field-standard').show();
+                    $('.ad-field-article').hide();
+                    $('#content').attr('required', 'required');
+                    $('#image_url').removeAttr('required');
+                    $('#description').removeAttr('required');
+                }
+            }
+            
+            $('#ad_type').on('change', toggleAdTypeFields);
+            toggleAdTypeFields(); // 初期表示
+            
+            // 画像プレビュー
+            $('#image_url').on('input', function() {
+                var url = $(this).val();
+                if (url && url.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+                    $('#image_preview').html('<img src="' + url + '" style="max-width: 200px; max-height: 150px; border: 1px solid #ddd; border-radius: 4px;">');
+                } else {
+                    $('#image_preview').empty();
+                }
+            });
+            
+            // メディアアップローダー
+            $('#upload_image_btn').on('click', function(e) {
+                e.preventDefault();
+                var mediaUploader = wp.media({
+                    title: '広告画像を選択',
+                    button: { text: '選択' },
+                    multiple: false
+                });
+                mediaUploader.on('select', function() {
+                    var attachment = mediaUploader.state().get('selection').first().toJSON();
+                    $('#image_url').val(attachment.url).trigger('input');
+                });
+                mediaUploader.open();
+            });
+            
             // モーダル開閉
             function openModal() {
                 $('#ji-ad-modal').show();
                 $('body').addClass('modal-open');
+                toggleAdTypeFields();
             }
             
             function closeModal() {
@@ -487,6 +544,8 @@ class JI_Affiliate_Ad_Manager {
                 $('#ji-ad-form')[0].reset();
                 $('#ad_id').val('');
                 $('#ji-modal-title').text('広告を追加');
+                $('#image_preview').empty();
+                toggleAdTypeFields();
             }
             
             // 新規追加ボタン
@@ -528,6 +587,14 @@ class JI_Affiliate_Ad_Manager {
                             $('#status').val(ad.status);
                             $('#priority').val(ad.priority);
                             
+                            // 記事型広告フィールド
+                            if (ad.image_url) $('#image_url').val(ad.image_url).trigger('input');
+                            if (ad.article_title) $('#article_title').val(ad.article_title);
+                            if (ad.description) $('#description').val(ad.description);
+                            if (ad.features) $('#features').val(ad.features);
+                            if (ad.price_info) $('#price_info').val(ad.price_info);
+                            if (ad.button_text) $('#button_text').val(ad.button_text);
+                            
                             // 複数選択の配置位置
                             if (ad.positions_array && ad.positions_array.length > 0) {
                                 $('#positions').val(ad.positions_array);
@@ -552,6 +619,7 @@ class JI_Affiliate_Ad_Manager {
                             }
                             
                             $('#ji-modal-title').text('広告を編集');
+                            toggleAdTypeFields();
                             openModal();
                         } else {
                             alert('広告データの取得に失敗しました');
@@ -1466,11 +1534,32 @@ class JI_Affiliate_Ad_Manager {
             : array();
         $target_categories_string = implode(',', array_map('sanitize_text_field', $target_categories));
         
+        // 記事型広告の場合、contentにJSON形式でデータを保存
+        $ad_type = sanitize_text_field($_POST['ad_type']);
+        $content = '';
+        
+        if ($ad_type === 'article') {
+            $article_data = array(
+                'image_url' => esc_url_raw($_POST['image_url'] ?? ''),
+                'article_title' => sanitize_text_field($_POST['article_title'] ?? ''),
+                'description' => sanitize_textarea_field($_POST['description'] ?? ''),
+                'features' => sanitize_textarea_field($_POST['features'] ?? ''),
+                'price_info' => sanitize_text_field($_POST['price_info'] ?? ''),
+                'button_text' => sanitize_text_field($_POST['button_text'] ?? '詳しく見る'),
+            );
+            $content = wp_json_encode($article_data, JSON_UNESCAPED_UNICODE);
+        } else {
+            $content = wp_kses_post($_POST['content']);
+        }
+        
         $data = array(
             'title' => sanitize_text_field($_POST['title']),
-            'ad_type' => sanitize_text_field($_POST['ad_type']),
-            'content' => wp_kses_post($_POST['content']),
+            'ad_type' => $ad_type,
+            'content' => $content,
             'link_url' => esc_url_raw($_POST['link_url']),
+            'image_url' => esc_url_raw($_POST['image_url'] ?? ''),
+            'description' => sanitize_textarea_field($_POST['description'] ?? ''),
+            'button_text' => sanitize_text_field($_POST['button_text'] ?? '詳しく見る'),
             'positions' => $positions_string,
             'target_pages' => $target_pages_string,
             'target_categories' => $target_categories_string,
@@ -1521,6 +1610,19 @@ class JI_Affiliate_Ad_Manager {
         $ad->positions_array = explode(',', $ad->positions);
         $ad->target_pages_array = !empty($ad->target_pages) ? explode(',', $ad->target_pages) : array();
         $ad->target_categories_array = !empty($ad->target_categories) ? explode(',', $ad->target_categories) : array();
+        
+        // 記事型広告の場合、JSONをパースしてフィールドに展開
+        if ($ad->ad_type === 'article' && !empty($ad->content)) {
+            $article_data = json_decode($ad->content, true);
+            if (is_array($article_data)) {
+                $ad->image_url = $article_data['image_url'] ?? $ad->image_url ?? '';
+                $ad->article_title = $article_data['article_title'] ?? '';
+                $ad->description = $article_data['description'] ?? $ad->description ?? '';
+                $ad->features = $article_data['features'] ?? '';
+                $ad->price_info = $article_data['price_info'] ?? '';
+                $ad->button_text = $article_data['button_text'] ?? $ad->button_text ?? '詳しく見る';
+            }
+        }
         
         wp_send_json_success($ad);
     }
@@ -1787,6 +1889,50 @@ class JI_Affiliate_Ad_Manager {
                 </a>
             <?php elseif ($ad->ad_type === 'script'): ?>
                 <?php echo $ad->content; ?>
+            <?php elseif ($ad->ad_type === 'article'): ?>
+                <?php 
+                $article_data = json_decode($ad->content, true);
+                if (!is_array($article_data)) $article_data = array();
+                $image_url = $article_data['image_url'] ?? $ad->image_url ?? '';
+                $article_title = $article_data['article_title'] ?? $ad->title;
+                $description = $article_data['description'] ?? $ad->description ?? '';
+                $features = $article_data['features'] ?? '';
+                $price_info = $article_data['price_info'] ?? '';
+                $button_text = $article_data['button_text'] ?? $ad->button_text ?? '詳しく見る';
+                $features_array = array_filter(array_map('trim', explode("\n", $features)));
+                ?>
+                <article class="ji-article-ad">
+                    <div class="ji-article-ad-badge">PR</div>
+                    <?php if ($image_url): ?>
+                    <a href="<?php echo esc_url($ad->link_url); ?>" target="_blank" rel="noopener noreferrer sponsored" class="ji-article-ad-image-link" data-ad-id="<?php echo esc_attr($ad->id); ?>">
+                        <img src="<?php echo esc_url($image_url); ?>" alt="<?php echo esc_attr($article_title); ?>" class="ji-article-ad-image" loading="lazy">
+                    </a>
+                    <?php endif; ?>
+                    <div class="ji-article-ad-content">
+                        <h4 class="ji-article-ad-title">
+                            <a href="<?php echo esc_url($ad->link_url); ?>" target="_blank" rel="noopener noreferrer sponsored" data-ad-id="<?php echo esc_attr($ad->id); ?>">
+                                <?php echo esc_html($article_title); ?>
+                            </a>
+                        </h4>
+                        <?php if ($description): ?>
+                        <p class="ji-article-ad-desc"><?php echo nl2br(esc_html($description)); ?></p>
+                        <?php endif; ?>
+                        <?php if (!empty($features_array)): ?>
+                        <ul class="ji-article-ad-features">
+                            <?php foreach (array_slice($features_array, 0, 5) as $feature): ?>
+                            <li><?php echo esc_html($feature); ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                        <?php endif; ?>
+                        <?php if ($price_info): ?>
+                        <div class="ji-article-ad-price"><?php echo esc_html($price_info); ?></div>
+                        <?php endif; ?>
+                        <a href="<?php echo esc_url($ad->link_url); ?>" target="_blank" rel="noopener noreferrer sponsored" class="ji-article-ad-cta" data-ad-id="<?php echo esc_attr($ad->id); ?>">
+                            <?php echo esc_html($button_text); ?>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </a>
+                    </div>
+                </article>
             <?php endif; ?>
         </div>
         
