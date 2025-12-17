@@ -351,6 +351,23 @@
     background: transparent;
 }
 
+/* Hide browser default search cancel button to avoid double X */
+.search-input::-webkit-search-cancel-button,
+.search-input::-webkit-search-decoration,
+.search-input::-webkit-search-results-button,
+.search-input::-webkit-search-results-decoration {
+    -webkit-appearance: none;
+    appearance: none;
+    display: none;
+}
+
+.search-input[type="search"]::-ms-clear,
+.search-input[type="search"]::-ms-reveal {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
 .search-input::placeholder {
     color: var(--gov-gray-500);
 }
@@ -359,7 +376,7 @@
     background: none;
     border: none;
     color: var(--gov-gray-400);
-    padding: 8px;
+    padding: 8px 12px;
     cursor: pointer;
     font-size: 20px;
     line-height: 1;
@@ -393,6 +410,91 @@
 .search-execute-btn:focus-visible {
     outline: 3px solid var(--gov-gold);
     outline-offset: 2px;
+}
+
+/* ==========================================================================
+   Search Suggestions - 検索候補
+   ========================================================================== */
+.search-bar-wrapper {
+    position: relative;
+}
+
+.search-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--gov-white);
+    border: 1px solid var(--gov-gray-300);
+    border-radius: var(--gov-radius);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: 4px;
+}
+
+.suggestions-header {
+    padding: 10px 16px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gov-gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: var(--gov-gray-50);
+    border-bottom: 1px solid var(--gov-gray-200);
+}
+
+.suggestions-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.suggestion-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--gov-gray-700);
+    border-bottom: 1px solid var(--gov-gray-100);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background var(--gov-transition);
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-item:hover,
+.suggestion-item.active {
+    background: var(--gov-navy-50);
+    color: var(--gov-navy-800);
+}
+
+.suggestion-item svg {
+    flex-shrink: 0;
+    color: var(--gov-gray-400);
+}
+
+.suggestion-text {
+    flex: 1;
+}
+
+.suggestion-text mark {
+    background: var(--gov-gold-pale);
+    color: inherit;
+    padding: 0 2px;
+    border-radius: 2px;
+}
+
+.suggestion-count {
+    font-size: 12px;
+    color: var(--gov-gray-500);
+    background: var(--gov-gray-100);
+    padding: 2px 8px;
+    border-radius: 10px;
 }
 
 /* ==========================================================================
@@ -998,33 +1100,35 @@
 }
 
 /* ==========================================================================
-   Pagination - ページネーション
+   Pagination - ページネーション (Consolidated)
    ========================================================================== */
 .pagination-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 4px;
+    gap: 8px;
     padding: 24px;
     border-top: 1px solid var(--gov-gray-200);
     background: var(--gov-navy-50);
+    flex-wrap: wrap;
 }
 
 .pagination-wrapper .page-numbers {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 40px;
-    height: 40px;
-    padding: 0 14px;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 10px;
     border: 1px solid var(--gov-gray-300);
     background: var(--gov-white);
     border-radius: var(--gov-radius);
     color: var(--gov-gray-700);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     text-decoration: none;
     transition: all var(--gov-transition);
+    gap: 4px;
 }
 
 .pagination-wrapper .page-numbers:hover {
@@ -1044,6 +1148,8 @@
     background: transparent;
     color: var(--gov-gray-500);
     pointer-events: none;
+    min-width: 24px;
+    padding: 0 4px;
 }
 
 /* ==========================================================================
@@ -1995,42 +2101,7 @@
     box-shadow: 0 0 0 3px rgba(27, 38, 59, 0.1);
 }
 
-.search-icon {
-    position: absolute;
-    left: 16px;
-    color: var(--gov-gray-500);
-    pointer-events: none;
-}
-
-.search-input {
-    flex: 1;
-    padding: 14px 16px 14px 48px;
-    border: none;
-    outline: none;
-    font-family: var(--gov-font-sans);
-    font-size: 15px;
-    color: var(--gov-gray-900);
-    background: transparent;
-}
-
-.search-input::placeholder {
-    color: var(--gov-gray-500);
-}
-
-.search-clear-btn {
-    background: none;
-    border: none;
-    color: var(--gov-gray-400);
-    padding: 8px 12px;
-    cursor: pointer;
-    font-size: 20px;
-    text-decoration: none;
-    transition: color var(--gov-transition);
-}
-
-.search-clear-btn:hover {
-    color: var(--gov-gray-700);
-}
+/* NOTE: Duplicate search styles removed - using definitions from line 336+ */
 
 .search-execute-btn {
     padding: 14px 28px;
@@ -2671,54 +2742,7 @@
     margin: 0;
 }
 
-/* ==========================================================================
-   Pagination
-   ========================================================================== */
-.pagination-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 4px;
-    padding: 24px;
-    border-top: 1px solid var(--gov-gray-200);
-    background: var(--gov-navy-50);
-    flex-wrap: wrap;
-}
-
-.pagination-wrapper .page-numbers {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 40px;
-    height: 40px;
-    padding: 0 14px;
-    border: 1px solid var(--gov-gray-300);
-    background: var(--gov-white);
-    border-radius: var(--gov-radius);
-    color: var(--gov-gray-700);
-    font-size: 14px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: all var(--gov-transition);
-    gap: 4px;
-}
-
-.pagination-wrapper .page-numbers:hover {
-    border-color: var(--gov-navy-400);
-    color: var(--gov-navy-800);
-}
-
-.pagination-wrapper .page-numbers.current {
-    background: var(--gov-navy-800);
-    border-color: var(--gov-navy-800);
-    color: var(--gov-white);
-}
-
-.pagination-wrapper .page-numbers.dots {
-    border: none;
-    background: transparent;
-    color: var(--gov-gray-500);
-}
+/* NOTE: Duplicate pagination styles removed - using consolidated version from line 1000+ */
 
 /* ==========================================================================
    Sidebar

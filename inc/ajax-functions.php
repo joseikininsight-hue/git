@@ -59,6 +59,10 @@ add_action('wp_ajax_nopriv_gi_load_grants', 'gi_load_grants');
 add_action('wp_ajax_gi_ajax_load_grants', 'gi_ajax_load_grants');
 add_action('wp_ajax_nopriv_gi_ajax_load_grants', 'gi_ajax_load_grants');
 
+// 検索候補機能
+add_action('wp_ajax_gi_search_suggestions', 'gi_ajax_search_suggestions');
+add_action('wp_ajax_nopriv_gi_search_suggestions', 'gi_ajax_search_suggestions');
+
 // チャット履歴機能
 add_action('wp_ajax_gi_get_chat_history', 'gi_ajax_get_chat_history');
 add_action('wp_ajax_nopriv_gi_get_chat_history', 'gi_ajax_get_chat_history');
@@ -3515,6 +3519,136 @@ if (!function_exists('gi_render_card_unified')) {
         
         return $output;
     }
+}
+
+/**
+ * 検索候補を取得（オートコンプリート用）
+ */
+function gi_ajax_search_suggestions() {
+    // nonceチェック
+    if (!wp_verify_nonce($_POST['nonce'] ?? '', 'gi_ajax_nonce')) {
+        wp_send_json_error(['message' => 'Security check failed']);
+        return;
+    }
+    
+    $query = sanitize_text_field($_POST['query'] ?? '');
+    $post_type = sanitize_text_field($_POST['post_type'] ?? 'grant');
+    
+    if (strlen($query) < 2) {
+        wp_send_json_success(['suggestions' => []]);
+        return;
+    }
+    
+    global $wpdb;
+    
+    // スペースで分割してキーワード配列を作成
+    $keywords = preg_split('/[\s　]+/u', trim($query), -1, PREG_SPLIT_NO_EMPTY);
+    $first_keyword = $keywords[0];
+    
+    $suggestions = [];
+    
+    // 1. タイトルから候補を取得（部分一致）
+    $like = '%' . $wpdb->esc_like($first_keyword) . '%';
+    $title_results = $wpdb->get_results($wpdb->prepare("
+        SELECT post_title as title, COUNT(*) as count
+        FROM {$wpdb->posts}
+        WHERE post_type = %s
+        AND post_status = 'publish'
+        AND post_title LIKE %s
+        GROUP BY post_title
+        ORDER BY count DESC
+        LIMIT 5
+    ", $post_type, $like));
+    
+    foreach ($title_results as $row) {
+        $suggestions[] = [
+            'title' => $row->title,
+            'type' => 'title'
+        ];
+    }
+    
+    // 2. カテゴリから候補を取得
+    $taxonomy = ($post_type === 'column') ? 'column_category' : 'grant_category';
+    $cat_results = $wpdb->get_results($wpdb->prepare("
+        SELECT t.name as title, tt.count as count
+        FROM {$wpdb->terms} t
+        INNER JOIN {$wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
+        WHERE tt.taxonomy = %s
+        AND t.name LIKE %s
+        ORDER BY tt.count DESC
+        LIMIT 3
+    ", $taxonomy, $like));
+    
+    foreach ($cat_results as $row) {
+        $suggestions[] = [
+            'title' => $row->title,
+            'type' => 'category',
+            'count' => (int)$row->count
+        ];
+    }
+    
+    // 3. 都道府県から候補を取得（助成金の場合）
+    if ($post_type === 'grant') {
+        $pref_results = $wpdb->get_results($wpdb->prepare("
+            SELECT t.name as title, tt.count as count
+            FROM {$wpdb->terms} t
+            INNER JOIN {$wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
+            WHERE tt.taxonomy = 'grant_prefecture'
+            AND t.name LIKE %s
+            ORDER BY tt.count DESC
+            LIMIT 3
+        ", $like));
+        
+        foreach ($pref_results as $row) {
+            $suggestions[] = [
+                'title' => $row->title,
+                'type' => 'prefecture',
+                'count' => (int)$row->count
+            ];
+        }
+    }
+    
+    // 4. よく使われる検索キーワードの候補（静的リスト）
+    $common_keywords = [
+        '設備投資', '人材育成', '創業支援', '事業承継', 'IT導入', 'DX推進',
+        '省エネ', '再生可能エネルギー', '販路拡大', '海外展開', '研究開発',
+        '雇用促進', '働き方改革', '育児支援', '介護支援', '障害者雇用',
+        '中小企業', '小規模事業者', 'スタートアップ', 'ベンチャー', 'NPO',
+        '農業', '製造業', 'サービス業', '観光業', '飲食業'
+    ];
+    
+    foreach ($common_keywords as $keyword) {
+        if (mb_strpos($keyword, $first_keyword) !== false && count($suggestions) < 10) {
+            // 重複チェック
+            $exists = false;
+            foreach ($suggestions as $s) {
+                if ($s['title'] === $keyword) {
+                    $exists = true;
+                    break;
+                }
+            }
+            if (!$exists) {
+                $suggestions[] = [
+                    'title' => $keyword,
+                    'type' => 'keyword'
+                ];
+            }
+        }
+    }
+    
+    // 重複を削除して上位10件に制限
+    $unique_suggestions = [];
+    $seen_titles = [];
+    foreach ($suggestions as $s) {
+        $lower_title = mb_strtolower($s['title']);
+        if (!isset($seen_titles[$lower_title])) {
+            $seen_titles[$lower_title] = true;
+            $unique_suggestions[] = $s;
+        }
+        if (count($unique_suggestions) >= 10) break;
+    }
+    
+    wp_send_json_success(['suggestions' => $unique_suggestions]);
 }
 
 /**

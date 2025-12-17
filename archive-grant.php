@@ -380,10 +380,10 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                             <circle cx="11" cy="11" r="8"/>
                             <path d="m21 21-4.35-4.35"/>
                         </svg>
-                        <input type="search" 
+                        <input type="text" 
                                id="keyword-search" 
                                class="search-input" 
-                               placeholder="助成金名、実施機関、対象事業で検索..."
+                               placeholder="助成金名、実施機関、対象事業で検索（スペース区切りでAND検索）..."
                                aria-label="助成金を検索"
                                autocomplete="off">
                         <button class="search-clear-btn" 
@@ -395,6 +395,11 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                                 id="search-btn" 
                                 aria-label="検索を実行"
                                 type="button">検索</button>
+                    </div>
+                    <!-- 検索候補ドロップダウン -->
+                    <div class="search-suggestions" id="search-suggestions" style="display: none;">
+                        <div class="suggestions-header">検索候補</div>
+                        <ul class="suggestions-list" id="suggestions-list"></ul>
                     </div>
                 </div>
             </section>

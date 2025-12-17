@@ -112,6 +112,8 @@
             el.keywordSearch = document.getElementById('keyword-search');
             el.searchBtn = document.getElementById('search-btn');
             el.searchClearBtn = document.getElementById('search-clear-btn');
+            el.searchSuggestions = document.getElementById('search-suggestions');
+            el.suggestionsList = document.getElementById('suggestions-list');
             
             el.categorySelect = document.getElementById('category-select');
             el.categorySearch = document.getElementById('category-search');
@@ -851,10 +853,20 @@
                 el.keywordSearch.addEventListener('input', this.debounce(function() {
                     self.handleSearchInput();
                 }, 300));
-                el.keywordSearch.addEventListener('keypress', function(e) {
+                el.keywordSearch.addEventListener('keydown', function(e) {
                     if (e.key === 'Enter') {
                         e.preventDefault();
                         self.handleSearch();
+                    } else if (e.key === 'Escape') {
+                        self.hideSearchSuggestions();
+                    } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        self.navigateSuggestions(e.key === 'ArrowDown' ? 1 : -1);
+                    }
+                });
+                el.keywordSearch.addEventListener('focus', function() {
+                    if (this.value.trim().length >= 2) {
+                        self.fetchSearchSuggestions(this.value.trim());
                     }
                 });
             }
@@ -870,6 +882,14 @@
                     self.clearSearch();
                 });
             }
+            
+            // 検索候補の外側クリックで閉じる
+            document.addEventListener('click', function(e) {
+                if (el.searchSuggestions && !el.searchSuggestions.contains(e.target) && 
+                    el.keywordSearch && !el.keywordSearch.contains(e.target)) {
+                    self.hideSearchSuggestions();
+                }
+            });
             
             // 表示切替
             el.viewBtns.forEach(function(btn) {
@@ -977,14 +997,138 @@
         },
 
         /**
-         * 検索入力ハンドラ
+         * 検索入力ハンドラ（検索候補表示対応）
          */
         handleSearchInput: function() {
+            const self = this;
             const el = this.elements;
             const query = el.keywordSearch.value.trim();
+            
             if (el.searchClearBtn) {
                 el.searchClearBtn.style.display = query.length > 0 ? 'flex' : 'none';
             }
+            
+            // 2文字以上で検索候補を表示
+            if (query.length >= 2 && el.searchSuggestions) {
+                this.fetchSearchSuggestions(query);
+            } else {
+                this.hideSearchSuggestions();
+            }
+        },
+        
+        /**
+         * 検索候補を取得
+         */
+        fetchSearchSuggestions: function(query) {
+            const self = this;
+            const el = this.elements;
+            
+            const formData = new FormData();
+            formData.append('action', 'gi_search_suggestions');
+            formData.append('nonce', this.config.nonce);
+            formData.append('query', query);
+            formData.append('post_type', this.config.postType);
+            
+            fetch(this.config.ajaxUrl, {
+                method: 'POST',
+                body: formData
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success && data.data.suggestions && data.data.suggestions.length > 0) {
+                    self.showSearchSuggestions(data.data.suggestions, query);
+                } else {
+                    self.hideSearchSuggestions();
+                }
+            })
+            .catch(function() {
+                self.hideSearchSuggestions();
+            });
+        },
+        
+        /**
+         * 検索候補を表示
+         */
+        showSearchSuggestions: function(suggestions, query) {
+            const self = this;
+            const el = this.elements;
+            if (!el.suggestionsList || !el.searchSuggestions) return;
+            
+            el.suggestionsList.innerHTML = suggestions.map(function(item, index) {
+                const highlightedText = self.highlightQuery(item.title, query);
+                return '<li class="suggestion-item" data-index="' + index + '" data-value="' + self.escapeHtml(item.title) + '">' +
+                    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+                    '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>' +
+                    '</svg>' +
+                    '<span class="suggestion-text">' + highlightedText + '</span>' +
+                    (item.count ? '<span class="suggestion-count">' + item.count + '件</span>' : '') +
+                    '</li>';
+            }).join('');
+            
+            el.searchSuggestions.style.display = 'block';
+            
+            // クリックイベントを設定
+            el.suggestionsList.querySelectorAll('.suggestion-item').forEach(function(item) {
+                item.addEventListener('click', function() {
+                    el.keywordSearch.value = this.dataset.value;
+                    self.hideSearchSuggestions();
+                    self.handleSearch();
+                });
+            });
+        },
+        
+        /**
+         * 検索候補を非表示
+         */
+        hideSearchSuggestions: function() {
+            const el = this.elements;
+            if (el.searchSuggestions) {
+                el.searchSuggestions.style.display = 'none';
+            }
+            this.state.suggestionIndex = -1;
+        },
+        
+        /**
+         * 検索候補のキーボードナビゲーション
+         */
+        navigateSuggestions: function(direction) {
+            const el = this.elements;
+            if (!el.suggestionsList || el.searchSuggestions.style.display === 'none') return;
+            
+            const items = el.suggestionsList.querySelectorAll('.suggestion-item');
+            if (items.length === 0) return;
+            
+            // 現在のインデックスを初期化
+            if (typeof this.state.suggestionIndex === 'undefined') {
+                this.state.suggestionIndex = -1;
+            }
+            
+            // 前のアクティブ項目を解除
+            items.forEach(function(item) { item.classList.remove('active'); });
+            
+            // 新しいインデックスを計算
+            this.state.suggestionIndex += direction;
+            if (this.state.suggestionIndex < 0) this.state.suggestionIndex = items.length - 1;
+            if (this.state.suggestionIndex >= items.length) this.state.suggestionIndex = 0;
+            
+            // アクティブ項目を設定
+            items[this.state.suggestionIndex].classList.add('active');
+            el.keywordSearch.value = items[this.state.suggestionIndex].dataset.value;
+        },
+        
+        /**
+         * クエリをハイライト
+         */
+        highlightQuery: function(text, query) {
+            if (!query) return this.escapeHtml(text);
+            const escaped = this.escapeHtml(text);
+            const keywords = query.split(/[\s　]+/).filter(function(k) { return k.length > 0; });
+            let result = escaped;
+            keywords.forEach(function(keyword) {
+                const regex = new RegExp('(' + keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+                result = result.replace(regex, '<mark>$1</mark>');
+            });
+            return result;
         },
 
         /**
@@ -994,6 +1138,7 @@
             const el = this.elements;
             this.state.filters.search = el.keywordSearch.value.trim();
             this.state.currentPage = 1;
+            this.hideSearchSuggestions();
             this.loadGrants();
         },
 
@@ -1005,6 +1150,7 @@
             el.keywordSearch.value = '';
             this.state.filters.search = '';
             if (el.searchClearBtn) el.searchClearBtn.style.display = 'none';
+            this.hideSearchSuggestions();
             this.state.currentPage = 1;
             this.loadGrants();
         },
