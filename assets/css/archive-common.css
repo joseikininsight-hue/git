@@ -492,12 +492,20 @@
     }
 }
 
-/* FIX: Compact filter dropdown wrapper */
+/* FIX: Compact filter dropdown wrapper with proper z-index stacking */
 .filter-dropdown-wrapper {
     display: flex;
     flex-direction: column;
     gap: 4px;
     min-width: 0;
+    position: relative;
+    z-index: 1;
+}
+
+/* When dropdown is open, increase z-index to appear above other filters */
+.filter-dropdown-wrapper:focus-within,
+.filter-dropdown-wrapper:has(.custom-select.active) {
+    z-index: 100;
 }
 
 @media (max-width: 768px) {
@@ -545,6 +553,11 @@
 .custom-select {
     position: relative;
     width: 100%;
+    z-index: 1;
+}
+
+.custom-select.active {
+    z-index: 1000;
 }
 
 /* FIX: Compact select trigger for inline layout */
@@ -594,7 +607,7 @@
     transform: rotate(180deg);
 }
 
-/* FIX: Compact dropdown */
+/* FIX: Compact dropdown with high z-index */
 .select-dropdown {
     position: absolute;
     top: calc(100% + 4px);
@@ -604,10 +617,11 @@
     background: var(--gov-white);
     border: 1px solid var(--gov-gray-300);
     border-radius: var(--gov-radius);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-    max-height: 280px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    max-height: 300px;
     overflow-y: auto;
-    z-index: 9990;
+    overflow-x: hidden;
+    z-index: 9999;
 }
 
 /* FIX: Compact options */
@@ -2189,120 +2203,7 @@
     border-color: var(--gov-navy-400);
 }
 
-.yahoo-filters-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-    padding: 24px;
-    position: relative;
-    z-index: 51;
-}
-
-.filter-dropdown-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    position: relative;
-    z-index: 52;
-}
-
-.filter-label {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--gov-navy-700);
-}
-
-/* ==========================================================================
-   Custom Select - 修正版
-   ========================================================================== */
-.custom-select {
-    position: relative;
-    width: 100%;
-    z-index: 53;
-}
-
-.select-trigger {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 14px;
-    background: var(--gov-white);
-    border: 1px solid var(--gov-gray-300);
-    border-radius: var(--gov-radius);
-    font-family: var(--gov-font-sans);
-    font-size: 14px;
-    color: var(--gov-gray-700);
-    cursor: pointer;
-    text-align: left;
-    transition: all var(--gov-transition);
-}
-
-.select-trigger:hover {
-    border-color: var(--gov-navy-400);
-}
-
-.custom-select.active .select-trigger {
-    border-color: var(--gov-navy-700);
-    box-shadow: 0 0 0 3px rgba(27, 38, 59, 0.1);
-}
-
-.select-value {
-    flex: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.select-arrow {
-    flex-shrink: 0;
-    color: var(--gov-gray-500);
-    transition: transform var(--gov-transition);
-}
-
-.custom-select.active .select-arrow {
-    transform: rotate(180deg);
-}
-
-.select-dropdown {
-    position: absolute;
-    top: calc(100% + 4px);
-    left: 0;
-    right: 0;
-    background: var(--gov-white);
-    border: 1px solid var(--gov-gray-300);
-    border-radius: var(--gov-radius);
-    box-shadow: var(--gov-shadow-lg);
-    max-height: 300px;
-    overflow-y: auto;
-    z-index: 1000; /* 高いz-indexを設定 */
-}
-
-.select-option {
-    padding: 12px 14px;
-    cursor: pointer;
-    font-size: 14px;
-    color: var(--gov-gray-700);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all var(--gov-transition);
-}
-
-.select-option:hover {
-    background: var(--gov-navy-50);
-}
-
-.select-option.active {
-    background: var(--gov-navy-100);
-    color: var(--gov-navy-900);
-    font-weight: 600;
-}
-
-.select-option .option-icon {
-    flex-shrink: 0;
-    color: var(--gov-navy-600);
-}
+/* NOTE: Duplicate filter styles removed - using compact versions from line 460+ */
 
 /* ==========================================================================
    Active Filters
