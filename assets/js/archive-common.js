@@ -1054,13 +1054,26 @@
             const el = this.elements;
             if (!el.suggestionsList || !el.searchSuggestions) return;
             
-            el.suggestionsList.innerHTML = suggestions.map(function(item, index) {
-                const highlightedText = self.highlightQuery(item.title, query);
-                return '<li class="suggestion-item" data-index="' + index + '" data-value="' + self.escapeHtml(item.title) + '">' +
-                    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
-                    '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>' +
-                    '</svg>' +
+            // 有効な候補のみフィルタリング
+            const validSuggestions = suggestions.filter(function(item) {
+                return item && item.title && item.title.trim() !== '' && item.title !== 'undefined';
+            });
+            
+            if (validSuggestions.length === 0) {
+                self.hideSearchSuggestions();
+                return;
+            }
+            
+            el.suggestionsList.innerHTML = validSuggestions.map(function(item, index) {
+                const title = item.title || '';
+                const highlightedText = self.highlightQuery(title, query);
+                const icon = self.getSuggestionIcon(item.type);
+                const typeLabel = self.getSuggestionTypeLabel(item.type);
+                
+                return '<li class="suggestion-item" data-index="' + index + '" data-value="' + self.escapeHtml(title) + '" data-type="' + (item.type || 'keyword') + '">' +
+                    icon +
                     '<span class="suggestion-text">' + highlightedText + '</span>' +
+                    (typeLabel ? '<span class="suggestion-type">' + typeLabel + '</span>' : '') +
                     (item.count ? '<span class="suggestion-count">' + item.count + '件</span>' : '') +
                     '</li>';
             }).join('');
@@ -1070,11 +1083,43 @@
             // クリックイベントを設定
             el.suggestionsList.querySelectorAll('.suggestion-item').forEach(function(item) {
                 item.addEventListener('click', function() {
-                    el.keywordSearch.value = this.dataset.value;
-                    self.hideSearchSuggestions();
-                    self.handleSearch();
+                    const value = this.dataset.value;
+                    if (value && value !== 'undefined') {
+                        el.keywordSearch.value = value;
+                        self.hideSearchSuggestions();
+                        self.handleSearch();
+                    }
                 });
             });
+        },
+        
+        /**
+         * 候補タイプ別アイコンを取得
+         */
+        getSuggestionIcon: function(type) {
+            const icons = {
+                'keyword': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>',
+                'category': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>',
+                'tag': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><path d="M7 7h.01"/></svg>',
+                'prefecture': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
+                'municipality': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9v.01"/><path d="M9 12v.01"/><path d="M9 15v.01"/><path d="M9 18v.01"/></svg>',
+                'related': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>'
+            };
+            return icons[type] || icons['keyword'];
+        },
+        
+        /**
+         * 候補タイプ別ラベルを取得
+         */
+        getSuggestionTypeLabel: function(type) {
+            const labels = {
+                'category': 'カテゴリ',
+                'tag': 'タグ',
+                'prefecture': '都道府県',
+                'municipality': '市区町村',
+                'related': '関連'
+            };
+            return labels[type] || '';
         },
         
         /**

@@ -489,12 +489,23 @@
     border-radius: 2px;
 }
 
+.suggestion-type {
+    font-size: 10px;
+    color: var(--gov-navy-600);
+    background: var(--gov-navy-100);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
 .suggestion-count {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--gov-gray-500);
     background: var(--gov-gray-100);
     padding: 2px 8px;
     border-radius: 10px;
+    white-space: nowrap;
 }
 
 /* ==========================================================================

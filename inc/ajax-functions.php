@@ -3522,7 +3522,7 @@ if (!function_exists('gi_render_card_unified')) {
 }
 
 /**
- * 検索候補を取得（オートコンプリート用）
+ * 検索候補を取得（オートコンプリート用）- 完全版
  */
 function gi_ajax_search_suggestions() {
     // nonceチェック
@@ -3534,121 +3534,306 @@ function gi_ajax_search_suggestions() {
     $query = sanitize_text_field($_POST['query'] ?? '');
     $post_type = sanitize_text_field($_POST['post_type'] ?? 'grant');
     
-    if (strlen($query) < 2) {
+    // 最小文字数チェック（日本語は1文字から）
+    $min_length = preg_match('/[^\x00-\x7F]/', $query) ? 1 : 2;
+    if (mb_strlen($query) < $min_length) {
         wp_send_json_success(['suggestions' => []]);
         return;
     }
     
-    global $wpdb;
+    $suggestions = [];
+    $seen_titles = [];
     
     // スペースで分割してキーワード配列を作成
     $keywords = preg_split('/[\s　]+/u', trim($query), -1, PREG_SPLIT_NO_EMPTY);
-    $first_keyword = $keywords[0];
+    $first_keyword = !empty($keywords) ? $keywords[0] : $query;
     
-    $suggestions = [];
-    
-    // 1. タイトルから候補を取得（部分一致）
-    $like = '%' . $wpdb->esc_like($first_keyword) . '%';
-    $title_results = $wpdb->get_results($wpdb->prepare("
-        SELECT post_title as title, COUNT(*) as count
-        FROM {$wpdb->posts}
-        WHERE post_type = %s
-        AND post_status = 'publish'
-        AND post_title LIKE %s
-        GROUP BY post_title
-        ORDER BY count DESC
-        LIMIT 5
-    ", $post_type, $like));
-    
-    foreach ($title_results as $row) {
-        $suggestions[] = [
-            'title' => $row->title,
-            'type' => 'title'
-        ];
-    }
-    
-    // 2. カテゴリから候補を取得
-    $taxonomy = ($post_type === 'column') ? 'column_category' : 'grant_category';
-    $cat_results = $wpdb->get_results($wpdb->prepare("
-        SELECT t.name as title, tt.count as count
-        FROM {$wpdb->terms} t
-        INNER JOIN {$wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
-        WHERE tt.taxonomy = %s
-        AND t.name LIKE %s
-        ORDER BY tt.count DESC
-        LIMIT 3
-    ", $taxonomy, $like));
-    
-    foreach ($cat_results as $row) {
-        $suggestions[] = [
-            'title' => $row->title,
-            'type' => 'category',
-            'count' => (int)$row->count
-        ];
-    }
-    
-    // 3. 都道府県から候補を取得（助成金の場合）
-    if ($post_type === 'grant') {
-        $pref_results = $wpdb->get_results($wpdb->prepare("
-            SELECT t.name as title, tt.count as count
-            FROM {$wpdb->terms} t
-            INNER JOIN {$wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
-            WHERE tt.taxonomy = 'grant_prefecture'
-            AND t.name LIKE %s
-            ORDER BY tt.count DESC
-            LIMIT 3
-        ", $like));
-        
-        foreach ($pref_results as $row) {
-            $suggestions[] = [
-                'title' => $row->title,
-                'type' => 'prefecture',
-                'count' => (int)$row->count
-            ];
+    // ===== 1. よく使われる検索キーワード（優先度高）=====
+    $common_suggestions = gi_get_common_search_suggestions($first_keyword);
+    foreach ($common_suggestions as $item) {
+        $key = mb_strtolower($item['title']);
+        if (!isset($seen_titles[$key]) && !empty($item['title'])) {
+            $seen_titles[$key] = true;
+            $suggestions[] = $item;
         }
     }
     
-    // 4. よく使われる検索キーワードの候補（静的リスト）
-    $common_keywords = [
-        '設備投資', '人材育成', '創業支援', '事業承継', 'IT導入', 'DX推進',
-        '省エネ', '再生可能エネルギー', '販路拡大', '海外展開', '研究開発',
-        '雇用促進', '働き方改革', '育児支援', '介護支援', '障害者雇用',
-        '中小企業', '小規模事業者', 'スタートアップ', 'ベンチャー', 'NPO',
-        '農業', '製造業', 'サービス業', '観光業', '飲食業'
+    // ===== 2. カテゴリ・タグから候補 =====
+    $taxonomy_suggestions = gi_get_taxonomy_suggestions($first_keyword, $post_type);
+    foreach ($taxonomy_suggestions as $item) {
+        $key = mb_strtolower($item['title']);
+        if (!isset($seen_titles[$key]) && !empty($item['title'])) {
+            $seen_titles[$key] = true;
+            $suggestions[] = $item;
+        }
+    }
+    
+    // ===== 3. 都道府県・市町村から候補（助成金の場合）=====
+    if ($post_type === 'grant') {
+        $location_suggestions = gi_get_location_suggestions($first_keyword);
+        foreach ($location_suggestions as $item) {
+            $key = mb_strtolower($item['title']);
+            if (!isset($seen_titles[$key]) && !empty($item['title'])) {
+                $seen_titles[$key] = true;
+                $suggestions[] = $item;
+            }
+        }
+    }
+    
+    // ===== 4. 投稿タイトルから候補（関連キーワード抽出）=====
+    $title_suggestions = gi_get_title_suggestions($first_keyword, $post_type);
+    foreach ($title_suggestions as $item) {
+        $key = mb_strtolower($item['title']);
+        if (!isset($seen_titles[$key]) && !empty($item['title'])) {
+            $seen_titles[$key] = true;
+            $suggestions[] = $item;
+        }
+    }
+    
+    // 上位8件に制限
+    $suggestions = array_slice($suggestions, 0, 8);
+    
+    wp_send_json_success(['suggestions' => $suggestions]);
+}
+
+/**
+ * よく使われる検索キーワードから候補を取得
+ */
+function gi_get_common_search_suggestions($keyword) {
+    $suggestions = [];
+    
+    // 業種・分野別キーワード
+    $keyword_groups = [
+        '業種' => [
+            '製造業', '建設業', '運輸業', '情報通信業', 'サービス業', 
+            '小売業', '卸売業', '飲食業', '宿泊業', '観光業',
+            '農業', '林業', '漁業', '医療', '介護', '福祉'
+        ],
+        '目的' => [
+            '設備投資', '人材育成', '人材採用', '雇用促進', '研究開発',
+            '販路拡大', '海外展開', '創業支援', '事業承継', '経営改善',
+            'IT導入', 'DX推進', 'デジタル化', '生産性向上', '省エネ',
+            '脱炭素', '環境対策', '働き方改革', 'テレワーク'
+        ],
+        '対象' => [
+            '中小企業', '小規模事業者', 'スタートアップ', 'ベンチャー',
+            '個人事業主', 'フリーランス', 'NPO', '社会福祉法人',
+            '農業法人', '医療法人', '学校法人'
+        ],
+        '金額' => [
+            '100万円', '500万円', '1000万円', '上限なし',
+            '補助率2/3', '補助率1/2', '全額補助'
+        ],
+        '地域' => [
+            '全国対象', '東京都', '大阪府', '愛知県', '福岡県',
+            '北海道', '神奈川県', '埼玉県', '千葉県', '兵庫県'
+        ]
     ];
     
-    foreach ($common_keywords as $keyword) {
-        if (mb_strpos($keyword, $first_keyword) !== false && count($suggestions) < 10) {
-            // 重複チェック
-            $exists = false;
-            foreach ($suggestions as $s) {
-                if ($s['title'] === $keyword) {
-                    $exists = true;
-                    break;
-                }
-            }
-            if (!$exists) {
+    foreach ($keyword_groups as $category => $keywords) {
+        foreach ($keywords as $kw) {
+            // 部分一致（入力がキーワードに含まれる、またはキーワードが入力に含まれる）
+            if (mb_stripos($kw, $keyword) !== false || mb_stripos($keyword, $kw) !== false) {
                 $suggestions[] = [
-                    'title' => $keyword,
-                    'type' => 'keyword'
+                    'title' => $kw,
+                    'type' => 'keyword',
+                    'category' => $category
                 ];
             }
         }
     }
     
-    // 重複を削除して上位10件に制限
-    $unique_suggestions = [];
-    $seen_titles = [];
-    foreach ($suggestions as $s) {
-        $lower_title = mb_strtolower($s['title']);
-        if (!isset($seen_titles[$lower_title])) {
-            $seen_titles[$lower_title] = true;
-            $unique_suggestions[] = $s;
+    // 関連性でソート（完全一致 > 前方一致 > 部分一致）
+    usort($suggestions, function($a, $b) use ($keyword) {
+        $a_title = $a['title'];
+        $b_title = $b['title'];
+        
+        // 完全一致
+        if ($a_title === $keyword) return -1;
+        if ($b_title === $keyword) return 1;
+        
+        // 前方一致
+        $a_starts = mb_stripos($a_title, $keyword) === 0;
+        $b_starts = mb_stripos($b_title, $keyword) === 0;
+        if ($a_starts && !$b_starts) return -1;
+        if (!$a_starts && $b_starts) return 1;
+        
+        // 文字列長（短い方が優先）
+        return mb_strlen($a_title) - mb_strlen($b_title);
+    });
+    
+    return array_slice($suggestions, 0, 5);
+}
+
+/**
+ * タクソノミー（カテゴリ・タグ）から候補を取得
+ */
+function gi_get_taxonomy_suggestions($keyword, $post_type) {
+    $suggestions = [];
+    
+    // 対象タクソノミー
+    $taxonomies = ($post_type === 'column') 
+        ? ['column_category'] 
+        : ['grant_category', 'grant_tag'];
+    
+    foreach ($taxonomies as $taxonomy) {
+        $terms = get_terms([
+            'taxonomy' => $taxonomy,
+            'hide_empty' => true,
+            'search' => $keyword,
+            'number' => 5
+        ]);
+        
+        if (!is_wp_error($terms)) {
+            foreach ($terms as $term) {
+                if (!empty($term->name)) {
+                    $suggestions[] = [
+                        'title' => $term->name,
+                        'type' => ($taxonomy === 'grant_tag') ? 'tag' : 'category',
+                        'count' => (int)$term->count,
+                        'slug' => $term->slug
+                    ];
+                }
+            }
         }
-        if (count($unique_suggestions) >= 10) break;
     }
     
-    wp_send_json_success(['suggestions' => $unique_suggestions]);
+    return $suggestions;
+}
+
+/**
+ * 都道府県・市町村から候補を取得
+ */
+function gi_get_location_suggestions($keyword) {
+    $suggestions = [];
+    
+    // 都道府県
+    $prefectures = get_terms([
+        'taxonomy' => 'grant_prefecture',
+        'hide_empty' => true,
+        'search' => $keyword,
+        'number' => 5
+    ]);
+    
+    if (!is_wp_error($prefectures)) {
+        foreach ($prefectures as $pref) {
+            if (!empty($pref->name)) {
+                $suggestions[] = [
+                    'title' => $pref->name,
+                    'type' => 'prefecture',
+                    'count' => (int)$pref->count,
+                    'slug' => $pref->slug
+                ];
+            }
+        }
+    }
+    
+    // 市町村（キーワードが3文字以上の場合のみ）
+    if (mb_strlen($keyword) >= 2) {
+        $municipalities = get_terms([
+            'taxonomy' => 'grant_municipality',
+            'hide_empty' => true,
+            'search' => $keyword,
+            'number' => 3
+        ]);
+        
+        if (!is_wp_error($municipalities)) {
+            foreach ($municipalities as $muni) {
+                if (!empty($muni->name)) {
+                    $suggestions[] = [
+                        'title' => $muni->name,
+                        'type' => 'municipality',
+                        'count' => (int)$muni->count,
+                        'slug' => $muni->slug
+                    ];
+                }
+            }
+        }
+    }
+    
+    return $suggestions;
+}
+
+/**
+ * 投稿タイトルからキーワード候補を抽出
+ */
+function gi_get_title_suggestions($keyword, $post_type) {
+    $suggestions = [];
+    global $wpdb;
+    
+    $like = '%' . $wpdb->esc_like($keyword) . '%';
+    
+    // タイトルに含まれる投稿を取得
+    $posts = $wpdb->get_results($wpdb->prepare("
+        SELECT DISTINCT post_title
+        FROM {$wpdb->posts}
+        WHERE post_type = %s
+        AND post_status = 'publish'
+        AND post_title LIKE %s
+        ORDER BY post_date DESC
+        LIMIT 10
+    ", $post_type, $like));
+    
+    if ($posts) {
+        foreach ($posts as $post) {
+            if (!empty($post->post_title)) {
+                // タイトルから関連キーワードを抽出
+                $extracted = gi_extract_keywords_from_title($post->post_title, $keyword);
+                foreach ($extracted as $kw) {
+                    $suggestions[] = [
+                        'title' => $kw,
+                        'type' => 'related'
+                    ];
+                }
+            }
+        }
+    }
+    
+    // 重複除去
+    $unique = [];
+    $seen = [];
+    foreach ($suggestions as $s) {
+        $key = mb_strtolower($s['title']);
+        if (!isset($seen[$key])) {
+            $seen[$key] = true;
+            $unique[] = $s;
+        }
+    }
+    
+    return array_slice($unique, 0, 3);
+}
+
+/**
+ * タイトルからキーワードを抽出
+ */
+function gi_extract_keywords_from_title($title, $search_keyword) {
+    $keywords = [];
+    
+    // 【】や「」で囲まれた部分を抽出
+    if (preg_match_all('/【([^】]+)】|「([^」]+)」/u', $title, $matches)) {
+        foreach ($matches[1] as $match) {
+            if (!empty($match) && mb_strlen($match) <= 20 && mb_strpos($match, $search_keyword) !== false) {
+                $keywords[] = $match;
+            }
+        }
+        foreach ($matches[2] as $match) {
+            if (!empty($match) && mb_strlen($match) <= 20 && mb_strpos($match, $search_keyword) !== false) {
+                $keywords[] = $match;
+            }
+        }
+    }
+    
+    // タイトルが短い場合はそのまま候補に
+    if (empty($keywords) && mb_strlen($title) <= 30) {
+        // 年度や日付を除去
+        $clean_title = preg_replace('/【?\d{4}年度?】?|令和\d+年度?/u', '', $title);
+        $clean_title = trim($clean_title);
+        if (!empty($clean_title) && mb_strpos($clean_title, $search_keyword) !== false) {
+            $keywords[] = $clean_title;
+        }
+    }
+    
+    return $keywords;
 }
 
 /**
