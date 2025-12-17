@@ -1378,17 +1378,79 @@
     font-size: 13px;
 }
 
-/* Sidebar Ad Space */
+/* ==========================================================================
+   Sidebar Ad Space - 広告枠スタイル
+   ========================================================================== */
 .sidebar-ad-space {
-    background: var(--gov-gray-100);
+    background: linear-gradient(135deg, var(--gov-gray-50) 0%, var(--gov-gray-100) 100%);
     border: 1px dashed var(--gov-gray-300);
     border-radius: var(--gov-radius-lg);
-    min-height: 250px;
+    min-height: 100px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--gov-gray-400);
     font-size: 12px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.sidebar-ad-space::before {
+    content: 'PR';
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--gov-gray-400);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.sidebar-ad-space:empty::after {
+    content: '広告枠';
+}
+
+/* 広告位置別スタイル */
+.sidebar-ad-top {
+    margin-top: 0;
+}
+
+.sidebar-ad-middle {
+    margin: 20px 0;
+}
+
+.sidebar-ad-bottom {
+    margin-bottom: 0;
+}
+
+/* 広告コンテンツ */
+.sidebar-ad-space .ji-affiliate-ad {
+    width: 100%;
+    padding: 12px;
+}
+
+.sidebar-ad-space .ji-affiliate-ad img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.sidebar-ad-space .ji-affiliate-ad a {
+    display: block;
+    transition: opacity 0.2s ease;
+}
+
+.sidebar-ad-space .ji-affiliate-ad a:hover {
+    opacity: 0.9;
+}
+
+/* スティッキー広告（オプション） */
+.sidebar-ad-sticky {
+    position: sticky;
+    top: 100px;
+    z-index: 10;
 }
 
 /* ==========================================================================
@@ -2904,18 +2966,7 @@
     padding: 20px;
 }
 
-/* Sidebar Ad Space */
-.sidebar-ad-space {
-    background: var(--gov-gray-100);
-    border: 1px dashed var(--gov-gray-300);
-    border-radius: var(--gov-radius-lg);
-    min-height: 250px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--gov-gray-400);
-    font-size: 12px;
-}
+/* NOTE: Duplicate Sidebar Ad Space removed - using definitions from line 1381 */
 
 /* Ranking */
 .ranking-list {

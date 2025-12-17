@@ -743,6 +743,108 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
     border: 6px solid transparent;
     border-top-color: #1f2937;
 }
+
+/* ==========================================================================
+   広告枠スタイル - Affiliate Ad Slots
+   ========================================================================== */
+.gi-ad-section {
+    background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+    border: 1px dashed #e0e0e0;
+}
+
+.gi-ad-section .gi-sidebar-header {
+    padding: 8px 16px;
+    border-bottom: 1px dashed #e0e0e0;
+    background: transparent;
+}
+
+.gi-pr-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #9e9e9e;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.gi-ad-slot {
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+}
+
+.gi-ad-slot:empty::before {
+    content: '広告枠';
+    color: #bdbdbd;
+    font-size: 12px;
+}
+
+/* 広告位置別スタイル */
+.gi-ad-top {
+    border-radius: var(--gi-radius-lg, 12px);
+    margin-bottom: 16px;
+}
+
+.gi-ad-middle {
+    border-radius: var(--gi-radius-lg, 12px);
+    margin: 16px 0;
+}
+
+.gi-ad-sticky {
+    border-radius: var(--gi-radius-lg, 12px);
+    margin: 16px 0;
+    position: sticky;
+    top: 100px;
+    z-index: 10;
+}
+
+.gi-ad-bottom {
+    border-radius: var(--gi-radius-lg, 12px);
+    margin: 16px 0;
+}
+
+/* 広告コンテンツ内のスタイル調整 */
+.gi-ad-slot img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.gi-ad-slot a {
+    display: block;
+    transition: opacity 0.2s ease;
+}
+
+.gi-ad-slot a:hover {
+    opacity: 0.9;
+}
+
+/* アフィリエイト広告共通 */
+.ji-affiliate-ad {
+    width: 100%;
+}
+
+.ji-affiliate-ad img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* モバイル対応 */
+@media (max-width: 768px) {
+    .gi-ad-section {
+        display: none; /* モバイルでは非表示（オプション） */
+    }
+    
+    /* モバイルで表示する場合はこちらを使用 */
+    .gi-ad-section.show-mobile {
+        display: block;
+    }
+    
+    .gi-ad-sticky {
+        position: static;
+    }
+}
 </style>
 
 <!-- Breadcrumb（JSON-LDで構造化データ出力済みのため、HTMLはMicrodata属性なし） -->
@@ -1471,6 +1573,16 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
             <!-- サイドバー -->
             <aside class="gi-sidebar">
                 
+                <!-- 広告枠（上部） -->
+                <?php if (function_exists('ji_display_ad')): ?>
+                <section class="gi-sidebar-section gi-ad-section gi-ad-top" aria-label="広告">
+                    <header class="gi-sidebar-header"><span class="gi-sidebar-title gi-pr-label">PR</span></header>
+                    <div class="gi-sidebar-body">
+                        <div class="gi-ad-slot" id="adSlotTop"><?php ji_display_ad('single_grant_sidebar_top'); ?></div>
+                    </div>
+                </section>
+                <?php endif; ?>
+                
                 <!-- AIアシスタント -->
                 <section class="gi-sidebar-section gi-ai-section" aria-labelledby="ai-title">
                     <header class="gi-sidebar-header">
@@ -1545,6 +1657,16 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                     </div>
                 </section>
 
+                <!-- 広告枠（中部1） -->
+                <?php if (function_exists('ji_display_ad')): ?>
+                <section class="gi-sidebar-section gi-ad-section gi-ad-middle" aria-label="広告">
+                    <header class="gi-sidebar-header"><span class="gi-sidebar-title gi-pr-label">PR</span></header>
+                    <div class="gi-sidebar-body">
+                        <div class="gi-ad-slot" id="adSlotMiddle1"><?php ji_display_ad('single_grant_sidebar_middle'); ?></div>
+                    </div>
+                </section>
+                <?php endif; ?>
+                
                 <!-- 締切間近 -->
                 <?php if ($deadline_soon_grants->have_posts()): ?>
                 <section class="gi-sidebar-section" aria-labelledby="deadline-soon-title">
@@ -1605,6 +1727,16 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                 </section>
                 <?php endif; ?>
 
+                <!-- 広告枠（中部2）- スティッキー対応 -->
+                <?php if (function_exists('ji_display_ad')): ?>
+                <section class="gi-sidebar-section gi-ad-section gi-ad-sticky" aria-label="広告">
+                    <header class="gi-sidebar-header"><span class="gi-sidebar-title gi-pr-label">PR</span></header>
+                    <div class="gi-sidebar-body">
+                        <div class="gi-ad-slot" id="adSlotMiddle2"><?php ji_display_ad('single_grant_content_middle'); ?></div>
+                    </div>
+                </section>
+                <?php endif; ?>
+                
                 <!-- おすすめコラム -->
                 <?php if (!empty($recommended_columns)): ?>
                 <section class="gi-sidebar-section" aria-labelledby="columns-title">
@@ -1628,13 +1760,15 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                 </section>
                 <?php endif; ?>
 
-                <!-- 広告枠 -->
-                <section class="gi-sidebar-section gi-ad-section" aria-label="広告">
-                    <header class="gi-sidebar-header"><span class="gi-sidebar-title">PR</span></header>
+                <!-- 広告枠（下部） -->
+                <?php if (function_exists('ji_display_ad')): ?>
+                <section class="gi-sidebar-section gi-ad-section gi-ad-bottom" aria-label="広告">
+                    <header class="gi-sidebar-header"><span class="gi-sidebar-title gi-pr-label">PR</span></header>
                     <div class="gi-sidebar-body">
-                        <div class="gi-ad-placeholder" id="adSlot1"><?php if (function_exists('gi_display_ad')) { gi_display_ad('sidebar_1'); } else { echo '広告枠'; } ?></div>
+                        <div class="gi-ad-slot" id="adSlotBottom"><?php ji_display_ad('single_grant_sidebar_bottom'); ?></div>
                     </div>
                 </section>
+                <?php endif; ?>
 
                 <!-- 関連カテゴリ -->
                 <?php if (!empty($taxonomies['categories'])): ?>

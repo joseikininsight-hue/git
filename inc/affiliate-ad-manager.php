@@ -38,11 +38,17 @@ class JI_Affiliate_Ad_Manager {
         'single_column_content_bottom' => 'コラム:本文下',
         // シングルページ - 補助金
         'single_grant_sidebar_top' => '補助金:SB上',
+        'single_grant_sidebar_upper' => '補助金:SB上部2',
         'single_grant_sidebar_middle' => '補助金:SB中',
+        'single_grant_sidebar_lower' => '補助金:SB下部2',
         'single_grant_sidebar_bottom' => '補助金:SB下',
+        'single_grant_sidebar_sticky' => '補助金:SB固定',
         'single_grant_content_top' => '補助金:本文上',
         'single_grant_content_middle' => '補助金:本文中',
         'single_grant_content_bottom' => '補助金:本文下',
+        // シングルページ - 補助金 アフィリエイト記事欄（新規）
+        'single_grant_article_after_details' => '補助金:詳細後記事',
+        'single_grant_article_before_checklist' => '補助金:チェック前記事',
         // アーカイブページ - 補助金
         'archive_grant_sidebar_top' => '補助金AR:SB上',
         'archive_grant_sidebar_middle' => '補助金AR:SB中',
@@ -52,6 +58,7 @@ class JI_Affiliate_Ad_Manager {
         // アーカイブページ - コラム
         'archive_column_sidebar_pr' => 'コラムAR:PR',
         'archive_column_sidebar_top' => 'コラムAR:SB上',
+        'archive_column_sidebar_middle' => 'コラムAR:SB中',
         'archive_column_sidebar_bottom' => 'コラムAR:SB下',
         // Taxonomy アーカイブ
         'category_grant_sidebar_top' => 'カテゴリAR:SB上',
@@ -228,6 +235,39 @@ class JI_Affiliate_Ad_Manager {
             $wpdb->query(
                 "ALTER TABLE {$this->table_name_ads} 
                 ADD COLUMN target_categories text DEFAULT NULL AFTER target_pages"
+            );
+        }
+        
+        // image_url カラムを追加（記事型広告用）
+        $image_url_column = $wpdb->get_results(
+            "SHOW COLUMNS FROM {$this->table_name_ads} LIKE 'image_url'"
+        );
+        if (empty($image_url_column)) {
+            $wpdb->query(
+                "ALTER TABLE {$this->table_name_ads} 
+                ADD COLUMN image_url varchar(500) DEFAULT '' AFTER link_url"
+            );
+        }
+        
+        // description カラムを追加（記事型広告用）
+        $description_column = $wpdb->get_results(
+            "SHOW COLUMNS FROM {$this->table_name_ads} LIKE 'description'"
+        );
+        if (empty($description_column)) {
+            $wpdb->query(
+                "ALTER TABLE {$this->table_name_ads} 
+                ADD COLUMN description text DEFAULT NULL AFTER image_url"
+            );
+        }
+        
+        // button_text カラムを追加（記事型広告用）
+        $button_text_column = $wpdb->get_results(
+            "SHOW COLUMNS FROM {$this->table_name_ads} LIKE 'button_text'"
+        );
+        if (empty($button_text_column)) {
+            $wpdb->query(
+                "ALTER TABLE {$this->table_name_ads} 
+                ADD COLUMN button_text varchar(100) DEFAULT '詳しく見る' AFTER description"
             );
         }
     }
@@ -702,23 +742,77 @@ class JI_Affiliate_Ad_Manager {
                             <td>
                                 <select name="ad_type" id="ad_type" required>
                                     <option value="html">HTML</option>
-                                    <option value="image">画像</option>
+                                    <option value="image">画像バナー</option>
                                     <option value="script">スクリプト</option>
+                                    <option value="article">記事型広告（商品紹介）</option>
                                 </select>
+                                <p class="description" id="ad_type_help">HTMLコードをそのまま入力</p>
                             </td>
                         </tr>
                         
-                        <tr>
+                        <!-- HTML/Script/Image用フィールド -->
+                        <tr class="ad-field-standard">
                             <th><label for="content">広告コンテンツ <span class="required">*</span></label></th>
                             <td>
-                                <textarea name="content" id="content" rows="8" class="large-text" required></textarea>
+                                <textarea name="content" id="content" rows="8" class="large-text"></textarea>
                                 <p class="description">HTML、画像タグ、またはスクリプトコードを入力してください。</p>
                             </td>
                         </tr>
                         
+                        <!-- 記事型広告用フィールド -->
+                        <tr class="ad-field-article" style="display: none;">
+                            <th><label for="image_url">商品画像URL <span class="required">*</span></label></th>
+                            <td>
+                                <input type="url" name="image_url" id="image_url" class="regular-text" placeholder="https://example.com/image.jpg">
+                                <button type="button" class="button" id="upload_image_btn">メディアから選択</button>
+                                <p class="description">商品の画像URL（推奨サイズ: 600x400px以上）</p>
+                                <div id="image_preview" style="margin-top: 10px;"></div>
+                            </td>
+                        </tr>
+                        
+                        <tr class="ad-field-article" style="display: none;">
+                            <th><label for="article_title">商品タイトル</label></th>
+                            <td>
+                                <input type="text" name="article_title" id="article_title" class="large-text" placeholder="例: 補助金申請に役立つクラウド会計ソフト">
+                                <p class="description">空欄の場合、「タイトル」フィールドの値を使用</p>
+                            </td>
+                        </tr>
+                        
+                        <tr class="ad-field-article" style="display: none;">
+                            <th><label for="description">商品説明文 <span class="required">*</span></label></th>
+                            <td>
+                                <textarea name="description" id="description" rows="4" class="large-text" placeholder="商品やサービスの説明文を入力..."></textarea>
+                                <p class="description">簡潔な商品説明（150〜300文字推奨）</p>
+                            </td>
+                        </tr>
+                        
+                        <tr class="ad-field-article" style="display: none;">
+                            <th><label for="features">特徴・ポイント</label></th>
+                            <td>
+                                <textarea name="features" id="features" rows="3" class="large-text" placeholder="・初期費用無料&#10;・補助金申請書類の自動作成&#10;・専門スタッフによるサポート"></textarea>
+                                <p class="description">箇条書きで特徴を入力（1行1項目）</p>
+                            </td>
+                        </tr>
+                        
+                        <tr class="ad-field-article" style="display: none;">
+                            <th><label for="price_info">価格・料金情報</label></th>
+                            <td>
+                                <input type="text" name="price_info" id="price_info" class="regular-text" placeholder="例: 月額980円〜 / 初期費用無料">
+                                <p class="description">価格や料金プランの情報（任意）</p>
+                            </td>
+                        </tr>
+                        
+                        <tr class="ad-field-article" style="display: none;">
+                            <th><label for="button_text">ボタンテキスト</label></th>
+                            <td>
+                                <input type="text" name="button_text" id="button_text" class="regular-text" value="詳しく見る" placeholder="詳しく見る">
+                                <p class="description">CTAボタンに表示するテキスト</p>
+                            </td>
+                        </tr>
+                        
                         <tr>
-                            <th><label for="link_url">リンクURL</label></th>
-                            <td><input type="url" name="link_url" id="link_url" class="regular-text"></td>
+                            <th><label for="link_url">リンクURL <span class="required">*</span></label></th>
+                            <td><input type="url" name="link_url" id="link_url" class="regular-text" placeholder="https://example.com/affiliate-link"></td>
                         </tr>
                         
                         <tr>
@@ -810,13 +904,22 @@ class JI_Affiliate_Ad_Manager {
                 <option value="single_column_content_middle">コラム: コンテンツ中央</option>
                 <option value="single_column_content_bottom">コラム: コンテンツ下部</option>
             </optgroup>
-            <optgroup label="シングルページ - 補助金">
-                <option value="single_grant_sidebar_top">補助金: サイドバー上部</option>
+            <optgroup label="シングルページ - 補助金 サイドバー">
+                <option value="single_grant_sidebar_top">補助金: サイドバー最上部</option>
+                <option value="single_grant_sidebar_upper">補助金: サイドバー上部2</option>
                 <option value="single_grant_sidebar_middle">補助金: サイドバー中央</option>
-                <option value="single_grant_sidebar_bottom">補助金: サイドバー下部</option>
+                <option value="single_grant_sidebar_lower">補助金: サイドバー下部2</option>
+                <option value="single_grant_sidebar_bottom">補助金: サイドバー最下部</option>
+                <option value="single_grant_sidebar_sticky">補助金: サイドバー固定</option>
+            </optgroup>
+            <optgroup label="シングルページ - 補助金 コンテンツ">
                 <option value="single_grant_content_top">補助金: コンテンツ上部</option>
                 <option value="single_grant_content_middle">補助金: コンテンツ中央</option>
                 <option value="single_grant_content_bottom">補助金: コンテンツ下部</option>
+            </optgroup>
+            <optgroup label="シングルページ - 補助金 記事型広告欄">
+                <option value="single_grant_article_after_details">補助金: 詳細セクション後（記事型）</option>
+                <option value="single_grant_article_before_checklist">補助金: チェックリスト前（記事型）</option>
             </optgroup>
             <optgroup label="アーカイブページ - 補助金">
                 <option value="archive_grant_sidebar_top">補助金AR: サイドバー上部</option>
