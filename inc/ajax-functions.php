@@ -37,9 +37,7 @@ add_action('wp_ajax_nopriv_handle_grant_ai_question', 'handle_grant_ai_question'
 add_action('wp_ajax_gi_voice_input', 'gi_ajax_process_voice_input');
 add_action('wp_ajax_nopriv_gi_voice_input', 'gi_ajax_process_voice_input');
 
-// 検索候補機能
-add_action('wp_ajax_gi_search_suggestions', 'gi_ajax_get_search_suggestions');
-add_action('wp_ajax_nopriv_gi_search_suggestions', 'gi_ajax_get_search_suggestions');
+// NOTE: 検索候補機能は63-64行目で定義（gi_ajax_search_suggestions - 完全版）
 
 // 音声履歴機能
 add_action('wp_ajax_gi_voice_history', 'gi_ajax_save_voice_history');
@@ -584,29 +582,13 @@ function gi_ajax_process_voice_input() {
 }
 
 /**
- * 検索候補取得
+ * 検索候補取得（旧版 - 使用しない）
+ * NOTE: gi_ajax_search_suggestions（完全版）を使用するため、この関数は無効化
  */
-function gi_ajax_get_search_suggestions() {
-    try {
-        if (!gi_verify_ajax_nonce()) {
-            wp_send_json_error(['message' => 'セキュリティチェックに失敗しました']);
-            return;
-        }
-        
-        $partial_query = sanitize_text_field($_POST['query'] ?? '');
-        $limit = min(intval($_POST['limit'] ?? 10), 20);
-        
-        $suggestions = gi_get_smart_search_suggestions($partial_query, $limit);
-        
-        wp_send_json_success([
-            'suggestions' => $suggestions,
-            'query' => $partial_query
-        ]);
-        
-    } catch (Exception $e) {
-        error_log('Search Suggestions Error: ' . $e->getMessage());
-        wp_send_json_error(['message' => '検索候補の取得に失敗しました']);
-    }
+function gi_ajax_get_search_suggestions_legacy() {
+    // この関数は使用されません
+    // 完全版の gi_ajax_search_suggestions を参照してください
+    wp_send_json_error(['message' => 'This function is deprecated']);
 }
 
 /**
