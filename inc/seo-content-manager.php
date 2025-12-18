@@ -2,14 +2,18 @@
 /**
  * Plugin Name: GI SEO Content Manager
  * Description: AIリノベーション・カルテ機能付きSEOコンテンツ管理 + 補助金データベース
- * Version: 30.0.0
+ * Version: 31.5.0
  * Author: GI Web Team
+ * 
+ * @version 31.5.0
+ * - Fixed: Invalid model name 'gemini-3-pro-preview' -> 'gemini-2.0-flash'
+ * - Updated: Model list with current available Gemini models
  */
 
 if (!defined('ABSPATH')) exit;
 
 class GI_SEO_Content_Manager {
-    private $version = '31.4.0';
+    private $version = '31.6.0';
     private $table_queue;
     private $table_failed;
     private $table_merge_history;
@@ -41,6 +45,8 @@ class GI_SEO_Content_Manager {
         add_action('wp_ajax_gi_seo_get_queue_status', array($this, 'ajax_get_queue_status'));
         add_action('wp_ajax_gi_seo_get_queue_details', array($this, 'ajax_get_queue_details'));
         add_action('wp_ajax_gi_seo_clear_queue', array($this, 'ajax_clear_queue'));
+        add_action('wp_ajax_gi_seo_get_process_log', array($this, 'ajax_get_process_log'));
+        add_action('wp_ajax_gi_seo_clear_process_log', array($this, 'ajax_clear_process_log'));
         add_action('wp_ajax_gi_seo_save_settings', array($this, 'ajax_save_settings'));
         add_action('wp_ajax_gi_seo_get_failed', array($this, 'ajax_get_failed'));
         add_action('wp_ajax_gi_seo_retry_failed', array($this, 'ajax_retry_failed'));
@@ -408,7 +414,7 @@ class GI_SEO_Content_Manager {
     }
 
     private function get_current_model() {
-        return $this->get_setting('model', 'gemini-3-pro-preview');
+        return $this->get_setting('model', 'gemini-2.0-flash');
     }
 
     private function get_target_post_types() {
@@ -1218,7 +1224,7 @@ class GI_SEO_Content_Manager {
     }
 
     // ================================================================
-    // Gemini API（gemini-3-pro-preview対応）
+    // Gemini API（gemini-2.0-flash対応）
     // ================================================================
     public function call_gemini($prompt, $temperature = null) {
         $api_key = $this->get_setting('api_key');
@@ -1923,6 +1929,55 @@ class GI_SEO_Content_Manager {
             'pending' => $pending,
             'completed' => $completed
         ));
+    }
+
+    /**
+     * プロセスログ取得（デバッグ用）
+     */
+    public function ajax_get_process_log() {
+        check_ajax_referer('gi_seo_nonce', 'nonce');
+        global $wpdb;
+        
+        $limit = isset($_POST['limit']) ? intval($_POST['limit']) : 50;
+        
+        $logs = $wpdb->get_results($wpdb->prepare(
+            "SELECT * FROM {$this->table_process_log} ORDER BY created_at DESC LIMIT %d",
+            $limit
+        ));
+        
+        // Cron状態情報
+        $last_cron = get_option('gi_seo_last_cron_run', 0);
+        $queue_running = get_option('gi_seo_queue_running', false);
+        $lock = get_transient('gi_seo_queue_lock');
+        $lock_time = get_option('gi_seo_lock_time', 0);
+        
+        wp_send_json_success(array(
+            'logs' => $logs,
+            'debug_info' => array(
+                'last_cron_run' => $last_cron ? date('Y-m-d H:i:s', $last_cron) : 'なし',
+                'last_cron_ago' => $last_cron ? human_time_diff($last_cron, time()) . '前' : 'N/A',
+                'queue_running' => $queue_running,
+                'lock_active' => (bool)$lock,
+                'lock_time' => $lock_time ? date('Y-m-d H:i:s', $lock_time) : 'なし',
+                'cron_scheduled' => wp_next_scheduled('gi_seo_process_queue') ? date('Y-m-d H:i:s', wp_next_scheduled('gi_seo_process_queue')) : 'なし',
+                'php_version' => phpversion(),
+                'wp_version' => get_bloginfo('version'),
+                'model' => $this->get_current_model(),
+                'api_key_set' => !empty($this->get_setting('api_key'))
+            )
+        ));
+    }
+
+    /**
+     * プロセスログクリア
+     */
+    public function ajax_clear_process_log() {
+        check_ajax_referer('gi_seo_nonce', 'nonce');
+        global $wpdb;
+        
+        $wpdb->query("TRUNCATE TABLE {$this->table_process_log}");
+        
+        wp_send_json_success('ログをクリアしました');
     }
 
     /**
@@ -3773,7 +3828,7 @@ class GI_SEO_Content_Manager {
 
         $settings = array(
             'api_key' => sanitize_text_field($_POST['api_key'] ?? ''),
-            'model' => sanitize_text_field($_POST['model'] ?? 'gemini-3-pro-preview'),
+            'model' => sanitize_text_field($_POST['model'] ?? 'gemini-2.0-flash'),
             'temperature' => floatval($_POST['temperature'] ?? 0.7),
             'processing_interval' => intval($_POST['processing_interval'] ?? 30),
             'post_types' => isset($_POST['post_types']) ? array_map('sanitize_text_field', (array)$_POST['post_types']) : array('post'),
@@ -3879,6 +3934,29 @@ class GI_SEO_Content_Manager {
                 <textarea class="gi-textarea" id="bulk-urls" placeholder="https://example.com/post1&#10;https://example.com/post2&#10;https://example.com/post3"></textarea>
                 <div style="margin-top:10px;">
                     <button class="gi-btn gi-btn-primary" id="btn-add-urls">URLをキューに追加</button>
+                </div>
+            </div>
+
+            <div class="gi-card">
+                <h3>🔧 デバッグ・診断</h3>
+                <div style="display:flex;gap:10px;margin-bottom:15px;">
+                    <button class="gi-btn" id="btn-load-log">📋 ログ取得</button>
+                    <button class="gi-btn" id="btn-clear-log" style="background:#ff6b6b;color:#fff;">🗑️ ログクリア</button>
+                    <button class="gi-btn gi-btn-primary" id="btn-test-cron">🔄 手動Cron実行</button>
+                </div>
+                <div id="debug-info" style="background:#f5f5f5;padding:15px;border-radius:4px;margin-bottom:15px;">
+                    <strong>システム状態</strong>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:10px;margin-top:10px;font-size:13px;">
+                        <div>最終Cron実行: <span id="dbg-last-cron">-</span></div>
+                        <div>キュー状態: <span id="dbg-queue-running">-</span></div>
+                        <div>ロック状態: <span id="dbg-lock">-</span></div>
+                        <div>次回Cron: <span id="dbg-next-cron">-</span></div>
+                        <div>使用モデル: <span id="dbg-model">-</span></div>
+                        <div>APIキー: <span id="dbg-api-key">-</span></div>
+                    </div>
+                </div>
+                <div id="process-log" style="max-height:300px;overflow-y:auto;background:#1e1e1e;color:#d4d4d4;padding:15px;border-radius:4px;font-family:monospace;font-size:12px;display:none;">
+                    <div id="log-content">ログを読み込むには「ログ取得」をクリックしてください</div>
                 </div>
             </div>
 
@@ -4273,6 +4351,66 @@ class GI_SEO_Content_Manager {
             });
 
             $('.gi-modal').click(function(e){ if(e.target===this) $(this).hide(); });
+
+            // デバッグ機能
+            function loadDebugLog() {
+                $('#process-log').show();
+                $('#log-content').html('<span style="color:#888;">読み込み中...</span>');
+                $.post(ajaxurl, {action:'gi_seo_get_process_log',nonce:nonce,limit:50}, function(r){
+                    if(r.success){
+                        // デバッグ情報更新
+                        var dbg = r.data.debug_info;
+                        $('#dbg-last-cron').text(dbg.last_cron_run + ' (' + dbg.last_cron_ago + ')');
+                        $('#dbg-queue-running').html(dbg.queue_running ? '<span style="color:#090;">実行中</span>' : '<span style="color:#999;">停止中</span>');
+                        $('#dbg-lock').html(dbg.lock_active ? '<span style="color:#c00;">ロック中</span>' : '<span style="color:#090;">解放</span>');
+                        $('#dbg-next-cron').text(dbg.cron_scheduled);
+                        $('#dbg-model').text(dbg.model);
+                        $('#dbg-api-key').html(dbg.api_key_set ? '<span style="color:#090;">設定済み</span>' : '<span style="color:#c00;">未設定</span>');
+                        
+                        // ログ表示
+                        var logHtml = '';
+                        if(r.data.logs.length === 0) {
+                            logHtml = '<span style="color:#888;">ログがありません</span>';
+                        } else {
+                            r.data.logs.forEach(function(log){
+                                var color = '#d4d4d4';
+                                if(log.action.includes('error') || log.action.includes('failed')) color = '#f48771';
+                                else if(log.action.includes('success') || log.action.includes('completed')) color = '#89d185';
+                                else if(log.action.includes('start')) color = '#569cd6';
+                                else if(log.action.includes('stop') || log.action.includes('timeout')) color = '#ce9178';
+                                
+                                logHtml += '<div style="margin-bottom:5px;">';
+                                logHtml += '<span style="color:#888;">['+log.created_at+']</span> ';
+                                logHtml += '<span style="color:'+color+';">'+log.action+'</span>: ';
+                                logHtml += log.message;
+                                logHtml += '</div>';
+                            });
+                        }
+                        $('#log-content').html(logHtml);
+                    }
+                });
+            }
+
+            $('#btn-load-log').click(function(){ loadDebugLog(); });
+            
+            $('#btn-clear-log').click(function(){
+                if(!confirm('プロセスログをクリアしますか？')) return;
+                $.post(ajaxurl, {action:'gi_seo_clear_process_log',nonce:nonce}, function(r){
+                    alert(r.success ? 'クリアしました' : 'エラー');
+                    loadDebugLog();
+                });
+            });
+            
+            $('#btn-test-cron').click(function(){
+                var btn = $(this);
+                btn.prop('disabled', true).text('実行中...');
+                $.post(ajaxurl, {action:'gi_seo_process_single',nonce:nonce}, function(r){
+                    btn.prop('disabled', false).text('🔄 手動Cron実行');
+                    alert(r.success ? '手動実行完了' : 'エラー: ' + r.data);
+                    loadQueue();
+                    loadDebugLog();
+                });
+            });
         });
         </script>
         <?php
@@ -6155,14 +6293,13 @@ class GI_SEO_Content_Manager {
                         <select class="gi-select" name="model">
                             <?php
                             $models = array(
-                                'gemini-3-pro-preview' => 'Gemini 3 Pro Preview（推奨）',
-                                'gemini-2.5-flash' => 'Gemini 2.5 Flash',
-                                'gemini-2.5-pro' => 'Gemini 2.5 Pro',
-                                'gemini-2.0-flash' => 'Gemini 2.0 Flash',
-                                'gemini-1.5-pro' => 'Gemini 1.5 Pro',
-                                'gemini-1.5-flash' => 'Gemini 1.5 Flash'
+                                'gemini-2.0-flash' => 'Gemini 2.0 Flash（推奨・高速）',
+                                'gemini-2.0-flash-exp' => 'Gemini 2.0 Flash Exp',
+                                'gemini-1.5-pro' => 'Gemini 1.5 Pro（高品質）',
+                                'gemini-1.5-flash' => 'Gemini 1.5 Flash',
+                                'gemini-1.5-flash-8b' => 'Gemini 1.5 Flash 8B（軽量）'
                             );
-                            $current = $settings['model'] ?? 'gemini-3-pro-preview';
+                            $current = $settings['model'] ?? 'gemini-2.0-flash';
                             foreach ($models as $v => $l) {
                                 echo '<option value="'.esc_attr($v).'"'.($v===$current?' selected':'').'>'.esc_html($l).'</option>';
                             }
