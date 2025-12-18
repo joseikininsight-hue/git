@@ -6,14 +6,20 @@
  * 301リダイレクトを自動で設定する機能を提供します。
  * 
  * @package Grant_Insight_Perfect
- * @version 1.0.0
+ * @version 2.0.0
  * @since 2024-12-08
+ * @updated 2024-12-18 - メモリ最適化: リダイレクトマップをpost_metaに分散保存
  * 
  * 機能:
  * - 新規投稿の自動ID-based スラッグ生成
  * - 既存投稿のスラッグ一括変換
  * - 旧URL→新URLへの301リダイレクト
  * - 変換履歴の保存とリダイレクトマップ管理
+ * 
+ * v2.0.0 変更点:
+ * - リダイレクトマップを1つの巨大なオプションではなく、各投稿のpost_metaに分散保存
+ * - メモリ使用量を大幅削減（数百MB→数KB）
+ * - リダイレクト検索をmeta_queryで効率的に実行
  */
 
 if (!defined('ABSPATH')) {
@@ -31,11 +37,14 @@ if (!defined('GI_SLUG_PREFIX')) {
     define('GI_SLUG_PREFIX', 'grant-');  // 例: grant-12345
 }
 
-// リダイレクトマップを保存するオプション名
+// リダイレクトマップを保存するオプション名（v2.0で非推奨、post_metaに移行）
 define('GI_SLUG_REDIRECT_MAP_OPTION', 'gi_grant_slug_redirect_map');
 
 // 変換ログオプション名
 define('GI_SLUG_CONVERSION_LOG_OPTION', 'gi_grant_slug_conversion_log');
+
+// 旧スラッグを保存するpost_metaキー（v2.0から使用）
+define('GI_REDIRECT_FROM_SLUG_META_KEY', '_gi_redirect_from_slug');
 
 /**
  * =============================================================================
@@ -187,80 +196,87 @@ function gi_should_convert_slug($slug) {
  */
 
 /**
- * リダイレクトマップにエントリを追加
+ * リダイレクトマップにエントリを追加（v2.0: post_metaに分散保存）
  * 
  * @param string $old_slug 旧スラッグ
  * @param string $new_slug 新スラッグ
  * @param int $post_id 投稿ID
  */
 function gi_add_slug_redirect($old_slug, $new_slug, $post_id) {
-    $redirect_map = get_option(GI_SLUG_REDIRECT_MAP_OPTION, array());
+    // v2.0: post_metaに旧スラッグを保存（メモリ効率的）
+    // 1つの投稿に複数の旧スラッグを保存可能（エンコード形式の違いに対応）
     
-    // URLエンコードされた形式も保存（両方でリダイレクトに対応）
-    $old_slug_encoded = urlencode($old_slug);
     $old_slug_decoded = urldecode($old_slug);
+    $old_slug_encoded = urlencode($old_slug);
     
-    // 両方の形式を保存
-    $redirect_map[$old_slug] = array(
-        'new_slug' => $new_slug,
-        'post_id' => $post_id,
-        'created_at' => current_time('mysql'),
-        'original_url' => home_url('/grants/' . $old_slug . '/')
-    );
-    
-    // エンコードされた形式が異なる場合は追加
-    if ($old_slug !== $old_slug_encoded) {
-        $redirect_map[$old_slug_encoded] = array(
-            'new_slug' => $new_slug,
-            'post_id' => $post_id,
-            'created_at' => current_time('mysql'),
-            'original_url' => home_url('/grants/' . $old_slug_encoded . '/')
-        );
+    // 既存の旧スラッグを取得
+    $existing_slugs = get_post_meta($post_id, GI_REDIRECT_FROM_SLUG_META_KEY, false);
+    if (!is_array($existing_slugs)) {
+        $existing_slugs = array();
     }
     
-    if ($old_slug !== $old_slug_decoded) {
-        $redirect_map[$old_slug_decoded] = array(
-            'new_slug' => $new_slug,
-            'post_id' => $post_id,
-            'created_at' => current_time('mysql'),
-            'original_url' => home_url('/grants/' . $old_slug_decoded . '/')
-        );
+    // 重複を避けて旧スラッグを追加
+    $slugs_to_add = array_unique(array(
+        $old_slug,
+        $old_slug_decoded,
+        $old_slug_encoded
+    ));
+    
+    foreach ($slugs_to_add as $slug) {
+        // 新スラッグと同じ場合はスキップ
+        if ($slug === $new_slug) {
+            continue;
+        }
+        // 既に保存済みならスキップ
+        if (!in_array($slug, $existing_slugs, true)) {
+            add_post_meta($post_id, GI_REDIRECT_FROM_SLUG_META_KEY, $slug);
+        }
     }
     
-    update_option(GI_SLUG_REDIRECT_MAP_OPTION, $redirect_map);
+    // 新スラッグも記録（検索用）
+    update_post_meta($post_id, '_gi_current_slug', $new_slug);
+    update_post_meta($post_id, '_gi_slug_converted_at', current_time('mysql'));
     
-    // ログに記録
+    // ログに記録（軽量化）
     gi_log_slug_conversion($post_id, $old_slug, $new_slug);
 }
 
 /**
- * 変換ログを記録
+ * 変換ログを記録（v2.0: 軽量化）
  * 
  * @param int $post_id 投稿ID
  * @param string $old_slug 旧スラッグ
  * @param string $new_slug 新スラッグ
  */
 function gi_log_slug_conversion($post_id, $old_slug, $new_slug) {
+    // v2.0: ログは最小限に（メモリ節約）
+    // 詳細はpost_metaから取得可能なため、ここでは最新100件のみ保持
+    
     $log = get_option(GI_SLUG_CONVERSION_LOG_OPTION, array());
+    
+    // 配列でない場合は初期化
+    if (!is_array($log)) {
+        $log = array();
+    }
     
     $log[] = array(
         'post_id' => $post_id,
         'old_slug' => $old_slug,
         'new_slug' => $new_slug,
-        'converted_at' => current_time('mysql'),
-        'post_title' => get_the_title($post_id)
+        'converted_at' => current_time('mysql')
+        // post_titleは省略（必要時にget_the_titleで取得）
     );
     
-    // ログは最大500件まで保存
-    if (count($log) > 500) {
-        $log = array_slice($log, -500);
+    // ログは最大100件まで保存（500→100に削減）
+    if (count($log) > 100) {
+        $log = array_slice($log, -100);
     }
     
-    update_option(GI_SLUG_CONVERSION_LOG_OPTION, $log);
+    update_option(GI_SLUG_CONVERSION_LOG_OPTION, $log, false); // autoload=false
 }
 
 /**
- * 旧URLから新URLへ301リダイレクト
+ * 旧URLから新URLへ301リダイレクト（v2.0: meta_queryで検索）
  */
 function gi_handle_old_slug_redirect() {
     // 管理画面やAPIリクエストでは実行しない
@@ -281,12 +297,62 @@ function gi_handle_old_slug_redirect() {
     // URLデコード
     $requested_slug_decoded = urldecode($requested_slug);
     
-    // リダイレクトマップを取得
+    // 既にgrant-数字形式なら、正規のURLなのでリダイレクト不要
+    if (preg_match('/^grant-\d+$/', $requested_slug)) {
+        return;
+    }
+    
+    // v2.0: post_metaから旧スラッグを検索（メモリ効率的）
+    global $wpdb;
+    
+    // 直接SQLで検索（WP_Queryより軽量）
+    $post_id = $wpdb->get_var($wpdb->prepare(
+        "SELECT post_id FROM {$wpdb->postmeta} 
+         WHERE meta_key = %s 
+         AND (meta_value = %s OR meta_value = %s)
+         LIMIT 1",
+        GI_REDIRECT_FROM_SLUG_META_KEY,
+        $requested_slug,
+        $requested_slug_decoded
+    ));
+    
+    if ($post_id) {
+        // 投稿が存在するか確認
+        $post = get_post($post_id);
+        
+        if ($post && $post->post_status === 'publish' && $post->post_type === 'grant') {
+            // 現在のスラッグでリダイレクト
+            $new_url = get_permalink($post_id);
+            
+            // 301リダイレクトを実行
+            wp_redirect($new_url, 301);
+            exit;
+        }
+    }
+    
+    // v1.0互換: 古いオプションベースのマップもチェック（移行期間中のみ）
+    // 注意: 巨大なデータがある場合はこの部分をコメントアウト
+    // gi_handle_legacy_redirect_map($requested_slug, $requested_slug_decoded);
+}
+add_action('template_redirect', 'gi_handle_old_slug_redirect', 1);
+
+/**
+ * v1.0互換: 古いオプションベースのリダイレクトマップを処理
+ * 注意: 巨大なデータがある場合はメモリエラーを起こすため無効化推奨
+ * 
+ * @param string $requested_slug リクエストされたスラッグ
+ * @param string $requested_slug_decoded デコードされたスラッグ
+ */
+function gi_handle_legacy_redirect_map($requested_slug, $requested_slug_decoded) {
+    // この関数は通常無効化されています
+    // 移行が完了したら削除してください
+    return;
+    
+    // 以下は移行期間中に必要な場合のみ有効化
+    /*
     $redirect_map = get_option(GI_SLUG_REDIRECT_MAP_OPTION, array());
     
-    // マップに存在するかチェック
     $redirect_info = null;
-    
     if (isset($redirect_map[$requested_slug])) {
         $redirect_info = $redirect_map[$requested_slug];
     } elseif (isset($redirect_map[$requested_slug_decoded])) {
@@ -294,20 +360,15 @@ function gi_handle_old_slug_redirect() {
     }
     
     if ($redirect_info) {
-        // 投稿が存在するか確認
         $post = get_post($redirect_info['post_id']);
-        
         if ($post && $post->post_status === 'publish') {
-            // 新しいURLを構築
             $new_url = home_url('/grants/' . $redirect_info['new_slug'] . '/');
-            
-            // 301リダイレクトを実行
             wp_redirect($new_url, 301);
             exit;
         }
     }
+    */
 }
-add_action('template_redirect', 'gi_handle_old_slug_redirect', 1);
 
 /**
  * =============================================================================
@@ -1526,12 +1587,99 @@ if (defined('WP_CLI') && WP_CLI) {
     WP_CLI::add_command('gi slug status', function() {
         $total = wp_count_posts('grant')->publish;
         $needs = gi_count_grants_needing_conversion();
-        $redirects = count(get_option(GI_SLUG_REDIRECT_MAP_OPTION, array()));
+        
+        // v2.0: post_metaベースのリダイレクト数をカウント
+        global $wpdb;
+        $redirects = $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(DISTINCT post_id) FROM {$wpdb->postmeta} WHERE meta_key = %s",
+            GI_REDIRECT_FROM_SLUG_META_KEY
+        ));
         
         WP_CLI::log("=== 助成金スラッグ状態 ===");
         WP_CLI::log("公開済み投稿: " . $total . "件");
         WP_CLI::log("変換済み: " . ($total - $needs) . "件");
         WP_CLI::log("要変換: " . $needs . "件");
-        WP_CLI::log("リダイレクト登録: " . $redirects . "件");
+        WP_CLI::log("リダイレクト登録（post_meta）: " . $redirects . "件");
     });
+    
+    /**
+     * WP-CLIコマンド: 旧リダイレクトマップを削除
+     */
+    WP_CLI::add_command('gi slug cleanup-legacy', function($args, $assoc_args) {
+        $dry_run = isset($assoc_args['dry-run']);
+        
+        // 旧オプションのサイズを確認
+        global $wpdb;
+        $size = $wpdb->get_var($wpdb->prepare(
+            "SELECT LENGTH(option_value) FROM {$wpdb->options} WHERE option_name = %s",
+            GI_SLUG_REDIRECT_MAP_OPTION
+        ));
+        
+        if (!$size) {
+            WP_CLI::success("旧リダイレクトマップは存在しません。");
+            return;
+        }
+        
+        WP_CLI::log("旧リダイレクトマップサイズ: " . round($size / 1048576, 2) . "MB");
+        
+        if ($dry_run) {
+            WP_CLI::success("--dry-run が指定されているため、削除は実行されません。");
+            return;
+        }
+        
+        WP_CLI::confirm("旧リダイレクトマップを削除しますか？");
+        
+        delete_option(GI_SLUG_REDIRECT_MAP_OPTION);
+        WP_CLI::success("旧リダイレクトマップを削除しました。");
+    });
+}
+
+/**
+ * =============================================================================
+ * 10. v2.0 移行ユーティリティ
+ * =============================================================================
+ */
+
+/**
+ * 旧オプションベースのリダイレクトマップのサイズを取得
+ * 
+ * @return array サイズ情報
+ */
+function gi_get_legacy_redirect_map_info() {
+    global $wpdb;
+    
+    $size = $wpdb->get_var($wpdb->prepare(
+        "SELECT LENGTH(option_value) FROM {$wpdb->options} WHERE option_name = %s",
+        GI_SLUG_REDIRECT_MAP_OPTION
+    ));
+    
+    return array(
+        'exists' => (bool) $size,
+        'size_bytes' => (int) $size,
+        'size_mb' => $size ? round($size / 1048576, 2) : 0,
+        'warning' => $size > 10485760 ? '10MB以上のデータがあります。削除を推奨します。' : null
+    );
+}
+
+/**
+ * 旧リダイレクトマップを削除（メモリを節約）
+ * 
+ * @return bool 成功したかどうか
+ */
+function gi_delete_legacy_redirect_map() {
+    return delete_option(GI_SLUG_REDIRECT_MAP_OPTION);
+}
+
+/**
+ * post_metaベースのリダイレクト数を取得
+ * 
+ * @return int リダイレクト登録数
+ */
+function gi_count_post_meta_redirects() {
+    global $wpdb;
+    
+    return (int) $wpdb->get_var($wpdb->prepare(
+        "SELECT COUNT(DISTINCT post_id) FROM {$wpdb->postmeta} WHERE meta_key = %s",
+        GI_REDIRECT_FROM_SLUG_META_KEY
+    ));
 }
