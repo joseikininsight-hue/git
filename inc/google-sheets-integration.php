@@ -25,7 +25,7 @@ if (!defined('ABSPATH')) {
 // ============================================================================
 
 if (!defined('GI_SHEETS_VERSION')) {
-    define('GI_SHEETS_VERSION', '3.1.0');
+    define('GI_SHEETS_VERSION', '3.2.0');
 }
 
 if (!defined('GI_SHEETS_BATCH_SIZE')) {
@@ -45,7 +45,8 @@ if (!defined('GI_SHEETS_MAX_EXECUTION_TIME')) {
 }
 
 if (!defined('GI_SHEETS_MEMORY_LIMIT')) {
-    define('GI_SHEETS_MEMORY_LIMIT', '512M');
+    // WP_MEMORY_LIMIT（1024M）を尊重するため、同等以上に設定
+    define('GI_SHEETS_MEMORY_LIMIT', '1024M');
 }
 
 // ============================================================================
@@ -1790,8 +1791,18 @@ class GoogleSheetsSync {
         // タイムアウト設定
         @set_time_limit(GI_SHEETS_MAX_EXECUTION_TIME);
         
-        // メモリ制限設定
-        @ini_set('memory_limit', GI_SHEETS_MEMORY_LIMIT);
+        // メモリ制限設定（現在の設定より小さい場合は上書きしない）
+        $current_limit = ini_get('memory_limit');
+        $new_limit = GI_SHEETS_MEMORY_LIMIT;
+        
+        // メモリ制限を数値に変換して比較
+        $current_bytes = $this->convertToBytes($current_limit);
+        $new_bytes = $this->convertToBytes($new_limit);
+        
+        // 新しい制限が現在より大きい場合、または-1（無制限）の場合のみ設定
+        if ($new_bytes > $current_bytes || $new_limit === '-1') {
+            @ini_set('memory_limit', $new_limit);
+        }
         
         // WordPressのキャッシュ追加を一時停止（メモリ節約）
         wp_suspend_cache_addition(true);
@@ -1829,6 +1840,35 @@ class GoogleSheetsSync {
             'max_execution_time' => ini_get('max_execution_time'),
             'current_memory' => $this->getMemoryUsage()
         ));
+    }
+    
+    /**
+     * メモリ制限文字列をバイト数に変換
+     * 
+     * @param string $val メモリ制限文字列（例: '512M', '1G', '2048M'）
+     * @return int バイト数
+     */
+    private function convertToBytes($val) {
+        $val = trim($val);
+        if ($val === '-1') {
+            return PHP_INT_MAX; // 無制限
+        }
+        
+        $last = strtolower($val[strlen($val) - 1]);
+        $val = (int) $val;
+        
+        switch ($last) {
+            case 'g':
+                $val *= 1024;
+                // fall through
+            case 'm':
+                $val *= 1024;
+                // fall through
+            case 'k':
+                $val *= 1024;
+        }
+        
+        return $val;
     }
     
     /**
