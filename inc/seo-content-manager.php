@@ -13,7 +13,7 @@
 if (!defined('ABSPATH')) exit;
 
 class GI_SEO_Content_Manager {
-    private $version = '31.6.0';
+    private $version = '31.7.0';
     private $table_queue;
     private $table_failed;
     private $table_merge_history;
@@ -122,7 +122,13 @@ class GI_SEO_Content_Manager {
         register_activation_hook(__FILE__, array($this, 'activate'));
         register_deactivation_hook(__FILE__, array($this, 'deactivate'));
 
-        $this->maybe_create_tables();
+        // テーブル作成はバージョン変更時のみ実行（パフォーマンス最適化）
+        $db_version = get_option('gi_seo_db_version', '0');
+        if (version_compare($db_version, $this->version, '<')) {
+            $this->maybe_create_tables();
+            update_option('gi_seo_db_version', $this->version);
+        }
+        
         $this->ensure_cron_running();
     }
 
@@ -220,6 +226,16 @@ class GI_SEO_Content_Manager {
             'message' => $message,
             'created_at' => current_time('mysql')
         ));
+        
+        // 古いログを自動クリーンアップ（1000件を超えたら古いものを削除）
+        static $cleanup_done = false;
+        if (!$cleanup_done) {
+            $count = $wpdb->get_var("SELECT COUNT(*) FROM {$this->table_process_log}");
+            if ($count > 1000) {
+                $wpdb->query("DELETE FROM {$this->table_process_log} ORDER BY created_at ASC LIMIT " . ($count - 1000));
+            }
+            $cleanup_done = true;
+        }
     }
 
     private function maybe_create_tables() {
@@ -3287,7 +3303,7 @@ class GI_SEO_Content_Manager {
         }
         
         $where_clause = implode(' AND ', $where);
-        $sql = "SELECT * FROM {$this->table_subsidy} WHERE {$where_clause} ORDER BY created_at DESC";
+        $sql = "SELECT * FROM {$this->table_subsidy} WHERE {$where_clause} ORDER BY created_at DESC LIMIT 10000";
         
         if (!empty($params)) {
             $sql = $wpdb->prepare($sql, $params);
