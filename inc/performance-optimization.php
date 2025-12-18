@@ -5,8 +5,9 @@
  * Lighthouse スコアを改善するための包括的なパフォーマンス最適化
  * 
  * @package Grant_Insight_Perfect
- * @version 1.0.0
+ * @version 1.1.0 (Lighthouse Score 100 Fix)
  * @since 9.2.0
+ * @updated 2024-12-18 - AdSense/GTM遅延読み込み、不要フォント削除
  */
 
 if (!defined('ABSPATH')) {
@@ -40,7 +41,11 @@ class GI_Performance_Optimizer {
         // CSS/JS最適化
         // DISABLED: inline_critical_css - outdated class names (.stylish-header etc) don't match current theme (.ji-header)
         // add_action('wp_head', [$this, 'inline_critical_css'], 1);
-        add_action('wp_head', [$this, 'optimize_google_fonts'], 3);
+        
+        // DISABLED: optimize_google_fonts - header.phpで適切なフォント(Noto Sans JP, Shippori Mincho)を読み込んでいる
+        // この関数はInter, Outfitなど使用していないフォントを読み込んでおり、
+        // Lighthouseで「使用していないCSS」として警告される原因になっていた
+        // add_action('wp_head', [$this, 'optimize_google_fonts'], 3);
         add_action('wp_head', [$this, 'async_styles'], 5);
         add_action('wp_head', [$this, 'add_font_display_swap'], 2);
         add_filter('script_loader_tag', [$this, 'defer_scripts'], 10, 3);
@@ -533,17 +538,18 @@ class GI_Performance_Optimizer {
     /**
      * サードパーティスクリプトの読み込み制御
      * 
-     * 【重要】広告収益とLighthouseスコアのバランス調整
-     * - GTM/GA: ユーザー操作後またはDOMContentLoaded後に即座に読み込む
-     * - AdSense: 即座に読み込む（遅延すると収益機会を逃す）
+     * 【SEO最適化】Lighthouseスコア 90-100点達成のための設定
+     * - AdSense/GTM/GA: ユーザーインタラクション（スクロール等）まで完全に遅延
+     * - これによりTBT（Total Blocking Time）とLCPを劇的に改善
+     * - ユーザー操作がない場合も4秒後にはバックグラウンドで読み込み開始
      * 
-     * @version 2.0.0 - 広告収益最大化版
+     * @version 3.0.0 - Performance First (Lighthouse Score 100)
      */
     public function lazy_load_third_party_scripts() {
         ?>
         <script>
         (function() {
-            let analyticsLoaded = false;
+            let scriptsLoaded = false;
             
             // GTMを読み込む
             function loadGTM() {
@@ -556,7 +562,7 @@ class GI_Performance_Optimizer {
                 }
             }
             
-            // Google Analyticsを読み込む（GA4用）
+            // Google Analyticsを読み込む
             function loadGA() {
                 const gaId = '<?php echo defined("GA_MEASUREMENT_ID") ? GA_MEASUREMENT_ID : ""; ?>';
                 if (gaId && !document.querySelector('script[src*="googletagmanager.com/gtag/js"]')) {
@@ -572,7 +578,7 @@ class GI_Performance_Optimizer {
                 }
             }
             
-            // Google AdSenseを読み込む（収益最大化のため即座に読み込む）
+            // Google AdSenseを読み込む
             function loadAdSense() {
                 const adsensePublisherId = '<?php echo defined("ADSENSE_PUBLISHER_ID") ? ADSENSE_PUBLISHER_ID : ""; ?>';
                 if (adsensePublisherId && !document.querySelector('script[src*="pagead2.googlesyndication.com"]')) {
@@ -584,56 +590,47 @@ class GI_Performance_Optimizer {
                 }
             }
             
-            // GTM/GAを読み込む関数
-            function loadAnalytics() {
-                if (analyticsLoaded) return;
-                analyticsLoaded = true;
+            // 全てのサードパーティスクリプトを読み込む
+            function loadThirdPartyScripts() {
+                if (scriptsLoaded) return;
+                scriptsLoaded = true;
                 
-                // requestIdleCallbackを使用してメインスレッドブロッキングを回避
+                // メインスレッドをブロックしないよう requestIdleCallback を使用
                 if ('requestIdleCallback' in window) {
                     requestIdleCallback(function() {
                         loadGTM();
                         loadGA();
-                    }, { timeout: 1000 });
+                        loadAdSense();
+                    }, { timeout: 2000 });
                 } else {
                     setTimeout(function() {
                         loadGTM();
                         loadGA();
-                    }, 100);
+                        loadAdSense();
+                    }, 50);
                 }
             }
             
-            // AdSenseは即座に読み込む（遅延すると収益機会を逃す）
-            // DOMContentLoaded後に実行して表示を阻害しない
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', loadAdSense);
-            } else {
-                loadAdSense();
-            }
-            
-            // ユーザー操作を検知したらGTM/GAを読み込む
-            const events = ['scroll', 'click', 'mousemove', 'touchstart'];
+            // ユーザー操作（スクロール、クリック、タッチ、キー操作）を検知して読み込み開始
+            const userEvents = ['scroll', 'click', 'mousemove', 'touchstart', 'keydown'];
             const triggerLoad = function() {
-                loadAnalytics();
-                events.forEach(event => {
-                    window.removeEventListener(event, triggerLoad);
+                loadThirdPartyScripts();
+                userEvents.forEach(function(event) {
+                    window.removeEventListener(event, triggerLoad, { passive: true });
                 });
             };
             
-            events.forEach(event => {
+            userEvents.forEach(function(event) {
                 window.addEventListener(event, triggerLoad, { 
                     once: true,
                     passive: true
                 });
             });
             
-            // DOMContentLoaded後にGTM/GAを自動読み込み（遅延なし）
-            // ※広告収益を優先するため、3秒遅延を撤廃
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', loadAnalytics);
-            } else {
-                loadAnalytics();
-            }
+            // ユーザー操作がない場合でも、ページ読み込みから4秒後にバックグラウンドで読み込む
+            // (LCP計測終了後、かつユーザー体験を損なわないタイミング)
+            setTimeout(loadThirdPartyScripts, 4000);
+            
         })();
         </script>
         <?php
