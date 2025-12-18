@@ -830,6 +830,12 @@ if (file_exists($affiliate_ad_file)) {
     require_once $affiliate_ad_file;
 }
 
+// Content Ad Injector - 記事本文中への広告自動挿入
+$content_ad_injector_file = get_template_directory() . '/inc/content-ad-injector.php';
+if (file_exists($content_ad_injector_file)) {
+    require_once $content_ad_injector_file;
+}
+
 // Access Tracking System
 $access_tracking_file = get_template_directory() . '/inc/access-tracking.php';
 if (file_exists($access_tracking_file)) {
