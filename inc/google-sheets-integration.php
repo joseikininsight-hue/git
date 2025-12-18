@@ -25,7 +25,7 @@ if (!defined('ABSPATH')) {
 // ============================================================================
 
 if (!defined('GI_SHEETS_VERSION')) {
-    define('GI_SHEETS_VERSION', '3.0.0');
+    define('GI_SHEETS_VERSION', '3.1.0');
 }
 
 if (!defined('GI_SHEETS_BATCH_SIZE')) {
@@ -1177,6 +1177,8 @@ class GoogleSheetsSync {
             
             if ($exists) {
                 $post_data['ID'] = $post_id;
+                // スラッグを grant-{投稿ID} 形式に設定
+                $post_data['post_name'] = 'grant-' . $post_id;
                 $result_id = wp_update_post($post_data, true);
                 
                 if (is_wp_error($result_id)) {
@@ -1194,6 +1196,12 @@ class GoogleSheetsSync {
                 
                 $post_id = $result_id;
                 $action = 'created';
+                
+                // 新規作成後にスラッグを grant-{投稿ID} 形式に更新
+                wp_update_post(array(
+                    'ID' => $post_id,
+                    'post_name' => 'grant-' . $post_id
+                ));
             }
         } else {
             // タイトルで既存投稿を検索（軽量クエリ）
@@ -1202,6 +1210,8 @@ class GoogleSheetsSync {
             if ($existing_post_id) {
                 // 既存投稿を更新
                 $post_data['ID'] = $existing_post_id;
+                // スラッグを grant-{投稿ID} 形式に設定
+                $post_data['post_name'] = 'grant-' . $existing_post_id;
                 $result_id = wp_update_post($post_data, true);
                 $post_id = $existing_post_id;
                 $action = 'updated';
@@ -1210,6 +1220,14 @@ class GoogleSheetsSync {
                 $result_id = wp_insert_post($post_data, true);
                 $post_id = $result_id;
                 $action = 'created';
+                
+                // 新規作成後にスラッグを grant-{投稿ID} 形式に更新
+                if (!is_wp_error($result_id)) {
+                    wp_update_post(array(
+                        'ID' => $post_id,
+                        'post_name' => 'grant-' . $post_id
+                    ));
+                }
             }
             
             if (is_wp_error($result_id)) {
@@ -3809,6 +3827,7 @@ class GoogleSheetsWebhook {
             'post_content' => wp_kses_post($row_data[2]),
             'post_excerpt' => sanitize_textarea_field($row_data[3]),
             'post_status' => sanitize_text_field($row_data[4]),
+            'post_name' => 'grant-' . $post_id,  // スラッグを grant-{投稿ID} 形式に設定
         );
         
         $result = wp_update_post($updated_post, true);
@@ -3853,6 +3872,12 @@ class GoogleSheetsWebhook {
         if (is_wp_error($post_id)) {
             return array('success' => false, 'message' => $post_id->get_error_message());
         }
+        
+        // 新規作成後にスラッグを grant-{投稿ID} 形式に更新
+        wp_update_post(array(
+            'ID' => $post_id,
+            'post_name' => 'grant-' . $post_id
+        ));
         
         return array(
             'success' => true,
