@@ -55,6 +55,7 @@ class JI_Affiliate_Ad_Manager {
         'archive_grant_sidebar_bottom' => '補助金AR:SB下',
         'archive_grant_content_top' => '補助金AR:本文上',
         'archive_grant_content_bottom' => '補助金AR:本文下',
+        'archive_grant_infeed' => '補助金AR:インフィード',
         // アーカイブページ - コラム
         'archive_column_sidebar_pr' => 'コラムAR:PR',
         'archive_column_sidebar_top' => 'コラムAR:SB上',

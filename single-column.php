@@ -599,6 +599,13 @@ if (!empty($faq_items)) $toc_items[] = array('id' => 'faq', 'title' => 'よく�
                     </header>
                     <div class="gic-content">
                         <?php echo apply_filters('the_content', $post_content); ?>
+                        
+                        <!-- 広告枠（記事直下） - アフィリエイト/自社CTA推奨：高成約率ポイント -->
+                        <?php if (function_exists('ji_display_ad')): ?>
+                        <div class="gic-ad-content-bottom" style="margin-top: 40px;">
+                            <?php ji_display_ad('single_column_content_bottom'); ?>
+                        </div>
+                        <?php endif; ?>
                     </div>
                 </article>
 
@@ -796,6 +803,15 @@ if (!empty($faq_items)) $toc_items[] = array('id' => 'faq', 'title' => 'よく�
             <!-- サイドバー -->
             <aside class="gic-sidebar">
                 
+                <!-- 広告枠（サイドバー上部） - AdSense推奨：ファーストビュー高CPC -->
+                <?php if (function_exists('ji_display_ad')): ?>
+                <section class="gic-sidebar-section gic-ad-section" aria-label="広告">
+                    <div class="gic-ad-slot">
+                        <?php ji_display_ad('single_column_sidebar_top'); ?>
+                    </div>
+                </section>
+                <?php endif; ?>
+                
                 <!-- AIアシスタント -->
                 <section class="gic-sidebar-section gic-ai-section" aria-labelledby="ai-title">
                     <header class="gic-sidebar-header">
@@ -944,6 +960,17 @@ if (!empty($faq_items)) $toc_items[] = array('id' => 'faq', 'title' => 'よく�
                         </div>
                     </div>
                 </section>
+                <?php endif; ?>
+
+                <!-- 広告枠（サイドバー追尾） - AdSenseマルチプレックス推奨 -->
+                <?php if (function_exists('ji_display_ad')): ?>
+                <div class="gic-sidebar-sticky" style="position: sticky; top: 100px;">
+                    <section class="gic-sidebar-section gic-ad-section" aria-label="広告">
+                        <div class="gic-ad-slot">
+                            <?php ji_display_ad('single_column_sidebar_bottom'); ?>
+                        </div>
+                    </section>
+                </div>
                 <?php endif; ?>
 
             </aside>

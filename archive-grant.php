@@ -1052,9 +1052,21 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                     $initial_grants_query = new WP_Query($query_args);
                     
                     if ($initial_grants_query->have_posts()) :
+                        $grant_count = 0; // インフィード広告用カウンター
                         while ($initial_grants_query->have_posts()) : 
                             $initial_grants_query->the_post();
                             include(get_template_directory() . '/template-parts/grant-card-unified.php');
+                            
+                            $grant_count++;
+                            
+                            // 4件目と8件目の後にインフィード広告を挿入（スマホ収益化対策）
+                            if (($grant_count === 4 || $grant_count === 8) && function_exists('ji_display_ad')) : ?>
+                                <div class="archive-infeed-ad" style="margin: 24px 0; padding: 15px; background: #f9f9f9; border-radius: 8px; text-align: center;">
+                                    <span style="font-size: 10px; color: #999; display: block; text-align: left; margin-bottom: 8px;">スポンサーリンク</span>
+                                    <?php ji_display_ad('archive_grant_infeed'); ?>
+                                </div>
+                            <?php endif;
+                            
                         endwhile;
                         wp_reset_postdata();
                     else :

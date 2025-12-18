@@ -531,39 +531,35 @@ class GI_Performance_Optimizer {
      */
     
     /**
-     * サードパーティスクリプトをユーザー操作後に読み込む
-     * Phase 2最適化: requestIdleCallback使用でTBT削減
+     * サードパーティスクリプトの読み込み制御
+     * 
+     * 【重要】広告収益とLighthouseスコアのバランス調整
+     * - GTM/GA: ユーザー操作後またはDOMContentLoaded後に即座に読み込む
+     * - AdSense: 即座に読み込む（遅延すると収益機会を逃す）
+     * 
+     * @version 2.0.0 - 広告収益最大化版
      */
     public function lazy_load_third_party_scripts() {
         ?>
         <script>
         (function() {
-            let thirdPartyScriptsLoaded = false;
+            let analyticsLoaded = false;
             
             // GTMを読み込む
             function loadGTM() {
-                // GTM IDが設定されている場合のみ読み込む
-                // header.phpで実際のGTM IDに置き換えてください
                 const gtmId = '<?php echo defined("GTM_ID") ? GTM_ID : ""; ?>';
-                if (gtmId) {
+                if (gtmId && !document.querySelector('script[src*="googletagmanager.com/gtm.js"]')) {
                     const script = document.createElement('script');
                     script.src = 'https://www.googletagmanager.com/gtm.js?id=' + gtmId;
                     script.async = true;
                     document.head.appendChild(script);
-                    console.log('GTM loaded in idle time');
                 }
-            }
-            
-            // Google Adsを読み込む
-            function loadAds() {
-                // 広告スクリプトがある場合はここに追加
-                console.log('Ads loading deferred');
             }
             
             // Google Analyticsを読み込む（GA4用）
             function loadGA() {
                 const gaId = '<?php echo defined("GA_MEASUREMENT_ID") ? GA_MEASUREMENT_ID : ""; ?>';
-                if (gaId) {
+                if (gaId && !document.querySelector('script[src*="googletagmanager.com/gtag/js"]')) {
                     const script = document.createElement('script');
                     script.src = 'https://www.googletagmanager.com/gtag/js?id=' + gaId;
                     script.async = true;
@@ -573,55 +569,71 @@ class GI_Performance_Optimizer {
                     function gtag(){dataLayer.push(arguments);}
                     gtag('js', new Date());
                     gtag('config', gaId);
-                    console.log('GA4 loaded in idle time');
                 }
             }
             
-            // サードパーティスクリプトを読み込む関数（改善版）
-            function loadThirdPartyScripts() {
-                if (thirdPartyScriptsLoaded) return;
-                thirdPartyScriptsLoaded = true;
+            // Google AdSenseを読み込む（収益最大化のため即座に読み込む）
+            function loadAdSense() {
+                const adsensePublisherId = '<?php echo defined("ADSENSE_PUBLISHER_ID") ? ADSENSE_PUBLISHER_ID : ""; ?>';
+                if (adsensePublisherId && !document.querySelector('script[src*="pagead2.googlesyndication.com"]')) {
+                    const script = document.createElement('script');
+                    script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + adsensePublisherId;
+                    script.async = true;
+                    script.crossOrigin = 'anonymous';
+                    document.head.appendChild(script);
+                }
+            }
+            
+            // GTM/GAを読み込む関数
+            function loadAnalytics() {
+                if (analyticsLoaded) return;
+                analyticsLoaded = true;
                 
-                console.log('Loading third-party scripts in idle time...');
-                
-                // requestIdleCallbackを使用してアイドル時に読み込む
-                // これによりメインスレッドブロッキングを回避
+                // requestIdleCallbackを使用してメインスレッドブロッキングを回避
                 if ('requestIdleCallback' in window) {
                     requestIdleCallback(function() {
                         loadGTM();
                         loadGA();
-                        loadAds();
-                    }, { timeout: 3000 }); // 3秒後にはタイムアウトして実行
+                    }, { timeout: 1000 });
                 } else {
-                    // requestIdleCallback非対応ブラウザ用フォールバック
                     setTimeout(function() {
                         loadGTM();
                         loadGA();
-                        loadAds();
-                    }, 3000);
+                    }, 100);
                 }
             }
             
-            // ユーザー操作を検知したら読み込む（改善版）
+            // AdSenseは即座に読み込む（遅延すると収益機会を逃す）
+            // DOMContentLoaded後に実行して表示を阻害しない
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', loadAdSense);
+            } else {
+                loadAdSense();
+            }
+            
+            // ユーザー操作を検知したらGTM/GAを読み込む
             const events = ['scroll', 'click', 'mousemove', 'touchstart'];
             const triggerLoad = function() {
-                loadThirdPartyScripts();
-                // イベントリスナーを削除してメモリリーク防止
+                loadAnalytics();
                 events.forEach(event => {
                     window.removeEventListener(event, triggerLoad);
                 });
             };
             
-            // 各イベントにリスナーを設定（passive: trueでスクロールパフォーマンス向上）
             events.forEach(event => {
                 window.addEventListener(event, triggerLoad, { 
-                    once: true,      // 一度だけ実行
-                    passive: true    // パフォーマンス向上
+                    once: true,
+                    passive: true
                 });
             });
             
-            // 3秒経過したら自動的に読み込む（5秒→3秒に短縮）
-            setTimeout(loadThirdPartyScripts, 3000);
+            // DOMContentLoaded後にGTM/GAを自動読み込み（遅延なし）
+            // ※広告収益を優先するため、3秒遅延を撤廃
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', loadAnalytics);
+            } else {
+                loadAnalytics();
+            }
         })();
         </script>
         <?php

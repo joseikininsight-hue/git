@@ -284,6 +284,43 @@ body.single-grant {
     /* single-grant.php で --gi-mobile-banner: 60px が設定されているため、
        ここでは追加パディングを適用しない */
 }
+
+/* ============================================
+   AdSense アンカー広告対策
+   Googleアンカー広告が下に出た場合、CTAを上にずらす
+   ============================================ */
+
+/* Googleのアンカー広告コンテナがある場合のスタイル調整 */
+/* AdSenseがbodyにパディングを追加する場合の対策 */
+body[style*="margin-bottom"],
+body[style*="padding-bottom"] {
+    /* AdSenseによるbodyへのスタイル追加を検知 */
+}
+
+/* Google アンカー広告が表示された場合（iframeベースの検出） */
+.ui-sticky-cta:has(~ ins.adsbygoogle[data-ad-format="auto"]),
+.ui-sticky-cta:has(~ iframe[id^="google_ads"]) {
+    /* CTAを上にずらす */
+    bottom: 100px !important;
+}
+
+/* AdSense アンカー広告との競合回避（JavaScript検出後に適用） */
+body.adsense-anchor-bottom .ui-sticky-cta {
+    bottom: 100px !important;
+    transition: bottom 0.3s ease;
+}
+
+/* 代替案：AdSenseアンカー広告が表示されている場合はCTAを非表示 */
+/* body.adsense-anchor-bottom .ui-sticky-cta {
+    display: none !important;
+} */
+
+/* モバイルでのアンカー広告競合対策 */
+@media (max-width: 767px) {
+    body.adsense-anchor-bottom .ui-sticky-cta {
+        bottom: 90px !important;
+    }
+}
 </style>
 
 <script>
@@ -292,6 +329,40 @@ body.single-grant {
 
     const stickyBar = document.getElementById('ui-sticky-cta');
     if (!stickyBar) return;
+
+    // AdSenseアンカー広告検出・競合回避
+    function detectAdSenseAnchor() {
+        // AdSenseアンカー広告のiframeを検出
+        const anchorAd = document.querySelector('iframe[id*="google_ads_iframe"][data-anchor-status]') ||
+                         document.querySelector('ins.adsbygoogle[data-anchor-status]') ||
+                         document.querySelector('div[id*="google_ads"][style*="position: fixed"][style*="bottom"]');
+        
+        // AdSenseがbodyに追加するスタイルを検出
+        const bodyStyle = window.getComputedStyle(document.body);
+        const hasBottomMargin = parseInt(bodyStyle.marginBottom) > 0;
+        
+        if (anchorAd || hasBottomMargin) {
+            document.body.classList.add('adsense-anchor-bottom');
+        } else {
+            document.body.classList.remove('adsense-anchor-bottom');
+        }
+    }
+    
+    // MutationObserverでDOM変更を監視（AdSense動的挿入対応）
+    const observer = new MutationObserver(function(mutations) {
+        detectAdSenseAnchor();
+    });
+    
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['style']
+    });
+    
+    // 初回検出とページ読み込み完了後の検出
+    detectAdSenseAnchor();
+    window.addEventListener('load', detectAdSenseAnchor);
 
     let lastScrollY = window.scrollY;
     let ticking = false;
