@@ -489,18 +489,37 @@ function gi_column_get_category_stats() {
     $stats = array();
     
     foreach ($categories as $category) {
-        $query = gi_get_columns_by_category($category->slug, -1);
+        // メモリ対策: IDのみを取得する軽量クエリに変更
+        // gi_get_columns_by_category は全データをロードするため使用しない
+        $args = array(
+            'post_type'      => 'column',
+            'posts_per_page' => -1, // 全件対象だが、IDのみなので軽量
+            'post_status'    => 'publish',
+            'fields'         => 'ids', // ★重要: IDだけを取得（メモリ大幅削減）
+            'tax_query'      => array(
+                array(
+                    'taxonomy' => 'column_category',
+                    'field'    => 'slug',
+                    'terms'    => $category->slug,
+                ),
+            ),
+            'no_found_rows'          => true, // ページネーション不要なのでカウントクエリ省略
+            'update_post_meta_cache' => false, // メタキャッシュ不要
+            'update_post_term_cache' => false, // タームキャッシュ不要
+        );
+
+        $ids = get_posts($args);
         
         $total_views = 0;
-        $count = 0;
+        $count = count($ids); // 件数は配列の要素数
         
-        if ($query->have_posts()) {
-            while ($query->have_posts()) {
-                $query->the_post();
-                $total_views += (int) get_field('view_count', get_the_ID());
-                $count++;
+        if ($ids) {
+            foreach ($ids as $post_id) {
+                // IDを使って必要なメタデータだけを取得
+                // ACFのget_fieldではなく直接get_post_metaで取得（軽量）
+                $views = get_post_meta($post_id, 'view_count', true);
+                $total_views += (int) $views;
             }
-            wp_reset_postdata();
         }
         
         $stats[] = array(
