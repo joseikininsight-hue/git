@@ -46,7 +46,7 @@ $hero_config = [
     // 画像設定（画像ID推奨・URL直接指定も可能）
     // メディアライブラリで画像IDを確認して 'hero_image_id' に設定してください
     // 例: 画像ID = 123 なら 'hero_image_id' => 123
-    'hero_image_id'     => null, // ← 実際の画像IDをここに設定（推奨）
+    'hero_image_id'     => 8049, // ← 実際の画像IDをここに設定（推奨）
     'hero_image'        => 'https://joseikin-insight.com/wp-content/uploads/2024/11/dashboard-screenshot.webp', // ← 実際の画像ファイルURLに変更してください
     'hero_image_alt'    => '補助金検索システムのダッシュボード画面',
     'hero_image_width'  => 800,
