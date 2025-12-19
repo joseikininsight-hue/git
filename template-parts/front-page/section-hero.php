@@ -43,8 +43,11 @@ $hero_config = [
         ]
     ],
     
-    // 画像
-    'hero_image'        => 'https://joseikin-insight.com/1-3/',
+    // 画像設定（画像ID推奨・URL直接指定も可能）
+    // メディアライブラリで画像IDを確認して 'hero_image_id' に設定してください
+    // 例: 画像ID = 123 なら 'hero_image_id' => 123
+    'hero_image_id'     => null, // ← 実際の画像IDをここに設定（推奨）
+    'hero_image'        => 'https://joseikin-insight.com/wp-content/uploads/2024/11/dashboard-screenshot.webp', // ← 実際の画像ファイルURLに変更してください
     'hero_image_alt'    => '補助金検索システムのダッシュボード画面',
     'hero_image_width'  => 800,
     'hero_image_height' => 600,
@@ -138,16 +141,38 @@ $hero_config = [
             <!-- 右カラム: ビジュアル -->
             <div class="hero__visual">
                 <figure class="hero__image-wrapper">
-                    <img 
-                        src="<?php echo esc_url($hero_config['hero_image']); ?>" 
-                        alt="<?php echo esc_attr($hero_config['hero_image_alt']); ?>"
-                        class="hero__image"
-                        width="<?php echo esc_attr($hero_config['hero_image_width']); ?>"
-                        height="<?php echo esc_attr($hero_config['hero_image_height']); ?>"
-                        loading="eager"
-                        fetchpriority="high"
-                        decoding="async"
-                        itemprop="image">
+                    <?php 
+                    // 画像ID指定がある場合はWordPress関数で最適化画像を出力
+                    if (!empty($hero_config['hero_image_id'])) {
+                        echo wp_get_attachment_image(
+                            $hero_config['hero_image_id'], 
+                            'large', // サイズ: large = 1024x1024（レスポンシブ対応自動）
+                            false, 
+                            [
+                                'class' => 'hero__image',
+                                'loading' => 'eager',       // LCP画像として即時読み込み
+                                'fetchpriority' => 'high',  // 最優先で取得
+                                'decoding' => 'async',
+                                'itemprop' => 'image',
+                                'alt' => $hero_config['hero_image_alt']
+                            ]
+                        );
+                    } else {
+                        // IDがない場合はURL直接指定（フォールバック）
+                        ?>
+                        <img 
+                            src="<?php echo esc_url($hero_config['hero_image']); ?>" 
+                            alt="<?php echo esc_attr($hero_config['hero_image_alt']); ?>"
+                            class="hero__image"
+                            width="<?php echo esc_attr($hero_config['hero_image_width']); ?>"
+                            height="<?php echo esc_attr($hero_config['hero_image_height']); ?>"
+                            loading="eager"
+                            fetchpriority="high"
+                            decoding="async"
+                            itemprop="image">
+                        <?php
+                    }
+                    ?>
                 </figure>
             </div>
             
