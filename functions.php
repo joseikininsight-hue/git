@@ -1466,6 +1466,13 @@ function gi_litespeed_inline_css_minify_control($minify) {
 // フィルターでは強制せず、ユーザー制御に委ねる
 
 /**
+ * CSS Async/Defer: FOUC防止のため無効化
+ * 初回訪問時のCSS崩れを防ぐ
+ */
+add_filter('litespeed_optm_css_async', '__return_false');
+add_filter('litespeed_optm_css_defer', '__return_false');
+
+/**
  * CSS HTTP/2 Push: 有効化推奨
  * Critical CSSをHTTP/2でプッシュして高速化
  */
@@ -1494,6 +1501,45 @@ function gi_litespeed_preload_resources() {
     
     // Critical Fontsのプリロード（該当する場合）
     // echo '<link rel="preload" as="font" href="/path/to/font.woff2" type="font/woff2" crossorigin>' . "\n";
+}
+
+/**
+ * Critical CSS: Above the Fold CSS Inline Injection
+ * FOUC防止のため、Above the Fold CSSを<head>内にインライン化
+ * 
+ * このCritical CSSは初回訪問時のFOUC (Flash of Unstyled Content) を防止します。
+ */
+add_action('wp_head', 'gi_inject_critical_css', 2);
+function gi_inject_critical_css() {
+    // Critical CSS（ヘッダー、ヒーローセクション、基本レイアウト）
+    $critical_css = "
+    /* Critical Reset & Base Styles */
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;line-height:1.6;color:#1a1a1a;background:#fff}
+    
+    /* Header Critical Styles */
+    #ji-header{position:fixed;top:0;left:0;right:0;z-index:1000;background:#fff;transition:transform .3s ease}
+    #ji-header.hidden{transform:translateY(-100%)}
+    #ji-header.scrolled{box-shadow:0 2px 8px rgba(0,0,0,.1)}
+    .ji-logo{display:block;height:40px}
+    .ji-logo-image{width:auto;height:100%;object-fit:contain}
+    
+    /* Hero Section Critical Styles */
+    .hero{min-height:400px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+    .hero__image{width:100%;height:auto;display:block}
+    
+    /* Layout Critical Styles */
+    .container{max-width:1200px;margin:0 auto;padding:0 20px}
+    
+    /* Prevent FOUC */
+    .no-js{opacity:1}
+    ";
+    
+    // Minify CSS（改行・スペース削除）
+    $critical_css = preg_replace('/\s+/', ' ', $critical_css);
+    $critical_css = str_replace([' {', '{ ', ' }', '} ', ': ', ' ;', '; '], ['{', '{', '}', '}', ':', ';', ';'], $critical_css);
+    
+    echo '<style id="critical-css">' . trim($critical_css) . '</style>' . "\n";
 }
 
 /**
