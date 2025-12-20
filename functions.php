@@ -1524,3 +1524,67 @@ function gi_litespeed_skip_external_image_check($continue, $src) {
     
     return $continue;
 }
+
+/**
+ * LiteSpeed Cache: Additional Filters to Prevent External Image Processing
+ * 追加フィルター：外部画像処理を完全にブロック
+ */
+
+// Lazy Load用の除外フィルター
+add_filter('litespeed_media_lazy_img_excludes', 'gi_litespeed_lazy_external_excludes', 999);
+function gi_litespeed_lazy_external_excludes($excludes) {
+    // 外部ドメインパターンを追加
+    $external_patterns = [
+        'googleusercontent.com',
+        'gstatic.com',
+        'ytimg.com',
+        'vimeocdn.com',
+        'twimg.com',
+        'fbcdn.net',
+    ];
+    
+    return array_merge($excludes, $external_patterns);
+}
+
+// 画像最適化リクエストをインターセプト
+add_action('litespeed_media_before_optm', 'gi_litespeed_block_external_optm', 10, 1);
+function gi_litespeed_block_external_optm($img_url) {
+    if (empty($img_url)) {
+        return;
+    }
+    
+    // 外部URLかチェック
+    $site_host = parse_url(site_url(), PHP_URL_HOST);
+    $img_host = parse_url($img_url, PHP_URL_HOST);
+    
+    if ($img_host && $img_host !== $site_host) {
+        // 外部URLの場合は処理を中断
+        wp_die('External image optimization blocked', '', array('response' => 403));
+    }
+}
+
+/**
+ * Suppress getimagesize() warnings for external URLs
+ * 外部URL用のgetimagesize警告抑制
+ */
+add_action('init', 'gi_setup_external_image_error_handler', 1);
+function gi_setup_external_image_error_handler() {
+    // エラーハンドラーをカスタマイズ
+    set_error_handler('gi_custom_getimagesize_error_handler', E_WARNING);
+}
+
+function gi_custom_getimagesize_error_handler($errno, $errstr, $errfile, $errline) {
+    // getimagesize関連のエラーで、外部URLの場合は抑制
+    if (strpos($errstr, 'getimagesize') !== false && 
+        (strpos($errstr, 'googleusercontent.com') !== false ||
+         strpos($errstr, '403 Forbidden') !== false)) {
+        // エラーログには記録するが、画面には表示しない
+        if (defined('WP_DEBUG') && WP_DEBUG && defined('WP_DEBUG_LOG') && WP_DEBUG_LOG) {
+            error_log("LiteSpeed Cache: Blocked external image optimization - $errstr");
+        }
+        return true; // エラーを抑制
+    }
+    
+    // その他のエラーは通常通り処理
+    return false;
+}
