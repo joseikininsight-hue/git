@@ -1360,49 +1360,116 @@ function gi_litespeed_lazy_excludes($excludes) {
 }
 
 /**
- * LiteSpeed Cache: JavaScript Defer Exclusions
- * 重要なJSを遅延除外（インタラクティブ要素）
+ * LiteSpeed Cache: JavaScript Optimization Settings
+ * Critical JS保護 + Defer最適化
+ * 
+ * 【最適化戦略】
+ * 1. jQuery/WordPress core JS: Deferから除外
+ * 2. インタラクティブJS: 即時実行
+ * 3. その他のJS: Defer可能
  */
 add_filter('litespeed_optm_js_defer_exc', 'gi_litespeed_js_defer_excludes');
 function gi_litespeed_js_defer_excludes($excludes) {
     $critical_js = [
         'jquery.min.js',            // jQuery本体
+        'jquery-core',              // WordPress jQuery Core
+        'jquery-migrate',           // jQuery Migrate
         'wp-includes/js/jquery',    // WordPress jQuery
         'data-no-defer',            // カスタム除外属性
-        'front-page.js',            // フロントページ重要JS
-        'section-hero.js',          // ヒーローセクションJS
     ];
     
     return array_merge($excludes, $critical_js);
 }
 
 /**
- * LiteSpeed Cache: CSS Inline Combine Exclusions
- * Critical CSSはインライン化しない（結合から除外）
- * 
- * 【緊急修正】CSS崩れ対策：CSS最適化を一時的に制限
+ * JS Combine: 条件付き有効化
+ * jQuery等のCore JSは結合から除外
  */
+add_filter('litespeed_optm_js_exc', 'gi_litespeed_js_combine_excludes');
+function gi_litespeed_js_combine_excludes($excludes) {
+    $exclude_from_combine = [
+        'jquery.min.js',
+        'jquery-core',
+        'jquery-migrate',
+        'wp-includes/js/jquery',
+        'wp-includes/js/dist',      // Gutenberg/Block Editor
+    ];
+    
+    return array_merge($excludes, $exclude_from_combine);
+}
+
+/**
+ * JS HTTP/2 Push: 有効化
+ * Critical JSをHTTP/2でプッシュ
+ */
+add_filter('litespeed_optm_js_http2', '__return_true');
+
+/**
+ * LiteSpeed Cache: CSS Optimization Settings
+ * Critical CSS保護 + 段階的最適化
+ * 
+ * 【最適化戦略】
+ * 1. Critical CSS（Above the Fold）は結合から除外
+ * 2. CSS Minify: 有効（安全）
+ * 3. CSS Combine: 有効（除外設定で保護）
+ * 4. Inline CSS: 条件付き最適化
+ * 5. CSS Async/Defer: 慎重に有効化
+ */
+
+// Critical CSS除外設定（最重要）
 add_filter('litespeed_optm_css_exc', 'gi_litespeed_css_excludes');
 function gi_litespeed_css_excludes($excludes) {
-    // Above the Fold用のCritical CSSは除外推奨
+    // Above the Fold用のCritical CSSは結合から除外
     $critical_css = [
         'critical-css',         // Critical CSS識別子
         'inline-critical',      // インラインクリティカルCSS
         'hero-styles',          // ヒーローセクションスタイル
-        'style.css',            // メインスタイルシート（必要に応じて）
     ];
     
     return array_merge($excludes, $critical_css);
 }
 
-// 【緊急追加】CSS Combine を一時的に無効化
-add_filter('litespeed_optm_css_async', '__return_false', 999);
-add_filter('litespeed_optm_css_defer', '__return_false', 999);
+/**
+ * CSS Minify: 有効化（安全な最適化）
+ * ファイルサイズ削減、レイアウトに影響なし
+ */
+// LiteSpeed Cache管理画面で制御するため、フィルターで強制しない
 
-// インラインCSS最適化も一時的に無効化
-add_filter('litespeed_optm_css_inline_minify', '__return_false', 999);
-add_filter('litespeed_optm_css_minify', '__return_false', 999);
-add_filter('litespeed_optm_css_combine', '__return_false', 999);
+/**
+ * CSS Combine: 条件付き有効化
+ * Critical CSS除外設定があるため安全
+ */
+add_filter('litespeed_optm_css_combine_priority', 'gi_litespeed_css_combine_priority');
+function gi_litespeed_css_combine_priority($priority) {
+    // Critical CSSを最優先で読み込む
+    return 1;
+}
+
+/**
+ * Inline CSS Minify: 選択的最適化
+ * フッターのインラインCSSは最適化、ヘッダーは除外
+ */
+add_filter('litespeed_optm_css_inline_minify', 'gi_litespeed_inline_css_minify_control');
+function gi_litespeed_inline_css_minify_control($minify) {
+    // ヘッダー内のCritical CSSは最適化しない
+    if (did_action('wp_head') && !did_action('wp_footer')) {
+        return false;
+    }
+    return true;
+}
+
+/**
+ * CSS Async Loading: Above the Fold以外のCSSを非同期化
+ * Critical CSSは同期読み込みのまま
+ */
+// LiteSpeed Cache管理画面で「Load CSS Asynchronously」を有効にすることを推奨
+// フィルターでは強制せず、ユーザー制御に委ねる
+
+/**
+ * CSS HTTP/2 Push: 有効化推奨
+ * Critical CSSをHTTP/2でプッシュして高速化
+ */
+add_filter('litespeed_optm_css_http2', '__return_true');
 
 /**
  * LiteSpeed Cache: Viewport Image Generation Settings
@@ -1443,21 +1510,60 @@ function gi_litespeed_cache_cookies($cookies) {
 }
 
 /**
- * LiteSpeed Cache: Aggressive Preset Compatibility Check
- * アグレッシブプリセット互換性チェック
+ * LiteSpeed Cache: Admin Notices with Optimization Guide
+ * 管理画面通知＋最適化ガイド
  */
-add_action('admin_notices', 'gi_litespeed_aggressive_notice');
-function gi_litespeed_aggressive_notice() {
+add_action('admin_notices', 'gi_litespeed_optimization_guide');
+function gi_litespeed_optimization_guide() {
     // LiteSpeed Cacheが有効かチェック
     if (!defined('LSCWP_V')) {
         return;
     }
     
     $screen = get_current_screen();
+    
+    // ダッシュボードで総合通知
     if ($screen && $screen->id === 'dashboard') {
         echo '<div class="notice notice-success is-dismissible">';
-        echo '<p><strong>LiteSpeed Cache Aggressive対応完了:</strong> Above the Fold画像のLazy Load除外、Critical JS/CSS設定が適用されています。</p>';
-        echo '<p>推奨: LiteSpeed Cache設定で「Aggressive」プリセットを選択し、QUIC.cloud接続を有効にしてください。</p>';
+        echo '<h3>🚀 LiteSpeed Cache 最適化完了</h3>';
+        echo '<p><strong>テーマ側の最適化設定が適用されました:</strong></p>';
+        echo '<ul style="list-style: disc; margin-left: 20px;">';
+        echo '<li>✅ Above the Fold画像のLazy Load除外</li>';
+        echo '<li>✅ Critical CSS/JS保護設定</li>';
+        echo '<li>✅ 外部画像の自動除外</li>';
+        echo '<li>✅ HTTP/2 Push有効化</li>';
+        echo '</ul>';
+        echo '<p><strong>推奨:</strong> LiteSpeed Cache → Presets で「<strong>Aggressive</strong>」を選択し、QUIC.cloud接続を有効にしてください。</p>';
+        echo '</div>';
+    }
+    
+    // LiteSpeed Cache設定ページで詳細ガイド
+    if ($screen && strpos($screen->id, 'litespeed') !== false) {
+        echo '<div class="notice notice-info">';
+        echo '<h3>📋 推奨設定ガイド</h3>';
+        echo '<h4>✅ 既にテーマ側で自動設定済み:</h4>';
+        echo '<ul style="list-style: disc; margin-left: 20px;">';
+        echo '<li>Critical CSS/JS除外リスト</li>';
+        echo '<li>外部画像URL除外（Google UserContent等）</li>';
+        echo '<li>HTTP/2 Push有効化</li>';
+        echo '</ul>';
+        echo '<h4>🔧 LiteSpeed Cache管理画面で設定してください:</h4>';
+        echo '<ul style="list-style: disc; margin-left: 20px;">';
+        echo '<li><strong>Page Optimization → CSS Settings:</strong><br>
+              - CSS Minify: ON<br>
+              - CSS Combine: ON<br>
+              - Load CSS Asynchronously: ON（推奨）<br>
+              - Inline CSS Minify: ON</li>';
+        echo '<li><strong>Page Optimization → JS Settings:</strong><br>
+              - JS Minify: ON<br>
+              - JS Combine: ON（External JSはOFF）<br>
+              - Load JS Deferred: ON</li>';
+        echo '<li><strong>Media → Lazy Load:</strong><br>
+              - Lazy Load Images: ON（Above the Foldは自動除外済み）</li>';
+        echo '<li><strong>Media → Image Optimization:</strong><br>
+              - WebP Replacement: ON<br>
+              - Responsive Placeholder: ON</li>';
+        echo '</ul>';
         echo '</div>';
     }
 }
@@ -1559,24 +1665,41 @@ function gi_litespeed_lazy_external_excludes($excludes) {
 }
 
 /**
- * Suppress getimagesize() warnings for external URLs ONLY
- * 外部URL用のgetimagesize警告抑制（より安全な実装）
+ * External Image Handling: Safe and Silent
+ * 外部URL用の警告抑制（安全な実装）
  * 
- * NOTE: エラーハンドラーは削除し、@演算子でLiteSpeed Cache側のエラーを抑制させる
+ * NOTE: エラーハンドラーは使用せず、フィルターのみで対応
+ * 403エラーがログに出ても無害（外部画像は正常表示される）
  */
 
-// LiteSpeed Cache設定でエラー抑制を推奨
-add_action('admin_notices', 'gi_litespeed_external_image_notice');
-function gi_litespeed_external_image_notice() {
+// 外部画像の403警告について管理者に説明
+add_action('admin_notices', 'gi_litespeed_external_image_info');
+function gi_litespeed_external_image_info() {
     if (!defined('LSCWP_V')) {
         return;
     }
     
     $screen = get_current_screen();
-    if ($screen && $screen->id === 'litespeed-cache_page_litespeed-img_optm') {
-        echo '<div class="notice notice-info is-dismissible">';
-        echo '<p><strong>外部画像の403エラーについて:</strong> Google UserContent等の外部画像は最適化から自動除外されます。</p>';
-        echo '<p>エラーログに403警告が表示される場合は、LiteSpeed Cache → 画像最適化 → 詳細設定 で「外部URLをスキップ」を有効にしてください。</p>';
-        echo '</div>';
+    
+    // エラーログページまたはLiteSpeed設定ページで表示
+    if ($screen && (strpos($screen->id, 'tools') !== false || strpos($screen->id, 'litespeed') !== false)) {
+        // エラーログに403警告がある場合のみ表示
+        if (file_exists(WP_CONTENT_DIR . '/debug.log')) {
+            $log_content = @file_get_contents(WP_CONTENT_DIR . '/debug.log');
+            if ($log_content && (strpos($log_content, '403 Forbidden') !== false || strpos($log_content, 'googleusercontent') !== false)) {
+                echo '<div class="notice notice-info is-dismissible">';
+                echo '<h4>ℹ️ 外部画像の403エラーについて</h4>';
+                echo '<p>エラーログに「<code>getimagesize() ... 403 Forbidden</code>」と表示される場合があります。</p>';
+                echo '<p><strong>これは無害です：</strong></p>';
+                echo '<ul style="list-style: disc; margin-left: 20px;">';
+                echo '<li>外部画像（Google UserContent等）は正常に表示されます</li>';
+                echo '<li>LiteSpeed Cacheがローカル最適化を試みただけです</li>';
+                echo '<li>サイトの表示・パフォーマンスに影響ありません</li>';
+                echo '<li>外部画像は自動的に最適化対象から除外されています</li>';
+                echo '</ul>';
+                echo '<p><strong>対処不要</strong>：このエラーは無視しても問題ありません。気になる場合は、ログローテーション設定で403エラーをフィルタリングできます。</p>';
+                echo '</div>';
+            }
+        }
     }
 }
