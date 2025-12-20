@@ -1379,6 +1379,8 @@ function gi_litespeed_js_defer_excludes($excludes) {
 /**
  * LiteSpeed Cache: CSS Inline Combine Exclusions
  * Critical CSSはインライン化しない（結合から除外）
+ * 
+ * 【緊急修正】CSS崩れ対策：CSS最適化を一時的に制限
  */
 add_filter('litespeed_optm_css_exc', 'gi_litespeed_css_excludes');
 function gi_litespeed_css_excludes($excludes) {
@@ -1387,10 +1389,20 @@ function gi_litespeed_css_excludes($excludes) {
         'critical-css',         // Critical CSS識別子
         'inline-critical',      // インラインクリティカルCSS
         'hero-styles',          // ヒーローセクションスタイル
+        'style.css',            // メインスタイルシート（必要に応じて）
     ];
     
     return array_merge($excludes, $critical_css);
 }
+
+// 【緊急追加】CSS Combine を一時的に無効化
+add_filter('litespeed_optm_css_async', '__return_false', 999);
+add_filter('litespeed_optm_css_defer', '__return_false', 999);
+
+// インラインCSS最適化も一時的に無効化
+add_filter('litespeed_optm_css_inline_minify', '__return_false', 999);
+add_filter('litespeed_optm_css_minify', '__return_false', 999);
+add_filter('litespeed_optm_css_combine', '__return_false', 999);
 
 /**
  * LiteSpeed Cache: Viewport Image Generation Settings
@@ -1546,45 +1558,25 @@ function gi_litespeed_lazy_external_excludes($excludes) {
     return array_merge($excludes, $external_patterns);
 }
 
-// 画像最適化リクエストをインターセプト
-add_action('litespeed_media_before_optm', 'gi_litespeed_block_external_optm', 10, 1);
-function gi_litespeed_block_external_optm($img_url) {
-    if (empty($img_url)) {
+/**
+ * Suppress getimagesize() warnings for external URLs ONLY
+ * 外部URL用のgetimagesize警告抑制（より安全な実装）
+ * 
+ * NOTE: エラーハンドラーは削除し、@演算子でLiteSpeed Cache側のエラーを抑制させる
+ */
+
+// LiteSpeed Cache設定でエラー抑制を推奨
+add_action('admin_notices', 'gi_litespeed_external_image_notice');
+function gi_litespeed_external_image_notice() {
+    if (!defined('LSCWP_V')) {
         return;
     }
     
-    // 外部URLかチェック
-    $site_host = parse_url(site_url(), PHP_URL_HOST);
-    $img_host = parse_url($img_url, PHP_URL_HOST);
-    
-    if ($img_host && $img_host !== $site_host) {
-        // 外部URLの場合は処理を中断
-        wp_die('External image optimization blocked', '', array('response' => 403));
+    $screen = get_current_screen();
+    if ($screen && $screen->id === 'litespeed-cache_page_litespeed-img_optm') {
+        echo '<div class="notice notice-info is-dismissible">';
+        echo '<p><strong>外部画像の403エラーについて:</strong> Google UserContent等の外部画像は最適化から自動除外されます。</p>';
+        echo '<p>エラーログに403警告が表示される場合は、LiteSpeed Cache → 画像最適化 → 詳細設定 で「外部URLをスキップ」を有効にしてください。</p>';
+        echo '</div>';
     }
-}
-
-/**
- * Suppress getimagesize() warnings for external URLs
- * 外部URL用のgetimagesize警告抑制
- */
-add_action('init', 'gi_setup_external_image_error_handler', 1);
-function gi_setup_external_image_error_handler() {
-    // エラーハンドラーをカスタマイズ
-    set_error_handler('gi_custom_getimagesize_error_handler', E_WARNING);
-}
-
-function gi_custom_getimagesize_error_handler($errno, $errstr, $errfile, $errline) {
-    // getimagesize関連のエラーで、外部URLの場合は抑制
-    if (strpos($errstr, 'getimagesize') !== false && 
-        (strpos($errstr, 'googleusercontent.com') !== false ||
-         strpos($errstr, '403 Forbidden') !== false)) {
-        // エラーログには記録するが、画面には表示しない
-        if (defined('WP_DEBUG') && WP_DEBUG && defined('WP_DEBUG_LOG') && WP_DEBUG_LOG) {
-            error_log("LiteSpeed Cache: Blocked external image optimization - $errstr");
-        }
-        return true; // エラーを抑制
-    }
-    
-    // その他のエラーは通常通り処理
-    return false;
 }
