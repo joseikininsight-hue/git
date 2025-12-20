@@ -154,7 +154,10 @@ $hero_config = [
                                 'fetchpriority' => 'high',  // 最優先で取得
                                 'decoding' => 'async',
                                 'itemprop' => 'image',
-                                'alt' => $hero_config['hero_image_alt']
+                                'alt' => $hero_config['hero_image_alt'],
+                                // LiteSpeed Cache Aggressive対応: Lazy Load除外
+                                'data-no-lazy' => '1',      // LiteSpeed Cache除外属性
+                                'data-skip-lazy' => '1',    // 汎用Lazy Load除外
                             ]
                         );
                     } else {
@@ -169,7 +172,9 @@ $hero_config = [
                             loading="eager"
                             fetchpriority="high"
                             decoding="async"
-                            itemprop="image">
+                            itemprop="image"
+                            data-no-lazy="1"
+                            data-skip-lazy="1">
                         <?php
                     }
                     ?>

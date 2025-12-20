@@ -553,7 +553,7 @@ if (!function_exists('gi_get_cached_stats')) {
                     <!-- Column 1: ロゴ・連絡先 -->
                     <div class="gov-nav-brand">
                         <a href="<?php echo esc_url(home_url('/')); ?>" class="gov-brand-logo" aria-label="<?php bloginfo('name'); ?> ホームへ">
-                            <img src="https://joseikin-insight.com/gemini_generated_image_19k6yi19k6yi19k6/" alt="Joseikin Insight" width="200" height="36" class="gov-logo-image">
+                            <img src="https://joseikin-insight.com/gemini_generated_image_19k6yi19k6yi19k6/" alt="Joseikin Insight" width="200" height="36" class="gov-logo-image" loading="lazy" data-no-lazy="1" data-skip-lazy="1">
                         </a>
                         
                         <p class="gov-brand-description">

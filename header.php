@@ -298,6 +298,12 @@ $grants_url = get_post_type_archive_link('grant');
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     
+    <!-- LiteSpeed Cache Optimization Hints -->
+    <meta name="litespeed-cache" content="cache-control: max-age=3600">
+    <?php if (is_front_page()): ?>
+    <meta name="litespeed-vary" content="is_mobile">
+    <?php endif; ?>
+    
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Shippori+Mincho:wght@500;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Shippori+Mincho:wght@500;700&display=swap" rel="stylesheet"></noscript>
     
@@ -1592,6 +1598,8 @@ $grants_url = get_post_type_archive_link('grant');
                         loading="eager"
                         fetchpriority="high"
                         decoding="async"
+                        data-no-lazy="1"
+                        data-skip-lazy="1"
                     >
                 </div>
             </a>

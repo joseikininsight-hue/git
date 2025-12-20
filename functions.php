@@ -1325,3 +1325,127 @@ function gi_log_contact_submission($name, $email, $type, $subject, $message) {
     $logs = array_slice($logs, 0, 50);
     update_option('gi_contact_logs', $logs);
 }
+
+/**
+ * ============================================================================
+ * LiteSpeed Cache Aggressive Preset Optimization
+ * アグレッシブプリセット対応最適化設定
+ * ============================================================================
+ */
+
+/**
+ * LiteSpeed Cache: Lazy Load Exclusions
+ * Above the Fold画像をLazy Load除外リストに追加
+ */
+add_filter('litespeed_media_lazy_img_excludes', 'gi_litespeed_lazy_excludes');
+function gi_litespeed_lazy_excludes($excludes) {
+    $critical_classes = [
+        'hero__image',          // ヒーロー画像
+        'ji-logo-image',        // ヘッダーロゴ
+        'gov-logo-image',       // フッターロゴ
+        'slider-image',         // スライダー画像
+        'above-fold',           // Above the Fold全般
+    ];
+    
+    // data-no-lazy属性も除外
+    $excludes[] = 'data-no-lazy';
+    $excludes[] = 'data-skip-lazy';
+    
+    // クラス名での除外
+    foreach ($critical_classes as $class) {
+        $excludes[] = $class;
+    }
+    
+    return $excludes;
+}
+
+/**
+ * LiteSpeed Cache: JavaScript Defer Exclusions
+ * 重要なJSを遅延除外（インタラクティブ要素）
+ */
+add_filter('litespeed_optm_js_defer_exc', 'gi_litespeed_js_defer_excludes');
+function gi_litespeed_js_defer_excludes($excludes) {
+    $critical_js = [
+        'jquery.min.js',            // jQuery本体
+        'wp-includes/js/jquery',    // WordPress jQuery
+        'data-no-defer',            // カスタム除外属性
+        'front-page.js',            // フロントページ重要JS
+        'section-hero.js',          // ヒーローセクションJS
+    ];
+    
+    return array_merge($excludes, $critical_js);
+}
+
+/**
+ * LiteSpeed Cache: CSS Inline Combine Exclusions
+ * Critical CSSはインライン化しない（結合から除外）
+ */
+add_filter('litespeed_optm_css_exc', 'gi_litespeed_css_excludes');
+function gi_litespeed_css_excludes($excludes) {
+    // Above the Fold用のCritical CSSは除外推奨
+    $critical_css = [
+        'critical-css',         // Critical CSS識別子
+        'inline-critical',      // インラインクリティカルCSS
+        'hero-styles',          // ヒーローセクションスタイル
+    ];
+    
+    return array_merge($excludes, $critical_css);
+}
+
+/**
+ * LiteSpeed Cache: Viewport Image Generation Settings
+ * ビューポート画像最適化の設定
+ */
+add_filter('litespeed_conf_img_optm_webp_replace', '__return_true');
+add_filter('litespeed_conf_img_optm_webp_attribute', '__return_true');
+
+/**
+ * LiteSpeed Cache: Preload Critical Resources
+ * 重要リソースのプリロード設定
+ */
+add_action('wp_head', 'gi_litespeed_preload_resources', 1);
+function gi_litespeed_preload_resources() {
+    // LCP画像のプリロード
+    if (is_front_page()) {
+        echo '<link rel="preload" as="image" href="https://joseikin-insight.com/wp-content/uploads/2024/11/dashboard-screenshot.webp" fetchpriority="high">' . "\n";
+    }
+    
+    // ロゴのプリロード
+    echo '<link rel="preload" as="image" href="https://joseikin-insight.com/gemini_generated_image_19k6yi19k6yi19k6/" fetchpriority="high">' . "\n";
+    
+    // Critical Fontsのプリロード（該当する場合）
+    // echo '<link rel="preload" as="font" href="/path/to/font.woff2" type="font/woff2" crossorigin>' . "\n";
+}
+
+/**
+ * LiteSpeed Cache: Cache Vary for Logged-in Users
+ * ログインユーザーのキャッシュ分離
+ */
+add_filter('litespeed_cache_cookies', 'gi_litespeed_cache_cookies');
+function gi_litespeed_cache_cookies($cookies) {
+    // ログインユーザーは別キャッシュ
+    if (is_user_logged_in()) {
+        $cookies[] = 'wordpress_logged_in_';
+    }
+    return $cookies;
+}
+
+/**
+ * LiteSpeed Cache: Aggressive Preset Compatibility Check
+ * アグレッシブプリセット互換性チェック
+ */
+add_action('admin_notices', 'gi_litespeed_aggressive_notice');
+function gi_litespeed_aggressive_notice() {
+    // LiteSpeed Cacheが有効かチェック
+    if (!defined('LSCWP_V')) {
+        return;
+    }
+    
+    $screen = get_current_screen();
+    if ($screen && $screen->id === 'dashboard') {
+        echo '<div class="notice notice-success is-dismissible">';
+        echo '<p><strong>LiteSpeed Cache Aggressive対応完了:</strong> Above the Fold画像のLazy Load除外、Critical JS/CSS設定が適用されています。</p>';
+        echo '<p>推奨: LiteSpeed Cache設定で「Aggressive」プリセットを選択し、QUIC.cloud接続を有効にしてください。</p>';
+        echo '</div>';
+    }
+}
