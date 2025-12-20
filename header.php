@@ -1911,7 +1911,7 @@ $grants_url = get_post_type_archive_link('grant');
 
 <main id="main-content" role="main">
 
-<script>
+<script data-no-defer>
 (function() {
     'use strict';
     
