@@ -1449,3 +1449,78 @@ function gi_litespeed_aggressive_notice() {
         echo '</div>';
     }
 }
+
+/**
+ * LiteSpeed Cache: External Image URL Exclusions
+ * 外部画像URL除外（403エラー対策）
+ */
+add_filter('litespeed_media_optm_exc_src', 'gi_litespeed_external_image_excludes');
+function gi_litespeed_external_image_excludes($excluded_urls) {
+    // 外部サービスの画像URL（403エラーを返すもの）を除外
+    $external_domains = [
+        'lh3.googleusercontent.com',    // Google UserContent (NotebookLM等)
+        'lh4.googleusercontent.com',
+        'lh5.googleusercontent.com',
+        'lh6.googleusercontent.com',
+        'ssl.gstatic.com',              // Google Static Content
+        'www.gstatic.com',
+        'i.ytimg.com',                  // YouTube Thumbnails
+        'i.vimeocdn.com',               // Vimeo Thumbnails
+        'platform.twitter.com',         // Twitter Embeds
+        'abs.twimg.com',                // Twitter Images
+        'external-',                    // Facebook External CDN
+        'scontent',                     // Facebook Content
+        'graph.facebook.com',           // Facebook Graph API
+    ];
+    
+    // 既存の除外リストに追加
+    if (!is_array($excluded_urls)) {
+        $excluded_urls = [];
+    }
+    
+    return array_merge($excluded_urls, $external_domains);
+}
+
+/**
+ * LiteSpeed Cache: Disable Image Optimization for External URLs
+ * 外部URL画像の最適化を完全に無効化
+ */
+add_filter('litespeed_media_check_ori_optm', 'gi_litespeed_skip_external_image_check', 10, 2);
+function gi_litespeed_skip_external_image_check($continue, $src) {
+    // 外部URLかチェック
+    if (empty($src)) {
+        return $continue;
+    }
+    
+    // 自サイトのURLでない場合はスキップ
+    $site_url = site_url();
+    $site_host = parse_url($site_url, PHP_URL_HOST);
+    $img_host = parse_url($src, PHP_URL_HOST);
+    
+    if ($img_host && $img_host !== $site_host) {
+        // 外部URLの場合は最適化をスキップ
+        return false;
+    }
+    
+    // Google UserContentの特別処理
+    if (strpos($src, 'googleusercontent.com') !== false) {
+        return false;
+    }
+    
+    // その他の外部CDN
+    $external_cdns = [
+        'gstatic.com',
+        'ytimg.com',
+        'vimeocdn.com',
+        'twimg.com',
+        'fbcdn.net',
+    ];
+    
+    foreach ($external_cdns as $cdn) {
+        if (strpos($src, $cdn) !== false) {
+            return false;
+        }
+    }
+    
+    return $continue;
+}
