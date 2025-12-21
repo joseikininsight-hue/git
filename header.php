@@ -393,9 +393,9 @@ $grants_url = get_post_type_archive_link('grant');
         text-decoration: none;
     }
     
-    /* ヘッダーナビゲーションのaタグは白色を継承しない */
+    /* ヘッダーナビゲーションのaタグは濃紺色（官公庁スタイル） */
     .ji-header a.ji-nav-link {
-        color: var(--h-white) !important;
+        color: var(--h-gov-navy-800) !important;
     }
 
     button {
@@ -405,9 +405,9 @@ $grants_url = get_post_type_archive_link('grant');
         background: none;
     }
     
-    /* ヘッダーナビゲーションのbuttonタグも白色 */
+    /* ヘッダーナビゲーションのbuttonタグも濃紺色（官公庁スタイル） */
     .ji-header button.ji-nav-link {
-        color: var(--h-white) !important;
+        color: var(--h-gov-navy-800) !important;
     }
 
     .ji-header-placeholder {
@@ -421,10 +421,11 @@ $grants_url = get_post_type_archive_link('grant');
         left: 0;
         right: 0;
         z-index: 9999;
-        background: linear-gradient(135deg, var(--h-gov-navy-800) 0%, var(--h-gov-navy-900) 100%);
+        background: var(--h-white);
         height: var(--h-header-height);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
         border-bottom: 3px solid var(--h-gov-gold);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
 
     .ji-header.scrolled {
@@ -530,7 +531,7 @@ $grants_url = get_post_type_archive_link('grant');
         align-items: center;
         gap: 6px;
         padding: 14px 18px;
-        color: var(--h-white) !important;
+        color: var(--h-gov-navy-800) !important;
         font-size: 14px;
         font-weight: 600;
         transition: all var(--h-transition);
@@ -546,8 +547,8 @@ $grants_url = get_post_type_archive_link('grant');
 
     .ji-nav-link:hover,
     .ji-nav-link:focus-visible {
-        background: rgba(255, 255, 255, 0.1);
-        color: var(--h-white) !important;
+        background: var(--h-gov-navy-50);
+        color: var(--h-gov-navy-900) !important;
     }
 
     .ji-nav-link:focus-visible {
@@ -557,7 +558,8 @@ $grants_url = get_post_type_archive_link('grant');
 
     .ji-nav-link--active,
     .ji-nav-link[aria-current="page"] {
-        background: rgba(255, 255, 255, 0.12);
+        background: var(--h-gov-navy-100);
+        color: var(--h-gov-navy-900) !important;
     }
 
     .ji-nav-link--active::after,
@@ -578,23 +580,23 @@ $grants_url = get_post_type_archive_link('grant');
         opacity: 0.9;
     }
     
-    /* ナビゲーションリンクのテキスト色を確実に白に */
+    /* ナビゲーションリンクのテキスト色を確実に濃紺に（官公庁スタイル） */
     .ji-nav .ji-nav-link span,
     .ji-nav-item .ji-nav-link span {
-        color: var(--h-white) !important;
+        color: var(--h-gov-navy-800) !important;
     }
     
     /* buttonとaタグ両方に対応 */
     a.ji-nav-link span,
     button.ji-nav-link span {
-        color: var(--h-white) !important;
+        color: var(--h-gov-navy-800) !important;
     }
 
     .ji-nav-link .ji-chevron {
         font-size: 10px;
         margin-left: 4px;
         transition: transform var(--h-transition);
-        color: var(--h-gov-navy-300);
+        color: var(--h-gov-navy-600);
     }
 
     .ji-nav-item.menu-active .ji-chevron {
@@ -871,20 +873,20 @@ $grants_url = get_post_type_archive_link('grant');
         width: 44px;
         height: 44px;
         padding: 0;
-        color: var(--h-white);
+        color: var(--h-gov-navy-800);
         background: transparent;
-        border-color: var(--h-gov-navy-400);
+        border-color: var(--h-gov-navy-300);
     }
 
     .ji-btn-icon:hover {
-        background: rgba(255, 255, 255, 0.1);
-        border-color: var(--h-white);
+        background: var(--h-gov-navy-50);
+        border-color: var(--h-gov-navy-600);
     }
 
     .ji-btn-primary {
-        background: var(--h-white);
-        color: var(--h-gov-navy-900);
-        border-color: var(--h-white);
+        background: var(--h-gov-navy-800);
+        color: var(--h-white);
+        border-color: var(--h-gov-navy-800);
         display: none;
         box-shadow: var(--h-shadow-sm);
     }
@@ -896,8 +898,8 @@ $grants_url = get_post_type_archive_link('grant');
     }
 
     .ji-btn-primary:hover {
-        background: var(--h-gov-gold-pale);
-        border-color: var(--h-gov-gold);
+        background: var(--h-gov-navy-900);
+        border-color: var(--h-gov-navy-900);
         transform: translateY(-2px);
         box-shadow: var(--h-shadow-lg);
     }
@@ -906,9 +908,9 @@ $grants_url = get_post_type_archive_link('grant');
         display: flex;
         width: 44px;
         height: 44px;
-        color: var(--h-white);
+        color: var(--h-gov-navy-800);
         background: transparent;
-        border: 2px solid var(--h-gov-navy-400);
+        border: 2px solid var(--h-gov-navy-300);
         border-radius: var(--h-radius);
         align-items: center;
         justify-content: center;
@@ -922,8 +924,8 @@ $grants_url = get_post_type_archive_link('grant');
     }
 
     .ji-mobile-toggle:hover {
-        background: rgba(255, 255, 255, 0.1);
-        border-color: var(--h-white);
+        background: var(--h-gov-navy-50);
+        border-color: var(--h-gov-navy-600);
     }
 
     .ji-mobile-toggle:focus-visible {

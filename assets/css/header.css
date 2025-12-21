@@ -62,10 +62,10 @@ img { max-width: 100%; height: auto; display: block; }
 a { color: inherit; text-decoration: none; }
 button { font-family: inherit; cursor: pointer; border: none; background: none; }
 
-/* ヘッダーナビゲーションのリンクは白色（inheritを上書き） */
+/* ヘッダーナビゲーションのリンクは濃紺色（官公庁スタイル） */
 .ji-header a.ji-nav-link,
 .ji-header button.ji-nav-link {
-    color: var(--gov-white) !important;
+    color: var(--gov-navy) !important;
 }
 
 /* ===============================================
@@ -211,11 +211,12 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     left: 0;
     right: 0;
     z-index: 9999;
-    background: #0D2A52 !important;
+    background: var(--gov-white) !important;
     height: var(--header-height);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     /* 金のライン - 官公庁風のアクセント */
-    border-bottom: 4px solid #C5A059 !important;
+    border-bottom: 4px solid var(--gov-gold) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .ji-header.scrolled {
@@ -328,7 +329,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     align-items: center;
     gap: 6px;
     padding: 14px 20px;
-    color: var(--gov-white) !important;
+    color: var(--gov-navy) !important;
     font-size: 0.9375rem;
     font-weight: 500;
     transition: all var(--transition);
@@ -342,8 +343,8 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 
 .ji-nav-link:hover,
 .ji-nav-link:focus-visible {
-    background: rgba(255, 255, 255, 0.12);
-    color: var(--gov-white) !important;
+    background: var(--gov-gray-100);
+    color: var(--gov-navy-dark) !important;
 }
 
 .ji-nav-link:focus-visible {
@@ -373,16 +374,16 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     color: var(--gov-gold-light) !important;
 }
 
-/* ナビゲーションリンクのテキスト色を確実に白に */
+/* ナビゲーションリンクのテキスト色を確実に濃紺に（官公庁スタイル） */
 .ji-nav .ji-nav-link span,
 .ji-nav-item .ji-nav-link span {
-    color: var(--gov-white) !important;
+    color: var(--gov-navy) !important;
 }
 
 /* buttonとaタグ両方に対応 */
 a.ji-nav-link span,
 button.ji-nav-link span {
-    color: var(--gov-white) !important;
+    color: var(--gov-navy) !important;
 }
 
 .ji-nav-link .ji-chevron {
