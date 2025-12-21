@@ -1061,7 +1061,6 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
             <li class="gi-breadcrumb-item">
                 <?php if ($i < count($breadcrumbs) - 1): ?>
                 <a href="<?php echo esc_url($crumb['url']); ?>" class="gi-breadcrumb-link">
-                    <span class="gi-breadcrumb-chapter">第<?php echo $i + 1; ?>章</span>
                     <span class="gi-breadcrumb-text"><?php echo esc_html($crumb['name']); ?></span>
                 </a>
                 <span class="gi-breadcrumb-sep" aria-hidden="true">
@@ -1069,14 +1068,12 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                 </span>
                 <?php else: ?>
                 <span class="gi-breadcrumb-current">
-                    <span class="gi-breadcrumb-chapter">本ページ</span>
                     <span class="gi-breadcrumb-text"><?php echo esc_html($crumb['name']); ?></span>
                 </span>
                 <?php endif; ?>
             </li>
             <?php endforeach; ?>
         </ol>
-        <div class="gi-breadcrumb-page-num">P.<?php echo str_pad($post_id, 3, '0', STR_PAD_LEFT); ?></div>
     </div>
 </nav>
 

@@ -332,16 +332,17 @@ ul, ol {
     gap: 4px;
 }
 
+/* PC版もスマホと同様のシンプルなスタイルに統一 */
 .gic-breadcrumb-link {
-    display: flex;
-    flex-direction: column;
+    display: inline-flex;
+    align-items: center;
     color: var(--gic-gray-600);
     text-decoration: none;
-    padding: 6px 12px;
+    padding: 6px 10px;
     border-radius: 4px;
     transition: all var(--gic-transition);
-    background: rgba(0, 50, 100, 0.03);
-    border: 1px solid transparent;
+    background: transparent;
+    font-size: 13px;
 }
 
 .gic-breadcrumb-link:hover {
@@ -350,14 +351,9 @@ ul, ol {
     color: var(--gic-gov-navy-800);
 }
 
+/* 「何章」表記削除 - ユーザー要望により非表示 */
 .gic-breadcrumb-chapter {
-    font-size: 9px;
-    font-weight: 600;
-    color: var(--gic-gov-gold-dark);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    line-height: 1;
-    margin-bottom: 2px;
+    display: none;
 }
 
 .gic-breadcrumb-text {
@@ -381,35 +377,36 @@ ul, ol {
     height: 14px;
 }
 
+/* PC版もスマホと同様のシンプルなスタイルに統一 */
 .gic-breadcrumb-current {
-    display: flex;
-    flex-direction: column;
-    padding: 6px 12px;
-    background: linear-gradient(135deg, var(--gic-gov-navy-800) 0%, var(--gic-gov-navy-900) 100%);
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 10px;
+    background: var(--gic-gov-navy-100);
     border-radius: 4px;
-    border: 1px solid var(--gic-gov-navy-700);
+    color: var(--gic-gov-navy-800);
+    font-size: 13px;
+    font-weight: 600;
 }
 
+/* 章番号は非表示のため不要 */
 .gic-breadcrumb-current .gic-breadcrumb-chapter {
-    color: var(--gic-gov-gold);
+    display: none;
 }
 
 .gic-breadcrumb-current .gic-breadcrumb-text {
-    color: var(--gic-white);
+    color: var(--gic-gov-navy-800);
     font-weight: 600;
-    max-width: 200px;
+    max-width: 250px;
 }
 
-/* ページ番号 */
+/* ページ番号 - シンプルスタイル */
 .gic-breadcrumb-page-num {
-    font-family: var(--gic-font-serif);
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--gic-gov-navy-800);
-    background: linear-gradient(135deg, var(--gic-gov-gold-light) 0%, var(--gic-gov-gold) 100%);
-    padding: 6px 14px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(201, 162, 39, 0.3);
+    font-family: var(--gic-font-sans);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gic-gray-500);
+    padding: 4px 8px;
     flex-shrink: 0;
 }
 
@@ -2322,14 +2319,9 @@ ul, ol {
     }
 }
 
+/* 金枠削除 - ユーザー要望により削除 */
 .gic-related::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--gic-gov-gold) 0%, var(--gic-gov-gold-light) 50%, var(--gic-gov-gold) 100%);
+    display: none;
 }
 
 .gic-related-header {
