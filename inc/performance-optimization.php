@@ -957,7 +957,7 @@ function gi_generate_breadcrumb_schema($items) {
  */
 function gi_generate_author_schema($author = array()) {
     $defaults = array(
-        'name' => '助成金インサイト編集部',
+        'name' => '補助金図鑑編集部',
         'type' => 'Organization',
         'url' => home_url('/about/'),
         'description' => '中小企業診断士・社会保険労務士監修のもと、補助金・助成金情報を提供',

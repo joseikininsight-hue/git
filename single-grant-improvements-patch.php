@@ -61,7 +61,7 @@ function gi_generate_optimized_meta_description($grant) {
 
 function gi_get_enhanced_supervisor_data($post_id) {
     $supervisor = array(
-        'name' => get_field('supervisor_name', $post_id) ?: '補助金インサイト編集部',
+        'name' => get_field('supervisor_name', $post_id) ?: '補助金図鑑編集部',
         'title' => get_field('supervisor_title', $post_id) ?: '中小企業診断士監修',
         'profile' => get_field('supervisor_profile', $post_id) ?: '補助金・助成金の専門家チーム。年間500件以上の補助金情報を調査・検証。',
         'image' => get_field('supervisor_image', $post_id) ?: '',

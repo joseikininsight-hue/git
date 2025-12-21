@@ -32,8 +32,8 @@ if (!isset($form_errors)) {
 $contact_schema = array(
     '@context' => 'https://schema.org',
     '@type' => 'ContactPage',
-    'name' => 'お問い合わせ - 補助金インサイト',
-    'description' => '補助金インサイトへのお問い合わせフォーム。サービスに関するご質問やご相談を承ります。',
+    'name' => 'お問い合わせ - 補助金図鑑',
+    'description' => '補助金図鑑へのお問い合わせフォーム。サービスに関するご質問やご相談を承ります。',
     'url' => 'https://joseikin-insight.com/contact/'
 );
 ?>
@@ -1552,7 +1552,7 @@ textarea.gov-form-control {
                             </svg>
                         </div>
                         <h3 class="gov-method-title">メールでのお問い合わせ</h3>
-                        <p class="gov-method-detail">Email: info@joseikin-insight.com</p>
+                        <p class="gov-method-detail">Email: info@hojokin-zukan.com</p>
                         <p class="gov-method-time">回答まで2-3営業日いただく場合があります</p>
                     </div>
                     
@@ -1565,7 +1565,7 @@ textarea.gov-form-control {
                         </div>
                         <h3 class="gov-method-title">郵送でのお問い合わせ</h3>
                         <p class="gov-method-detail">〒136-0073<br>東京都江東区北砂3-23-8 401</p>
-                        <p class="gov-method-time">補助金インサイト運営事務局 宛</p>
+                        <p class="gov-method-time">補助金図鑑運営事務局 宛</p>
                     </div>
                 </div>
             </section>

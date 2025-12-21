@@ -3,7 +3,7 @@
 **作成日**: 2025年12月13日  
 **現在スコア**: 88/100点  
 **目標スコア**: 100/100点  
-**対象テーマ**: 助成金インサイト (Grant Insight Perfect v11.0.3)
+**対象テーマ**: 補助金図鑑 (Grant Insight Perfect v11.0.3)
 
 ---
 
@@ -41,7 +41,7 @@ Lighthouse SEOスコアは**14項目の均等配分**で計算されます。
 
 **必要な修正**:
 ```txt
-# robots.txt for 助成金インサイト
+# robots.txt for 補助金図鑑
 
 User-agent: *
 Allow: /
@@ -295,7 +295,7 @@ function gi_add_organization_schema() {
         $schema = array(
             '@context' => 'https://schema.org',
             '@type' => 'Organization',
-            'name' => '助成金インサイト',
+            'name' => '補助金図鑑',
             'url' => home_url('/'),
             'logo' => 'https://joseikin-insight.com/wp-content/uploads/2025/05/cropped-logo3.webp',
             'description' => '中小企業・個人事業主のための補助金・助成金検索サイト',
@@ -323,7 +323,7 @@ function gi_add_website_schema() {
         $schema = array(
             '@context' => 'https://schema.org',
             '@type' => 'WebSite',
-            'name' => '助成金インサイト',
+            'name' => '補助金図鑑',
             'url' => home_url('/'),
             'potentialAction' => array(
                 '@type' => 'SearchAction',

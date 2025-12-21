@@ -1,7 +1,7 @@
 /* ===================================
- * Grant Single Page - Government Official Design v54.0
- * 補助金詳細ページ - 官公庁風デザイン
- * 濃紺×金カラースキーム
+ * Grant Single Page - Government Official Design v55.0
+ * 補助金図鑑 - 官公庁風デザイン × 図鑑スタイル
+ * 濃紺×金カラースキーム + 本・辞典要素
  * =================================== */
 
 :root {
@@ -2983,6 +2983,498 @@ ul, ol {
 
 .gi-skip-link:focus {
     top: 8px;
+}
+
+/* ==========================================================================
+   📚 補助金図鑑 - 本・辞典スタイル要素
+   ========================================================================== */
+
+/* ページの本風フレーム装飾 */
+.gi-page::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    bottom: 0;
+    left: 0;
+    width: 6px;
+    background: linear-gradient(
+        180deg,
+        var(--gi-gov-gold) 0%,
+        var(--gi-gov-gold-light) 20%,
+        var(--gi-gov-navy-300) 40%,
+        var(--gi-gov-navy-200) 60%,
+        var(--gi-gov-navy-300) 80%,
+        var(--gi-gov-gold-light) 100%
+    );
+    z-index: 10;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+}
+
+/* 図鑑のインデックスタブ（ページ左端） */
+.gi-book-index-tab {
+    position: fixed;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.gi-book-index-tab-item {
+    width: 32px;
+    height: 56px;
+    background: linear-gradient(90deg, var(--gi-gov-navy-700) 0%, var(--gi-gov-navy-800) 100%);
+    border-radius: 0 4px 4px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gi-white);
+    font-size: 10px;
+    font-weight: 700;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    cursor: pointer;
+    transition: all var(--gi-transition);
+    border-left: 3px solid var(--gi-gov-gold);
+    text-decoration: none;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+}
+
+.gi-book-index-tab-item:hover {
+    width: 48px;
+    background: linear-gradient(90deg, var(--gi-gov-gold) 0%, var(--gi-gov-gold-light) 100%);
+    color: var(--gi-gov-navy-900);
+    text-decoration: none;
+}
+
+.gi-book-index-tab-item.active {
+    width: 40px;
+    background: linear-gradient(90deg, var(--gi-gov-gold) 0%, var(--gi-gov-gold-light) 100%);
+    color: var(--gi-gov-navy-900);
+}
+
+@media (max-width: 1024px) {
+    .gi-book-index-tab {
+        display: none;
+    }
+    .gi-page::after {
+        display: none;
+    }
+}
+
+/* 図鑑風ページヘッダー装飾 */
+.gi-zukan-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px;
+    background: linear-gradient(135deg, var(--gi-gov-navy-800) 0%, var(--gi-gov-navy-900) 100%);
+    border-bottom: 4px solid var(--gi-gov-gold);
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+}
+
+.gi-zukan-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c9a227' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.5;
+}
+
+.gi-zukan-book-icon {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+}
+
+.gi-zukan-book-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.gi-zukan-header-content {
+    position: relative;
+    flex: 1;
+}
+
+.gi-zukan-category-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    background: var(--gi-gov-gold);
+    color: var(--gi-gov-navy-900);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    border-radius: 2px;
+    margin-bottom: 8px;
+}
+
+.gi-zukan-category-label svg {
+    width: 12px;
+    height: 12px;
+}
+
+.gi-zukan-entry-number {
+    font-family: var(--gi-font-mono);
+    font-size: 12px;
+    color: var(--gi-gov-gold-light);
+    margin-bottom: 4px;
+    letter-spacing: 0.1em;
+}
+
+.gi-zukan-title {
+    font-family: var(--gi-font-serif);
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.8);
+    margin: 0;
+}
+
+/* セクションの本風デザイン */
+.gi-section.gi-book-style {
+    position: relative;
+    border-left: 4px solid var(--gi-gov-navy-300);
+    box-shadow: 
+        var(--gi-shadow-sm),
+        -4px 0 0 var(--gi-gov-navy-200),
+        -8px 0 0 var(--gi-gov-navy-100);
+}
+
+.gi-section.gi-book-style::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -4px;
+    width: 4px;
+    background: linear-gradient(
+        180deg,
+        var(--gi-gov-gold) 0%,
+        var(--gi-gov-gold-light) 50%,
+        var(--gi-gov-gold) 100%
+    );
+}
+
+/* ページ番号風デザイン */
+.gi-page-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: var(--gi-gov-navy-50);
+    border: 2px solid var(--gi-gov-navy-200);
+    border-radius: 50%;
+    font-family: var(--gi-font-mono);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gi-gov-navy-700);
+    position: absolute;
+    right: 24px;
+    top: 24px;
+}
+
+/* 図鑑の見出しスタイル */
+.gi-section-header.gi-zukan-style {
+    position: relative;
+    padding-left: 20px;
+    border-bottom: none;
+    margin-bottom: 20px;
+}
+
+.gi-section-header.gi-zukan-style::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    background: linear-gradient(180deg, var(--gi-gov-gold) 0%, var(--gi-gov-gold-light) 100%);
+    border-radius: 3px;
+}
+
+.gi-section-header.gi-zukan-style::after {
+    content: '';
+    position: absolute;
+    left: 20px;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: repeating-linear-gradient(
+        90deg,
+        var(--gi-gov-navy-200) 0px,
+        var(--gi-gov-navy-200) 4px,
+        transparent 4px,
+        transparent 8px
+    );
+}
+
+/* しおり風デコレーション */
+.gi-bookmark-ribbon {
+    position: absolute;
+    top: 0;
+    right: 40px;
+    width: 32px;
+    height: 80px;
+    background: linear-gradient(180deg, var(--gi-gov-gold) 0%, #b8941f 100%);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%);
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+    z-index: 5;
+}
+
+.gi-bookmark-ribbon::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.2) 0%, transparent 50%, rgba(0,0,0,0.1) 100%);
+}
+
+/* インデックスカード風メトリクス */
+.gi-metrics.gi-card-style {
+    background: var(--gi-white);
+    border: none;
+    border-radius: 0;
+    box-shadow: 
+        0 4px 12px rgba(0,0,0,0.1),
+        0 0 0 1px var(--gi-gov-navy-200),
+        0 0 0 4px var(--gi-white),
+        0 0 0 5px var(--gi-gov-navy-100);
+    position: relative;
+}
+
+.gi-metrics.gi-card-style::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 30px;
+    right: 30px;
+    height: 8px;
+    background: var(--gi-gov-navy-100);
+    border-radius: 2px 2px 0 0;
+    z-index: -1;
+}
+
+/* 図鑑エントリーナンバー */
+.gi-entry-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: linear-gradient(135deg, var(--gi-gov-navy-800) 0%, var(--gi-gov-navy-900) 100%);
+    color: var(--gi-gov-gold);
+    font-family: var(--gi-font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    border-radius: 2px;
+    margin-bottom: 12px;
+}
+
+.gi-entry-badge svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* 辞書風の注釈スタイル */
+.gi-dict-note {
+    display: flex;
+    gap: 12px;
+    padding: 16px 20px;
+    background: linear-gradient(90deg, var(--gi-gov-navy-50) 0%, var(--gi-white) 100%);
+    border-left: 3px solid var(--gi-gov-gold);
+    margin: 16px 0;
+    font-size: 13px;
+    line-height: 1.7;
+    position: relative;
+}
+
+.gi-dict-note::before {
+    content: '📖';
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.gi-dict-note-text {
+    flex: 1;
+    color: var(--gi-gray-800);
+}
+
+/* ページコーナー装飾 */
+.gi-page-corner {
+    position: absolute;
+    width: 48px;
+    height: 48px;
+    pointer-events: none;
+}
+
+.gi-page-corner-tl {
+    top: 0;
+    left: 0;
+    border-top: 3px solid var(--gi-gov-gold);
+    border-left: 3px solid var(--gi-gov-gold);
+}
+
+.gi-page-corner-tr {
+    top: 0;
+    right: 0;
+    border-top: 3px solid var(--gi-gov-gold);
+    border-right: 3px solid var(--gi-gov-gold);
+}
+
+.gi-page-corner-bl {
+    bottom: 0;
+    left: 0;
+    border-bottom: 3px solid var(--gi-gov-gold);
+    border-left: 3px solid var(--gi-gov-gold);
+}
+
+.gi-page-corner-br {
+    bottom: 0;
+    right: 0;
+    border-bottom: 3px solid var(--gi-gov-gold);
+    border-right: 3px solid var(--gi-gov-gold);
+}
+
+/* 百科事典風セクション区切り */
+.gi-encyclopedia-divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 40px 0;
+    color: var(--gi-gov-navy-400);
+}
+
+.gi-encyclopedia-divider::before,
+.gi-encyclopedia-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, var(--gi-gov-navy-200) 50%, transparent 100%);
+}
+
+.gi-encyclopedia-divider svg {
+    width: 24px;
+    height: 24px;
+    color: var(--gi-gov-gold);
+}
+
+/* 図鑑カードスタイル */
+.gi-zukan-card {
+    background: var(--gi-white);
+    border: 1px solid var(--gi-gray-200);
+    border-radius: 0;
+    position: relative;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 
+        4px 4px 0 var(--gi-gov-navy-100),
+        8px 8px 0 var(--gi-gov-navy-50);
+}
+
+.gi-zukan-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, var(--gi-gov-navy-800) 0%, var(--gi-gov-navy-900) 100%);
+    border-bottom: 3px solid var(--gi-gov-gold);
+}
+
+.gi-zukan-card-number {
+    font-family: var(--gi-font-mono);
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--gi-gov-gold);
+    min-width: 48px;
+}
+
+.gi-zukan-card-title {
+    font-family: var(--gi-font-serif);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--gi-white);
+    flex: 1;
+}
+
+.gi-zukan-card-body {
+    padding: 20px;
+}
+
+/* 索引スタイル（頭文字装飾） */
+.gi-index-letter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--gi-gov-navy-800) 0%, var(--gi-gov-navy-900) 100%);
+    color: var(--gi-gov-gold);
+    font-family: var(--gi-font-serif);
+    font-size: 28px;
+    font-weight: 700;
+    margin-right: 16px;
+    float: left;
+    shape-outside: margin-box;
+    box-shadow: 2px 2px 0 var(--gi-gov-gold);
+}
+
+/* 図鑑風フッター */
+.gi-zukan-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    background: var(--gi-gov-navy-50);
+    border-top: 2px solid var(--gi-gov-navy-200);
+    font-size: 12px;
+    color: var(--gi-gray-600);
+}
+
+.gi-zukan-footer-page {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--gi-font-mono);
+    font-weight: 700;
+    color: var(--gi-gov-navy-600);
+}
+
+.gi-zukan-footer-page svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* 図鑑の本マーク */
+.gi-book-mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: var(--gi-gov-gold-pale);
+    border: 1px solid var(--gi-gov-gold);
+    border-radius: 2px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gi-gov-navy-800);
+}
+
+.gi-book-mark svg {
+    width: 14px;
+    height: 14px;
+    color: var(--gi-gov-gold);
 }
 
 /* ==========================================================================

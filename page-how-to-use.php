@@ -60,7 +60,7 @@ $video_schema = array(
     'embedUrl' => 'https://www.youtube.com/embed/' . $video_config['video_id'],
     'publisher' => array(
         '@type' => 'Organization',
-        'name' => '補助金インサイト',
+        'name' => '補助金図鑑',
         'logo' => array(
             '@type' => 'ImageObject',
             'url' => get_site_icon_url()
@@ -78,7 +78,7 @@ $howto_schema = array(
     'totalTime' => $video_config['duration'],
     'tool' => array(
         '@type' => 'HowToTool',
-        'name' => '補助金インサイト AI検索システム'
+        'name' => '補助金図鑑 AI検索システム'
     ),
     'step' => array()
 );

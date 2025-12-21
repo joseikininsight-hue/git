@@ -1,6 +1,6 @@
 <?php
 /**
- * JOSEIKIN INSIGHT - Perfect Header
+ * 補助金図鑑 - Perfect Header
  * 官公庁風デザイン - 完全統合版
  * CSS・PHP・JavaScript一体型ファイル
  * スキップリンクなしバージョン
@@ -1849,7 +1849,7 @@ $grants_url = get_post_type_archive_link('grant');
             <div class="ji-mobile-logo-icon">
                 <img src="https://joseikin-insight.com/gemini_generated_image_19k6yi19k6yi19k6/" alt="アイコン" width="32" height="32">
             </div>
-            <span class="ji-mobile-logo-text">助成金インサイト</span>
+            <span class="ji-mobile-logo-text">補助金図鑑</span>
         </div>
         <button type="button" id="ji-mobile-close" class="ji-mobile-close" aria-label="メニューを閉じる">
             <i class="fas fa-times" aria-hidden="true"></i>
@@ -1917,9 +1917,9 @@ $grants_url = get_post_type_archive_link('grant');
             <a href="https://twitter.com/joseikininsight" class="ji-mobile-social-link" aria-label="X (Twitter)" target="_blank" rel="noopener">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
             </a>
-            <a href="https://facebook.com/joseikin.insight" class="ji-mobile-social-link" aria-label="Facebook" target="_blank" rel="noopener"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://facebook.com/hojokin.zukan" class="ji-mobile-social-link" aria-label="Facebook" target="_blank" rel="noopener"><i class="fab fa-facebook-f"></i></a>
             <a href="https://www.youtube.com/channel/UCbfjOrG3nSPI3GFzKnGcspQ" class="ji-mobile-social-link" aria-label="YouTube" target="_blank" rel="noopener"><i class="fab fa-youtube"></i></a>
-            <a href="https://note.com/joseikin_insight" class="ji-mobile-social-link" aria-label="Note" target="_blank" rel="noopener"><i class="fas fa-pen-nib"></i></a>
+            <a href="https://note.com/hojokin_zukan" class="ji-mobile-social-link" aria-label="Note" target="_blank" rel="noopener"><i class="fas fa-pen-nib"></i></a>
         </div>
         
         <div class="ji-mobile-trust">
@@ -2224,6 +2224,6 @@ $grants_url = get_post_type_archive_link('grant');
     
     handleScroll();
     
-    console.log('[✓] Joseikin Insight Header v14.1.0 - Government Official Style (No Skip Link)');
+    console.log('[✓] 補助金図鑑 Header v14.1.0 - Government Official Style (No Skip Link)');
 })();
 </script>

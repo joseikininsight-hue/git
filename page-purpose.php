@@ -233,7 +233,7 @@ $breadcrumbs = [
     "url": "<?php echo esc_url($canonical_url); ?>",
     "provider": {
         "@type": "Organization",
-        "name": "助成金インサイト",
+        "name": "補助金図鑑",
         "url": "<?php echo esc_url(home_url()); ?>"
     },
     "breadcrumb": {
