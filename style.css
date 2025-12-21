@@ -455,5 +455,131 @@ body:not(.no-sticky-cta-padding) {
 }
 
 /* ==========================================================================
+   Ad Revenue Optimization - CTA Button Styles (2024-12-21)
+   収益最適化：広告CTAボタンスタイル
+   ========================================================================== */
+
+/* 記事型広告 - CTAボタンの視認性向上 */
+.ji-article-ad-cta {
+    background: #ff5722 !important; /* 目立つオレンジレッド */
+    color: white !important;
+    font-weight: bold !important;
+    padding: 14px 28px !important;
+    border-radius: 6px !important;
+    text-align: center !important;
+    display: inline-block !important;
+    width: 100% !important;
+    margin-top: 12px !important;
+    box-shadow: 0 4px 8px rgba(255, 87, 34, 0.3) !important;
+    transition: all 0.3s ease !important;
+    text-decoration: none !important;
+    font-size: 16px !important;
+    line-height: 1.4 !important;
+    cursor: pointer !important;
+}
+
+.ji-article-ad-cta:hover {
+    transform: translateY(-2px) !important;
+    background: #f4511e !important;
+    box-shadow: 0 6px 12px rgba(255, 87, 34, 0.4) !important;
+    text-decoration: none !important;
+    color: white !important;
+}
+
+.ji-article-ad-cta:active {
+    transform: translateY(0) !important;
+}
+
+/* モバイル最適化 */
+@media (max-width: 768px) {
+    .ji-article-ad-cta {
+        padding: 12px 24px !important;
+        font-size: 15px !important;
+    }
+}
+
+/* 記事型広告全体の視認性改善 */
+.ji-article-ad {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.3s ease;
+}
+
+.ji-article-ad:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.ji-article-ad-badge {
+    display: inline-block;
+    background: #666;
+    color: white;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 3px 8px;
+    border-radius: 3px;
+    margin-bottom: 12px;
+}
+
+.ji-article-ad-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin: 10px 0;
+    line-height: 1.4;
+}
+
+.ji-article-ad-title a {
+    color: #333;
+    text-decoration: none;
+}
+
+.ji-article-ad-title a:hover {
+    color: #ff5722;
+}
+
+.ji-article-ad-image {
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+    margin-bottom: 15px;
+}
+
+.ji-article-ad-desc {
+    color: #555;
+    line-height: 1.7;
+    margin: 12px 0;
+}
+
+.ji-article-ad-features {
+    list-style: none;
+    padding: 0;
+    margin: 15px 0;
+}
+
+.ji-article-ad-features li {
+    padding: 6px 0 6px 20px;
+    position: relative;
+    color: #444;
+}
+
+.ji-article-ad-features li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #4caf50;
+    font-weight: bold;
+}
+
+.ji-article-ad-price {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #ff5722;
+    margin: 12px 0;
+}
+
+/* ==========================================================================
    End of Grant Insight Perfect Main Stylesheet
    ========================================================================== */

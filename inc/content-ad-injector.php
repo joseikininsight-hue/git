@@ -20,6 +20,8 @@ if (!defined('ABSPATH')) {
 /**
  * 記事本文中のH2見出し手前に広告を自動挿入する
  * 
+ * ✅ 収益最適化: 最初のH2だけでなく、記事中盤・後半にも広告を配置
+ * 
  * @param string $content 記事本文
  * @return string 広告挿入後の記事本文
  */
@@ -101,6 +103,51 @@ function ji_inject_ad_content_middle($content) {
     return $content;
 }
 add_filter('the_content', 'ji_inject_ad_content_middle', 20);
+
+
+/**
+ * 【収益最適化】記事の中盤～後半にも広告を追加
+ * 
+ * 最初のH2だけでなく、3番目のH2の前にも広告を配置することで、
+ * 記事が長い場合の収益機会を増やします。
+ * 
+ * @param string $content 記事本文
+ * @return string 広告挿入後の記事本文
+ */
+function ji_inject_additional_ads($content) {
+    // 対象投稿タイプのチェック
+    if (!is_singular(array('grant', 'column'))) {
+        return $content;
+    }
+    
+    // REST APIリクエストは除外
+    if (defined('REST_REQUEST') && REST_REQUEST) {
+        return $content;
+    }
+    
+    // ji_inject_ad_at_multiple_h2 関数が存在するか確認
+    if (!function_exists('ji_inject_ad_at_multiple_h2')) {
+        return $content;
+    }
+    
+    // 投稿タイプに応じた広告位置ID
+    $post_type = get_post_type();
+    $position_id = ($post_type === 'grant') ? 'single_grant_content_middle' : 'single_column_content_middle';
+    
+    // H2の数をカウント
+    $h2_pattern = '/<h2[^>]*>/i';
+    preg_match_all($h2_pattern, $content, $matches);
+    $h2_count = count($matches[0]);
+    
+    // H2が4つ以上ある記事のみ、3番目のH2の前に広告を追加
+    // （短い記事では広告過多を避ける）
+    if ($h2_count >= 4) {
+        $content = ji_inject_ad_at_multiple_h2($content, array(3), $position_id);
+    }
+    
+    return $content;
+}
+add_filter('the_content', 'ji_inject_additional_ads', 21);
 
 
 /**

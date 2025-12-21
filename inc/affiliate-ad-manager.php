@@ -1952,22 +1952,87 @@ class JI_Affiliate_Ad_Manager {
                 category_name: adContainer.getAttribute('data-category-name')
             };
             
-            // インプレッション追跡
-            if (typeof jQuery !== 'undefined') {
-                jQuery(document).ready(function($) {
-                    $.post('<?php echo admin_url('admin-ajax.php'); ?>', Object.assign({
-                        action: 'ji_track_ad_impression'
-                    }, trackingData));
-                });
+            // 堅牢化されたインプレッション追跡（Intersection Observer API使用）
+            // ユーザーが実際に広告を見た時点でのみカウント（精度向上）
+            var impressionTracked = false;
+            
+            if ('IntersectionObserver' in window) {
+                var observer = new IntersectionObserver(function(entries) {
+                    entries.forEach(function(entry) {
+                        if (entry.isIntersecting && !impressionTracked) {
+                            impressionTracked = true;
+                            trackImpression();
+                            observer.disconnect();
+                        }
+                    });
+                }, { threshold: 0.5 }); // 50%以上表示された時点でカウント
+                
+                observer.observe(adContainer);
+            } else {
+                // Intersection Observer非対応ブラウザの場合は従来通り即座にトラッキング
+                trackImpression();
             }
             
-            // クリック追跡
+            function trackImpression() {
+                if (typeof jQuery !== 'undefined') {
+                    jQuery.post('<?php echo admin_url('admin-ajax.php'); ?>', Object.assign({
+                        action: 'ji_track_ad_impression'
+                    }, trackingData)).fail(function() {
+                        // トラッキング失敗時のリトライ（1回のみ）
+                        setTimeout(function() {
+                            jQuery.post('<?php echo admin_url('admin-ajax.php'); ?>', Object.assign({
+                                action: 'ji_track_ad_impression'
+                            }, trackingData));
+                        }, 2000);
+                    });
+                } else if (typeof fetch !== 'undefined') {
+                    // jQuery非依存のフォールバック
+                    var formData = new FormData();
+                    for (var key in trackingData) {
+                        formData.append(key, trackingData[key]);
+                    }
+                    formData.append('action', 'ji_track_ad_impression');
+                    fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+                        method: 'POST',
+                        body: formData
+                    }).catch(function() {
+                        // エラー時のリトライ
+                        setTimeout(function() {
+                            fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+                                method: 'POST',
+                                body: formData
+                            });
+                        }, 2000);
+                    });
+                }
+            }
+            
+            // クリック追跡（堅牢化版）
             adContainer.querySelectorAll('a').forEach(function(link) {
-                link.addEventListener('click', function() {
-                    if (typeof jQuery !== 'undefined') {
-                        jQuery.post('<?php echo admin_url('admin-ajax.php'); ?>', Object.assign({
-                            action: 'ji_track_ad_click'
-                        }, trackingData));
+                link.addEventListener('click', function(e) {
+                    var clickData = Object.assign({ action: 'ji_track_ad_click' }, trackingData);
+                    
+                    // sendBeacon API を優先使用（ページ遷移時も確実に送信）
+                    if (navigator.sendBeacon) {
+                        var formData = new FormData();
+                        for (var key in clickData) {
+                            formData.append(key, clickData[key]);
+                        }
+                        navigator.sendBeacon('<?php echo admin_url('admin-ajax.php'); ?>', formData);
+                    } else if (typeof jQuery !== 'undefined') {
+                        // フォールバック: jQuery（非同期だがページ遷移前に送信を試みる）
+                        jQuery.post('<?php echo admin_url('admin-ajax.php'); ?>', clickData);
+                    } else if (typeof fetch !== 'undefined') {
+                        // フォールバック: Fetch API (keepalive オプション使用)
+                        var formData = new FormData();
+                        for (var key in clickData) {
+                            formData.append(key, clickData[key]);
+                        }
+                        fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+                            method: 'POST',
+                            body: formData,
+                            keepalive: true
+                        });
                     }
                 });
             });
