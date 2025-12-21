@@ -83,12 +83,13 @@ if (get_query_var('hide_sticky_cta')) return;
     }
 }
 
-/* Wrapper */
+/* Wrapper - 最下部に完全固定 */
 .ui-sticky-cta {
     position: fixed !important;
     bottom: 0 !important;
     left: 0 !important;
     right: 0 !important;
+    width: 100% !important;
     z-index: var(--cta-z-index) !important;
     background: #FFFFFF !important;
     background-color: #FFFFFF !important;
@@ -96,13 +97,19 @@ if (get_query_var('hide_sticky_cta')) return;
     box-shadow: 0 -8px 32px rgba(13, 42, 82, 0.15) !important;
     padding-bottom: env(safe-area-inset-bottom);
     transform: translateY(0);
-    transition: transform 0.4s var(--cta-trans);
-    will-change: transform;
+    transition: transform 0.35s var(--cta-trans), opacity 0.35s ease;
+    will-change: transform, opacity;
+    /* 隙間防止のために追加 */
+    margin: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
 }
 
-/* Hidden State */
+/* Hidden State - スクロール下方向で隠れる */
 .ui-sticky-cta.is-hidden {
     transform: translateY(100%);
+    opacity: 0;
+    pointer-events: none;
 }
 
 /* Inner Layout */
@@ -270,19 +277,28 @@ if (get_query_var('hide_sticky_cta')) return;
     }
 }
 
-/* Body padding handling: コンテンツが隠れないようにするためのパディング */
-/* 注意: ページ固有のCSSで上書きされる可能性があるため、!importantは避ける */
-/* JSで動的に調整することを推奨 (下記スクリプトで対応) */
+/* Body padding handling: フッターの下に固定CTAのスペースを確保 */
+/* スティッキーバナーが隠れた時も隙間が出ないように統一 */
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    padding-bottom: var(--cta-height) !important;
+}
+
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
-    body:not(.no-sticky-cta-padding) {
-        padding-bottom: calc(var(--cta-height) + env(safe-area-inset-bottom));
+    body {
+        padding-bottom: calc(var(--cta-height) + env(safe-area-inset-bottom)) !important;
     }
 }
 
-/* Single Grant ページは独自のモバイルバナー設定があるため除外 */
-body.single-grant {
-    /* single-grant.php で --gi-mobile-banner: 60px が設定されているため、
-       ここでは追加パディングを適用しない */
+/* フッター直後のスペース確保（隙間防止） */
+footer,
+.site-footer,
+.footer,
+[class*="footer"] {
+    margin-bottom: 0 !important;
 }
 
 /* ============================================
@@ -332,12 +348,10 @@ body.adsense-anchor-bottom .ui-sticky-cta {
 
     // AdSenseアンカー広告検出・競合回避
     function detectAdSenseAnchor() {
-        // AdSenseアンカー広告のiframeを検出
         const anchorAd = document.querySelector('iframe[id*="google_ads_iframe"][data-anchor-status]') ||
                          document.querySelector('ins.adsbygoogle[data-anchor-status]') ||
                          document.querySelector('div[id*="google_ads"][style*="position: fixed"][style*="bottom"]');
         
-        // AdSenseがbodyに追加するスタイルを検出
         const bodyStyle = window.getComputedStyle(document.body);
         const hasBottomMargin = parseInt(bodyStyle.marginBottom) > 0;
         
@@ -348,7 +362,6 @@ body.adsense-anchor-bottom .ui-sticky-cta {
         }
     }
     
-    // MutationObserverでDOM変更を監視（AdSense動的挿入対応）
     const observer = new MutationObserver(function(mutations) {
         detectAdSenseAnchor();
     });
@@ -360,19 +373,20 @@ body.adsense-anchor-bottom .ui-sticky-cta {
         attributeFilter: ['style']
     });
     
-    // 初回検出とページ読み込み完了後の検出
     detectAdSenseAnchor();
     window.addEventListener('load', detectAdSenseAnchor);
 
+    // ===== スクロール時の表示/非表示制御 =====
     let lastScrollY = window.scrollY;
     let ticking = false;
-    const threshold = 50;
+    const scrollThreshold = 80; // スクロール開始からこの距離以上で反応
+    const scrollDelta = 15; // この量以上スクロールしたら反応
+    let scrollDeltaAccum = 0; // 累積スクロール量
     
-    // ★パフォーマンス改善: 高さをキャッシュ（リサイズ時のみ再計算）
+    // 高さキャッシュ
     let cachedWindowHeight = window.innerHeight;
     let cachedDocHeight = document.documentElement.scrollHeight;
     
-    // リサイズ時のみ高さを再計算
     let resizeTimeout;
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimeout);
@@ -384,18 +398,34 @@ body.adsense-anchor-bottom .ui-sticky-cta {
 
     const updateUI = () => {
         const currentScrollY = window.scrollY;
+        const delta = currentScrollY - lastScrollY;
 
-        // キャッシュした値を使用（Reflow防止）
-        if (cachedWindowHeight + currentScrollY >= cachedDocHeight - 50) {
+        // ページ最下部付近では常に表示
+        const nearBottom = cachedWindowHeight + currentScrollY >= cachedDocHeight - 100;
+        
+        // ページ上部では常に表示
+        const nearTop = currentScrollY < scrollThreshold;
+        
+        if (nearBottom || nearTop) {
             stickyBar.classList.remove('is-hidden');
-            ticking = false;
-            return;
-        }
-
-        if (currentScrollY > lastScrollY && currentScrollY > threshold) {
-            stickyBar.classList.add('is-hidden');
+            scrollDeltaAccum = 0;
         } else {
-            stickyBar.classList.remove('is-hidden');
+            // スクロール方向に応じた累積量計算
+            scrollDeltaAccum += delta;
+            
+            // 下スクロール: 累積量がthresholdを超えたら隠す
+            if (scrollDeltaAccum > scrollDelta) {
+                stickyBar.classList.add('is-hidden');
+            }
+            // 上スクロール: 累積量が-thresholdを下回ったら表示
+            else if (scrollDeltaAccum < -scrollDelta) {
+                stickyBar.classList.remove('is-hidden');
+            }
+            
+            // 累積量のリセット（方向転換検知）
+            if ((delta > 0 && scrollDeltaAccum < 0) || (delta < 0 && scrollDeltaAccum > 0)) {
+                scrollDeltaAccum = delta;
+            }
         }
 
         lastScrollY = currentScrollY;
@@ -409,14 +439,16 @@ body.adsense-anchor-bottom .ui-sticky-cta {
         }
     }, { passive: true });
 
+    // 初期表示
     setTimeout(() => {
         stickyBar.classList.remove('is-hidden');
-    }, 800);
+    }, 500);
 
+    // クリックイベント
     const btns = stickyBar.querySelectorAll('.ui-sticky-btn');
     btns.forEach(btn => {
         btn.addEventListener('click', function() {
-            const label = this.querySelector('.en').innerText;
+            const label = this.querySelector('.en')?.innerText || '';
             if (typeof gtag !== 'undefined') {
                 gtag('event', 'click', {
                     'event_category': 'Sticky CTA',

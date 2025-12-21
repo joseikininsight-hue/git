@@ -479,7 +479,6 @@ if (!empty($faq_items)) $toc_items[] = array('id' => 'faq', 'title' => 'よく�
             <li class="gic-breadcrumb-item">
                 <?php if ($i < count($breadcrumbs) - 1): ?>
                 <a href="<?php echo esc_url($crumb['url']); ?>" class="gic-breadcrumb-link">
-                    <span class="gic-breadcrumb-chapter">第<?php echo $i + 1; ?>章</span>
                     <span class="gic-breadcrumb-text"><?php echo esc_html($crumb['name']); ?></span>
                 </a>
                 <span class="gic-breadcrumb-sep" aria-hidden="true">
@@ -487,14 +486,12 @@ if (!empty($faq_items)) $toc_items[] = array('id' => 'faq', 'title' => 'よく�
                 </span>
                 <?php else: ?>
                 <span class="gic-breadcrumb-current">
-                    <span class="gic-breadcrumb-chapter">本ページ</span>
                     <span class="gic-breadcrumb-text"><?php echo esc_html($crumb['name']); ?></span>
                 </span>
                 <?php endif; ?>
             </li>
             <?php endforeach; ?>
         </ol>
-        <div class="gic-breadcrumb-page-num">P.<?php echo str_pad($post_id, 3, '0', STR_PAD_LEFT); ?></div>
     </div>
 </nav>
 
@@ -651,13 +648,6 @@ if (!empty($faq_items)) $toc_items[] = array('id' => 'faq', 'title' => 'よく�
 
                 <!-- 記事本文 -->
                 <article class="gic-section gic-book-style" id="content" aria-labelledby="content-title">
-                    <header class="gic-section-header">
-                        <!-- 📚 章番号 -->
-                        <div class="gic-chapter-number">
-                            <span class="gic-chapter-number-circle">1</span>
-                            <span class="gic-chapter-number-text">CHAPTER ONE</span>
-                        </div>
-                    </header>
                     <header class="gic-section-header" style="border-bottom: none; padding-bottom: 0;">
                         <svg class="gic-section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
                         <h2 class="gic-section-title" id="content-title">記事本文</h2>
@@ -751,13 +741,6 @@ if (!empty($faq_items)) $toc_items[] = array('id' => 'faq', 'title' => 'よく�
                 <!-- 関連補助金 -->
                 <?php if (!empty($related_grants)): ?>
                 <section class="gic-section gic-book-style" id="grants" aria-labelledby="grants-title">
-                    <header class="gic-section-header">
-                        <!-- 📚 章番号 -->
-                        <div class="gic-chapter-number">
-                            <span class="gic-chapter-number-circle">2</span>
-                            <span class="gic-chapter-number-text">CHAPTER TWO</span>
-                        </div>
-                    </header>
                     <header class="gic-section-header" style="border-bottom: none; padding-bottom: 0;">
                         <svg class="gic-section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
                         <h2 class="gic-section-title" id="grants-title">関連する補助金</h2>
@@ -784,13 +767,6 @@ if (!empty($faq_items)) $toc_items[] = array('id' => 'faq', 'title' => 'よく�
                 <!-- FAQ -->
                 <?php if (!empty($faq_items)): ?>
                 <section class="gic-section gic-book-style" id="faq" aria-labelledby="faq-title">
-                    <header class="gic-section-header">
-                        <!-- 📚 章番号 -->
-                        <div class="gic-chapter-number">
-                            <span class="gic-chapter-number-circle">3</span>
-                            <span class="gic-chapter-number-text">CHAPTER THREE</span>
-                        </div>
-                    </header>
                     <header class="gic-section-header" style="border-bottom: none; padding-bottom: 0;">
                         <svg class="gic-section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                         <h2 class="gic-section-title" id="faq-title">よくある質問</h2>
