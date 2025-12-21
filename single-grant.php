@@ -1043,18 +1043,7 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
 }
 </style>
 
-<!-- 📚 図鑑インデックスタブ（左端） -->
-<nav class="gi-book-index-tab" aria-label="ページ内ナビゲーション">
-    <?php if (!empty($grant['ai_summary'])): ?>
-    <a href="#summary" class="gi-book-index-tab-item" title="AI要約">要約</a>
-    <?php endif; ?>
-    <a href="#details" class="gi-book-index-tab-item" title="詳細情報">詳細</a>
-    <a href="#content" class="gi-book-index-tab-item" title="補助金概要">概要</a>
-    <a href="#checklist" class="gi-book-index-tab-item" title="チェックリスト">確認</a>
-    <?php if (!empty($faq_items)): ?>
-    <a href="#faq" class="gi-book-index-tab-item" title="よくある質問">FAQ</a>
-    <?php endif; ?>
-</nav>
+<!-- 📚 図鑑インデックスタブ（左端）- モバイル・PC共通でサイドバー目次に統一のため削除 -->
 
 <!-- Breadcrumb（JSON-LDで構造化データ出力済みのため、HTMLはMicrodata属性なし） -->
 <nav class="gi-breadcrumb" aria-label="パンくずリスト">

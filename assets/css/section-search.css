@@ -1089,3 +1089,131 @@
     visibility: visible !important;
     opacity: 1 !important;
 }
+
+/* ==========================================================================
+   📚 補助金図鑑 - 本・辞典スタイル要素（検索セクション用）
+   ========================================================================== */
+
+/* 検索セクションの図鑑風ヘッダー */
+.search__zukan-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: linear-gradient(135deg, var(--s-gov-navy-800) 0%, var(--s-gov-navy-900) 100%);
+    border-radius: var(--s-radius-lg);
+    margin-bottom: 20px;
+    border-bottom: 3px solid var(--s-gov-gold);
+    position: relative;
+    overflow: hidden;
+}
+
+.search__zukan-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23c9a227' fill-opacity='0.04'%3E%3Cpath d='M20 20v-10h-2v10h-10v2h10v10h2v-10h10v-2h-10z'/%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+}
+
+.search__zukan-icon {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+}
+
+.search__zukan-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.search__zukan-content {
+    flex: 1;
+    position: relative;
+    z-index: 1;
+}
+
+.search__zukan-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    background: var(--s-gov-gold);
+    color: var(--s-gov-navy-900);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    border-radius: 2px;
+    margin-bottom: 6px;
+}
+
+.search__zukan-label svg {
+    width: 11px;
+    height: 11px;
+}
+
+.search__zukan-title {
+    font-family: var(--s-font-serif);
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.85);
+    margin: 0;
+}
+
+/* 検索カードの図鑑風スタイル */
+.search__card-zukan {
+    position: relative;
+    border-left: 4px solid var(--s-gov-navy-300);
+    transition: all var(--s-transition);
+}
+
+.search__card-zukan:hover {
+    border-left-color: var(--s-gov-gold);
+    box-shadow: 
+        var(--s-shadow-md),
+        -3px 0 0 var(--s-gov-navy-200);
+}
+
+/* 検索の図鑑エントリー番号 */
+.search__entry-number {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    background: linear-gradient(135deg, var(--s-gov-navy-800) 0%, var(--s-gov-navy-900) 100%);
+    color: var(--s-gov-gold);
+    font-family: var(--s-font-mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    border-radius: 2px;
+}
+
+.search__entry-number svg {
+    width: 10px;
+    height: 10px;
+}
+
+/* 図鑑風しおりリボン（検索結果カード用） */
+.search__bookmark-ribbon {
+    position: absolute;
+    top: -4px;
+    right: 12px;
+    width: 20px;
+    height: 44px;
+    background: linear-gradient(180deg, var(--s-gov-gold) 0%, #b8941f 100%);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 85%, 0 100%);
+    box-shadow: 1px 2px 4px rgba(0,0,0,0.12);
+    z-index: 5;
+    opacity: 0;
+    transition: opacity var(--s-transition);
+}
+
+.search__card-zukan:hover .search__bookmark-ribbon {
+    opacity: 1;
+}
