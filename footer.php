@@ -399,73 +399,6 @@ if (!function_exists('gi_get_cached_stats')) {
         }
         
         /* ===============================================
-           TRUST SECTION - 信頼性
-           =============================================== */
-        .gov-footer-trust {
-            padding: 2rem 0;
-            border-bottom: 1px solid var(--gov-border);
-        }
-        
-        .gov-trust-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-        }
-        
-        @media (min-width: 1024px) {
-            .gov-trust-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-        
-        .gov-trust-item {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--gov-border);
-            border-radius: 8px;
-            transition: all var(--gov-transition);
-        }
-        
-        .gov-trust-item:hover {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: var(--gov-gold);
-        }
-        
-        .gov-trust-icon {
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--gov-gold);
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-        
-        .gov-trust-icon i {
-            font-size: 0.9375rem;
-            color: var(--gov-navy);
-        }
-        
-        .gov-trust-content h4 {
-            font-size: 0.8125rem;
-            font-weight: 700;
-            color: var(--gov-white);
-            margin-bottom: 0.125rem;
-            line-height: 1.4;
-        }
-        
-        .gov-trust-content p {
-            font-size: 0.75rem;
-            color: var(--gov-text-muted);
-            line-height: 1.4;
-            margin: 0;
-        }
-        
-        /* ===============================================
            BOTTOM SECTION
            =============================================== */
         .gov-footer-bottom {
@@ -755,50 +688,6 @@ if (!function_exists('gi_get_cached_stats')) {
                 </div>
             </nav>
             
-            <!-- Trust Section - 信頼性 -->
-            <section class="gov-footer-trust" aria-labelledby="trust-heading">
-                <div class="gov-trust-grid">
-                    <div class="gov-trust-item">
-                        <div class="gov-trust-icon">
-                            <i class="fas fa-sync-alt" aria-hidden="true"></i>
-                        </div>
-                        <div class="gov-trust-content">
-                            <h4>毎日更新</h4>
-                            <p>公的機関の最新情報を反映</p>
-                        </div>
-                    </div>
-                    
-                    <div class="gov-trust-item">
-                        <div class="gov-trust-icon">
-                            <i class="fas fa-user-check" aria-hidden="true"></i>
-                        </div>
-                        <div class="gov-trust-content">
-                            <h4>専門家監修</h4>
-                            <p>補助金申請の専門家が監修</p>
-                        </div>
-                    </div>
-                    
-                    <div class="gov-trust-item">
-                        <div class="gov-trust-icon">
-                            <i class="fas fa-landmark" aria-hidden="true"></i>
-                        </div>
-                        <div class="gov-trust-content">
-                            <h4>公的情報源</h4>
-                            <p>国・自治体の公式発表を使用</p>
-                        </div>
-                    </div>
-                    
-                    <div class="gov-trust-item">
-                        <div class="gov-trust-icon">
-                            <i class="fas fa-lock" aria-hidden="true"></i>
-                        </div>
-                        <div class="gov-trust-content">
-                            <h4>セキュリティ</h4>
-                            <p>SSL暗号化通信で安全</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
             
         </div>
         
