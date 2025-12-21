@@ -392,12 +392,22 @@ $grants_url = get_post_type_archive_link('grant');
         color: inherit;
         text-decoration: none;
     }
+    
+    /* ヘッダーナビゲーションのaタグは白色を継承しない */
+    .ji-header a.ji-nav-link {
+        color: var(--h-white) !important;
+    }
 
     button {
         font-family: inherit;
         cursor: pointer;
         border: none;
         background: none;
+    }
+    
+    /* ヘッダーナビゲーションのbuttonタグも白色 */
+    .ji-header button.ji-nav-link {
+        color: var(--h-white) !important;
     }
 
     .ji-header-placeholder {
@@ -568,7 +578,15 @@ $grants_url = get_post_type_archive_link('grant');
         opacity: 0.9;
     }
     
-    .ji-nav-link span {
+    /* ナビゲーションリンクのテキスト色を確実に白に */
+    .ji-nav .ji-nav-link span,
+    .ji-nav-item .ji-nav-link span {
+        color: var(--h-white) !important;
+    }
+    
+    /* buttonとaタグ両方に対応 */
+    a.ji-nav-link span,
+    button.ji-nav-link span {
         color: var(--h-white) !important;
     }
 
