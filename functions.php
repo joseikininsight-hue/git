@@ -980,15 +980,15 @@ function gi_add_organization_schema() {
         $schema = array(
             '@context' => 'https://schema.org',
             '@type' => 'Organization',
-            'name' => '助成金インサイト',
+            'name' => '補助金図鑑',
             'url' => home_url('/'),
             'logo' => 'https://joseikin-insight.com/wp-content/uploads/2025/05/cropped-logo3.webp',
             'description' => '中小企業・個人事業主のための補助金・助成金検索サイト。最新の補助金情報を専門家監修のもとわかりやすく解説。',
             'sameAs' => array(
-                'https://twitter.com/joseikininsight',
-                'https://facebook.com/joseikin.insight',
+                'https://twitter.com/hojokin_zukan',
+                'https://facebook.com/hojokin.zukan',
                 'https://www.youtube.com/channel/UCbfjOrG3nSPI3GFzKnGcspQ',
-                'https://note.com/joseikin_insight'
+                'https://note.com/hojokin_zukan'
             ),
             'contactPoint' => array(
                 '@type' => 'ContactPoint',
@@ -1018,7 +1018,7 @@ function gi_add_website_schema() {
         $schema = array(
             '@context' => 'https://schema.org',
             '@type' => 'WebSite',
-            'name' => '助成金インサイト',
+            'name' => '補助金図鑑',
             'url' => home_url('/'),
             'description' => '全国の補助金・助成金を簡単検索。中小企業診断士監修のもと毎日更新。',
             'potentialAction' => array(

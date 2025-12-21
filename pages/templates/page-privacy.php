@@ -17,8 +17,8 @@ get_header();
 $privacy_schema = array(
     '@context' => 'https://schema.org',
     '@type' => 'WebPage',
-    'name' => 'プライバシーポリシー - 補助金インサイト',
-    'description' => '補助金インサイトのプライバシーポリシー。個人情報の取り扱い、収集する情報、利用目的などについて定めています。',
+    'name' => 'プライバシーポリシー - 補助金図鑑',
+    'description' => '補助金図鑑のプライバシーポリシー。個人情報の取り扱い、収集する情報、利用目的などについて定めています。',
     'url' => 'https://joseikin-insight.com/privacy/',
     'datePublished' => '2025-10-09',
     'dateModified' => '2025-10-09'
@@ -719,7 +719,7 @@ html { scroll-behavior: smooth; }
             
             <!-- Preamble -->
             <div class="gov-preamble">
-                <p>補助金インサイト（以下「当サイト」といいます）は、運営者である中澤圭志（以下「当社」といいます）が、ユーザーの個人情報の重要性を認識し、個人情報の保護に関する法律（以下「個人情報保護法」といいます）を遵守すると共に、以下のプライバシーポリシー（以下「本ポリシー」といいます）に従い、適切な取扱い及び保護に努めます。</p>
+                <p>補助金図鑑（以下「当サイト」といいます）は、運営者である中澤圭志（以下「当社」といいます）が、ユーザーの個人情報の重要性を認識し、個人情報の保護に関する法律（以下「個人情報保護法」といいます）を遵守すると共に、以下のプライバシーポリシー（以下「本ポリシー」といいます）に従い、適切な取扱い及び保護に努めます。</p>
             </div>
             
             <!-- TOC -->
@@ -944,7 +944,7 @@ html { scroll-behavior: smooth; }
                         <div class="gov-contact-details">
                             <div class="gov-contact-row">
                                 <span class="gov-contact-label">サイト名</span>
-                                <span class="gov-contact-value">補助金インサイト</span>
+                                <span class="gov-contact-value">補助金図鑑</span>
                             </div>
                             <div class="gov-contact-row">
                                 <span class="gov-contact-label">運営者</span>
@@ -956,7 +956,7 @@ html { scroll-behavior: smooth; }
                             </div>
                             <div class="gov-contact-row">
                                 <span class="gov-contact-label">メールアドレス</span>
-                                <span class="gov-contact-value"><a href="mailto:info@joseikin-insight.com">info@joseikin-insight.com</a></span>
+                                <span class="gov-contact-value"><a href="mailto:info@hojokin-zukan.com">info@hojokin-zukan.com</a></span>
                             </div>
                             <div class="gov-contact-row">
                                 <span class="gov-contact-label">お問い合わせ</span>

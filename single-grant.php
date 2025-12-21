@@ -1,10 +1,10 @@
 <?php
 /**
- * Grant Single Page - Ultimate Edition v303
- * 補助金詳細ページ - 採択率AI判断注意書き追加版
+ * Grant Single Page - Ultimate Edition v304
+ * 補助金図鑑 - 本・辞典スタイル + 採択率AI判断注意書き
  * 
  * @package Grant_Insight_Ultimate
- * @version 303.0.0
+ * @version 304.0.0
  */
 
 if (!defined('ABSPATH')) exit;
@@ -258,7 +258,7 @@ $grant = array(
 
 // デフォルト監修者
 if (empty($grant['supervisor_name'])) {
-    $grant['supervisor_name'] = '補助金インサイト編集部';
+    $grant['supervisor_name'] = '補助金図鑑編集部';
     $grant['supervisor_title'] = '中小企業診断士・行政書士監修';
     $grant['supervisor_profile'] = '補助金・助成金の専門家チーム。中小企業診断士、行政書士、税理士など各分野の専門家が在籍。年間1,000件以上の補助金申請支援実績があります。';
     $grant['supervisor_credentials'] = array(
@@ -593,7 +593,7 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
             "dateModified": "<?php echo get_the_modified_date('c'); ?>",
             "author": {
                 "@type": "Organization",
-                "name": <?php echo json_encode($grant['supervisor_name'] ? $grant['supervisor_name'] : '補助金インサイト編集部', JSON_UNESCAPED_UNICODE); ?>
+                "name": <?php echo json_encode($grant['supervisor_name'] ? $grant['supervisor_name'] : '補助金図鑑編集部', JSON_UNESCAPED_UNICODE); ?>
             },
             "publisher": {
                 "@type": "Organization",
@@ -1043,6 +1043,19 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
 }
 </style>
 
+<!-- 📚 図鑑インデックスタブ（左端） -->
+<nav class="gi-book-index-tab" aria-label="ページ内ナビゲーション">
+    <?php if (!empty($grant['ai_summary'])): ?>
+    <a href="#summary" class="gi-book-index-tab-item" title="AI要約">要約</a>
+    <?php endif; ?>
+    <a href="#details" class="gi-book-index-tab-item" title="詳細情報">詳細</a>
+    <a href="#content" class="gi-book-index-tab-item" title="補助金概要">概要</a>
+    <a href="#checklist" class="gi-book-index-tab-item" title="チェックリスト">確認</a>
+    <?php if (!empty($faq_items)): ?>
+    <a href="#faq" class="gi-book-index-tab-item" title="よくある質問">FAQ</a>
+    <?php endif; ?>
+</nav>
+
 <!-- Breadcrumb（JSON-LDで構造化データ出力済みのため、HTMLはMicrodata属性なし） -->
 <nav class="gi-breadcrumb" aria-label="パンくずリスト">
     <ol class="gi-breadcrumb-list">
@@ -1059,9 +1072,34 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
     </ol>
 </nav>
 
-<div class="gi-page">
+<div class="gi-page gi-grant-page">
     <div class="gi-container">
         
+        <!-- 📚 図鑑風ヘッダー（補助金図鑑らしさを演出） -->
+        <div class="gi-zukan-header">
+            <div class="gi-zukan-book-icon">
+                <!-- 本のSVGアイコン -->
+                <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="8" y="6" width="44" height="52" rx="2" fill="#1b263b" stroke="#c9a227" stroke-width="2"/>
+                    <rect x="12" y="6" width="40" height="52" rx="2" fill="#0d1b2a"/>
+                    <path d="M16 12h28M16 18h28M16 24h20" stroke="#c9a227" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+                    <rect x="52" y="6" width="4" height="52" fill="#c9a227"/>
+                    <path d="M54 10v44" stroke="#b8941f" stroke-width="1"/>
+                    <circle cx="32" cy="40" r="8" fill="#c9a227" opacity="0.2"/>
+                    <path d="M28 40l3 3 5-6" stroke="#c9a227" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="gi-zukan-header-content">
+                <div class="gi-zukan-category-label">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    補助金図鑑
+                </div>
+                <div class="gi-zukan-entry-number">ENTRY No.<?php echo str_pad($post_id, 5, '0', STR_PAD_LEFT); ?></div>
+                <p class="gi-zukan-title"><?php echo esc_html($grant['organization'] ? $grant['organization'] : '補助金'); ?>の詳細情報</p>
+            </div>
+            <div class="gi-bookmark-ribbon"></div>
+        </div>
+
         <!-- ヒーロー -->
         <header class="gi-hero">
             <div class="gi-hero-badges">
@@ -1089,8 +1127,14 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
             </div>
         </header>
 
+        <!-- 📚 図鑑エントリーバッジ -->
+        <div class="gi-entry-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            補助金図鑑 #<?php echo str_pad($post_id, 5, '0', STR_PAD_LEFT); ?>
+        </div>
+
         <!-- メトリクス -->
-        <section class="gi-metrics" aria-label="重要情報">
+        <section class="gi-metrics gi-card-style" aria-label="重要情報">
             <div class="gi-metric">
                 <div class="gi-metric-label">補助金額</div>
                 <div class="gi-metric-value highlight"><?php echo $amount_display ? esc_html($amount_display) : '要確認'; ?></div>
@@ -1150,8 +1194,9 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                 <?php endif; ?>
 
                 <!-- 詳細情報 -->
-                <section class="gi-section" id="details" aria-labelledby="details-title">
-                    <header class="gi-section-header">
+                <section class="gi-section gi-book-style" id="details" aria-labelledby="details-title">
+                    <span class="gi-page-number">01</span>
+                    <header class="gi-section-header gi-zukan-style">
                         <svg class="gi-section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
                         <h2 class="gi-section-title" id="details-title">補助金詳細</h2>
                         <span class="gi-section-en">Details</span>
@@ -1382,13 +1427,25 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                 <?php endif; ?>
 
                 <!-- 本文（補助金概要） -->
-                <section class="gi-section" id="content" aria-labelledby="content-title">
-                    <header class="gi-section-header">
+                <section class="gi-section gi-book-style" id="content" aria-labelledby="content-title">
+                    <span class="gi-page-number">02</span>
+                    <header class="gi-section-header gi-zukan-style">
                         <svg class="gi-section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
                         <h2 class="gi-section-title" id="content-title">補助金概要</h2>
                         <span class="gi-section-en">Overview</span>
                     </header>
+                    
+                    <!-- 📚 図鑑風注釈 -->
+                    <div class="gi-dict-note">
+                        <span class="gi-dict-note-text">この補助金に関する詳細な説明と申請に必要な情報を掲載しています。最新情報は公式サイトで必ずご確認ください。</span>
+                    </div>
+                    
                     <div class="gi-content"><?php echo apply_filters('the_content', $content); ?></div>
+                    
+                    <!-- 📚 セクション区切り -->
+                    <div class="gi-encyclopedia-divider">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    </div>
                 </section>
 
                 <!-- アフィリエイト記事欄（チェックリスト前） -->
@@ -1406,7 +1463,8 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                 <?php endif; ?>
 
                 <!-- チェックリスト（補助金概要の後に配置） -->
-                <section class="gi-section" id="checklist" aria-labelledby="checklist-title">
+                <section class="gi-section gi-book-style" id="checklist" aria-labelledby="checklist-title">
+                    <span class="gi-page-number">03</span>
                     <div class="gi-checklist">
                         <header class="gi-checklist-header">
                             <h2 class="gi-checklist-title" id="checklist-title">
@@ -1685,8 +1743,9 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
 
                 <!-- FAQ -->
                 <?php if (!empty($faq_items)): ?>
-                <section class="gi-section" id="faq" aria-labelledby="faq-title">
-                    <header class="gi-section-header">
+                <section class="gi-section gi-book-style" id="faq" aria-labelledby="faq-title">
+                    <span class="gi-page-number">04</span>
+                    <header class="gi-section-header gi-zukan-style">
                         <svg class="gi-section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                         <h2 class="gi-section-title" id="faq-title">よくある質問</h2>
                         <span class="gi-section-en">FAQ</span>
@@ -1736,6 +1795,18 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                     </div>
                 </section>
                 <?php endif; ?>
+<!-- 📚 図鑑風フッター -->
+                <div class="gi-zukan-footer">
+                    <div class="gi-zukan-footer-page">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                        補助金図鑑 エントリー #<?php echo str_pad($post_id, 5, '0', STR_PAD_LEFT); ?>
+                    </div>
+                    <div class="gi-book-mark">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                        <?php echo date('Y年版'); ?>
+                    </div>
+                </div>
+
 <!-- 情報ソース -->
 <div class="gi-source-card">
     <div class="gi-source-header">

@@ -1,7 +1,7 @@
 <?php
 /**
  * Template Name: サイトマップ
- * Description: 助成金インサイト全ページのサイトマップ
+ * Description: 補助金図鑑全ページのサイトマップ
  * 
  * @package Joseikin_Insight
  * @version 1.0.0
@@ -206,7 +206,7 @@ get_header();
 <section class="sitemap-hero">
     <div>
         <h1>サイトマップ</h1>
-        <p>助成金インサイトの全ページへのリンク一覧です。お探しの情報を素早く見つけることができます。</p>
+        <p>補助金図鑑の全ページへのリンク一覧です。お探しの情報を素早く見つけることができます。</p>
     </div>
 </section>
 
@@ -224,7 +224,7 @@ get_header();
     
     <!-- Introduction -->
     <div class="sitemap-intro">
-        <h2 style="font-size: 1.75rem; font-weight: 700; margin-bottom: 1rem; color: #1e293b;">助成金インサイト サイトマップ</h2>
+        <h2 style="font-size: 1.75rem; font-weight: 700; margin-bottom: 1rem; color: #1e293b;">補助金図鑑 サイトマップ</h2>
         <p style="color: #64748b; line-height: 1.7;">当サイトの全ページを分類別に掲載しています。目的のページをお探しの際にご活用ください。</p>
     </div>
     

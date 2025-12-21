@@ -1,11 +1,11 @@
 <?php
 /**
- * Single Column Template - Government Official Design v8.0
- * コラム記事詳細ページ - 官公庁風デザイン（single-grantベース）
+ * Single Column Template - Government Official Design v9.0
+ * コラム記事詳細ページ - 補助金図鑑スタイル
  * 
  * @package Grant_Insight_Ultimate
  * @subpackage Column_System
- * @version 8.0.0
+ * @version 9.0.0
  */
 
 if (!defined('ABSPATH')) exit;
@@ -151,7 +151,7 @@ $key_points_array = gicsc_parse_key_points($column['key_points']);
 
 // デフォルト監修者
 if (empty($column['supervisor_name'])) {
-    $column['supervisor_name'] = '補助金インサイト編集部';
+    $column['supervisor_name'] = '補助金図鑑編集部';
     $column['supervisor_title'] = '中小企業診断士・行政書士監修';
     $column['supervisor_profile'] = '補助金・助成金の専門家チーム。中小企業診断士、行政書士、税理士など各分野の専門家が在籍。年間1,000件以上の補助金申請支援実績があります。';
     $column['supervisor_credentials'] = array(
@@ -461,6 +461,23 @@ if (!empty($faq_items)) $toc_items[] = array('id' => 'faq', 'title' => 'よく�
 
 <div class="gic-progress" id="progressBar"></div>
 
+<!-- 📚 図鑑インデックスタブ（左端） -->
+<nav class="gic-book-index-tab" aria-label="ページ内ナビゲーション">
+    <?php if (!empty($column['ai_summary'])): ?>
+    <a href="#summary" class="gic-book-index-tab-item" title="AI要約">要約</a>
+    <?php endif; ?>
+    <a href="#content" class="gic-book-index-tab-item" title="記事本文">本文</a>
+    <?php if (!empty($key_points_array)): ?>
+    <a href="#keypoints" class="gic-book-index-tab-item" title="ポイント">要点</a>
+    <?php endif; ?>
+    <?php if (!empty($related_grants)): ?>
+    <a href="#grants" class="gic-book-index-tab-item" title="関連補助金">補助金</a>
+    <?php endif; ?>
+    <?php if (!empty($faq_items)): ?>
+    <a href="#faq" class="gic-book-index-tab-item" title="よくある質問">FAQ</a>
+    <?php endif; ?>
+</nav>
+
 <!-- パンくず -->
 <nav class="gic-breadcrumb" aria-label="パンくずリスト">
     <ol class="gic-breadcrumb-list">
@@ -480,6 +497,38 @@ if (!empty($faq_items)) $toc_items[] = array('id' => 'faq', 'title' => 'よく�
 <div class="gic-page">
     <div class="gic-container">
         
+        <!-- 📚 図鑑風ヘッダー（コラム用） -->
+        <div class="gic-zukan-header">
+            <div class="gic-zukan-book-icon">
+                <!-- 本のSVGアイコン（コラム用） -->
+                <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="6" y="4" width="40" height="48" rx="2" fill="#1b263b" stroke="#c9a227" stroke-width="2"/>
+                    <rect x="10" y="4" width="36" height="48" rx="2" fill="#0d1b2a"/>
+                    <path d="M14 10h24M14 16h24M14 22h16" stroke="#c9a227" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+                    <rect x="46" y="4" width="4" height="48" fill="#c9a227"/>
+                    <path d="M48 8v40" stroke="#b8941f" stroke-width="1"/>
+                    <path d="M14 34h24M14 40h18" stroke="rgba(255,255,255,0.3)" stroke-width="1" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="gic-zukan-header-content">
+                <div class="gic-zukan-category-label">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    補助金図鑑 コラム
+                </div>
+                <div class="gic-zukan-entry-number">COLUMN No.<?php echo str_pad($post_id, 5, '0', STR_PAD_LEFT); ?></div>
+                <p class="gic-zukan-title">
+                    <?php 
+                    if (!empty($categories[0])) {
+                        echo esc_html($categories[0]->name);
+                    } else {
+                        echo 'お役立ち情報';
+                    }
+                    ?>
+                </p>
+            </div>
+            <div class="gic-bookmark-ribbon"></div>
+        </div>
+
         <!-- ヒーロー -->
         <header class="gic-hero">
             <div class="gic-hero-badges">
@@ -516,6 +565,12 @@ if (!empty($faq_items)) $toc_items[] = array('id' => 'faq', 'title' => 'よく�
                 </span>
             </div>
         </header>
+
+        <!-- 📚 図鑑エントリーバッジ -->
+        <div class="gic-entry-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            補助金図鑑 コラム #<?php echo str_pad($post_id, 5, '0', STR_PAD_LEFT); ?>
+        </div>
 
         <!-- メトリクス -->
         <section class="gic-metrics" aria-label="記事情報">
@@ -591,12 +646,25 @@ if (!empty($faq_items)) $toc_items[] = array('id' => 'faq', 'title' => 'よく�
                 <?php endif; ?>
 
                 <!-- 記事本文 -->
-                <article class="gic-section" id="content" aria-labelledby="content-title">
+                <article class="gic-section gic-book-style" id="content" aria-labelledby="content-title">
                     <header class="gic-section-header">
+                        <!-- 📚 章番号 -->
+                        <div class="gic-chapter-number">
+                            <span class="gic-chapter-number-circle">1</span>
+                            <span class="gic-chapter-number-text">CHAPTER ONE</span>
+                        </div>
+                    </header>
+                    <header class="gic-section-header" style="border-bottom: none; padding-bottom: 0;">
                         <svg class="gic-section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
                         <h2 class="gic-section-title" id="content-title">記事本文</h2>
                         <span class="gic-section-en">Content</span>
                     </header>
+                    
+                    <!-- 📚 図鑑風注釈 -->
+                    <div class="gic-dict-note">
+                        <span class="gic-dict-note-text">この記事は補助金・助成金に関する知識を深めるためのコラムです。実際の申請時は必ず公式情報をご確認ください。</span>
+                    </div>
+                    
                     <div class="gic-content">
                         <?php echo apply_filters('the_content', $post_content); ?>
                         
@@ -608,6 +676,11 @@ if (!empty($faq_items)) $toc_items[] = array('id' => 'faq', 'title' => 'よく�
                         <?php endif; ?>
                     </div>
                 </article>
+
+                <!-- 📚 セクション区切り -->
+                <div class="gic-encyclopedia-divider">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                </div>
 
                 <!-- ポイントまとめ -->
                 <?php if (!empty($key_points_array)): ?>
@@ -640,7 +713,7 @@ if (!empty($faq_items)) $toc_items[] = array('id' => 'faq', 'title' => 'よく�
                             </svg>
                         </div>
                         <h2 class="gic-cta-title">あなたに合う補助金を今すぐ見つけましょう</h2>
-                        <p class="gic-cta-desc">AI診断で最適な補助金を提案。助成金インサイトであなたのビジネスに最適な支援制度を見つけましょう。</p>
+                        <p class="gic-cta-desc">AI診断で最適な補助金を提案。補助金図鑑であなたのビジネスに最適な支援制度を見つけましょう。</p>
                         <div class="gic-cta-buttons">
                             <a href="<?php echo esc_url(home_url('/subsidy-diagnosis/')); ?>" class="gic-cta-btn gic-cta-btn-primary">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -662,8 +735,15 @@ if (!empty($faq_items)) $toc_items[] = array('id' => 'faq', 'title' => 'よく�
 
                 <!-- 関連補助金 -->
                 <?php if (!empty($related_grants)): ?>
-                <section class="gic-section" id="grants" aria-labelledby="grants-title">
+                <section class="gic-section gic-book-style" id="grants" aria-labelledby="grants-title">
                     <header class="gic-section-header">
+                        <!-- 📚 章番号 -->
+                        <div class="gic-chapter-number">
+                            <span class="gic-chapter-number-circle">2</span>
+                            <span class="gic-chapter-number-text">CHAPTER TWO</span>
+                        </div>
+                    </header>
+                    <header class="gic-section-header" style="border-bottom: none; padding-bottom: 0;">
                         <svg class="gic-section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
                         <h2 class="gic-section-title" id="grants-title">関連する補助金</h2>
                         <span class="gic-section-en">Related Grants</span>
@@ -688,8 +768,15 @@ if (!empty($faq_items)) $toc_items[] = array('id' => 'faq', 'title' => 'よく�
 
                 <!-- FAQ -->
                 <?php if (!empty($faq_items)): ?>
-                <section class="gic-section" id="faq" aria-labelledby="faq-title">
+                <section class="gic-section gic-book-style" id="faq" aria-labelledby="faq-title">
                     <header class="gic-section-header">
+                        <!-- 📚 章番号 -->
+                        <div class="gic-chapter-number">
+                            <span class="gic-chapter-number-circle">3</span>
+                            <span class="gic-chapter-number-text">CHAPTER THREE</span>
+                        </div>
+                    </header>
+                    <header class="gic-section-header" style="border-bottom: none; padding-bottom: 0;">
                         <svg class="gic-section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                         <h2 class="gic-section-title" id="faq-title">よくある質問</h2>
                         <span class="gic-section-en">FAQ</span>
@@ -740,6 +827,18 @@ if (!empty($faq_items)) $toc_items[] = array('id' => 'faq', 'title' => 'よく�
                     </div>
                 </aside>
 
+                <!-- 📚 図鑑風フッター -->
+                <div class="gic-zukan-footer">
+                    <div class="gic-zukan-footer-page">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                        補助金図鑑 コラム #<?php echo str_pad($post_id, 5, '0', STR_PAD_LEFT); ?>
+                    </div>
+                    <div class="gic-book-mark">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                        <?php echo date('Y年版'); ?>
+                    </div>
+                </div>
+
                 <!-- 情報ソース -->
                 <div class="gic-source-card">
                     <div class="gic-source-header">
@@ -748,7 +847,7 @@ if (!empty($faq_items)) $toc_items[] = array('id' => 'faq', 'title' => 'よく�
                     </div>
                     <div class="gic-source-body">
                         <div class="gic-source-info">
-                            <div class="gic-source-name"><?php echo esc_html($column['source_name'] ?: '補助金インサイト編集部'); ?></div>
+                            <div class="gic-source-name"><?php echo esc_html($column['source_name'] ?: '補助金図鑑編集部'); ?></div>
                             <div class="gic-source-verified">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                                 <?php echo esc_html($last_verified_display); ?> 確認済み

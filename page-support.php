@@ -1,7 +1,7 @@
 <?php
 /**
  * Template Name: ヘルプセンター
- * Description: 助成金インサイトのヘルプ・サポートページ
+ * Description: 補助金図鑑のヘルプ・サポートページ
  * 
  * @package Joseikin_Insight
  * @version 1.0.0
@@ -393,7 +393,7 @@ get_header();
 <section class="support-hero">
     <div>
         <h1>ヘルプセンター</h1>
-        <p>助成金インサイトの使い方、よくある質問、サポート情報をご案内します。</p>
+        <p>補助金図鑑の使い方、よくある質問、サポート情報をご案内します。</p>
         
         <div class="search-box">
             <input type="search" class="search-input" placeholder="お困りのことを検索...">

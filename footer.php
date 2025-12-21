@@ -1,6 +1,6 @@
 <?php
 /**
- * JOSEIKIN INSIGHT - Government Style Footer
+ * 補助金図鑑 - Government Style Footer
  * 官公庁風デザイン - 信頼性・公共性・堅実性を演出
  * 
  * @package Joseikin_Insight_Footer
@@ -12,11 +12,11 @@ if (!function_exists('gi_get_sns_urls')) {
     function gi_get_sns_urls() {
         return [
             'twitter' => get_option('gi_sns_twitter_url', 'https://twitter.com/joseikininsight'),
-            'facebook' => get_option('gi_sns_facebook_url', 'https://facebook.com/joseikin.insight'),
+            'facebook' => get_option('gi_sns_facebook_url', 'https://facebook.com/hojokin.zukan'),
             'linkedin' => get_option('gi_sns_linkedin_url', ''),
-            'instagram' => get_option('gi_sns_instagram_url', 'https://instagram.com/joseikin_insight'),
+            'instagram' => get_option('gi_sns_instagram_url', 'https://instagram.com/hojokin_zukan'),
             'youtube' => get_option('gi_sns_youtube_url', 'https://www.youtube.com/channel/UCbfjOrG3nSPI3GFzKnGcspQ'),
-            'note' => get_option('gi_sns_note_url', 'https://note.com/joseikin_insight')
+            'note' => get_option('gi_sns_note_url', 'https://note.com/hojokin_zukan')
         ];
     }
 }
@@ -75,7 +75,7 @@ if (!function_exists('gi_get_cached_stats')) {
 
     <style>
         /* ===============================================
-           JOSEIKIN INSIGHT - GOVERNMENT STYLE FOOTER
+           補助金図鑑 - GOVERNMENT STYLE FOOTER
            官公庁風デザイン v9.1.0
            =============================================== */
         
@@ -553,7 +553,7 @@ if (!function_exists('gi_get_cached_stats')) {
                     <!-- Column 1: ロゴ・連絡先 -->
                     <div class="gov-nav-brand">
                         <a href="<?php echo esc_url(home_url('/')); ?>" class="gov-brand-logo" aria-label="<?php bloginfo('name'); ?> ホームへ">
-                            <img src="https://joseikin-insight.com/gemini_generated_image_19k6yi19k6yi19k6/" alt="Joseikin Insight" width="200" height="36" class="gov-logo-image" loading="lazy" data-no-lazy="1" data-skip-lazy="1">
+                            <img src="https://joseikin-insight.com/gemini_generated_image_19k6yi19k6yi19k6/" alt="補助金図鑑" width="200" height="36" class="gov-logo-image" loading="lazy" data-no-lazy="1" data-skip-lazy="1">
                         </a>
                         
                         <p class="gov-brand-description">

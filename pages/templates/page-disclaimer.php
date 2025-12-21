@@ -17,8 +17,8 @@ get_header();
 $disclaimer_schema = array(
     '@context' => 'https://schema.org',
     '@type' => 'WebPage',
-    'name' => '免責事項 - 補助金インサイト',
-    'description' => '補助金インサイトの免責事項。情報の正確性、利用上の注意事項、責任の限界、技術的制約について定めています。',
+    'name' => '免責事項 - 補助金図鑑',
+    'description' => '補助金図鑑の免責事項。情報の正確性、利用上の注意事項、責任の限界、技術的制約について定めています。',
     'url' => 'https://joseikin-insight.com/disclaimer/',
     'datePublished' => '2025-10-09',
     'dateModified' => '2025-12-16'
@@ -63,7 +63,7 @@ $disclaimer_schema = array(
             <section class="content-section preamble-section">
                 <div class="preamble-content">
                     <p>
-                        補助金インサイト（以下「当サイト」といいます）をご利用いただく前に、以下の免責事項を必ずお読みください。当サイトのご利用をもって、本免責事項に同意いただいたものとみなします。
+                        補助金図鑑（以下「当サイト」といいます）をご利用いただく前に、以下の免責事項を必ずお読みください。当サイトのご利用をもって、本免責事項に同意いただいたものとみなします。
                     </p>
                 </div>
             </section>
@@ -265,7 +265,7 @@ $disclaimer_schema = array(
                         <h3 class="contact-title">運営者情報</h3>
                         <dl class="contact-details">
                             <dt>サイト名</dt>
-                            <dd>補助金インサイト</dd>
+                            <dd>補助金図鑑</dd>
                             
                             <dt>運営者</dt>
                             <dd>中澤圭志</dd>
@@ -274,7 +274,7 @@ $disclaimer_schema = array(
                             <dd>〒136-0073<br>東京都江東区北砂3-23-8　401</dd>
                             
                             <dt>メールアドレス</dt>
-                            <dd><a href="mailto:info@joseikin-insight.com" class="text-link">info@joseikin-insight.com</a></dd>
+                            <dd><a href="mailto:info@hojokin-zukan.com" class="text-link">info@hojokin-zukan.com</a></dd>
                             
                             <dt>お問い合わせフォーム</dt>
                             <dd><a href="https://joseikin-insight.com/contact/" class="text-link">https://joseikin-insight.com/contact/</a></dd>

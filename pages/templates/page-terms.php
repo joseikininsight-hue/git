@@ -17,8 +17,8 @@ get_header(); // ヘッダーを読み込み
 $terms_schema = array(
     '@context' => 'https://schema.org',
     '@type' => 'WebPage',
-    'name' => '利用規約 - 補助金インサイト',
-    'description' => '補助金インサイトの利用規約。サービス利用に関する規定、禁止事項、免責事項などを定めています。',
+    'name' => '利用規約 - 補助金図鑑',
+    'description' => '補助金図鑑の利用規約。サービス利用に関する規定、禁止事項、免責事項などを定めています。',
     'url' => 'https://joseikin-insight.com/terms/',
     'datePublished' => '2025-10-09',
     'dateModified' => '2025-10-09'
@@ -65,7 +65,7 @@ $terms_schema = array(
             <section class="gov-content-section gov-preamble-section">
                 <div class="gov-preamble">
                     <p>
-                        補助金インサイト（以下「当サイト」といいます）の運営者である中澤圭志（以下「運営者」といいます）が提供する「補助金インサイト」（https://joseikin-insight.com/、以下「本サービス」といいます）の利用に関して、利用者（以下「ユーザー」といいます）との間で以下のとおり利用規約（以下「本規約」といいます）を定めます。
+                        補助金図鑑（以下「当サイト」といいます）の運営者である中澤圭志（以下「運営者」といいます）が提供する「補助金図鑑」（https://joseikin-insight.com/、以下「本サービス」といいます）の利用に関して、利用者（以下「ユーザー」といいます）との間で以下のとおり利用規約（以下「本規約」といいます）を定めます。
                     </p>
                 </div>
             </section>

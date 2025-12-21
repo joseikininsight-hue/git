@@ -23,12 +23,12 @@ get_header();
 $about_schema = array(
     '@context' => 'https://schema.org',
     '@type' => 'AboutPage',
-    'name' => '当サイトについて - 補助金インサイト',
-    'description' => '補助金インサイトは、全国の補助金・助成金情報を効率的に検索できるAI活用型のポータルサイトです。',
+    'name' => '当サイトについて - 補助金図鑑',
+    'description' => '補助金図鑑は、全国の補助金・助成金情報を効率的に検索できるAI活用型のポータルサイトです。',
     'url' => 'https://joseikin-insight.com/about/',
     'mainEntity' => array(
         '@type' => 'Organization',
-        'name' => '補助金インサイト',
+        'name' => '補助金図鑑',
         'url' => 'https://joseikin-insight.com',
         'description' => '中小企業・個人事業主・スタートアップ企業向けの補助金・助成金情報検索サービス'
     )
@@ -701,7 +701,7 @@ $about_schema = array(
     <div class="gov-page-content">
         <div class="gov-container">
             
-            <!-- 補助金インサイトとは -->
+            <!-- 補助金図鑑とは -->
             <section class="gov-content-section" id="about-overview">
                 <div class="gov-section-header">
                     <div class="gov-section-icon">
@@ -710,11 +710,11 @@ $about_schema = array(
                             <path d="M12 16v-4M12 8h.01"/>
                         </svg>
                     </div>
-                    <h2 class="gov-section-title">補助金インサイトとは</h2>
+                    <h2 class="gov-section-title">補助金図鑑とは</h2>
                 </div>
                 <div class="gov-section-content">
                     <p class="gov-lead-text">
-                        補助金インサイトは、全国の補助金・助成金情報を効率的に検索できるAI活用型のポータルサイトです。中小企業・個人事業主・スタートアップ企業の皆様が、ビジネスに適した支援制度を見つけ、申請手続きを円滑に進められるよう、情報提供とサポートサービスを行っています。
+                        補助金図鑑は、全国の補助金・助成金情報を効率的に検索できるAI活用型のポータルサイトです。中小企業・個人事業主・スタートアップ企業の皆様が、ビジネスに適した支援制度を見つけ、申請手続きを円滑に進められるよう、情報提供とサポートサービスを行っています。
                     </p>
                 </div>
             </section>
@@ -927,7 +927,7 @@ $about_schema = array(
                         <div class="gov-operator-details">
                             <div class="gov-operator-row">
                                 <span class="gov-operator-label">サイト名</span>
-                                <span class="gov-operator-value">補助金インサイト</span>
+                                <span class="gov-operator-value">補助金図鑑</span>
                             </div>
                             <div class="gov-operator-row">
                                 <span class="gov-operator-label">運営者</span>
@@ -939,7 +939,7 @@ $about_schema = array(
                             </div>
                             <div class="gov-operator-row">
                                 <span class="gov-operator-label">メールアドレス</span>
-                                <span class="gov-operator-value"><a href="mailto:info@joseikin-insight.com">info@joseikin-insight.com</a></span>
+                                <span class="gov-operator-value"><a href="mailto:info@hojokin-zukan.com">info@hojokin-zukan.com</a></span>
                             </div>
                             <div class="gov-operator-row">
                                 <span class="gov-operator-label">サイトURL</span>
