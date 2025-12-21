@@ -1045,20 +1045,39 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
 
 <!-- 📚 図鑑インデックスタブ（左端）- モバイル・PC共通でサイドバー目次に統一のため削除 -->
 
-<!-- Breadcrumb（JSON-LDで構造化データ出力済みのため、HTMLはMicrodata属性なし） -->
-<nav class="gi-breadcrumb" aria-label="パンくずリスト">
-    <ol class="gi-breadcrumb-list">
-        <?php foreach ($breadcrumbs as $i => $crumb): ?>
-        <li>
-            <?php if ($i < count($breadcrumbs) - 1): ?>
-            <a href="<?php echo esc_url($crumb['url']); ?>" class="gi-breadcrumb-link"><?php echo esc_html($crumb['name']); ?></a>
-            <span class="gi-breadcrumb-sep" aria-hidden="true">›</span>
-            <?php else: ?>
-            <span class="gi-breadcrumb-current"><?php echo esc_html($crumb['name']); ?></span>
-            <?php endif; ?>
-        </li>
-        <?php endforeach; ?>
-    </ol>
+<!-- 📚 本・図鑑風パンくずリスト -->
+<nav class="gi-breadcrumb gi-book-breadcrumb" aria-label="パンくずリスト">
+    <div class="gi-breadcrumb-book-spine"></div>
+    <div class="gi-breadcrumb-inner">
+        <div class="gi-breadcrumb-book-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                <path d="M8 7h8M8 11h5"/>
+            </svg>
+        </div>
+        <ol class="gi-breadcrumb-list">
+            <?php foreach ($breadcrumbs as $i => $crumb): ?>
+            <li class="gi-breadcrumb-item">
+                <?php if ($i < count($breadcrumbs) - 1): ?>
+                <a href="<?php echo esc_url($crumb['url']); ?>" class="gi-breadcrumb-link">
+                    <span class="gi-breadcrumb-chapter">第<?php echo $i + 1; ?>章</span>
+                    <span class="gi-breadcrumb-text"><?php echo esc_html($crumb['name']); ?></span>
+                </a>
+                <span class="gi-breadcrumb-sep" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+                </span>
+                <?php else: ?>
+                <span class="gi-breadcrumb-current">
+                    <span class="gi-breadcrumb-chapter">本ページ</span>
+                    <span class="gi-breadcrumb-text"><?php echo esc_html($crumb['name']); ?></span>
+                </span>
+                <?php endif; ?>
+            </li>
+            <?php endforeach; ?>
+        </ol>
+        <div class="gi-breadcrumb-page-num">P.<?php echo str_pad($post_id, 3, '0', STR_PAD_LEFT); ?></div>
+    </div>
 </nav>
 
 <div class="gi-page gi-grant-page">
@@ -1788,7 +1807,7 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                 <div class="gi-zukan-footer">
                     <div class="gi-zukan-footer-page">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-                        補助金図鑑 エントリー #<?php echo str_pad($post_id, 5, '0', STR_PAD_LEFT); ?>
+                        補助金図鑑 #<?php echo str_pad($post_id, 5, '0', STR_PAD_LEFT); ?>
                     </div>
                     <div class="gi-book-mark">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>

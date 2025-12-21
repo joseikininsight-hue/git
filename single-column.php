@@ -463,20 +463,39 @@ if (!empty($faq_items)) $toc_items[] = array('id' => 'faq', 'title' => 'よく�
 
 <!-- 📚 図鑑インデックスタブ（左端）- モバイル・PC共通でサイドバー目次に統一のため削除 -->
 
-<!-- パンくず -->
-<nav class="gic-breadcrumb" aria-label="パンくずリスト">
-    <ol class="gic-breadcrumb-list">
-        <?php foreach ($breadcrumbs as $i => $crumb): ?>
-        <li>
-            <?php if ($i < count($breadcrumbs) - 1): ?>
-            <a href="<?php echo esc_url($crumb['url']); ?>" class="gic-breadcrumb-link"><?php echo esc_html($crumb['name']); ?></a>
-            <span class="gic-breadcrumb-sep" aria-hidden="true">›</span>
-            <?php else: ?>
-            <span class="gic-breadcrumb-current"><?php echo esc_html($crumb['name']); ?></span>
-            <?php endif; ?>
-        </li>
-        <?php endforeach; ?>
-    </ol>
+<!-- 📚 本・図鑑風パンくずリスト -->
+<nav class="gic-breadcrumb gic-book-breadcrumb" aria-label="パンくずリスト">
+    <div class="gic-breadcrumb-book-spine"></div>
+    <div class="gic-breadcrumb-inner">
+        <div class="gic-breadcrumb-book-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                <path d="M8 7h8M8 11h5"/>
+            </svg>
+        </div>
+        <ol class="gic-breadcrumb-list">
+            <?php foreach ($breadcrumbs as $i => $crumb): ?>
+            <li class="gic-breadcrumb-item">
+                <?php if ($i < count($breadcrumbs) - 1): ?>
+                <a href="<?php echo esc_url($crumb['url']); ?>" class="gic-breadcrumb-link">
+                    <span class="gic-breadcrumb-chapter">第<?php echo $i + 1; ?>章</span>
+                    <span class="gic-breadcrumb-text"><?php echo esc_html($crumb['name']); ?></span>
+                </a>
+                <span class="gic-breadcrumb-sep" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+                </span>
+                <?php else: ?>
+                <span class="gic-breadcrumb-current">
+                    <span class="gic-breadcrumb-chapter">本ページ</span>
+                    <span class="gic-breadcrumb-text"><?php echo esc_html($crumb['name']); ?></span>
+                </span>
+                <?php endif; ?>
+            </li>
+            <?php endforeach; ?>
+        </ol>
+        <div class="gic-breadcrumb-page-num">P.<?php echo str_pad($post_id, 3, '0', STR_PAD_LEFT); ?></div>
+    </div>
 </nav>
 
 <div class="gic-page">
@@ -687,14 +706,22 @@ if (!empty($faq_items)) $toc_items[] = array('id' => 'faq', 'title' => 'よく�
                 </section>
                 <?php endif; ?>
 
-                <!-- CTA -->
-                <section class="gic-cta">
+                <!-- 📚 本・図鑑風CTA -->
+                <section class="gic-cta gic-book-cta">
+                    <div class="gic-cta-book-spine"></div>
+                    <div class="gic-cta-book-corner gic-cta-book-corner-tl"></div>
+                    <div class="gic-cta-book-corner gic-cta-book-corner-tr"></div>
+                    <div class="gic-cta-book-corner gic-cta-book-corner-bl"></div>
+                    <div class="gic-cta-book-corner gic-cta-book-corner-br"></div>
                     <div class="gic-cta-inner">
+                        <div class="gic-cta-book-header">
+                            <div class="gic-cta-chapter">📖 次のステップへ</div>
+                            <div class="gic-cta-book-ribbon">おすすめ</div>
+                        </div>
                         <div class="gic-cta-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
-                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-                                <circle cx="12" cy="12" r="2" fill="currentColor"/>
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
                             </svg>
                         </div>
                         <h2 class="gic-cta-title">あなたに合う補助金を今すぐ見つけましょう</h2>
@@ -714,6 +741,9 @@ if (!empty($faq_items)) $toc_items[] = array('id' => 'faq', 'title' => 'よく�
                                 </svg>
                                 <span>一覧から探す</span>
                             </a>
+                        </div>
+                        <div class="gic-cta-book-footer">
+                            <span class="gic-cta-page-num">補助金図鑑</span>
                         </div>
                     </div>
                 </section>
