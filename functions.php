@@ -767,13 +767,16 @@ add_filter('script_loader_tag', 'gi_add_defer_attribute', 10, 2);
 
 /**
  * Add preload for critical CSS
- * クリティカルCSSのプリロード
+ * クリティカルCSSのプリロード（LiteSpeed Cache対応）
+ * 
+ * 初回訪問時でもCSSが正しく読み込まれるよう、重要なCSSをプリロード
  */
 function gi_add_css_preload() {
+    $template_uri = get_template_directory_uri();
+    $template_dir = get_template_directory();
+    
+    // トップページ用
     if (is_front_page() || is_home()) {
-        $template_uri = get_template_directory_uri();
-        $template_dir = get_template_directory();
-        
         // Preload front-page CSS
         if (file_exists($template_dir . '/assets/css/front-page.css')) {
             echo '<link rel="preload" as="style" href="' . esc_url($template_uri . '/assets/css/front-page.css?ver=' . filemtime($template_dir . '/assets/css/front-page.css')) . '" />' . "\n";
@@ -782,6 +785,27 @@ function gi_add_css_preload() {
         // Preload section-hero CSS
         if (file_exists($template_dir . '/assets/css/section-hero.css')) {
             echo '<link rel="preload" as="style" href="' . esc_url($template_uri . '/assets/css/section-hero.css?ver=' . filemtime($template_dir . '/assets/css/section-hero.css')) . '" />' . "\n";
+        }
+    }
+    
+    // 補助金詳細ページ用
+    if (is_singular('grant')) {
+        if (file_exists($template_dir . '/assets/css/single-grant.css')) {
+            echo '<link rel="preload" as="style" href="' . esc_url($template_uri . '/assets/css/single-grant.css?ver=' . filemtime($template_dir . '/assets/css/single-grant.css')) . '" />' . "\n";
+        }
+    }
+    
+    // コラム詳細ページ用
+    if (is_singular('column')) {
+        if (file_exists($template_dir . '/assets/css/single-column.css')) {
+            echo '<link rel="preload" as="style" href="' . esc_url($template_uri . '/assets/css/single-column.css?ver=' . filemtime($template_dir . '/assets/css/single-column.css')) . '" />' . "\n";
+        }
+    }
+    
+    // アーカイブページ用
+    if (is_post_type_archive('grant') || is_tax('grant_category') || is_tax('grant_prefecture')) {
+        if (file_exists($template_dir . '/assets/css/archive-common.css')) {
+            echo '<link rel="preload" as="style" href="' . esc_url($template_uri . '/assets/css/archive-common.css?ver=' . filemtime($template_dir . '/assets/css/archive-common.css')) . '" />' . "\n";
         }
     }
 }
@@ -1511,7 +1535,7 @@ function gi_litespeed_preload_resources() {
  */
 add_action('wp_head', 'gi_inject_critical_css', 2);
 function gi_inject_critical_css() {
-    // Critical CSS（ヘッダー、ヒーローセクション、基本レイアウト）
+    // Critical CSS（ヘッダー、ヒーローセクション、基本レイアウト、本風デザイン）
     $critical_css = "
     /* Critical Reset & Base Styles */
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -1530,6 +1554,12 @@ function gi_inject_critical_css() {
     
     /* Layout Critical Styles */
     .container{max-width:1200px;margin:0 auto;padding:0 20px}
+    
+    /* 📚 本風デザイン Critical Styles */
+    .gi-book-breadcrumb,.gic-book-breadcrumb,.book-breadcrumb{background:linear-gradient(180deg,#faf8f5 0%,#fff 100%);position:relative;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+    .gi-breadcrumb-book-spine,.gic-breadcrumb-book-spine,.book-breadcrumb-spine{position:absolute;left:0;top:0;bottom:0;width:8px;background:linear-gradient(180deg,#0D2A52 0%,#081C38 100%)}
+    .gi-breadcrumb-book-spine::after,.gic-breadcrumb-book-spine::after,.book-breadcrumb-spine::after{content:'';position:absolute;left:100%;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#C9A227 0%,#D4B57A 100%)}
+    .gi-breadcrumb-inner,.gic-breadcrumb-inner,.book-breadcrumb-inner{display:flex;align-items:center;padding:14px 24px;gap:12px}
     
     /* Prevent FOUC */
     .no-js{opacity:1}

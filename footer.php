@@ -102,7 +102,7 @@ if (!function_exists('gi_get_cached_stats')) {
         }
         
         /* ===============================================
-           BASE FOOTER STYLES
+           BASE FOOTER STYLES - 📚 本・図鑑風
            =============================================== */
         .gov-footer {
             background: var(--gov-navy);
@@ -112,15 +112,90 @@ if (!function_exists('gi_get_cached_stats')) {
             border-top: 4px solid var(--gov-gold);
         }
         
+        /* 📚 本の背表紙装飾（左端） */
+        .gov-footer::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 12px;
+            background: linear-gradient(180deg, var(--gov-navy-dark) 0%, #050f1c 100%);
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
+            z-index: 1;
+        }
+        
+        .gov-footer::after {
+            content: '';
+            position: absolute;
+            left: 12px;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, var(--gov-gold) 0%, var(--gov-gold-light) 100%);
+            z-index: 1;
+        }
+        
+        /* 📚 しおり装飾 */
+        .gov-footer-bookmark {
+            position: absolute;
+            top: 0;
+            right: 40px;
+            width: 48px;
+            background: linear-gradient(180deg, var(--gov-gold) 0%, var(--gov-gold-light) 100%);
+            padding: 12px 8px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 85%, 0 100%);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+        }
+        
+        .gov-footer-bookmark svg {
+            width: 20px;
+            height: 20px;
+            color: var(--gov-navy);
+        }
+        
+        .gov-footer-bookmark span {
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--gov-navy);
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            letter-spacing: 1px;
+        }
+        
+        @media (max-width: 767px) {
+            .gov-footer-bookmark {
+                right: 20px;
+                width: 36px;
+                padding: 8px 6px 12px;
+            }
+            
+            .gov-footer-bookmark svg {
+                width: 16px;
+                height: 16px;
+            }
+            
+            .gov-footer-bookmark span {
+                font-size: 8px;
+            }
+        }
+        
         .gov-footer-inner {
             max-width: var(--gov-max-width);
             margin: 0 auto;
             padding: 0 1.5rem;
+            padding-left: 2rem; /* 背表紙分の余白 */
         }
         
         @media (min-width: 768px) {
             .gov-footer-inner {
                 padding: 0 2rem;
+                padding-left: 2.5rem; /* 背表紙分の余白 */
             }
         }
         
@@ -539,8 +614,14 @@ if (!function_exists('gi_get_cached_stats')) {
         }
     </style>
 
-    <!-- Government Style Footer -->
+    <!-- Government Style Footer - 📚 本・図鑑風 -->
     <footer class="gov-footer" role="contentinfo" itemscope itemtype="https://schema.org/WPFooter">
+        
+        <!-- 📚 しおり装飾 -->
+        <div class="gov-footer-bookmark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            <span><?php echo date('Y'); ?>年版</span>
+        </div>
         
         <!-- Schema.org Organization Data: REMOVED - Already output via JSON-LD in functions.php (gi_add_organization_schema) -->
         
