@@ -226,51 +226,212 @@ ul, ol {
 }
 
 /* ==========================================================================
-   パンくずリスト
+   📚 本・図鑑風パンくずリスト
    ========================================================================== */
 .gi-breadcrumb {
-    padding: 16px 0;
-    padding-top: 88px;
-    border-bottom: 1px solid var(--gi-gray-200);
+    padding: 0;
+    padding-top: 72px;
     font-size: 12px;
-    background: var(--gi-white);
+    background: linear-gradient(180deg, #faf8f5 0%, #fff 100%);
+    position: relative;
+}
+
+.gi-book-breadcrumb {
+    border-bottom: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* 本の背表紙装飾（左端） */
+.gi-breadcrumb-book-spine {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 8px;
+    background: linear-gradient(180deg, var(--gi-gov-navy-800) 0%, var(--gi-gov-navy-900) 100%);
+    box-shadow: 2px 0 6px rgba(0, 50, 100, 0.15);
+}
+
+.gi-breadcrumb-book-spine::after {
+    content: '';
+    position: absolute;
+    left: 100%;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--gi-gov-gold) 0%, var(--gi-gov-gold-light) 100%);
+}
+
+.gi-breadcrumb-inner {
+    display: flex;
+    align-items: center;
+    max-width: var(--gi-container);
+    margin: 0 auto;
+    padding: 16px 24px 16px 32px;
+    gap: 12px;
+}
+
+/* 本のアイコン */
+.gi-breadcrumb-book-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--gi-gov-navy-800) 0%, var(--gi-gov-navy-900) 100%);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 2px 4px rgba(0, 50, 100, 0.2);
+}
+
+.gi-breadcrumb-book-icon svg {
+    width: 20px;
+    height: 20px;
+    color: var(--gi-gov-gold);
 }
 
 .gi-breadcrumb-list {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
     color: var(--gi-gray-600);
-    max-width: var(--gi-container);
-    margin: 0 auto;
-    padding: 0 24px;
-    overflow-x: hidden;
+    flex: 1;
+    margin: 0;
+    padding: 0;
+    list-style: none;
 }
 
-@media (max-width: 768px) {
-    .gi-breadcrumb-list {
-        padding: 0 16px;
-    }
+.gi-breadcrumb-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .gi-breadcrumb-link {
+    display: flex;
+    flex-direction: column;
     color: var(--gi-gray-600);
-    font-weight: 500;
-    transition: color var(--gi-transition);
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    transition: all var(--gi-transition);
+    background: rgba(0, 50, 100, 0.03);
+    border: 1px solid transparent;
 }
 
 .gi-breadcrumb-link:hover {
+    background: rgba(0, 50, 100, 0.08);
+    border-color: var(--gi-gov-navy-200);
     color: var(--gi-gov-navy-800);
+}
+
+.gi-breadcrumb-chapter {
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--gi-gov-gold-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1;
+    margin-bottom: 2px;
+}
+
+.gi-breadcrumb-text {
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.3;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .gi-breadcrumb-sep {
     color: var(--gi-gray-400);
+    display: flex;
+    align-items: center;
+}
+
+.gi-breadcrumb-sep svg {
+    width: 14px;
+    height: 14px;
 }
 
 .gi-breadcrumb-current {
-    color: var(--gi-gov-navy-900);
+    display: flex;
+    flex-direction: column;
+    padding: 6px 12px;
+    background: linear-gradient(135deg, var(--gi-gov-navy-800) 0%, var(--gi-gov-navy-900) 100%);
+    border-radius: 4px;
+    border: 1px solid var(--gi-gov-navy-700);
+}
+
+.gi-breadcrumb-current .gi-breadcrumb-chapter {
+    color: var(--gi-gov-gold);
+}
+
+.gi-breadcrumb-current .gi-breadcrumb-text {
+    color: var(--gi-white);
     font-weight: 600;
+    max-width: 200px;
+}
+
+/* ページ番号 */
+.gi-breadcrumb-page-num {
+    font-family: var(--gi-font-serif);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gi-gov-navy-800);
+    background: linear-gradient(135deg, var(--gi-gov-gold-light) 0%, var(--gi-gov-gold) 100%);
+    padding: 6px 14px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(201, 162, 39, 0.3);
+    flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    .gi-breadcrumb-inner {
+        padding: 12px 16px 12px 24px;
+        gap: 8px;
+    }
+    
+    .gi-breadcrumb-book-icon {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .gi-breadcrumb-book-icon svg {
+        width: 16px;
+        height: 16px;
+    }
+    
+    .gi-breadcrumb-link,
+    .gi-breadcrumb-current {
+        padding: 4px 8px;
+    }
+    
+    .gi-breadcrumb-chapter {
+        font-size: 8px;
+    }
+    
+    .gi-breadcrumb-text {
+        font-size: 11px;
+        max-width: 80px;
+    }
+    
+    .gi-breadcrumb-current .gi-breadcrumb-text {
+        max-width: 100px;
+    }
+    
+    .gi-breadcrumb-page-num {
+        font-size: 11px;
+        padding: 4px 10px;
+    }
+    
+    .gi-breadcrumb-sep svg {
+        width: 12px;
+        height: 12px;
+    }
 }
 
 /* ==========================================================================
