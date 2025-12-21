@@ -2124,10 +2124,9 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
     <section class="gi-related gi-book-related" aria-labelledby="related-title">
         <div class="gi-book-spine-left"></div>
         <div class="gi-container">
-            <header class="gi-related-header gi-book-chapter-header">
-                <div class="gi-book-chapter-num">📖 関連項目</div>
+            <header class="gi-related-header">
+                <p class="gi-related-en">Related Grants</p>
                 <h2 class="gi-related-title" id="related-title">関連する補助金</h2>
-                <div class="gi-book-chapter-line"></div>
             </header>
             <div class="gi-related-grid">
                 <?php foreach ($similar_grants as $i => $sg): ?>
