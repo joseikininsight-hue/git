@@ -414,47 +414,77 @@ ul, ol {
 }
 
 @media (max-width: 768px) {
+    .gic-breadcrumb {
+        padding-top: 60px;
+    }
+    
+    .gic-breadcrumb-book-spine {
+        width: 6px;
+    }
+    
+    .gic-breadcrumb-book-spine::after {
+        width: 2px;
+    }
+    
     .gic-breadcrumb-inner {
-        padding: 12px 16px 12px 24px;
-        gap: 8px;
+        padding: 10px 12px 10px 16px;
+        gap: 6px;
+        flex-wrap: wrap;
     }
     
     .gic-breadcrumb-book-icon {
-        width: 28px;
-        height: 28px;
+        display: none;
     }
     
-    .gic-breadcrumb-book-icon svg {
-        width: 16px;
-        height: 16px;
+    .gic-breadcrumb-list {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        padding-bottom: 2px;
+    }
+    
+    .gic-breadcrumb-list::-webkit-scrollbar {
+        display: none;
+    }
+    
+    .gic-breadcrumb-item {
+        flex-shrink: 0;
     }
     
     .gic-breadcrumb-link,
     .gic-breadcrumb-current {
         padding: 4px 8px;
+        flex-direction: row;
+        gap: 4px;
+        align-items: center;
     }
     
     .gic-breadcrumb-chapter {
-        font-size: 8px;
+        font-size: 9px;
+        margin-bottom: 0;
+        white-space: nowrap;
     }
     
     .gic-breadcrumb-text {
         font-size: 11px;
-        max-width: 80px;
-    }
-    
-    .gic-breadcrumb-current .gic-breadcrumb-text {
         max-width: 100px;
     }
     
+    .gic-breadcrumb-current .gic-breadcrumb-text {
+        max-width: 120px;
+    }
+    
     .gic-breadcrumb-page-num {
-        font-size: 11px;
-        padding: 4px 10px;
+        font-size: 10px;
+        padding: 4px 8px;
+        margin-left: auto;
     }
     
     .gic-breadcrumb-sep svg {
-        width: 12px;
-        height: 12px;
+        width: 10px;
+        height: 10px;
     }
 }
 

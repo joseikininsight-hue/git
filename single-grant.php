@@ -2119,22 +2119,29 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
         </div>
     </div>
 
-    <!-- 関連補助金 -->
+    <!-- 📚 本風・関連補助金セクション -->
     <?php if (!empty($similar_grants)): ?>
-    <section class="gi-related" aria-labelledby="related-title">
+    <section class="gi-related gi-book-related" aria-labelledby="related-title">
+        <div class="gi-book-spine-left"></div>
         <div class="gi-container">
-            <header class="gi-related-header">
-                <p class="gi-related-en">Related Grants</p>
+            <header class="gi-related-header gi-book-chapter-header">
+                <div class="gi-book-chapter-num">📖 関連項目</div>
                 <h2 class="gi-related-title" id="related-title">関連する補助金</h2>
+                <div class="gi-book-chapter-line"></div>
             </header>
             <div class="gi-related-grid">
-                <?php foreach ($similar_grants as $sg): ?>
-                <a href="<?php echo esc_url($sg['permalink']); ?>" class="gi-related-card">
+                <?php foreach ($similar_grants as $i => $sg): ?>
+                <a href="<?php echo esc_url($sg['permalink']); ?>" class="gi-related-card gi-book-card">
+                    <div class="gi-book-card-bookmark"></div>
+                    <div class="gi-book-card-index"><?php echo $i + 1; ?></div>
                     <span class="gi-related-card-badge"><?php echo $sg['application_status'] === 'open' ? '募集中' : '募集終了'; ?></span>
                     <h3 class="gi-related-card-title"><?php echo esc_html($sg['title']); ?></h3>
                     <div class="gi-related-card-meta">
                         <?php if ($sg['max_amount']): ?><span><strong><?php echo esc_html($sg['max_amount']); ?></strong></span><?php endif; ?>
                         <?php if ($sg['deadline']): ?><span><?php echo esc_html($sg['deadline']); ?></span><?php endif; ?>
+                    </div>
+                    <div class="gi-book-card-footer">
+                        <span class="gi-book-card-page">詳細を見る →</span>
                     </div>
                 </a>
                 <?php endforeach; ?>

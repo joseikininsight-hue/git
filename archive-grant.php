@@ -246,31 +246,49 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
       itemscope 
       itemtype="https://schema.org/CollectionPage">
 
-    <!-- パンくずリスト -->
-    <nav class="breadcrumb-nav" 
+    <!-- 📚 本・図鑑風パンくずリスト -->
+    <nav class="breadcrumb-nav book-breadcrumb" 
          aria-label="パンくずリスト" 
          itemscope 
          itemtype="https://schema.org/BreadcrumbList">
+        <div class="book-breadcrumb-spine"></div>
         <div class="yahoo-container">
-            <ol class="breadcrumb-list">
-                <?php foreach ($breadcrumbs as $index => $breadcrumb): ?>
-                <li class="breadcrumb-item" 
-                    itemprop="itemListElement" 
-                    itemscope 
-                    itemtype="https://schema.org/ListItem">
-                    <?php if (!empty($breadcrumb['url'])): ?>
-                        <a href="<?php echo esc_url($breadcrumb['url']); ?>" 
-                           itemprop="item"
-                           title="<?php echo esc_attr($breadcrumb['name']); ?>へ移動">
-                            <span itemprop="name"><?php echo esc_html($breadcrumb['name']); ?></span>
-                        </a>
-                    <?php else: ?>
-                        <span itemprop="name"><?php echo esc_html($breadcrumb['name']); ?></span>
-                    <?php endif; ?>
-                    <meta itemprop="position" content="<?php echo $index + 1; ?>">
-                </li>
-                <?php endforeach; ?>
-            </ol>
+            <div class="book-breadcrumb-inner">
+                <div class="book-breadcrumb-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                        <path d="M8 7h8M8 11h5"/>
+                    </svg>
+                </div>
+                <ol class="breadcrumb-list">
+                    <?php foreach ($breadcrumbs as $index => $breadcrumb): ?>
+                    <li class="breadcrumb-item" 
+                        itemprop="itemListElement" 
+                        itemscope 
+                        itemtype="https://schema.org/ListItem">
+                        <?php if (!empty($breadcrumb['url'])): ?>
+                            <a href="<?php echo esc_url($breadcrumb['url']); ?>" 
+                               itemprop="item"
+                               class="book-breadcrumb-link"
+                               title="<?php echo esc_attr($breadcrumb['name']); ?>へ移動">
+                                <span class="book-breadcrumb-chapter">第<?php echo $index + 1; ?>章</span>
+                                <span itemprop="name" class="book-breadcrumb-text"><?php echo esc_html($breadcrumb['name']); ?></span>
+                            </a>
+                            <span class="book-breadcrumb-sep" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+                            </span>
+                        <?php else: ?>
+                            <span class="book-breadcrumb-current">
+                                <span class="book-breadcrumb-chapter">本ページ</span>
+                                <span itemprop="name" class="book-breadcrumb-text"><?php echo esc_html($breadcrumb['name']); ?></span>
+                            </span>
+                        <?php endif; ?>
+                        <meta itemprop="position" content="<?php echo $index + 1; ?>">
+                    </li>
+                    <?php endforeach; ?>
+                </ol>
+            </div>
         </div>
     </nav>
 
