@@ -3010,55 +3010,9 @@ ul, ol {
     box-shadow: 2px 0 8px rgba(0,0,0,0.1);
 }
 
-/* 図鑑のインデックスタブ（ページ左端） */
-.gi-book-index-tab {
-    position: fixed;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 50;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-.gi-book-index-tab-item {
-    width: 32px;
-    height: 56px;
-    background: linear-gradient(90deg, var(--gi-gov-navy-700) 0%, var(--gi-gov-navy-800) 100%);
-    border-radius: 0 4px 4px 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--gi-white);
-    font-size: 10px;
-    font-weight: 700;
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-    cursor: pointer;
-    transition: all var(--gi-transition);
-    border-left: 3px solid var(--gi-gov-gold);
-    text-decoration: none;
-    box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
-}
-
-.gi-book-index-tab-item:hover {
-    width: 48px;
-    background: linear-gradient(90deg, var(--gi-gov-gold) 0%, var(--gi-gov-gold-light) 100%);
-    color: var(--gi-gov-navy-900);
-    text-decoration: none;
-}
-
-.gi-book-index-tab-item.active {
-    width: 40px;
-    background: linear-gradient(90deg, var(--gi-gov-gold) 0%, var(--gi-gov-gold-light) 100%);
-    color: var(--gi-gov-navy-900);
-}
-
+/* 図鑑のインデックスタブ（ページ左端）- サイドバー目次に統一のため削除 */
+/* 左端スパイン装飾のみ保持 */
 @media (max-width: 1024px) {
-    .gi-book-index-tab {
-        display: none;
-    }
     .gi-page::after {
         display: none;
     }

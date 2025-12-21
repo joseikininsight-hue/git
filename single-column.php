@@ -461,22 +461,7 @@ if (!empty($faq_items)) $toc_items[] = array('id' => 'faq', 'title' => 'よく�
 
 <div class="gic-progress" id="progressBar"></div>
 
-<!-- 📚 図鑑インデックスタブ（左端） -->
-<nav class="gic-book-index-tab" aria-label="ページ内ナビゲーション">
-    <?php if (!empty($column['ai_summary'])): ?>
-    <a href="#summary" class="gic-book-index-tab-item" title="AI要約">要約</a>
-    <?php endif; ?>
-    <a href="#content" class="gic-book-index-tab-item" title="記事本文">本文</a>
-    <?php if (!empty($key_points_array)): ?>
-    <a href="#keypoints" class="gic-book-index-tab-item" title="ポイント">要点</a>
-    <?php endif; ?>
-    <?php if (!empty($related_grants)): ?>
-    <a href="#grants" class="gic-book-index-tab-item" title="関連補助金">補助金</a>
-    <?php endif; ?>
-    <?php if (!empty($faq_items)): ?>
-    <a href="#faq" class="gic-book-index-tab-item" title="よくある質問">FAQ</a>
-    <?php endif; ?>
-</nav>
+<!-- 📚 図鑑インデックスタブ（左端）- モバイル・PC共通でサイドバー目次に統一のため削除 -->
 
 <!-- パンくず -->
 <nav class="gic-breadcrumb" aria-label="パンくずリスト">
