@@ -520,7 +520,7 @@ $grants_url = get_post_type_archive_link('grant');
         align-items: center;
         gap: 6px;
         padding: 14px 18px;
-        color: var(--h-white);
+        color: var(--h-white) !important;
         font-size: 14px;
         font-weight: 600;
         transition: all var(--h-transition);
@@ -537,7 +537,7 @@ $grants_url = get_post_type_archive_link('grant');
     .ji-nav-link:hover,
     .ji-nav-link:focus-visible {
         background: rgba(255, 255, 255, 0.1);
-        color: var(--h-white);
+        color: var(--h-white) !important;
     }
 
     .ji-nav-link:focus-visible {
@@ -564,8 +564,12 @@ $grants_url = get_post_type_archive_link('grant');
 
     .ji-nav-link .ji-icon {
         font-size: 14px;
-        color: var(--h-gov-gold);
+        color: var(--h-gov-gold) !important;
         opacity: 0.9;
+    }
+    
+    .ji-nav-link span {
+        color: var(--h-white) !important;
     }
 
     .ji-nav-link .ji-chevron {

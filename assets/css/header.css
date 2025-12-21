@@ -322,7 +322,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     align-items: center;
     gap: 6px;
     padding: 14px 20px;
-    color: var(--gov-white);
+    color: var(--gov-white) !important;
     font-size: 0.9375rem;
     font-weight: 500;
     transition: all var(--transition);
@@ -337,7 +337,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .ji-nav-link:hover,
 .ji-nav-link:focus-visible {
     background: rgba(255, 255, 255, 0.12);
-    color: var(--gov-white);
+    color: var(--gov-white) !important;
 }
 
 .ji-nav-link:focus-visible {
@@ -364,7 +364,11 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .ji-nav-link .ji-icon {
     font-size: 0.875rem;
     opacity: 0.9;
-    color: var(--gov-gold-light);
+    color: var(--gov-gold-light) !important;
+}
+
+.ji-nav-link span {
+    color: var(--gov-white) !important;
 }
 
 .ji-nav-link .ji-chevron {
