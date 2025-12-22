@@ -270,11 +270,15 @@ add_action('pre_get_posts', 'gi_enhance_grant_search');
 
 /**
  * セキュリティ強化
+ * 
+ * 注意: X-Frame-Options は AdSense 等の広告配信に影響を与える可能性があるため
+ * 削除しています。広告はiframeで配信されることが多いためです。
  */
 function gi_security_headers() {
     if (!is_admin()) {
         header('X-Content-Type-Options: nosniff');
-        header('X-Frame-Options: SAMEORIGIN');
+        // X-Frame-Options: SAMEORIGIN は AdSense 広告の表示を妨げる可能性があるため削除
+        // header('X-Frame-Options: SAMEORIGIN');
         header('X-XSS-Protection: 1; mode=block');
     }
 }
