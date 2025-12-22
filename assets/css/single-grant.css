@@ -2789,7 +2789,7 @@ ul, ol {
    ========================================================================== */
 .gi-book-related {
     background: linear-gradient(180deg, #faf8f5 0%, #f5f2eb 100%);
-    border-top: 4px solid var(--gi-gov-navy-800);
+    border-top: 4px solid #ffffff;
     position: relative;
 }
 
