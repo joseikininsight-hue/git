@@ -2119,7 +2119,6 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
     <!-- 📚 本風・関連補助金セクション -->
     <?php if (!empty($similar_grants)): ?>
     <section class="gi-related gi-book-related" aria-labelledby="related-title">
-        <div class="gi-book-spine-left"></div>
         <div class="gi-container">
             <header class="gi-related-header">
                 <p class="gi-related-en">Related Grants</p>
