@@ -2129,7 +2129,6 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                 <?php foreach ($similar_grants as $i => $sg): ?>
                 <a href="<?php echo esc_url($sg['permalink']); ?>" class="gi-related-card gi-book-card">
                     <div class="gi-book-card-bookmark"></div>
-                    <div class="gi-book-card-index"><?php echo $i + 1; ?></div>
                     <span class="gi-related-card-badge"><?php echo $sg['application_status'] === 'open' ? '募集中' : '募集終了'; ?></span>
                     <h3 class="gi-related-card-title"><?php echo esc_html($sg['title']); ?></h3>
                     <div class="gi-related-card-meta">
