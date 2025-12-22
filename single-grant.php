@@ -1548,6 +1548,24 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                     </div>
                 </section>
 
+                <!-- アフィリエイト記事欄（チェックリスト後） -->
+                <?php 
+                // 出力バッファリング開始
+                ob_start();
+                ji_display_ad('single_grant_article_after_checklist');
+                $ad_after_checklist = ob_get_clean(); // 内容を変数に取得
+
+                if (!empty($ad_after_checklist)): 
+                ?>
+                <aside class="gi-article-ad-section" aria-label="関連サービス">
+                    <header class="gi-article-ad-section-header">
+                        <span class="gi-article-ad-section-badge">PR</span>
+                        <span class="gi-article-ad-section-title">申請をスムーズに</span>
+                    </header>
+                    <?php echo $ad_after_checklist; ?>
+                </aside>
+                <?php endif; ?>
+
                 <!-- 申請フロー -->
                 <?php if (!empty($grant['application_flow_steps']) || !empty($grant['application_flow'])): ?>
                 <section class="gi-section" id="flow" aria-labelledby="flow-title">
@@ -1584,6 +1602,24 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                         <?php endforeach; ?>
                     </div>
                 </section>
+                <?php endif; ?>
+
+                <!-- アフィリエイト記事欄（申請フロー後） -->
+                <?php 
+                // 出力バッファリング開始
+                ob_start();
+                ji_display_ad('single_grant_article_after_flow');
+                $ad_after_flow = ob_get_clean(); // 内容を変数に取得
+
+                if (!empty($ad_after_flow)): 
+                ?>
+                <aside class="gi-article-ad-section" aria-label="おすすめツール">
+                    <header class="gi-article-ad-section-header">
+                        <span class="gi-article-ad-section-badge">PR</span>
+                        <span class="gi-article-ad-section-title">申請書類作成をサポート</span>
+                    </header>
+                    <?php echo $ad_after_flow; ?>
+                </aside>
                 <?php endif; ?>
 
                 <!-- 申請のコツ -->
@@ -1776,6 +1812,24 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                         <?php endforeach; ?>
                     </div>
                 </section>
+                <?php endif; ?>
+
+                <!-- アフィリエイト記事欄（お問い合わせ前） -->
+                <?php 
+                // 出力バッファリング開始
+                ob_start();
+                ji_display_ad('single_grant_article_before_contact');
+                $ad_before_contact = ob_get_clean(); // 内容を変数に取得
+
+                if (!empty($ad_before_contact)): 
+                ?>
+                <aside class="gi-article-ad-section" aria-label="便利なサービス">
+                    <header class="gi-article-ad-section-header">
+                        <span class="gi-article-ad-section-badge">PR</span>
+                        <span class="gi-article-ad-section-title">補助金活用のヒント</span>
+                    </header>
+                    <?php echo $ad_before_contact; ?>
+                </aside>
                 <?php endif; ?>
 
                 <!-- お問い合わせ -->
