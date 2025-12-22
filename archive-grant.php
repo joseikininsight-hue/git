@@ -292,85 +292,73 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
         </div>
     </nav>
 
-    <!-- ヒーローセクション -->
+    <!-- ヒーローセクション（図鑑式・横長レイアウト） -->
     <header class="yahoo-hero-section" 
             itemscope 
             itemtype="https://schema.org/WPHeader">
         <div class="yahoo-container">
             <div class="hero-content-wrapper">
-                
-                <!-- カテゴリーバッジ -->
-                <div class="category-badge" role="status">
-                    <svg class="badge-icon" 
-                         width="16" 
-                         height="16" 
-                         viewBox="0 0 24 24" 
-                         fill="none" 
-                         stroke="currentColor" 
-                         stroke-width="2" 
-                         aria-hidden="true">
-                        <circle cx="11" cy="11" r="8"/>
-                        <path d="m21 21-4.35-4.35"/>
-                    </svg>
-                    <span>助成金・補助金検索</span>
-                </div>
-
-                <!-- メインタイトル -->
-                <h1 class="yahoo-main-title" itemprop="headline">
-                    <?php echo esc_html($archive_title); ?>
-                </h1>
-
-                <!-- リード文 -->
-                <p class="yahoo-lead-text" itemprop="description">
-                    <?php echo esc_html($archive_description); ?>
-                </p>
-
-                <!-- メタ情報 -->
-                <div class="yahoo-meta-info" role="group" aria-label="統計情報">
-                    <div class="meta-item" itemscope itemtype="https://schema.org/QuantitativeValue">
-                        <svg class="meta-icon" 
-                             width="16" 
-                             height="16" 
-                             viewBox="0 0 24 24" 
-                             fill="none" 
-                             stroke="currentColor" 
-                             stroke-width="2" 
-                             aria-hidden="true">
-                            <path d="M9 11H7v10a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V11h-2v8H9v-8z"/>
-                            <path d="M13 7h2l-5-5-5 5h2v4h6V7z"/>
-                        </svg>
-                        <strong itemprop="value"><?php echo $total_grants_formatted; ?></strong>
-                        <span itemprop="unitText">件</span>
+                <div class="hero-encyclopedia-layout">
+                    
+                    <!-- 左側：タイトル・説明 -->
+                    <div class="hero-main-info">
+                        <div class="hero-region-badge">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"/>
+                                <path d="m21 21-4.35-4.35"/>
+                            </svg>
+                            <span>助成金・補助金検索</span>
+                        </div>
+                        <h1 class="hero-title-encyclopedia" itemprop="headline">
+                            <span class="hero-title-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                                    <path d="M8 7h8M8 11h5"/>
+                                </svg>
+                            </span>
+                            <?php echo esc_html($archive_title); ?>
+                        </h1>
+                        <p class="hero-subtitle" itemprop="description">
+                            <?php echo esc_html($archive_description); ?>
+                        </p>
                     </div>
-                    <div class="meta-item">
-                        <svg class="meta-icon" 
-                             width="16" 
-                             height="16" 
-                             viewBox="0 0 24 24" 
-                             fill="none" 
-                             stroke="currentColor" 
-                             stroke-width="2" 
-                             aria-hidden="true">
-                            <circle cx="12" cy="12" r="10"/>
-                            <polyline points="12 6 12 12 16 14"/>
-                        </svg>
-                        <time datetime="<?php echo $current_year; ?>" itemprop="dateModified">
-                            <?php echo $current_year; ?>年度版
-                        </time>
+                    
+                    <!-- 中央：統計情報 -->
+                    <div class="hero-stats-area">
+                        <div class="hero-stat-card" itemscope itemtype="https://schema.org/QuantitativeValue">
+                            <span class="hero-stat-number" itemprop="value"><?php echo $total_grants_formatted; ?></span>
+                            <span class="hero-stat-label" itemprop="unitText">件の助成金</span>
+                        </div>
+                        <div class="hero-stat-card">
+                            <span class="hero-stat-number"><?php echo $current_year; ?></span>
+                            <span class="hero-stat-label">年度版</span>
+                        </div>
+                        <div class="hero-stat-card">
+                            <span class="hero-stat-number">47</span>
+                            <span class="hero-stat-label">都道府県対応</span>
+                        </div>
                     </div>
-                    <div class="meta-item">
-                        <svg class="meta-icon" 
-                             width="16" 
-                             height="16" 
-                             viewBox="0 0 24 24" 
-                             fill="none" 
-                             stroke="currentColor" 
-                             stroke-width="2" 
-                             aria-hidden="true">
-                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                        </svg>
-                        <span>毎日更新</span>
+                    
+                    <!-- 右側：クイックリンク -->
+                    <div class="hero-action-area">
+                        <div class="hero-quick-links">
+                            <a href="<?php echo esc_url(add_query_arg('view', 'prefectures', get_post_type_archive_link('grant'))); ?>" class="hero-quick-link">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                    <circle cx="12" cy="10" r="3"/>
+                                </svg>
+                                都道府県から探す
+                            </a>
+                            <a href="#filter-panel" class="hero-quick-link">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+                                </svg>
+                                絞り込み検索
+                            </a>
+                        </div>
                     </div>
+                    
                 </div>
             </div>
         </div>

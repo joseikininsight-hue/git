@@ -269,224 +269,77 @@ $keywords_string = implode(',', $keywords);
         </div>
     </nav>
 
-    <!-- 都道府県ヒーローセクション -->
+    <!-- 都道府県ヒーローセクション（図鑑式・横長レイアウト） -->
     <header class="yahoo-hero-section" 
             itemscope 
             itemtype="https://schema.org/WPHeader">
         <div class="yahoo-container">
             <div class="hero-content-wrapper">
-                
-                <!-- 都道府県バッジ -->
-                <div class="category-badge prefecture-badge">
-                    <svg class="badge-icon" 
-                         width="20" 
-                         height="20" 
-                         viewBox="0 0 24 24" 
-                         fill="none" 
-                         stroke="currentColor" 
-                         stroke-width="2" 
-                         aria-hidden="true">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                        <circle cx="12" cy="10" r="3"/>
-                    </svg>
-                    <span><?php echo esc_html($current_region_name ? $current_region_name . '地方' : '都道府県'); ?></span>
-                </div>
-
-                <!-- メインタイトル -->
-                <h1 class="yahoo-main-title" itemprop="headline">
-                    <?php echo esc_html($prefecture_name); ?>の補助金・助成金一覧
-                </h1>
-
-                <!-- 都道府県説明文 -->
-                <div class="yahoo-lead-section" itemprop="description">
-                    <?php if ($prefecture_description): ?>
-                    <div class="category-description-rich">
-                        <?php echo wpautop(wp_kses_post($prefecture_description)); ?>
-                    </div>
-                    <?php endif; ?>
-                    <p class="yahoo-lead-text">
-                        <?php echo esc_html($prefecture_name); ?>で利用できる助成金・補助金を
-                        <strong><?php echo number_format($prefecture_count); ?>件</strong>掲載。
-                        <?php if ($current_region_name): ?>
-                        <?php echo esc_html($current_region_name); ?>地方の都道府県として、県独自の制度から国の支援まで幅広く網羅。
-                        <?php endif; ?>
-                        <?php echo $current_year; ?>年度の最新募集情報を毎日更新しています。
-                    </p>
-                </div>
-
-                <!-- メタ情報 -->
-                <div class="yahoo-meta-info" role="group" aria-label="都道府県統計情報">
-                    <div class="meta-item" itemscope itemtype="https://schema.org/QuantitativeValue">
-                        <svg class="meta-icon" 
-                             width="18" 
-                             height="18" 
-                             viewBox="0 0 24 24" 
-                             fill="none" 
-                             stroke="currentColor" 
-                             stroke-width="2" 
-                             aria-hidden="true">
-                            <path d="M9 11H7v10a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V11h-2v8H9v-8z"/>
-                            <path d="M13 7h2l-5-5-5 5h2v4h6V7z"/>
-                        </svg>
-                        <strong itemprop="value"><?php echo number_format($prefecture_count); ?></strong>
-                        <span itemprop="unitText">件の助成金</span>
-                    </div>
-                    <?php if ($current_region_name): ?>
-                    <div class="meta-item">
-                        <svg class="meta-icon" 
-                             width="18" 
-                             height="18" 
-                             viewBox="0 0 24 24" 
-                             fill="none" 
-                             stroke="currentColor" 
-                             stroke-width="2" 
-                             aria-hidden="true">
-                            <circle cx="12" cy="12" r="10"/>
-                            <line x1="2" y1="12" x2="22" y2="12"/>
-                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                        </svg>
-                        地域: <span class="region-name"><?php echo esc_html($current_region_name); ?>地方</span>
-                    </div>
-                    <?php endif; ?>
-                    <div class="meta-item">
-                        <svg class="meta-icon" 
-                             width="18" 
-                             height="18" 
-                             viewBox="0 0 24 24" 
-                             fill="none" 
-                             stroke="currentColor" 
-                             stroke-width="2" 
-                             aria-hidden="true">
-                            <circle cx="12" cy="12" r="10"/>
-                            <polyline points="12 6 12 12 16 14"/>
-                        </svg>
-                        <time datetime="<?php echo $current_year; ?>" itemprop="dateModified">
-                            <?php echo $current_year; ?>年度最新情報
-                        </time>
-                    </div>
-                    <div class="meta-item">
-                        <svg class="meta-icon" 
-                             width="18" 
-                             height="18" 
-                             viewBox="0 0 24 24" 
-                             fill="none" 
-                             stroke="currentColor" 
-                             stroke-width="2" 
-                             aria-hidden="true">
-                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                        </svg>
-                        <span>毎日更新中</span>
-                    </div>
-                </div>
-
-                <!-- 特徴カード -->
-                <div class="feature-cards-grid">
-                    <article class="feature-card">
-                        <div class="feature-card-icon" aria-hidden="true">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                                <path d="M12 6v6l4 2"/>
-                            </svg>
-                        </div>
-                        <div class="feature-card-content">
-                            <h3>リアルタイム更新</h3>
-                            <p><?php echo esc_html($prefecture_name); ?>の最新募集情報・締切情報を毎日チェック。見逃しを防ぎます。</p>
-                        </div>
-                    </article>
-
-                    <article class="feature-card">
-                        <div class="feature-card-icon" aria-hidden="true">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <div class="hero-encyclopedia-layout">
+                    
+                    <!-- 左側：タイトル・説明 -->
+                    <div class="hero-main-info">
+                        <div class="hero-region-badge">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
                                 <circle cx="12" cy="10" r="3"/>
                             </svg>
+                            <span><?php echo esc_html($current_region_name ? $current_region_name . '地方' : '都道府県'); ?></span>
                         </div>
-                        <div class="feature-card-content">
-                            <h3>県内全域対応</h3>
-                            <p><?php echo esc_html($prefecture_name); ?>の県独自の助成金から国の制度まで網羅。市町村別の検索も可能です。</p>
-                        </div>
-                    </article>
-
-                    <article class="feature-card">
-                        <div class="feature-card-icon" aria-hidden="true">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                <polyline points="14 2 14 8 20 8"/>
-                            </svg>
-                        </div>
-                        <div class="feature-card-content">
-                            <h3>詳細な申請ガイド</h3>
-                            <p>申請方法から採択のコツまで、専門家監修の情報を提供。初めての方でも安心して申請できます。</p>
-                        </div>
-                    </article>
-                </div>
-
-                <!-- 関連市町村 -->
-                <?php if (!empty($related_municipalities)): ?>
-                <div class="related-areas-section">
-                    <h2 class="related-areas-title">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                            <path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/>
-                        </svg>
-                        <?php echo esc_html($prefecture_name); ?>の市町村
-                    </h2>
-                    <div class="related-areas-grid">
-                        <?php $displayed = 0; foreach ($related_municipalities as $municipality): 
-                            if ($displayed >= 8) break;
-                            $displayed++;
-                        ?>
-                        <a href="<?php echo esc_url(get_term_link($municipality['slug'], 'grant_municipality')); ?>" 
-                           class="related-area-card municipality-card"
-                           title="<?php echo esc_attr($municipality['name']); ?>の助成金を見る">
-                            <div class="card-icon">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/>
-                                </svg>
-                            </div>
-                            <span class="card-name"><?php echo esc_html($municipality['name']); ?></span>
-                            <span class="card-label">市町村</span>
-                        </a>
-                        <?php endforeach; ?>
-                    </div>
-                    <?php if (count($related_municipalities) > 8): ?>
-                    <p class="more-areas-link">
-                        <a href="#municipality-filter">全<?php echo count($related_municipalities); ?>市町村から絞り込む →</a>
-                    </p>
-                    <?php endif; ?>
-                </div>
-                <?php endif; ?>
-
-                <!-- 同地域の他の都道府県 -->
-                <?php if (!empty($same_region_prefectures)): ?>
-                <div class="related-areas-section same-region-section">
-                    <h2 class="related-areas-title">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                            <circle cx="12" cy="10" r="3"/>
-                        </svg>
-                        <?php echo esc_html($current_region_name); ?>地方の他の都道府県
-                    </h2>
-                    <div class="related-areas-grid">
-                        <?php $displayed = 0; foreach ($same_region_prefectures as $pref): 
-                            if ($displayed >= 6) break;
-                            $displayed++;
-                        ?>
-                        <a href="<?php echo esc_url(get_term_link($pref['slug'], 'grant_prefecture')); ?>" 
-                           class="related-area-card prefecture-card"
-                           title="<?php echo esc_attr($pref['name']); ?>の助成金を見る">
-                            <div class="card-icon">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <h1 class="hero-title-encyclopedia" itemprop="headline">
+                            <span class="hero-title-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
                                     <circle cx="12" cy="10" r="3"/>
                                 </svg>
-                            </div>
-                            <span class="card-name"><?php echo esc_html($pref['name']); ?></span>
-                            <span class="card-label">都道府県</span>
-                        </a>
-                        <?php endforeach; ?>
+                            </span>
+                            <?php echo esc_html($prefecture_name); ?>の補助金・助成金
+                        </h1>
+                        <p class="hero-subtitle">
+                            <?php echo $current_year; ?>年度の最新情報を毎日更新。県独自の制度から国の支援まで幅広く網羅しています。
+                        </p>
                     </div>
+                    
+                    <!-- 中央：統計情報 -->
+                    <div class="hero-stats-area">
+                        <div class="hero-stat-card" itemscope itemtype="https://schema.org/QuantitativeValue">
+                            <span class="hero-stat-number" itemprop="value"><?php echo number_format($prefecture_count); ?></span>
+                            <span class="hero-stat-label" itemprop="unitText">件の助成金</span>
+                        </div>
+                        <?php if (!empty($related_municipalities)): ?>
+                        <div class="hero-stat-card">
+                            <span class="hero-stat-number"><?php echo count($related_municipalities); ?></span>
+                            <span class="hero-stat-label">市町村</span>
+                        </div>
+                        <?php endif; ?>
+                        <div class="hero-stat-card">
+                            <span class="hero-stat-number"><?php echo $current_year; ?></span>
+                            <span class="hero-stat-label">年度版</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 右側：クイックリンク -->
+                    <div class="hero-action-area">
+                        <div class="hero-quick-links">
+                            <?php if ($parent_prefecture ?? false): ?>
+                            <a href="<?php echo esc_url(get_term_link($parent_prefecture['slug'], 'grant_prefecture')); ?>" class="hero-quick-link">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                    <circle cx="12" cy="10" r="3"/>
+                                </svg>
+                                県全体を見る
+                            </a>
+                            <?php endif; ?>
+                            <a href="#filter-panel" class="hero-quick-link">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+                                </svg>
+                                絞り込み検索
+                            </a>
+                        </div>
+                    </div>
+                    
                 </div>
-                <?php endif; ?>
             </div>
         </div>
     </header>

@@ -233,185 +233,75 @@ $keywords_string = implode(',', $keywords);
         </div>
     </nav>
 
-    <!-- カテゴリーヒーローセクション -->
+    <!-- カテゴリーヒーローセクション（図鑑式・横長レイアウト） -->
     <header class="yahoo-hero-section" 
             itemscope 
             itemtype="https://schema.org/WPHeader">
         <div class="yahoo-container">
             <div class="hero-content-wrapper">
-                
-                <!-- カテゴリーバッジ -->
-                <div class="category-badge" 
-                     role="status"
-                     <?php if ($category_color): ?>
-                     style="background: <?php echo esc_attr($category_color); ?>;"
-                     <?php endif; ?>>
-                    <?php if ($category_icon): ?>
-                        <img src="<?php echo esc_url($category_icon); ?>" 
-                             alt="<?php echo esc_attr($category_name); ?>アイコン" 
-                             class="badge-icon-img"
-                             width="20" 
-                             height="20">
-                    <?php else: ?>
-                        <svg class="badge-icon" 
-                             width="20" 
-                             height="20" 
-                             viewBox="0 0 24 24" 
-                             fill="none" 
-                             stroke="currentColor" 
-                             stroke-width="2" 
-                             aria-hidden="true">
-                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
-                        </svg>
-                    <?php endif; ?>
-                    <span><?php echo esc_html($category_name); ?>カテゴリー</span>
-                </div>
-
-                <!-- メインタイトル -->
-                <h1 class="yahoo-main-title" itemprop="headline">
-                    <?php echo esc_html($category_name); ?>の補助金・助成金一覧
-                </h1>
-
-                <!-- カテゴリー説明文 -->
-                <div class="yahoo-lead-section" itemprop="description">
-                    <?php if ($category_description): ?>
-                    <div class="category-description-rich">
-                        <?php echo wpautop(wp_kses_post($category_description)); ?>
-                    </div>
-                    <?php endif; ?>
-                    <p class="yahoo-lead-text">
-                        <?php echo esc_html($category_name); ?>に関する助成金・補助金を
-                        <strong><?php echo number_format($category_count); ?>件</strong>掲載。
-                        <?php echo $current_year; ?>年度の最新募集情報を毎日更新中。
-                        都道府県・市町村別の検索にも対応し、あなたの地域で利用できる助成金を簡単に見つけられます。
-                    </p>
-                </div>
-
-                <!-- メタ情報 -->
-                <div class="yahoo-meta-info" role="group" aria-label="カテゴリー統計情報">
-                    <div class="meta-item" itemscope itemtype="https://schema.org/QuantitativeValue">
-                        <svg class="meta-icon" 
-                             width="18" 
-                             height="18" 
-                             viewBox="0 0 24 24" 
-                             fill="none" 
-                             stroke="currentColor" 
-                             stroke-width="2" 
-                             aria-hidden="true">
-                            <path d="M9 11H7v10a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V11h-2v8H9v-8z"/>
-                            <path d="M13 7h2l-5-5-5 5h2v4h6V7z"/>
-                        </svg>
-                        <strong itemprop="value"><?php echo number_format($category_count); ?></strong>
-                        <span itemprop="unitText">件の助成金</span>
-                    </div>
-                    <div class="meta-item">
-                        <svg class="meta-icon" 
-                             width="18" 
-                             height="18" 
-                             viewBox="0 0 24 24" 
-                             fill="none" 
-                             stroke="currentColor" 
-                             stroke-width="2" 
-                             aria-hidden="true">
-                            <circle cx="12" cy="12" r="10"/>
-                            <polyline points="12 6 12 12 16 14"/>
-                        </svg>
-                        <time datetime="<?php echo $current_year; ?>" itemprop="dateModified">
-                            <?php echo $current_year; ?>年度最新情報
-                        </time>
-                    </div>
-                    <div class="meta-item">
-                        <svg class="meta-icon" 
-                             width="18" 
-                             height="18" 
-                             viewBox="0 0 24 24" 
-                             fill="none" 
-                             stroke="currentColor" 
-                             stroke-width="2" 
-                             aria-hidden="true">
-                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                        </svg>
-                        <span>毎日更新中</span>
-                    </div>
-                    <div class="meta-item">
-                        <svg class="meta-icon" 
-                             width="18" 
-                             height="18" 
-                             viewBox="0 0 24 24" 
-                             fill="none" 
-                             stroke="currentColor" 
-                             stroke-width="2" 
-                             aria-hidden="true">
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                            <circle cx="12" cy="10" r="3"/>
-                        </svg>
-                        <span>地域別対応</span>
-                    </div>
-                </div>
-
-                <!-- 特徴カード -->
-                <div class="feature-cards-grid">
-                    <article class="feature-card">
-                        <div class="feature-card-icon" aria-hidden="true">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                                <path d="M12 6v6l4 2"/>
+                <div class="hero-encyclopedia-layout">
+                    
+                    <!-- 左側：タイトル・説明 -->
+                    <div class="hero-main-info">
+                        <div class="hero-region-badge">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
                             </svg>
+                            <span>カテゴリー</span>
                         </div>
-                        <div class="feature-card-content">
-                            <h3>リアルタイム更新</h3>
-                            <p>最新の募集情報・締切情報を毎日チェック。見逃しを防ぎます。</p>
-                        </div>
-                    </article>
-
-                    <article class="feature-card">
-                        <div class="feature-card-icon" aria-hidden="true">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                                <circle cx="12" cy="10" r="3"/>
-                            </svg>
-                        </div>
-                        <div class="feature-card-content">
-                            <h3>地域別検索対応</h3>
-                            <p>都道府県・市町村で絞り込み。地域密着型の助成金も見つかります。</p>
-                        </div>
-                    </article>
-
-                    <article class="feature-card">
-                        <div class="feature-card-icon" aria-hidden="true">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                <polyline points="14 2 14 8 20 8"/>
-                            </svg>
-                        </div>
-                        <div class="feature-card-content">
-                            <h3>詳細な申請ガイド</h3>
-                            <p>申請方法から採択のコツまで、専門家監修の情報を提供。</p>
-                        </div>
-                    </article>
-                </div>
-
-                <!-- 関連カテゴリー -->
-                <?php if (!empty($related_categories) && !is_wp_error($related_categories)): ?>
-                <div class="related-categories-section">
-                    <h2 class="related-categories-title">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
-                        </svg>
-                        <?php echo $current_category->parent > 0 ? '関連カテゴリー' : 'サブカテゴリー'; ?>
-                    </h2>
-                    <div class="related-categories-grid">
-                        <?php foreach ($related_categories as $rel_cat): ?>
-                        <a href="<?php echo esc_url(get_term_link($rel_cat)); ?>" 
-                           class="related-category-card"
-                           title="<?php echo esc_attr($rel_cat->name); ?>の助成金を見る">
-                            <span class="related-category-name"><?php echo esc_html($rel_cat->name); ?></span>
-                            <span class="related-category-count"><?php echo number_format($rel_cat->count); ?>件</span>
-                        </a>
-                        <?php endforeach; ?>
+                        <h1 class="hero-title-encyclopedia" itemprop="headline">
+                            <span class="hero-title-icon">
+                                <?php if ($category_icon): ?>
+                                    <img src="<?php echo esc_url($category_icon); ?>" alt="" width="22" height="22">
+                                <?php else: ?>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                                    </svg>
+                                <?php endif; ?>
+                            </span>
+                            <?php echo esc_html($category_name); ?>の補助金・助成金
+                        </h1>
+                        <p class="hero-subtitle">
+                            <?php echo $current_year; ?>年度の最新情報を毎日更新。都道府県・市町村別の検索にも対応しています。
+                        </p>
                     </div>
+                    
+                    <!-- 中央：統計情報 -->
+                    <div class="hero-stats-area">
+                        <div class="hero-stat-card" itemscope itemtype="https://schema.org/QuantitativeValue">
+                            <span class="hero-stat-number" itemprop="value"><?php echo number_format($category_count); ?></span>
+                            <span class="hero-stat-label" itemprop="unitText">件の助成金</span>
+                        </div>
+                        <div class="hero-stat-card">
+                            <span class="hero-stat-number"><?php echo $current_year; ?></span>
+                            <span class="hero-stat-label">年度版</span>
+                        </div>
+                        <div class="hero-stat-card">
+                            <span class="hero-stat-number">47</span>
+                            <span class="hero-stat-label">都道府県対応</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 右側：クイックリンク -->
+                    <div class="hero-action-area">
+                        <div class="hero-quick-links">
+                            <a href="<?php echo esc_url(get_post_type_archive_link('grant')); ?>" class="hero-quick-link">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                                    <polyline points="9 22 9 12 15 12 15 22"/>
+                                </svg>
+                                全補助金を見る
+                            </a>
+                            <a href="#filter-panel" class="hero-quick-link">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+                                </svg>
+                                絞り込み検索
+                            </a>
+                        </div>
+                    </div>
+                    
                 </div>
-                <?php endif; ?>
             </div>
         </div>
     </header>
