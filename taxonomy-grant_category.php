@@ -267,14 +267,10 @@ $keywords_string = implode(',', $keywords);
                     <span><?php echo esc_html($category_name); ?>カテゴリー</span>
                 </div>
 
-                <!-- メインタイトル（SEO最適化：中キーワード対策） -->
-                <h1 class="yahoo-main-title book-encyclopedia-title" itemprop="headline">
-                    <span class="book-title-prefix">補助金図鑑</span>
-                    <span class="category-name-highlight"><?php echo esc_html($category_name); ?></span>
-                    <span class="title-text">補助金一覧</span>
-                    <span class="year-badge"><?php echo $current_year; ?>年度版</span>
+                <!-- メインタイトル -->
+                <h1 class="yahoo-main-title" itemprop="headline">
+                    <?php echo esc_html($category_name); ?>の補助金・助成金一覧
                 </h1>
-                <p class="seo-catchphrase"><?php echo esc_html($seo_catchphrase); ?></p>
 
                 <!-- カテゴリー説明文 -->
                 <div class="yahoo-lead-section" itemprop="description">
@@ -419,34 +415,6 @@ $keywords_string = implode(',', $keywords);
             </div>
         </div>
     </header>
-
-    <!-- 📚 動的コンテンツセクション - 補助金図鑑スタイル -->
-    <?php 
-    // 動的セクション用CSS読み込み
-    $dynamic_css_file = get_template_directory() . '/assets/css/dynamic-sections.css';
-    if (file_exists($dynamic_css_file)):
-    ?>
-    <link rel="stylesheet" href="<?php echo esc_url(get_template_directory_uri() . '/assets/css/dynamic-sections.css?ver=' . filemtime($dynamic_css_file)); ?>" media="all">
-    <?php endif; ?>
-    
-    <div class="yahoo-container gi-dynamic-wrapper">
-        <?php 
-        // 動的セクションをインクルード
-        $dynamic_sections_file = get_template_directory() . '/template-parts/grant/dynamic-sections.php';
-        if (file_exists($dynamic_sections_file)) {
-            include_once($dynamic_sections_file);
-            
-            // コンテキストを渡してレンダリング
-            gi_render_dynamic_sections([
-                'type' => 'category',
-                'term_id' => $category_id,
-                'term_name' => $category_name,
-                'term_slug' => $category_slug,
-                'parent_prefecture' => null
-            ]);
-        }
-        ?>
-    </div>
 
     <!-- 2カラムレイアウト -->
     <div class="yahoo-container yahoo-two-column-layout">

@@ -278,8 +278,8 @@ $keywords_string = implode(',', $keywords);
         <div class="yahoo-container">
             <div class="hero-content-wrapper">
                 
-                <!-- 市町村バッジ（図鑑スタイル） -->
-                <div class="category-badge municipality-badge book-badge">
+                <!-- 市町村バッジ -->
+                <div class="category-badge municipality-badge">
                     <svg class="badge-icon" 
                          width="20" 
                          height="20" 
@@ -288,21 +288,15 @@ $keywords_string = implode(',', $keywords);
                          stroke="currentColor" 
                          stroke-width="2" 
                          aria-hidden="true">
-                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-                        <path d="M8 7h8M8 11h5"/>
+                        <path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/>
                     </svg>
-                    <span>補助金図鑑 / <?php echo esc_html($parent_prefecture ? $parent_prefecture['name'] : ''); ?>エリア</span>
+                    <span><?php echo esc_html($parent_prefecture ? $parent_prefecture['name'] : ''); ?></span>
                 </div>
 
-                <!-- メインタイトル（SEO最適化：中キーワード対策） -->
-                <h1 class="yahoo-main-title book-encyclopedia-title" itemprop="headline">
-                    <span class="book-title-prefix">補助金図鑑</span>
-                    <span class="category-name-highlight"><?php echo esc_html($municipality_name); ?></span>
-                    <span class="title-text">補助金一覧</span>
-                    <span class="year-badge"><?php echo $current_year; ?>年度版</span>
+                <!-- メインタイトル -->
+                <h1 class="yahoo-main-title" itemprop="headline">
+                    <?php echo esc_html($municipality_name); ?>の補助金・助成金一覧
                 </h1>
-                <p class="seo-catchphrase"><?php echo esc_html($seo_catchphrase); ?></p>
 
                 <!-- 市町村説明文 -->
                 <div class="yahoo-lead-section" itemprop="description">
@@ -479,34 +473,6 @@ $keywords_string = implode(',', $keywords);
             </div>
         </div>
     </header>
-
-    <!-- 📚 動的コンテンツセクション - 補助金図鑑スタイル -->
-    <?php 
-    // 動的セクション用CSS読み込み
-    $dynamic_css_file = get_template_directory() . '/assets/css/dynamic-sections.css';
-    if (file_exists($dynamic_css_file)):
-    ?>
-    <link rel="stylesheet" href="<?php echo esc_url(get_template_directory_uri() . '/assets/css/dynamic-sections.css?ver=' . filemtime($dynamic_css_file)); ?>" media="all">
-    <?php endif; ?>
-    
-    <div class="yahoo-container gi-dynamic-wrapper">
-        <?php 
-        // 動的セクションをインクルード
-        $dynamic_sections_file = get_template_directory() . '/template-parts/grant/dynamic-sections.php';
-        if (file_exists($dynamic_sections_file)) {
-            include_once($dynamic_sections_file);
-            
-            // コンテキストを渡してレンダリング
-            gi_render_dynamic_sections([
-                'type' => 'municipality',
-                'term_id' => $municipality_id,
-                'term_name' => $municipality_name,
-                'term_slug' => $municipality_slug,
-                'parent_prefecture' => $parent_prefecture
-            ]);
-        }
-        ?>
-    </div>
 
     <!-- 2カラムレイアウト -->
     <div class="yahoo-container yahoo-two-column-layout">
