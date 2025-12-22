@@ -2880,23 +2880,6 @@ ul, ol {
     box-shadow: 0 2px 4px rgba(201, 162, 39, 0.3);
 }
 
-/* インデックス番号 */
-.gi-book-card-index {
-    position: absolute;
-    top: 10px;
-    left: -4px;
-    width: 24px;
-    height: 24px;
-    background: var(--gi-gov-navy-800);
-    color: var(--gi-white);
-    font-family: var(--gi-font-serif);
-    font-size: 12px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 2px;
-}
 
 /* カードフッター */
 .gi-book-card-footer {
