@@ -1400,6 +1400,11 @@ function gi_litespeed_js_defer_excludes($excludes) {
         'jquery-migrate',           // jQuery Migrate
         'wp-includes/js/jquery',    // WordPress jQuery
         'data-no-defer',            // カスタム除外属性
+        // Google AdSense関連（自動広告の正常動作に必須）
+        'adsbygoogle.js',
+        'pagead2.googlesyndication.com',
+        'googlesyndication',
+        'googleads',
     ];
     
     return array_merge($excludes, $critical_js);
@@ -1417,6 +1422,11 @@ function gi_litespeed_js_combine_excludes($excludes) {
         'jquery-migrate',
         'wp-includes/js/jquery',
         'wp-includes/js/dist',      // Gutenberg/Block Editor
+        // Google AdSense関連（結合すると広告が表示されなくなる）
+        'adsbygoogle.js',
+        'pagead2.googlesyndication.com',
+        'googlesyndication',
+        'googleads',
     ];
     
     return array_merge($excludes, $exclude_from_combine);

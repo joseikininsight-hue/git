@@ -578,7 +578,7 @@ class GI_Performance_Optimizer {
                 }
             }
             
-            // Google AdSenseを読み込む
+            // Google AdSenseを読み込む（自動広告のため即座に読み込む）
             function loadAdSense() {
                 const adsensePublisherId = '<?php echo defined("ADSENSE_PUBLISHER_ID") ? ADSENSE_PUBLISHER_ID : ""; ?>';
                 if (adsensePublisherId && !document.querySelector('script[src*="pagead2.googlesyndication.com"]')) {
@@ -590,23 +590,25 @@ class GI_Performance_Optimizer {
                 }
             }
             
+            // AdSenseは自動広告の正常動作のため即座に読み込む
+            loadAdSense();
+            
             // 全てのサードパーティスクリプトを読み込む
             function loadThirdPartyScripts() {
                 if (scriptsLoaded) return;
                 scriptsLoaded = true;
                 
                 // メインスレッドをブロックしないよう requestIdleCallback を使用
+                // ※AdSenseは自動広告のため上で即座に読み込み済み
                 if ('requestIdleCallback' in window) {
                     requestIdleCallback(function() {
                         loadGTM();
                         loadGA();
-                        loadAdSense();
                     }, { timeout: 2000 });
                 } else {
                     setTimeout(function() {
                         loadGTM();
                         loadGA();
-                        loadAdSense();
                     }, 50);
                 }
             }
