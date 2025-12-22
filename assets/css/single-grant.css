@@ -2797,16 +2797,7 @@ ul, ol {
     display: none;
 }
 
-/* 本の背表紙（左端） */
-.gi-book-spine-left {
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 12px;
-    background: linear-gradient(180deg, var(--gi-gov-navy-800) 0%, var(--gi-gov-navy-900) 100%);
-    z-index: 1;
-}
+
 
 .gi-book-spine-left::after {
     content: '';
