@@ -230,7 +230,6 @@ ul, ol {
    ========================================================================== */
 .gi-breadcrumb {
     padding: 0;
-    padding-top: 72px;
     font-size: 12px;
     background: linear-gradient(180deg, #faf8f5 0%, #fff 100%);
     position: relative;
