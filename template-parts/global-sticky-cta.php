@@ -63,6 +63,9 @@ if (get_query_var('hide_sticky_cta')) return;
 :root {
     --cta-z-index: 9999;
     --cta-height: 70px;
+    /* single-grant.css との互換性のため */
+    --gi-mobile-banner: 70px;
+    --gic-mobile-banner: 70px;
     /* 官公庁カラーパレット */
     --cta-gov-navy: #0D2A52;
     --cta-gov-navy-light: #1A3D6E;
@@ -80,6 +83,8 @@ if (get_query_var('hide_sticky_cta')) return;
 @media (max-width: 767px) {
     :root {
         --cta-height: 60px;
+        --gi-mobile-banner: 60px;
+        --gic-mobile-banner: 60px;
     }
 }
 
@@ -293,12 +298,32 @@ body {
     }
 }
 
+/* Single Grant / Single Column ページ用 */
+body.single-grant,
+body.single-column {
+    padding-bottom: var(--cta-height) !important;
+}
+
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+    body.single-grant,
+    body.single-column {
+        padding-bottom: calc(var(--cta-height) + env(safe-area-inset-bottom)) !important;
+    }
+}
+
 /* フッター直後のスペース確保（隙間防止） */
 footer,
 .site-footer,
 .footer,
+.gov-footer,
 [class*="footer"] {
     margin-bottom: 0 !important;
+}
+
+/* gi-page, gic-page のpadding調整 */
+.gi-page,
+.gic-page {
+    padding-bottom: 0 !important;
 }
 
 /* ============================================
