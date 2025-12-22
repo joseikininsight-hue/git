@@ -93,12 +93,10 @@ function ji_inject_ad_content_middle($content) {
             $content,
             1 // 1回だけ置換（＝最初のH2だけ）
         );
+    } else {
+        // H2がない場合は記事末尾に追加
+        $content .= $ad_wrapper;
     }
-    // H2がない場合は何も挿入しない（レイアウト崩れ防止）
-    // 必要に応じて以下のコメントを外して記事末尾に追加可能
-    // else {
-    //     $content .= $ad_wrapper;
-    // }
     
     return $content;
 }
@@ -139,10 +137,13 @@ function ji_inject_additional_ads($content) {
     preg_match_all($h2_pattern, $content, $matches);
     $h2_count = count($matches[0]);
     
-    // H2が4つ以上ある記事のみ、3番目のH2の前に広告を追加
-    // （短い記事では広告過多を避ける）
+    // H2の数に応じて広告を追加
+    // H2が2つ以上: 2番目のH2の前に広告
+    // H2が4つ以上: 2番目と4番目のH2の前に広告
     if ($h2_count >= 4) {
-        $content = ji_inject_ad_at_multiple_h2($content, array(3), $position_id);
+        $content = ji_inject_ad_at_multiple_h2($content, array(2, 4), $position_id);
+    } elseif ($h2_count >= 2) {
+        $content = ji_inject_ad_at_multiple_h2($content, array(2), $position_id);
     }
     
     return $content;
