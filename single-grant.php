@@ -1419,7 +1419,11 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
 
                 <!-- アフィリエイト記事欄（補助金詳細後） -->
                 <?php 
-                $ad_after_details = ji_display_ad('single_grant_article_after_details');
+                // 出力バッファリング開始
+                ob_start();
+                ji_display_ad('single_grant_article_after_details');
+                $ad_after_details = ob_get_clean(); // 内容を変数に取得
+
                 if (!empty($ad_after_details)): 
                 ?>
                 <aside class="gi-article-ad-section" aria-label="関連サービス紹介">
@@ -1455,7 +1459,11 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
 
                 <!-- アフィリエイト記事欄（チェックリスト前） -->
                 <?php 
-                $ad_before_checklist = ji_display_ad('single_grant_article_before_checklist');
+                // 出力バッファリング開始
+                ob_start();
+                ji_display_ad('single_grant_article_before_checklist');
+                $ad_before_checklist = ob_get_clean(); // 内容を変数に取得
+
                 if (!empty($ad_before_checklist)): 
                 ?>
                 <aside class="gi-article-ad-section" aria-label="おすすめサービス">
