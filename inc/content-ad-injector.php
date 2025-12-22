@@ -100,7 +100,8 @@ function ji_inject_ad_content_middle($content) {
     
     return $content;
 }
-add_filter('the_content', 'ji_inject_ad_content_middle', 20);
+// AdSense自動広告に任せるため無効化
+// add_filter('the_content', 'ji_inject_ad_content_middle', 20);
 
 
 /**
@@ -148,7 +149,8 @@ function ji_inject_additional_ads($content) {
     
     return $content;
 }
-add_filter('the_content', 'ji_inject_additional_ads', 21);
+// AdSense自動広告に任せるため無効化
+// add_filter('the_content', 'ji_inject_additional_ads', 21);
 
 
 /**
