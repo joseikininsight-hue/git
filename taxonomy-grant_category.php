@@ -65,11 +65,15 @@ $season = ($current_month >= 3 && $current_month <= 5) ? '春' :
           (($current_month >= 6 && $current_month <= 8) ? '夏' : 
           (($current_month >= 9 && $current_month <= 11) ? '秋' : '冬'));
 
-// ページタイトル・説明文の生成
-$page_title = $category_name . 'の助成金・補助金一覧【' . $current_year . '年度最新版】';
+// ページタイトル・説明文の生成（SEO中キーワード対策）
+$page_title = $category_name . '補助金一覧【' . $current_year . '年度最新版】全' . number_format($category_count) . '件';
 $page_description = $category_description ?: 
-    $category_name . 'に関する助成金・補助金を' . number_format($category_count) . '件掲載。' . 
-    $current_year . '年度の最新募集情報、申請要件、対象事業、助成金額、締切日を詳しく解説。都道府県・市町村別の検索も可能。専門家による申請サポート完備。';
+    $category_name . 'の補助金・助成金を' . number_format($category_count) . '件掲載。' . 
+    $current_year . '年度の最新募集情報、申請要件、対象事業、助成金額、締切日を詳しく解説。' .
+    '都道府県・市町村別の検索も可能。専門家による申請サポート完備。';
+
+// SEO用キャッチコピー
+$seo_catchphrase = $category_name . '補助金一覧 | ' . number_format($category_count) . '件の助成金情報を完全収録';
 
 $canonical_url = get_term_link($current_category);
 
@@ -263,12 +267,14 @@ $keywords_string = implode(',', $keywords);
                     <span><?php echo esc_html($category_name); ?>カテゴリー</span>
                 </div>
 
-                <!-- メインタイトル -->
-                <h1 class="yahoo-main-title" itemprop="headline">
+                <!-- メインタイトル（SEO最適化：中キーワード対策） -->
+                <h1 class="yahoo-main-title book-encyclopedia-title" itemprop="headline">
+                    <span class="book-title-prefix">補助金図鑑</span>
                     <span class="category-name-highlight"><?php echo esc_html($category_name); ?></span>
-                    <span class="title-text">の助成金・補助金</span>
+                    <span class="title-text">補助金一覧</span>
                     <span class="year-badge"><?php echo $current_year; ?>年度版</span>
                 </h1>
+                <p class="seo-catchphrase"><?php echo esc_html($seo_catchphrase); ?></p>
 
                 <!-- カテゴリー説明文 -->
                 <div class="yahoo-lead-section" itemprop="description">
@@ -413,6 +419,34 @@ $keywords_string = implode(',', $keywords);
             </div>
         </div>
     </header>
+
+    <!-- 📚 動的コンテンツセクション - 補助金図鑑スタイル -->
+    <?php 
+    // 動的セクション用CSS読み込み
+    $dynamic_css_file = get_template_directory() . '/assets/css/dynamic-sections.css';
+    if (file_exists($dynamic_css_file)):
+    ?>
+    <link rel="stylesheet" href="<?php echo esc_url(get_template_directory_uri() . '/assets/css/dynamic-sections.css?ver=' . filemtime($dynamic_css_file)); ?>" media="all">
+    <?php endif; ?>
+    
+    <div class="yahoo-container gi-dynamic-wrapper">
+        <?php 
+        // 動的セクションをインクルード
+        $dynamic_sections_file = get_template_directory() . '/template-parts/grant/dynamic-sections.php';
+        if (file_exists($dynamic_sections_file)) {
+            include_once($dynamic_sections_file);
+            
+            // コンテキストを渡してレンダリング
+            gi_render_dynamic_sections([
+                'type' => 'category',
+                'term_id' => $category_id,
+                'term_name' => $category_name,
+                'term_slug' => $category_slug,
+                'parent_prefecture' => null
+            ]);
+        }
+        ?>
+    </div>
 
     <!-- 2カラムレイアウト -->
     <div class="yahoo-container yahoo-two-column-layout">

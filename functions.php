@@ -143,6 +143,109 @@ function gi_should_output_theme_seo() {
     return !gi_is_seo_plugin_active();
 }
 
+/**
+ * ============================================================================
+ * SEO Title Optimization for Taxonomy Archives (中キーワード対策)
+ * ============================================================================
+ * 
+ * 「東京都補助金一覧」「江東区補助金一覧」などの中キーワードで上位を狙うため、
+ * アーカイブページのタイトルを最適化する
+ * 
+ * @since 11.0.3
+ */
+add_filter('document_title_parts', 'gi_optimize_taxonomy_archive_titles', 10, 1);
+function gi_optimize_taxonomy_archive_titles($title_parts) {
+    // タクソノミーアーカイブページでのみ適用
+    if (!is_tax()) {
+        return $title_parts;
+    }
+    
+    $queried_object = get_queried_object();
+    if (!$queried_object) {
+        return $title_parts;
+    }
+    
+    $term_name = $queried_object->name;
+    $term_count = $queried_object->count;
+    $current_year = date('Y');
+    
+    // タクソノミーに応じたタイトル生成
+    if (is_tax('grant_prefecture')) {
+        // 都道府県アーカイブ
+        $title_parts['title'] = $term_name . '補助金一覧【' . $current_year . '年度最新版】全' . number_format($term_count) . '件';
+    } elseif (is_tax('grant_municipality')) {
+        // 市町村アーカイブ
+        $title_parts['title'] = $term_name . '補助金一覧【' . $current_year . '年度最新版】全' . number_format($term_count) . '件';
+    } elseif (is_tax('grant_category')) {
+        // カテゴリアーカイブ
+        $title_parts['title'] = $term_name . '補助金一覧【' . $current_year . '年度最新版】全' . number_format($term_count) . '件';
+    } elseif (is_tax('grant_purpose')) {
+        // 目的別アーカイブ
+        $title_parts['title'] = $term_name . '向け補助金一覧【' . $current_year . '年度】' . number_format($term_count) . '件';
+    } elseif (is_tax('grant_tag')) {
+        // タグアーカイブ
+        $title_parts['title'] = $term_name . '関連の補助金一覧【' . $current_year . '年度】';
+    }
+    
+    return $title_parts;
+}
+
+/**
+ * メタディスクリプションの最適化（SEOプラグインがない場合のみ）
+ * 
+ * @since 11.0.3
+ */
+add_action('wp_head', 'gi_output_taxonomy_meta_description', 5);
+function gi_output_taxonomy_meta_description() {
+    // SEOプラグインがある場合はスキップ
+    if (gi_is_seo_plugin_active()) {
+        return;
+    }
+    
+    // タクソノミーアーカイブページでのみ適用
+    if (!is_tax()) {
+        return;
+    }
+    
+    $queried_object = get_queried_object();
+    if (!$queried_object) {
+        return;
+    }
+    
+    $term_name = $queried_object->name;
+    $term_count = $queried_object->count;
+    $term_description = $queried_object->description;
+    $current_year = date('Y');
+    
+    // タクソノミーに応じた説明文生成
+    $description = '';
+    
+    if (is_tax('grant_prefecture')) {
+        $description = $term_name . 'の補助金・助成金を' . number_format($term_count) . '件掲載。' . 
+            $current_year . '年度の最新募集情報を毎日更新。新着補助金、締切間近の助成金、金額帯別など多彩な検索が可能。';
+    } elseif (is_tax('grant_municipality')) {
+        $description = $term_name . 'の補助金・助成金を' . number_format($term_count) . '件掲載。' . 
+            $current_year . '年度の最新募集情報を毎日更新。地域密着型の支援制度から国の制度まで幅広く掲載。';
+    } elseif (is_tax('grant_category')) {
+        $description = $term_name . 'の補助金・助成金を' . number_format($term_count) . '件掲載。' . 
+            $current_year . '年度の最新募集情報、申請要件、対象事業、助成金額、締切日を詳しく解説。';
+    } elseif (is_tax('grant_purpose')) {
+        $description = $term_name . '向けの補助金・助成金を' . number_format($term_count) . '件掲載。' . 
+            $current_year . '年度の最新情報を毎日更新。';
+    } elseif (is_tax('grant_tag')) {
+        $description = $term_name . 'に関連する補助金・助成金情報を掲載。' . $current_year . '年度の最新情報を毎日更新。';
+    }
+    
+    // カスタム説明文がある場合はそちらを優先
+    if ($term_description) {
+        $description = wp_strip_all_tags($term_description);
+    }
+    
+    if ($description) {
+        echo '<meta name="description" content="' . esc_attr($description) . '">' . "\n";
+    }
+}
+
 // Disable Jetpack modules that cause conflicts
 add_filter('jetpack_get_available_modules', 'gi_disable_problematic_jetpack_modules', 999);
 function gi_disable_problematic_jetpack_modules($modules) {

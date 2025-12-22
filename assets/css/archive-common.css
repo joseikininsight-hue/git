@@ -398,6 +398,124 @@
     color: var(--gov-gold);
 }
 
+/* ==========================================================================
+   📚 Book Encyclopedia Title Styles - 補助金図鑑タイトル
+   ========================================================================== */
+.book-badge {
+    background: linear-gradient(135deg, rgba(201, 162, 39, 0.2) 0%, rgba(139, 115, 85, 0.15) 100%);
+    border: 2px solid var(--gov-gold);
+    border-radius: 6px;
+    padding: 10px 18px;
+    position: relative;
+}
+
+.book-badge::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--gov-gold);
+    border-radius: 4px 0 0 4px;
+}
+
+.book-encyclopedia-title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 12px;
+}
+
+.book-title-prefix {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gov-gold) !important;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 6px 14px;
+    border-radius: 4px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-family: var(--gov-font-sans);
+}
+
+.category-name-highlight {
+    font-size: clamp(32px, 6vw, 52px);
+    font-weight: 900;
+    color: var(--gov-white) !important;
+    font-family: var(--gov-font-serif);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    letter-spacing: 0.05em;
+}
+
+.yahoo-main-title .title-text {
+    font-size: clamp(20px, 3.5vw, 28px);
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.year-badge {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--gov-navy-900) !important;
+    background: var(--gov-gold);
+    padding: 6px 14px;
+    border-radius: 20px;
+    margin-left: 8px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.seo-catchphrase {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.75) !important;
+    font-weight: 500;
+    margin: -8px 0 20px;
+    padding: 10px 16px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    border-left: 4px solid var(--gov-gold);
+    display: inline-block;
+}
+
+/* 動的コンテンツラッパー */
+.gi-dynamic-wrapper {
+    padding: 0;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    .book-encyclopedia-title {
+        gap: 8px;
+    }
+    
+    .book-title-prefix {
+        font-size: 11px;
+        padding: 4px 10px;
+        width: 100%;
+        text-align: center;
+    }
+    
+    .category-name-highlight {
+        font-size: clamp(24px, 8vw, 36px);
+    }
+    
+    .yahoo-main-title .title-text {
+        font-size: clamp(16px, 4vw, 20px);
+    }
+    
+    .year-badge {
+        font-size: 10px;
+        padding: 4px 10px;
+    }
+    
+    .seo-catchphrase {
+        font-size: 12px;
+        padding: 8px 12px;
+        display: block;
+    }
+}
+
 .yahoo-hero-section .yahoo-main-title,
 .grant-archive-yahoo-style .yahoo-main-title,
 .column-archive-yahoo-style .yahoo-main-title {

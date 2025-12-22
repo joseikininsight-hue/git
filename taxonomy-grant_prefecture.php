@@ -89,13 +89,18 @@ foreach ($prefectures as $pref) {
 $current_year = date('Y');
 $current_month = date('n');
 
-// ページタイトル・説明文の生成
-$page_title = $prefecture_name . 'の助成金・補助金一覧【' . $current_year . '年度最新版】';
+// ページタイトル・説明文の生成（SEO中キーワード対策）
+$page_title = $prefecture_name . '補助金一覧【' . $current_year . '年度最新版】全' . number_format($prefecture_count) . '件';
+$page_title_h1 = $prefecture_name . 'の補助金・助成金 完全ガイド';
 $page_description = $prefecture_description ?: 
-    $prefecture_name . 'で利用できる助成金・補助金を' . number_format($prefecture_count) . '件掲載。' . 
-    ($current_region_name ? $current_region_name . '地方の都道府県として、' : '') .
-    '県独自の制度から国の支援まで幅広く網羅。' .
-    $current_year . '年度の最新募集情報を毎日更新中。';
+    $prefecture_name . 'の補助金・助成金を' . number_format($prefecture_count) . '件掲載。' . 
+    ($current_region_name ? $current_region_name . '地方エリアで' : '') .
+    '利用可能な国・県の制度を網羅した完全ガイド。' .
+    $current_year . '年度の最新募集情報を毎日更新。' .
+    '新着補助金、締切間近の助成金、金額帯別など多彩な検索が可能。';
+
+// SEO用キャッチコピー
+$seo_catchphrase = $prefecture_name . '補助金一覧 | ' . number_format($prefecture_count) . '件の助成金情報を完全収録';
 
 $canonical_url = get_term_link($current_prefecture);
 
@@ -271,8 +276,8 @@ $keywords_string = implode(',', $keywords);
         <div class="yahoo-container">
             <div class="hero-content-wrapper">
                 
-                <!-- 都道府県バッジ -->
-                <div class="category-badge prefecture-badge">
+                <!-- 都道府県バッジ（図鑑スタイル） -->
+                <div class="category-badge prefecture-badge book-badge">
                     <svg class="badge-icon" 
                          width="20" 
                          height="20" 
@@ -281,18 +286,21 @@ $keywords_string = implode(',', $keywords);
                          stroke="currentColor" 
                          stroke-width="2" 
                          aria-hidden="true">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                        <circle cx="12" cy="10" r="3"/>
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                        <path d="M8 7h8M8 11h5"/>
                     </svg>
-                    <span>都道府県別助成金</span>
+                    <span>補助金図鑑 / <?php echo esc_html($current_region_name ?: ''); ?>エリア</span>
                 </div>
 
-                <!-- メインタイトル -->
-                <h1 class="yahoo-main-title" itemprop="headline">
+                <!-- メインタイトル（SEO最適化：中キーワード対策） -->
+                <h1 class="yahoo-main-title book-encyclopedia-title" itemprop="headline">
+                    <span class="book-title-prefix">補助金図鑑</span>
                     <span class="category-name-highlight"><?php echo esc_html($prefecture_name); ?></span>
-                    <span class="title-text">の助成金・補助金</span>
+                    <span class="title-text">補助金一覧</span>
                     <span class="year-badge"><?php echo $current_year; ?>年度版</span>
                 </h1>
+                <p class="seo-catchphrase"><?php echo esc_html($seo_catchphrase); ?></p>
 
                 <!-- 都道府県説明文 -->
                 <div class="yahoo-lead-section" itemprop="description">
@@ -487,6 +495,34 @@ $keywords_string = implode(',', $keywords);
             </div>
         </div>
     </header>
+
+    <!-- 📚 動的コンテンツセクション - 補助金図鑑スタイル -->
+    <?php 
+    // 動的セクション用CSS読み込み
+    $dynamic_css_file = get_template_directory() . '/assets/css/dynamic-sections.css';
+    if (file_exists($dynamic_css_file)):
+    ?>
+    <link rel="stylesheet" href="<?php echo esc_url(get_template_directory_uri() . '/assets/css/dynamic-sections.css?ver=' . filemtime($dynamic_css_file)); ?>" media="all">
+    <?php endif; ?>
+    
+    <div class="yahoo-container gi-dynamic-wrapper">
+        <?php 
+        // 動的セクションをインクルード
+        $dynamic_sections_file = get_template_directory() . '/template-parts/grant/dynamic-sections.php';
+        if (file_exists($dynamic_sections_file)) {
+            include_once($dynamic_sections_file);
+            
+            // コンテキストを渡してレンダリング
+            gi_render_dynamic_sections([
+                'type' => 'prefecture',
+                'term_id' => $prefecture_id,
+                'term_name' => $prefecture_name,
+                'term_slug' => $prefecture_slug,
+                'parent_prefecture' => null
+            ]);
+        }
+        ?>
+    </div>
 
     <!-- 2カラムレイアウト -->
     <div class="yahoo-container yahoo-two-column-layout">
