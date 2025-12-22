@@ -1041,21 +1041,6 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
         margin: 16px 0;
     }
 }
-
-/* Google AdSense自動広告の本文内挿入を防止 */
-.gi-content ins.adsbygoogle,
-.gi-content .google-anno-skip,
-.gi-content [data-google-interstitial],
-.gi-content [data-google-vignette] {
-    display: none !important;
-}
-
-/* 本文コンテンツ内の自動広告ラッパーを非表示 */
-.gi-content > div[class*="google-"],
-.gi-content > div[aria-label*="広告"],
-.gi-content > div[role="link"][tabindex] {
-    display: none !important;
-}
 </style>
 
 <!-- 📚 図鑑インデックスタブ（左端）- モバイル・PC共通でサイドバー目次に統一のため削除 -->
@@ -1464,7 +1449,7 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                         <span class="gi-dict-note-text">この補助金に関する詳細な説明と申請に必要な情報を掲載しています。最新情報は公式サイトで必ずご確認ください。</span>
                     </div>
                     
-                    <div class="gi-content" data-nosnippet data-google-ad-exclude><?php echo apply_filters('the_content', $content); ?></div>
+                    <div class="gi-content"><?php echo apply_filters('the_content', $content); ?></div>
                     
                     <!-- 📚 セクション区切り -->
                     <div class="gi-encyclopedia-divider">
@@ -1645,7 +1630,7 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                         <h2 class="gi-section-title" id="tips-title">申請のコツ・ポイント</h2>
                         <span class="gi-section-en">Tips</span>
                     </header>
-                    <div class="gi-content" data-nosnippet data-google-ad-exclude><?php echo wp_kses_post($grant['application_tips']); ?></div>
+                    <div class="gi-content"><?php echo wp_kses_post($grant['application_tips']); ?></div>
                 </section>
                 <?php endif; ?>
 
@@ -1657,7 +1642,7 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                         <h2 class="gi-section-title" id="mistakes-title">よくある失敗・注意点</h2>
                         <span class="gi-section-en">Caution</span>
                     </header>
-                    <div class="gi-content" data-nosnippet data-google-ad-exclude style="background: var(--gi-error-light); padding: 20px; border-left: 4px solid var(--gi-error);"><?php echo wp_kses_post($grant['common_mistakes']); ?></div>
+                    <div class="gi-content" style="background: var(--gi-error-light); padding: 20px; border-left: 4px solid var(--gi-error);"><?php echo wp_kses_post($grant['common_mistakes']); ?></div>
                 </section>
                 <?php endif; ?>
 
