@@ -336,8 +336,49 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                 </div>
             </div>
             
-            <!-- List Container: Dictionary Layout -->
-            <div id="subsidy-list" class="grid gap-0 border-t border-gray-200 mb-20">
+            <!-- Mobile Filter (Simplified) -->
+            <div class="md:hidden bg-paper-shadow p-4 border-b border-gray-200 mb-8 rounded-sm">
+                <p class="text-xs font-bold mb-2 text-gray-600 font-serif">カテゴリ絞り込み</p>
+                <div class="flex flex-wrap gap-2 mobile-filters">
+                    <a href="?category=" class="text-xs px-3 py-1 bg-book-cover text-white rounded-full">すべて</a>
+                    <a href="?category=startup" class="text-xs px-3 py-1 bg-white border border-gray-300 rounded-full">創業</a>
+                    <a href="?category=facility" class="text-xs px-3 py-1 bg-white border border-gray-300 rounded-full">設備</a>
+                    <a href="?category=it" class="text-xs px-3 py-1 bg-white border border-gray-300 rounded-full">IT/DX</a>
+                    <a href="?category=energy" class="text-xs px-3 py-1 bg-white border border-gray-300 rounded-full">省エネ</a>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <section class="yahoo-results-section" id="grants-results-section">
+                
+                <?php if (!empty($url_params['view']) && $url_params['view'] === 'prefectures'): ?>
+                <div class="prefectures-grid-container" style="padding: 40px 0;">
+                    <h2 class="text-xl font-bold mb-6 text-ink-primary font-serif">都道府県から助成金を探す</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <?php
+                        $all_prefectures = get_terms(array(
+                            'taxonomy' => 'grant_prefecture',
+                            'hide_empty' => true,
+                            'orderby' => 'name',
+                            'order' => 'ASC'
+                        ));
+                        
+                        if ($all_prefectures && !is_wp_error($all_prefectures)) {
+                            foreach ($all_prefectures as $pref) {
+                                $pref_link = get_term_link($pref);
+                                echo '<a href="' . esc_url($pref_link) . '" class="block p-4 bg-white border border-gray-200 rounded hover:shadow-md transition-shadow text-ink-primary">';
+                                echo '<span class="font-bold">' . esc_html($pref->name) . '</span>';
+                                echo '<span class="text-gray-500 text-xs ml-2">(' . $pref->count . ')</span>';
+                                echo '</a>';
+                            }
+                        }
+                        ?>
+                    </div>
+                </div>
+                <?php else: ?>
+            
+                <!-- List Container: Dictionary Layout -->
+                <div id="subsidy-list" class="grid gap-0 border-t border-gray-200 mb-20">
                     <?php
                     // WP_Queryの引数を構築
                     $query_args = array(
