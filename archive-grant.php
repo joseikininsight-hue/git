@@ -279,21 +279,19 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
         </div>
     </nav>
 
-    <!-- ヒーローセクション - シンプルなSEOテキストベース -->
+    <!-- ヒーローセクション - タイトルページ風 -->
     <section class="zukan-hero zukan-hero-simple">
         <div class="yahoo-container">
             <div class="zukan-hero-content">
-                <div class="zukan-hero-header">
-                    <span class="zukan-hero-label">Subsidy & Grant Archive</span>
-                    <h2 class="zukan-hero-title">助成金・補助金総合検索</h2>
-                    <p class="zukan-hero-subtitle-text">令和<?php echo date('Y') - 2018; ?>年度版</p>
-                </div>
+                <span class="zukan-hero-label">Subsidy & Grant Archive</span>
+                <h1 class="zukan-hero-title">
+                    <?php echo esc_html($archive_title); ?><br>
+                    <span class="zukan-hero-subtitle-text">令和<?php echo date('Y') - 2018; ?>年度版 図鑑</span>
+                </h1>
                 <p class="zukan-hero-description">
-                    本アーカイブは、全国で事業を営む<strong>中小企業および個人事業主</strong>のために編纂されたものである。
-                    複雑怪奇な申請要件を紐解き、事業成長の糧となる「知」を提供する。
-                    多くの大型補助金（ものづくり補助金や事業再構築補助金など）で、「<strong>給与支給総額の年率増加</strong>」が
-                    必須要件、あるいは強力な加点項目となっている。「投資して、稼いで、社員に還元する」サイクルを描ける企業が採択を勝ち取れる。
+                    <?php echo esc_html($archive_description); ?>
                 </p>
+                <div class="ornament-line"><span>&#10086;</span></div>
                 <div class="zukan-hero-stats-simple">
                     <span class="zukan-hero-stat">収録制度数：<strong><?php echo $total_grants_formatted; ?></strong>件以上</span>
                     <span class="zukan-hero-stat-divider">|</span>
@@ -310,43 +308,65 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
         <div class="yahoo-main-content zukan-main-content">
             
             <?php 
-            // アーカイブSEOコンテンツ: おすすめ記事
-            if (function_exists('gi_output_archive_featured_posts')) {
-                gi_output_archive_featured_posts();
-            }
-            
-            // アーカイブSEOコンテンツ: イントロ
+            // アーカイブSEOコンテンツ: イントロ（01傾向と対策）を先に表示
             if (function_exists('gi_output_archive_intro_content')) {
                 gi_output_archive_intro_content();
             }
+            
+            // アーカイブSEOコンテンツ: おすすめ記事（02編集部選定）
+            if (function_exists('gi_output_archive_featured_posts')) {
+                gi_output_archive_featured_posts();
+            }
             ?>
             
-            <!-- 統合された検索結果ヘッダー（イントロの後に配置） -->
-            <div class="results-header zukan-results-header unified-results-header mb-0">
-                <div class="flex items-center mb-8">
-                    <span class="text-4xl text-gray-200 font-serif font-bold mr-4 -mt-2">03</span>
-                    <h2 class="text-2xl font-serif font-bold text-ink-primary border-b border-accent-gold pb-1 w-full flex justify-between items-end">
-                        <span>補助金図鑑一覧</span>
-                        <div class="text-xs font-normal text-gray-500 mb-1 hidden md:flex items-center gap-4">
-                             <span class="results-count-primary">
-                                条件に合致：<strong id="current-count"><?php echo $total_grants_formatted; ?></strong> 件
-                            </span>
+            <!-- 統合された検索結果ヘッダー -->
+            <section class="editors-pick-section" id="list">
+                <div class="editors-pick-header">
+                    <div class="flex items-center">
+                        <span class="editors-pick-number">03</span>
+                        <div class="editors-pick-title-wrap">
+                            <h2>補助金図鑑一覧</h2>
                         </div>
-                    </h2>
+                    </div>
                 </div>
-            </div>
+                <?php
+                // ページネーション用の件数計算
+                $current_page = get_query_var('paged') ? get_query_var('paged') : 1;
+                $posts_per_page = 12;
+                $showing_from = (($current_page - 1) * $posts_per_page) + 1;
+                $showing_to = min($current_page * $posts_per_page, $total_grants);
+                ?>
+                <div class="results-range-display">
+                    <div class="results-range-text">
+                        <span class="total-count" id="current-count"><?php echo $total_grants_formatted; ?></span> 件中 
+                        <span class="range-numbers" id="showing-from"><?php echo number_format($showing_from); ?></span>〜<span class="range-numbers" id="showing-to"><?php echo number_format($showing_to); ?></span> 件を表示
+                    </div>
+                    <div class="results-sort-select">
+                        <label for="archive-sort-select">並び替え:</label>
+                        <select id="archive-sort-select" onchange="window.location.href=this.value">
+                            <?php
+                            $current_orderby = isset($_GET['orderby']) ? $_GET['orderby'] : '';
+                            $sort_options = array(
+                                '' => 'おすすめ順',
+                                'new' => '新着順',
+                                'deadline' => '締切が近い順',
+                                'popular' => '人気順',
+                            );
+                            foreach ($sort_options as $value => $label) {
+                                $url = add_query_arg('orderby', $value, remove_query_arg('orderby'));
+                                if (empty($value)) {
+                                    $url = remove_query_arg('orderby');
+                                }
+                                $selected = ($current_orderby === $value || (empty($current_orderby) && empty($value))) ? 'selected' : '';
+                                echo '<option value="' . esc_url($url) . '" ' . $selected . '>' . esc_html($label) . '</option>';
+                            }
+                            ?>
+                        </select>
+                    </div>
+                </div>
+            </section>
             
-            <!-- Mobile Filter (Simplified) -->
-            <div class="md:hidden bg-paper-shadow p-4 border-b border-gray-200 mb-8 rounded-sm">
-                <p class="text-xs font-bold mb-2 text-gray-600 font-serif">カテゴリ絞り込み</p>
-                <div class="flex flex-wrap gap-2 mobile-filters">
-                    <a href="?category=" class="text-xs px-3 py-1 bg-book-cover text-white rounded-full">すべて</a>
-                    <a href="?category=startup" class="text-xs px-3 py-1 bg-white border border-gray-300 rounded-full">創業</a>
-                    <a href="?category=facility" class="text-xs px-3 py-1 bg-white border border-gray-300 rounded-full">設備</a>
-                    <a href="?category=it" class="text-xs px-3 py-1 bg-white border border-gray-300 rounded-full">IT/DX</a>
-                    <a href="?category=energy" class="text-xs px-3 py-1 bg-white border border-gray-300 rounded-full">省エネ</a>
-                </div>
-            </div>
+            <!-- カテゴリ絞り込みセクションは削除済み -->
 
             <!-- Results Section -->
             <section class="yahoo-results-section" id="grants-results-section">
@@ -560,7 +580,8 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                         // ベースURLにクエリパラメータを追加
                         $base_url = add_query_arg($preserved_params, str_replace( $big, '%#%', esc_url( get_pagenum_link( $big ) ) ));
                         
-                        echo paginate_links( array(
+                        // ページネーションリンクに#listアンカーを追加
+                        $pagination_links = paginate_links( array(
                             'base' => $base_url,
                             'format' => '&paged=%#%',
                             'current' => max( 1, get_query_var('paged') ),
@@ -572,6 +593,10 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                             'end_size' => 1,
                             'add_args' => $preserved_params,
                         ) );
+                        // 各リンクに#listアンカーを追加
+                        if ($pagination_links) {
+                            echo preg_replace('/href="([^"]+)"/', 'href="$1#list"', $pagination_links);
+                        }
                     }
                     ?>
                 </div>
@@ -585,7 +610,7 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
             }
             ?>
             
-            <!-- SEO解説記事セクション（図鑑スタイル - 原稿用紙風） -->
+            <!-- SEO解説記事セクション -->
             <?php 
             // SEOコンテンツがある場合はカスタム内容を表示、なければデフォルト記事を表示
             $show_default_article = true;
@@ -595,53 +620,62 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
             
             if ($show_default_article && ($is_category_archive || $is_prefecture_archive || is_post_type_archive('grant'))): 
             ?>
-            <section class="relative pt-12 mt-12 border-t-4 border-double border-gray-300">
-                <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-paper-warm px-4 text-ink-secondary text-2xl">
-                    ❦
-                </div>
+            <section class="zukan-article-section" id="guide">
+                <span class="ornament-center">&#10086;</span>
 
-                <article class="prose prose-stone font-serif max-w-none">
-                    <h2 class="text-3xl font-bold text-center mb-10 text-ink-primary">
-                        <span class="block text-sm font-normal text-gray-500 tracking-widest mb-2 uppercase">Editorial Guide</span>
+                <article class="zukan-article-content">
+                    <div class="zukan-article-header">
+                        <span class="label-text">Editorial Guide</span>
                         <?php if ($is_prefecture_archive): ?>
                         <?php echo esc_html($current_category->name); ?>の助成金・補助金申請ガイド
                         <?php elseif ($is_category_archive): ?>
                         <?php echo esc_html($current_category->name); ?>の申請傾向と採択のポイント
                         <?php else: ?>
-                        助成金・補助金の選び方と申請の基礎知識
+                        採択率を上げるための「三つの鉄則」
                         <?php endif; ?>
-                    </h2>
+                    </div>
                     
-                    <div class="zukan-article-content text-justify leading-loose">
+                    <div class="zukan-article-columns">
                         <?php if ($is_prefecture_archive): ?>
-                        <h3 class="font-bold text-lg border-b border-gray-200 pb-2 mb-3 mt-6">申請の傾向</h3>
-                        <p><?php echo esc_html($current_category->name); ?>では、地域の産業振興や中小企業支援を目的とした独自の助成金制度が充実しています。特に創業支援、事業承継、設備投資に関する支援が手厚く、申請件数も年々増加傾向にあります。審査では地域経済への貢献度や雇用創出効果が重視される傾向があります。</p>
-                        
-                        <h3 class="font-bold text-lg border-b border-gray-200 pb-2 mb-3 mt-6">採択のポイント</h3>
-                        <p>採択率を高めるためには、事業計画の具体性と実現可能性が鍵となります。また、<?php echo esc_html($current_category->name); ?>の産業政策との整合性を示すことも重要です。申請書類では、数値目標を明確に設定し、その達成に向けた具体的なアクションプランを提示することをお勧めします。</p>
-                        
-                        <?php elseif ($is_category_archive): ?>
-                        <h3 class="font-bold text-lg border-b border-gray-200 pb-2 mb-3 mt-6">この分野の特徴</h3>
-                        <p><?php echo esc_html($current_category->name); ?>関連の助成金は、技術革新や事業効率化を促進することを目的としています。近年は特にデジタル化やサステナビリティへの取り組みに対する支援が拡充されており、申請の機会が広がっています。補助率も比較的高く設定されているケースが多いのが特徴です。</p>
-                        
-                        <h3 class="font-bold text-lg border-b border-gray-200 pb-2 mb-3 mt-6">申請時の注意点</h3>
-                        <p>この分野では、導入する技術や設備の先進性・革新性を明確に示すことが求められます。また、投資対効果（ROI）を具体的な数値で示し、事業の持続可能性についても説明することが採択への近道です。専門家のサポートを受けながら申請することをお勧めします。</p>
-                        
-                        <?php else: ?>
-                        <h3 class="font-bold text-lg border-b border-gray-200 pb-2 mb-3 mt-6">助成金・補助金とは</h3>
-                        <p>助成金・補助金は、国や地方自治体、公的機関が事業者の取り組みを支援するために給付する資金です。融資と異なり返済不要なため、新規事業の立ち上げや設備投資、人材育成など、様々な経営課題の解決に活用できます。ただし、申請要件や使途に制限があるため、事前の確認が重要です。</p>
-                        
-                        <h3 class="font-bold text-lg border-b border-gray-200 pb-2 mb-3 mt-6">申請の基本ステップ</h3>
-                        <p>まず、自社の事業計画に合致する制度を見つけることから始めます。公募要領を熟読し、対象要件や補助対象経費を確認した上で、事業計画書を作成します。審査では計画の実現可能性や効果が評価されるため、具体的かつ現実的な内容にすることが採択への鍵となります。</p>
-                        <?php endif; ?>
-                        
-                        <div class="mt-10 p-6 bg-gray-100 border border-gray-300 rounded-sm text-center">
-                            <p class="font-bold text-sm text-gray-800">※ 専門家への相談をお勧めします</p>
-                            <p class="text-xs text-gray-600 mt-2 leading-relaxed">
-                                助成金の申請は要件確認から書類作成まで専門知識が必要です。<br>
-                                当サイトでは無料相談を承っておりますので、お気軽にお問い合わせください。
-                            </p>
+                        <div>
+                            <h3>壱. 申請の傾向</h3>
+                            <p><?php echo esc_html($current_category->name); ?>では、地域の産業振興や中小企業支援を目的とした独自の助成金制度が充実しています。特に創業支援、事業承継、設備投資に関する支援が手厚く、申請件数も年々増加傾向にあります。審査では地域経済への貢献度や雇用創出効果が重視される傾向があります。</p>
                         </div>
+                        <div>
+                            <h3>弐. 採択のポイント</h3>
+                            <p>採択率を高めるためには、事業計画の具体性と実現可能性が鍵となります。また、<?php echo esc_html($current_category->name); ?>の産業政策との整合性を示すことも重要です。申請書類では、数値目標を明確に設定し、その達成に向けた具体的なアクションプランを提示することをお勧めします。</p>
+                        </div>
+                        <?php elseif ($is_category_archive): ?>
+                        <div>
+                            <h3>壱. この分野の特徴</h3>
+                            <p><?php echo esc_html($current_category->name); ?>関連の助成金は、技術革新や事業効率化を促進することを目的としています。近年は特にデジタル化やサステナビリティへの取り組みに対する支援が拡充されており、申請の機会が広がっています。補助率も比較的高く設定されているケースが多いのが特徴です。</p>
+                        </div>
+                        <div>
+                            <h3>弐. 申請時の注意点</h3>
+                            <p>この分野では、導入する技術や設備の先進性・革新性を明確に示すことが求められます。また、投資対効果（ROI）を具体的な数値で示し、事業の持続可能性についても説明することが採択への近道です。専門家のサポートを受けながら申請することをお勧めします。</p>
+                        </div>
+                        <?php else: ?>
+                        <div>
+                            <h3>壱. 具体性の徹底</h3>
+                            <p>審査員は貴社の業界については素人であると心得るべし。「売上が上がります」という予言ではなく、「なぜ上がるのか」という論理的帰結を記さねばならない。顧客ターゲットの属性、市場規模の数値的根拠（EBPM）、競合優位性を明確なデータで示すことこそが、採択への近道である。</p>
+                        </div>
+                        <div>
+                            <h3>弐. 加点の全取得</h3>
+                            <p>補助金審査は減点方式ではなく加点方式である。「経営革新計画」の承認、「パートナーシップ構築宣言」の登録。これらは面倒ではあるが、確実に点数を積み上げられる要素だ。ボーダーライン上で合否を分けるのは、こうした地道な努力の差に他ならない。</p>
+                        </div>
+                        <div>
+                            <h3>参. 資金計画の現実性</h3>
+                            <p>多くの補助金は「後払い」である。採択決定から入金まで、1年以上を要することも珍しくない。その間のつなぎ融資は確保できているか?資金ショートによる事業断念は、最も避けねばならない結末である。金融機関との事前調整を怠るべからず。</p>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                    
+                    <div class="zukan-article-note">
+                        <p class="note-title">※ 注意書き</p>
+                        <p class="note-text">
+                            本図鑑の記述は<?php echo date('Y'); ?>年時点の情報に基づく。制度は生き物であり、常に変化する。<br>
+                            最新の公募要領は、必ず公式の布告（公式サイト）にて確認されたし。
+                        </p>
                     </div>
                 </article>
             </section>
@@ -1004,10 +1038,10 @@ $js_uri = get_template_directory_uri() . '/assets/js/archive-common.js';
 <script src="<?php echo esc_url($js_uri . '?ver=' . filemtime($js_file)); ?>"></script>
 <?php endif; ?>
 
-<!-- 初期化スクリプト（archive-common.jsに統合済み） -->
+<!-- 初期化スクリプト（最小限） -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // ArchiveCommon の初期化（サイドバーフィルター、統合ソートは自動的に初期化）
+    // ArchiveCommon の初期化（サイドバーフィルター等は archive-common.js で処理）
     if (typeof ArchiveCommon !== 'undefined') {
         ArchiveCommon.init({
             ajaxUrl: '<?php echo admin_url("admin-ajax.php"); ?>',
