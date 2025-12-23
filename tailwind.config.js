@@ -25,6 +25,17 @@ module.exports = {
           DEFAULT: '#ffeb3b',
           light: '#fff9c4',
           dark: '#fbc02d',
+          gold: '#d4af37', // Added for new design
+          red: '#ef4444',  // Added for new design
+        },
+        ink: {
+          primary: '#2c3e50', // Added for new design
+        },
+        paper: {
+          warm: '#fdfbf7', // Added for new design
+        },
+        highlight: {
+          blue: '#3b82f6', // Added for new design
         },
         // Book Theme - 補助金図鑑デザインシステム
         'book': {
@@ -99,6 +110,7 @@ module.exports = {
         'md': '0 4px 12px rgba(0, 0, 0, 0.1)',
         'lg': '0 8px 24px rgba(0, 0, 0, 0.12)',
         'xl': '0 12px 32px rgba(0, 0, 0, 0.15)',
+        'book-depth': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05), 0 20px 25px -5px rgba(0, 0, 0, 0.1)', // Added for new design
       },
       transitionDuration: {
         'DEFAULT': '200ms',
