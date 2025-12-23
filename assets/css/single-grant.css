@@ -1,11 +1,24 @@
 /* ===================================
- * Grant Single Page - Government Official Design v55.0
- * 補助金図鑑 - 官公庁風デザイン × 図鑑スタイル
- * 濃紺×金カラースキーム + 本・辞典要素
+ * Grant Single Page - Zukan Style (図鑑風デザイン)
+ * 補助金図鑑 - 書斎・図鑑風デザイン統一版
+ * v56.0.0 - Header/Footer Unified Edition
  * =================================== */
 
 :root {
-    /* === 官公庁カラーパレット - メイン === */
+    /* === 補助金図鑑カラーパレット (Header/Footer統一) === */
+    --gi-paper-bg: #fdfbf7;
+    --gi-paper-dark: #f2efe9;
+    --gi-ink-primary: #2b2b2b;
+    --gi-ink-light: #595959;
+    --gi-accent-gold: #c5a059;
+    --gi-accent-gold-light: #d4b77a;
+    --gi-accent-gold-pale: #f0e6c8;
+    --gi-accent-red: #a63737;
+    --gi-highlight-blue: #2c5282;
+    --gi-wood-brown: #4a3b32;
+    --gi-book-cover: #1e293b;
+    
+    /* 官公庁カラー (互換性維持) */
     --gi-gov-navy-900: #0d1b2a;
     --gi-gov-navy-800: #1b263b;
     --gi-gov-navy-700: #2c3e50;
@@ -17,8 +30,8 @@
     --gi-gov-navy-100: #e8ecf1;
     --gi-gov-navy-50: #f4f6f8;
     
-    /* アクセントカラー - 金 */
-    --gi-gov-gold: #c9a227;
+    /* アクセントカラー - 金 (統一) */
+    --gi-gov-gold: #c5a059;
     --gi-gov-gold-light: #d4b77a;
     --gi-gov-gold-pale: #f0e6c8;
     
@@ -47,23 +60,25 @@
     --gi-gray-100: #f8f9fa;
     --gi-gray-50: #fcfcfc;
     
-    /* 背景色 */
-    --gi-bg: linear-gradient(180deg, var(--gi-gov-navy-50) 0%, var(--gi-white) 100%);
-    --gi-bg-section: var(--gi-gov-navy-50);
+    /* 背景色 (図鑑風) */
+    --gi-bg: linear-gradient(180deg, var(--gi-paper-bg) 0%, var(--gi-white) 100%);
+    --gi-bg-section: var(--gi-paper-bg);
     
-    /* プライマリカラー（官公庁濃紺） */
-    --gi-primary: var(--gi-gov-navy-800);
+    /* プライマリカラー */
+    --gi-primary: var(--gi-book-cover);
     --gi-primary-dark: var(--gi-gov-navy-900);
     --gi-primary-light: var(--gi-gov-navy-100);
     
-    /* アクセントカラー（官公庁金色） */
-    --gi-accent: var(--gi-gov-gold);
-    --gi-accent-light: var(--gi-gov-gold-pale);
+    /* アクセントカラー */
+    --gi-accent: var(--gi-accent-gold);
+    --gi-accent-light: var(--gi-accent-gold-pale);
     
-    /* タイポグラフィ */
+    /* タイポグラフィ (Header/Footer統一) */
+    --gi-font-heading: "Zen Old Mincho", "Shippori Mincho", "Yu Mincho", serif;
     --gi-font-serif: "Shippori Mincho", "Yu Mincho", "YuMincho", "Hiragino Mincho ProN", serif;
     --gi-font-sans: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     --gi-font-mono: 'SF Mono', 'Monaco', 'Cascadia Code', 'Courier New', monospace;
+    --gi-font-hand: "La Belle Aurore", cursive;
     
     /* レイアウト */
     --gi-container: 1200px;
@@ -71,18 +86,22 @@
     --gi-gap: 40px;
     
     /* ボーダー */
-    --gi-radius: 4px;
-    --gi-radius-lg: 8px;
+    --gi-radius: 2px;
+    --gi-radius-lg: 4px;
     
-    /* シャドウ */
+    /* シャドウ (図鑑風) */
     --gi-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
     --gi-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     --gi-shadow-md: 0 6px 16px rgba(0, 0, 0, 0.12);
     --gi-shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
+    --gi-shadow-book: 0 2px 5px rgba(43, 43, 43, 0.05), 0 1px 2px rgba(43, 43, 43, 0.1);
     
     /* トランジション */
     --gi-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     --gi-transition-slow: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    
+    /* 紙のノイズテクスチャ */
+    --gi-paper-texture: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
 }
 
 /* ==========================================================================
@@ -3806,21 +3825,419 @@ ul, ol {
 .gi-grant-page .gi-checklist-label {
     display: block !important;
     visibility: visible !important;
+}
 
-:root {
-    /* === 官公庁カラーパレット - メイン === */
-    --gi-gov-navy-900: #0d1b2a;
-    --gi-gov-navy-800: #1b263b;
-    --gi-gov-navy-700: #2c3e50;
-    --gi-gov-navy-600: #34495e;
-    --gi-gov-navy-500: #415a77;
-    --gi-gov-navy-400: #778da9;
-    --gi-gov-navy-300: #a3b1c6;
-    --gi-gov-navy-200: #cfd8e3;
-    --gi-gov-navy-100: #e8ecf1;
-    --gi-gov-navy-50: #f4f6f8;
+/* ==========================================================================
+   AI推定値バッジ・注意書きスタイル
+   ========================================================================== */
+.gi-ai-estimate-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #6366f1;
+    background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 6px;
+    border: 1px solid #c7d2fe;
+}
+
+.gi-ai-estimate-badge svg {
+    width: 12px;
+    height: 12px;
+}
+
+.gi-metric-ai-note {
+    font-size: 11px;
+    color: var(--gi-gray-500, #6b7280);
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.gi-metric-ai-note svg {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+}
+
+.gi-compare-ai-note {
+    display: block;
+    font-size: 10px;
+    color: #6366f1;
+    margin-top: 2px;
+}
+
+.gi-ai-disclaimer {
+    background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
+    border: 1px solid #fde047;
+    border-radius: var(--gi-radius-lg, 8px);
+    padding: 12px 16px;
+    margin: 16px 0;
+    font-size: 13px;
+    color: #854d0e;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.gi-ai-disclaimer svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.gi-ai-disclaimer-text {
+    line-height: 1.6;
+}
+
+.gi-ai-disclaimer-text strong {
+    color: #92400e;
+}
+
+/* ==========================================================================
+   ツールチップ
+   ========================================================================== */
+.gi-tooltip-trigger {
+    display: inline-flex;
+    align-items: center;
+    cursor: help;
+    position: relative;
+}
+
+.gi-tooltip-trigger:hover .gi-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.gi-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(8px);
+    background: #1f2937;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 400;
+    padding: 8px 12px;
+    border-radius: 6px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    z-index: 100;
+    margin-bottom: 8px;
+    max-width: 280px;
+    white-space: normal;
+    text-align: left;
+    line-height: 1.5;
+}
+
+.gi-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #1f2937;
+}
+
+/* ==========================================================================
+   広告枠スタイル - 外部化版
+   ========================================================================== */
+.gi-ad-section {
+    background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+    border: 1px dashed #e0e0e0;
+}
+
+.gi-ad-section .gi-sidebar-header {
+    padding: 8px 16px;
+    border-bottom: 1px dashed #e0e0e0;
+    background: transparent;
+}
+
+.gi-pr-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #9e9e9e;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.gi-ad-slot {
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+}
+
+.gi-ad-slot:empty::before {
+    content: '広告枠';
+    color: #bdbdbd;
+    font-size: 12px;
+}
+
+.gi-ad-top {
+    border-radius: var(--gi-radius-lg, 8px);
+    margin-bottom: 16px;
+}
+
+.gi-ad-upper {
+    border-radius: var(--gi-radius-lg, 8px);
+    margin: 16px 0;
+}
+
+.gi-ad-middle {
+    border-radius: var(--gi-radius-lg, 8px);
+    margin: 16px 0;
+}
+
+.gi-ad-lower {
+    border-radius: var(--gi-radius-lg, 8px);
+    margin: 16px 0;
+}
+
+.gi-ad-sticky {
+    border-radius: var(--gi-radius-lg, 8px);
+    margin: 16px 0;
+    position: sticky;
+    top: 100px;
+    z-index: 10;
+}
+
+.gi-ad-bottom {
+    border-radius: var(--gi-radius-lg, 8px);
+    margin: 16px 0;
+}
+
+.gi-ad-slot img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.gi-ad-slot a {
+    display: block;
+    transition: opacity 0.2s ease;
+}
+
+.gi-ad-slot a:hover {
+    opacity: 0.9;
+}
+
+/* アフィリエイト広告共通 */
+.ji-affiliate-ad {
+    width: 100%;
+}
+
+.ji-affiliate-ad img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* ==========================================================================
+   記事型広告スタイル - 外部化版
+   ========================================================================== */
+.ji-article-ad {
+    position: relative;
+    background: #fff;
+    border: 1px solid var(--gi-gray-200, #e5e7eb);
+    border-radius: var(--gi-radius-lg, 8px);
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.ji-article-ad:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.ji-article-ad-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+    z-index: 2;
+}
+
+.ji-article-ad-image-link {
+    display: block;
+    overflow: hidden;
+}
+
+.ji-article-ad-image {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.ji-article-ad:hover .ji-article-ad-image {
+    transform: scale(1.03);
+}
+
+.ji-article-ad-content {
+    padding: 16px 20px 20px;
+}
+
+.ji-article-ad-title {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin: 0 0 10px;
+    color: var(--gi-gray-900, #111827);
+}
+
+.ji-article-ad-title a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.ji-article-ad-title a:hover {
+    color: var(--gi-accent-gold, #c5a059);
+}
+
+.ji-article-ad-desc {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--gi-gray-600, #6b7280);
+    margin: 0 0 12px;
+}
+
+.ji-article-ad-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 12px;
+}
+
+.ji-article-ad-features li {
+    font-size: 12px;
+    color: var(--gi-gray-700, #374151);
+    padding: 4px 0 4px 20px;
+    position: relative;
+}
+
+.ji-article-ad-features li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--gi-success, #10b981);
+    font-weight: 700;
+}
+
+.ji-article-ad-price {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gi-error, #ef4444);
+    margin-bottom: 12px;
+}
+
+.ji-article-ad-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, var(--gi-accent-gold, #c5a059) 0%, #b08d3e 100%);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.ji-article-ad-cta:hover {
+    background: linear-gradient(135deg, #b08d3e 0%, #9a7a35 100%);
+    transform: translateY(-1px);
+    color: #fff;
+}
+
+.ji-article-ad-cta svg {
+    transition: transform 0.2s ease;
+}
+
+.ji-article-ad-cta:hover svg {
+    transform: translateX(3px);
+}
+
+/* コンテンツ内記事型広告 */
+.gi-article-ad-section {
+    background: linear-gradient(135deg, var(--gi-paper-bg, #fdfbf7) 0%, #fff 100%);
+    border: 1px solid var(--gi-gray-200, #e5e7eb);
+    border-radius: var(--gi-radius-lg, 8px);
+    padding: 20px;
+    margin: 24px 0;
+}
+
+.gi-article-ad-section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed var(--gi-gray-300, #d1d5db);
+}
+
+.gi-article-ad-section-badge {
+    background: var(--gi-accent-gold, #c5a059);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+}
+
+.gi-article-ad-section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gi-gray-600, #6b7280);
+    margin: 0;
+}
+
+/* モバイル対応 - 広告 */
+@media (max-width: 768px) {
+    .gi-ad-section {
+        display: none;
+    }
     
-    /* アクセントカラー - 金 */
-    --gi-gov-gold: #c9a227;
-    --gi-gov-gold-light: #d4b77a;
-    --gi-gov-gold-pale
+    .gi-ad-section.show-mobile {
+        display: block;
+    }
+    
+    .gi-ad-sticky {
+        position: static;
+    }
+    
+    .ji-article-ad-content {
+        padding: 12px 16px 16px;
+    }
+    
+    .ji-article-ad-title {
+        font-size: 15px;
+    }
+    
+    .ji-article-ad-cta {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .gi-article-ad-section {
+        padding: 16px;
+        margin: 16px 0;
+    }
+}

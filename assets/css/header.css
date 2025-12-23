@@ -1,397 +1,314 @@
 /**
- * Header Styles - Government Official Style
- * 官公庁・自治体風デザイン
- * 濃紺×白×金のカラースキーム
+ * Header Styles - Zukan Style (図鑑風デザイン)
+ * 補助金図鑑 - Perfect Header
+ * 書斎・図鑑風デザイン
  * 
- * @version 12.0.0
- * - ヘッダー色強制（CSS最高優先度）
- * - メガメニューデザイン刷新
- * - テキスト色統一
+ * @package Joseikin_Insight_Header
+ * @version 16.1.0 (Zukan Edition - Logo Fix)
  */
 
 /* ===============================================
-   CSS VARIABLES - Government Official Color Scheme
+   CSS VARIABLES - Zukan Design System
    =============================================== */
 :root {
-    /* 官公庁カラーパレット */
-    --gov-navy: #0D2A52;           /* メイン濃紺 */
-    --gov-navy-dark: #081D3D;      /* 濃紺（暗め） */
-    --gov-navy-light: #1A3D6E;     /* 濃紺（明るめ） */
-    --gov-gold: #C5A059;           /* 金色アクセント */
-    --gov-gold-light: #D4B77A;     /* 金色（明るめ） */
-    --gov-white: #FFFFFF;          /* 白 */
-    --gov-gray-50: #F8FAFC;        /* 薄いグレー */
-    --gov-gray-100: #F1F5F9;
-    --gov-gray-200: #E2E8F0;
-    --gov-gray-300: #CBD5E1;
-    --gov-gray-400: #94A3B8;
-    --gov-gray-500: #64748B;
-    --gov-gray-600: #475569;
-    --gov-gray-700: #334155;
-    --gov-text-primary: #1E293B;   /* 本文色 */
-    --gov-text-secondary: #475569;
-    --gov-link: #1D4ED8;           /* リンク色 */
-    --gov-success: #059669;        /* 成功・募集中 */
-    --gov-danger: #DC2626;         /* 注意 */
+    /* 補助金図鑑カラーパレット */
+    --h-paper-bg: #fdfbf7;
+    --h-paper-dark: #f2efe9;
+    --h-ink-primary: #2b2b2b;
+    --h-ink-light: #595959;
+    --h-accent-gold: #c5a059;
+    --h-accent-red: #a63737;
+    --h-highlight-blue: #2c5282;
+    --h-wood-brown: #4a3b32;
+    --h-book-cover: #1e293b;
     
-    /* 基本設定 */
-    --header-height: 64px;
-    --utility-bar-height: 36px;
-    --max-width: 1280px;
-    --transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --h-white: #ffffff;
+    --h-gray-100: #f8f9fa;
+    --h-gray-200: #e9ecef;
+    --h-gray-300: #dee2e6;
+    --h-gray-400: #ced4da;
+    
+    --h-font-serif: "Shippori Mincho", "Yu Mincho", serif;
+    --h-font-heading: "Zen Old Mincho", "Shippori Mincho", serif;
+    --h-font-sans: "Noto Sans JP", sans-serif;
+    --h-font-hand: "La Belle Aurore", cursive;
+    
+    --h-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    --h-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --h-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --h-shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
+    --h-shadow-book: 0 2px 5px rgba(43, 43, 43, 0.05), 0 1px 2px rgba(43, 43, 43, 0.1);
+    --h-radius: 2px;
+    --h-radius-lg: 4px;
+    
+    --h-header-height: 64px;
+    --h-max-width: 1200px;
+    
+    /* 紙のノイズテクスチャ */
+    --h-paper-texture: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
 }
-
-/* ===============================================
-   RESET & BASE
-   =============================================== */
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
-
-body {
-    font-family: 'Noto Sans JP', 'Yu Gothic', 'YuGothic', 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
-    font-size: 16px;
-    line-height: 1.7;
-    color: var(--gov-text-primary);
-    background: var(--gov-gray-50);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-
-img { max-width: 100%; height: auto; display: block; }
-a { color: inherit; text-decoration: none; }
-button { font-family: inherit; cursor: pointer; border: none; background: none; }
-
-/* ヘッダーナビゲーションのリンクは濃紺色（官公庁スタイル） */
-.ji-header a.ji-nav-link,
-.ji-header button.ji-nav-link {
-    color: var(--gov-navy) !important;
-}
-
-/* ===============================================
-   SKIP LINK
-   =============================================== */
-.ji-skip-link {
-    position: absolute;
-    top: -100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--gov-navy);
-    color: var(--gov-white);
-    padding: 12px 24px;
-    border-radius: 0 0 8px 8px;
-    z-index: 100000;
-    font-weight: 600;
-}
-.ji-skip-link:focus { top: 0; }
 
 /* ===============================================
    HEADER PLACEHOLDER
    =============================================== */
-.ji-header-placeholder { 
-    height: var(--header-height); 
-    display: block; 
+.ji-header-placeholder {
+    height: var(--h-header-height);
+    display: block;
 }
 
 /* ===============================================
-   UTILITY BAR (官公庁風の上部バー)
+   HEADER - Main Styles
    =============================================== */
-.ji-utility-bar {
-    background: var(--gov-white);
-    border-bottom: 1px solid var(--gov-gray-200);
-    height: var(--utility-bar-height);
-    display: none;
-}
-
-@media (min-width: 768px) {
-    .ji-utility-bar { display: block; }
-}
-
-.ji-utility-inner {
-    max-width: var(--max-width);
-    margin: 0 auto;
-    padding: 0 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 100%;
-}
-
-.ji-utility-left {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    color: var(--gov-gray-600);
-    font-size: 0.8125rem;
-}
-
-.ji-utility-date {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.ji-utility-date i {
-    color: var(--gov-gold);
-}
-
-.ji-utility-right {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.ji-utility-link {
-    color: var(--gov-gray-600);
-    font-size: 0.8125rem;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 8px;
-    border-radius: 4px;
-    transition: all var(--transition);
-}
-
-.ji-utility-link:hover {
-    color: var(--gov-navy);
-    background: var(--gov-gray-100);
-}
-
-.ji-utility-link i {
-    font-size: 0.75rem;
-}
-
-/* 文字サイズ変更ボタン */
-.ji-font-size-controls {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    border-left: 1px solid var(--gov-gray-200);
-    padding-left: 16px;
-}
-
-.ji-font-size-label {
-    color: var(--gov-gray-600);
-    font-size: 0.75rem;
-    margin-right: 4px;
-}
-
-.ji-font-size-btn {
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--gov-gray-300);
-    border-radius: 4px;
-    color: var(--gov-gray-600);
-    font-size: 0.75rem;
-    font-weight: 700;
-    transition: all var(--transition);
-}
-
-.ji-font-size-btn:hover {
-    background: var(--gov-gray-100);
-    border-color: var(--gov-gray-400);
-}
-
-.ji-font-size-btn.active {
-    background: var(--gov-navy);
-    color: var(--gov-white);
-    border-color: var(--gov-navy);
-}
-
-/* ===============================================
-   MAIN HEADER
-   =============================================== */
-.ji-header {
+header#ji-header.ji-header {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     z-index: 9999;
-    background: var(--gov-white) !important;
-    height: var(--header-height);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    /* 金のライン - 官公庁風のアクセント */
-    border-bottom: 4px solid var(--gov-gold) !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    background: rgba(253, 251, 247, 0.95) !important;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    height: var(--h-header-height);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    border-bottom: 1px solid var(--h-gray-300);
 }
 
-.ji-header.scrolled {
-    box-shadow: 0 4px 20px rgba(13, 42, 82, 0.3);
+header#ji-header.ji-header.scrolled {
+    box-shadow: var(--h-shadow);
+    background: rgba(253, 251, 247, 0.98) !important;
 }
 
-.ji-header.hidden {
+header#ji-header.ji-header.hidden {
     transform: translateY(-100%);
 }
 
-.ji-header-main {
-    height: var(--header-height);
-    display: flex;
-    align-items: center;
+header#ji-header .ji-header-main {
+    height: var(--h-header-height);
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
 }
 
-.ji-header-inner {
-    max-width: var(--max-width);
+header#ji-header .ji-header-inner {
+    max-width: var(--h-max-width);
     margin: 0 auto;
-    padding: 0 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    padding: 0 24px;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
     height: 100%;
     width: 100%;
 }
 
-@media (min-width: 768px) {
-    .ji-header-inner { padding: 0 24px; }
-}
-
-/* ===============================================
-   LOGO
-   =============================================== */
-.ji-logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-shrink: 0;
-    padding: 8px 12px;
-    margin: -8px -12px;
-    border-radius: 8px;
-    transition: all var(--transition);
-    text-decoration: none;
-}
-
-.ji-logo:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.ji-logo:focus-visible {
-    outline: 2px solid var(--gov-gold);
-    outline-offset: 2px;
-}
-
-.ji-logo-image-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.ji-logo-image {
-    height: 36px;
-    width: auto;
-    max-width: 220px;
-    object-fit: contain;
-    display: block;
-    /* 白背景のロゴ用 */
-    filter: brightness(1.1);
-}
-
-@media (max-width: 767px) {
-    .ji-logo-image {
-        height: 28px;
-        max-width: 160px;
+@media (max-width: 640px) {
+    header#ji-header .ji-header-inner {
+        padding: 0 16px;
     }
 }
 
 /* ===============================================
-   DESKTOP NAVIGATION
+   LOGO - Zukan Style (強化版)
+   =============================================== */
+header#ji-header a.ji-logo,
+.ji-header a.ji-logo {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+    gap: 10px !important;
+    flex-shrink: 0 !important;
+    text-decoration: none !important;
+    transition: opacity var(--h-transition);
+    height: auto !important;
+    width: auto !important;
+    max-width: none !important;
+}
+
+header#ji-header a.ji-logo:hover {
+    opacity: 0.8;
+}
+
+header#ji-header .ji-logo-icon,
+.ji-header .ji-logo-icon {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+    max-width: 36px !important;
+    max-height: 36px !important;
+    background-color: var(--h-book-cover) !important;
+    color: var(--h-accent-gold) !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: var(--h-radius) !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
+    border: 1px solid #4a5568 !important;
+    transition: background-color var(--h-transition);
+    flex-shrink: 0 !important;
+}
+
+header#ji-header a.ji-logo:hover .ji-logo-icon {
+    background-color: var(--h-ink-primary) !important;
+}
+
+header#ji-header .ji-logo-icon span,
+.ji-header .ji-logo-icon span {
+    font-family: "Zen Old Mincho", "Shippori Mincho", "Yu Mincho", "Hiragino Mincho ProN", serif !important;
+    font-weight: 700 !important;
+    font-size: 18px !important;
+    line-height: 1 !important;
+    display: inline-block !important;
+    color: var(--h-accent-gold) !important;
+}
+
+header#ji-header .ji-logo-text-wrapper,
+.ji-header .ji-logo-text-wrapper {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    gap: 2px !important;
+    flex-shrink: 0 !important;
+}
+
+header#ji-header .ji-logo-title,
+.ji-header .ji-logo-title {
+    font-family: "Zen Old Mincho", "Shippori Mincho", "Yu Mincho", "Hiragino Mincho ProN", serif !important;
+    font-weight: 700 !important;
+    font-size: 16px !important;
+    line-height: 1.2 !important;
+    letter-spacing: 0.05em !important;
+    color: var(--h-ink-primary) !important;
+    white-space: nowrap !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+header#ji-header .ji-logo-subtitle,
+.ji-header .ji-logo-subtitle {
+    font-family: "Noto Sans JP", sans-serif !important;
+    font-size: 9px !important;
+    color: var(--h-ink-light) !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    white-space: nowrap !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1 !important;
+}
+
+/* Mobile Logo Adjustments */
+@media (max-width: 480px) {
+    header#ji-header a.ji-logo {
+        gap: 8px !important;
+    }
+    
+    header#ji-header .ji-logo-icon {
+        width: 32px !important;
+        height: 32px !important;
+        min-width: 32px !important;
+        min-height: 32px !important;
+        max-width: 32px !important;
+        max-height: 32px !important;
+    }
+    
+    header#ji-header .ji-logo-icon span {
+        font-size: 16px !important;
+    }
+    
+    header#ji-header .ji-logo-title {
+        font-size: 14px !important;
+    }
+    
+    header#ji-header .ji-logo-subtitle {
+        font-size: 8px !important;
+    }
+}
+
+/* ===============================================
+   NAVIGATION
    =============================================== */
 .ji-nav {
     display: none;
     align-items: center;
-    gap: 0;
+    gap: 24px;
     margin: 0 24px;
     flex: 1;
     justify-content: center;
     height: 100%;
 }
 
-@media (min-width: 1024px) { .ji-nav { display: flex; } }
+@media (min-width: 1024px) {
+    .ji-nav {
+        display: flex;
+    }
+}
 
 .ji-nav-item {
     position: static;
     height: 100%;
     display: flex;
     align-items: center;
-    /* 縦線で区切り - 官公庁風 */
-    border-left: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.ji-nav-item:last-child {
-    border-right: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .ji-nav-link {
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 14px 20px;
-    color: var(--gov-navy) !important;
-    font-size: 0.9375rem;
+    padding: 8px 4px;
+    color: var(--h-ink-light);
+    font-family: var(--h-font-sans);
+    font-size: 13px;
     font-weight: 500;
-    transition: all var(--transition);
+    transition: color var(--h-transition);
     white-space: nowrap;
     cursor: pointer;
     position: relative;
-    min-height: 48px;
     text-decoration: none;
     letter-spacing: 0.02em;
 }
 
 .ji-nav-link:hover,
 .ji-nav-link:focus-visible {
-    background: var(--gov-gray-100);
-    color: var(--gov-navy-dark) !important;
+    color: var(--h-accent-gold);
 }
 
-.ji-nav-link:focus-visible {
-    outline: 2px solid var(--gov-gold);
-    outline-offset: -2px;
+.ji-nav-link--active {
+    color: var(--h-ink-primary);
+    font-weight: 700;
 }
 
-.ji-nav-link[aria-current="page"] {
-    background: rgba(255, 255, 255, 0.15);
-    font-weight: 600;
+/* Diagnostic Button (Header) */
+.ji-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 20px;
+    background-color: var(--h-ink-primary);
+    color: var(--h-white);
+    border-radius: var(--h-radius);
+    font-family: var(--h-font-sans);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    transition: all var(--h-transition);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
-.ji-nav-link[aria-current="page"]::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 20%;
-    right: 20%;
-    height: 3px;
-    background: var(--gov-gold);
-    border-radius: 3px 3px 0 0;
-}
-
-.ji-nav-link .ji-icon {
-    font-size: 0.875rem;
-    opacity: 0.9;
-    color: var(--gov-gold-light) !important;
-}
-
-/* ナビゲーションリンクのテキスト色を確実に濃紺に（官公庁スタイル） */
-.ji-nav .ji-nav-link span,
-.ji-nav-item .ji-nav-link span {
-    color: var(--gov-navy) !important;
-}
-
-/* buttonとaタグ両方に対応 */
-a.ji-nav-link span,
-button.ji-nav-link span {
-    color: var(--gov-navy) !important;
+.ji-nav-btn:hover {
+    background-color: var(--h-accent-gold);
+    color: var(--h-white);
+    transform: translateY(-1px);
 }
 
 .ji-nav-link .ji-chevron {
-    font-size: 0.625rem;
-    margin-left: 4px;
-    transition: transform var(--transition);
-    color: var(--gov-white);
-    opacity: 0.8;
+    font-size: 10px;
+    margin-left: 2px;
+    transition: transform var(--h-transition);
+    color: var(--h-gray-400);
 }
 
 .ji-nav-item.menu-active .ji-chevron {
@@ -399,24 +316,26 @@ button.ji-nav-link span {
 }
 
 /* ===============================================
-   MEGA MENU
+   MEGA MENU - Zukan Style
    =============================================== */
 .ji-mega-menu {
     position: absolute;
     top: 100%;
     left: 0;
     right: 0;
-    width: 100vw;
-    background: var(--gov-white);
-    border-top: none;
-    padding: 32px 0 40px;
+    width: 100%;
+    background: var(--h-paper-bg);
+    background-image: var(--h-paper-texture);
+    padding: 0;
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-4px);
-    transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+    transform: translateY(-5px);
+    transition: all var(--h-transition);
     pointer-events: none;
-    box-shadow: 0 20px 50px rgba(13, 42, 82, 0.15);
+    box-shadow: var(--h-shadow-lg);
     z-index: 9998;
+    border-bottom: 4px solid var(--h-accent-gold);
+    border-top: 1px solid var(--h-gray-200);
 }
 
 .ji-nav-item.menu-active .ji-mega-menu {
@@ -427,340 +346,248 @@ button.ji-nav-link span {
 }
 
 .ji-mega-menu-inner {
-    max-width: var(--max-width);
+    max-width: var(--h-max-width);
     margin: 0 auto;
-    padding: 0 24px;
+    padding: 0;
 }
 
 .ji-mega-menu-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 28px;
-    padding-bottom: 20px;
-    border-bottom: 3px solid var(--gov-gold);
-    background: linear-gradient(to right, rgba(13, 42, 82, 0.03) 0%, transparent 100%);
-    padding: 16px 20px 20px;
-    margin: -16px -20px 28px;
-    border-radius: 8px 8px 0 0;
-}
-
-.ji-mega-menu-title {
-    color: var(--gov-navy);
-    font-size: 1.25rem;
-    font-weight: 700;
+    background: var(--h-paper-dark);
+    padding: 16px 32px;
+    border-bottom: 1px solid var(--h-gray-300);
     display: flex;
     align-items: center;
     gap: 12px;
 }
 
-.ji-mega-menu-title i { 
-    color: var(--gov-gold); 
+.ji-mega-menu-title {
+    font-family: var(--h-font-heading);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--h-ink-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.ji-mega-menu-stats { 
-    display: flex; 
-    gap: 32px; 
-}
-
-.ji-mega-stat { text-align: center; }
-
-.ji-mega-stat-value {
-    color: var(--gov-navy);
-    font-size: 1.5rem;
-    font-weight: 800;
-    display: block;
-    letter-spacing: -0.02em;
-}
-
-.ji-mega-stat-label {
-    color: var(--gov-gray-500);
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+.ji-mega-menu-title i {
+    color: var(--h-accent-gold);
 }
 
 .ji-mega-menu-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 40px;
+    gap: 0;
+    background: var(--h-paper-bg);
 }
 
-.ji-mega-column { display: flex; flex-direction: column; }
+.ji-mega-column {
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    border-right: 1px dashed var(--h-gray-300);
+}
+
+.ji-mega-column:last-child {
+    border-right: none;
+}
+
+.ji-mega-column--prefectures {
+    background: var(--h-paper-dark);
+}
 
 .ji-mega-column-title {
-    color: var(--gov-navy);
-    font-size: 0.875rem;
+    font-family: var(--h-font-sans);
+    font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.1em;
+    color: var(--h-ink-light);
     margin-bottom: 16px;
-    padding: 10px 14px;
-    background: linear-gradient(135deg, var(--gov-navy) 0%, var(--gov-navy-light) 100%);
-    color: var(--gov-white);
-    border-radius: 6px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--h-accent-gold);
     display: flex;
     align-items: center;
     gap: 8px;
-    position: relative;
+    text-transform: uppercase;
 }
 
-.ji-mega-column-title::before {
-    content: '';
-    width: 4px;
-    height: 100%;
-    background: var(--gov-gold);
-    position: absolute;
-    left: 0;
-    top: 0;
-    border-radius: 6px 0 0 6px;
+.ji-mega-links {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .ji-mega-link {
     display: flex;
     align-items: center;
-    gap: 10px;
-    color: var(--gov-text-primary);
-    font-size: 0.9375rem;
+    color: var(--h-ink-primary);
+    font-family: var(--h-font-serif);
+    font-size: 14px;
     font-weight: 500;
-    padding: 12px 16px;
-    margin: 4px -16px;
-    border-radius: 8px;
-    transition: all var(--transition);
-    min-height: 48px;
-    position: relative;
+    padding: 8px 12px;
+    border-radius: var(--h-radius);
+    transition: all var(--h-transition);
     text-decoration: none;
-    border: 1px solid transparent;
 }
 
-.ji-mega-link::before {
-    content: '';
-    width: 6px;
-    height: 6px;
-    background: var(--gov-gold);
-    border-radius: 50%;
-    flex-shrink: 0;
-    transition: all var(--transition);
+.ji-mega-link:hover {
+    background: var(--h-paper-dark);
+    color: var(--h-accent-gold);
+    padding-left: 16px;
 }
 
-.ji-mega-link:hover,
-.ji-mega-link:focus-visible {
-    color: var(--gov-navy);
-    background: linear-gradient(135deg, var(--gov-gray-50) 0%, rgba(197, 160, 89, 0.08) 100%);
-    border-color: var(--gov-gold);
-    transform: translateX(4px);
+.ji-mega-link-text {
+    position: relative;
 }
 
-.ji-mega-link:hover::before {
-    background: var(--gov-navy);
-    transform: scale(1.3);
+.ji-mega-link:hover .ji-mega-link-text::before {
+    content: '>';
+    position: absolute;
+    left: -12px;
+    color: var(--h-accent-gold);
 }
 
-.ji-mega-link:focus-visible {
-    outline: 2px solid var(--gov-navy);
-    outline-offset: 2px;
-}
-
-.ji-mega-link .ji-badge {
-    background: var(--gov-danger);
-    color: var(--gov-white);
-    font-size: 0.625rem;
-    font-weight: 700;
-    padding: 3px 8px;
-    border-radius: 4px;
-    margin-left: auto;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-}
-
-.ji-mega-link .ji-badge.new { 
-    background: var(--gov-success); 
-}
-
+/* Prefecture Grid */
 .ji-prefecture-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 4px 8px;
-    max-height: 320px;
+    gap: 6px;
+    max-height: 280px;
     overflow-y: auto;
-    padding-right: 8px;
-    margin: 0 -8px;
-}
-
-.ji-prefecture-grid::-webkit-scrollbar { width: 6px; }
-.ji-prefecture-grid::-webkit-scrollbar-track {
-    background: var(--gov-gray-100);
-    border-radius: 9999px;
-}
-.ji-prefecture-grid::-webkit-scrollbar-thumb {
-    background: var(--gov-gray-300);
-    border-radius: 9999px;
-}
-.ji-prefecture-grid::-webkit-scrollbar-thumb:hover {
-    background: var(--gov-gray-400);
 }
 
 .ji-prefecture-link {
-    color: var(--gov-text-secondary);
-    font-size: 0.8125rem;
-    font-weight: 500;
-    padding: 10px 12px;
-    border-radius: 6px;
-    transition: all var(--transition);
+    color: var(--h-ink-light);
+    font-family: var(--h-font-sans);
+    font-size: 12px;
+    padding: 6px 4px;
     text-align: center;
-    min-height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    border: 1px solid var(--h-gray-300);
+    background: var(--h-white);
+    border-radius: var(--h-radius);
+    transition: all var(--h-transition);
     text-decoration: none;
-    border: 1px solid var(--gov-gray-200);
-    background: var(--gov-white);
 }
 
-.ji-prefecture-link:hover,
-.ji-prefecture-link:focus-visible {
-    color: var(--gov-white);
-    background: var(--gov-navy);
-    border-color: var(--gov-navy);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(13, 42, 82, 0.2);
+.ji-prefecture-link:hover {
+    border-color: var(--h-highlight-blue);
+    color: var(--h-highlight-blue);
+    background: var(--h-white);
 }
 
-.ji-prefecture-link:focus-visible {
-    outline: 2px solid var(--gov-navy);
-    outline-offset: 1px;
+@media (max-width: 1279px) {
+    .ji-mega-menu-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .ji-mega-column--prefectures {
+        grid-column: span 2;
+    }
+    .ji-prefecture-grid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
+
+@media (max-width: 1023px) {
+    .ji-mega-menu {
+        display: none;
+    }
 }
 
 /* ===============================================
-   HEADER ACTIONS
+   ACTIONS (Search, Mobile Toggle)
    =============================================== */
 .ji-actions {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
     flex-shrink: 0;
 }
 
-@media (min-width: 768px) { .ji-actions { gap: 12px; } }
-
-.ji-btn {
-    display: inline-flex;
+/* Icon Buttons */
+.ji-btn-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 10px 18px;
-    border-radius: 6px;
-    font-size: 0.875rem;
-    font-weight: 600;
-    transition: all var(--transition);
-    white-space: nowrap;
-    min-height: 44px;
-    text-decoration: none;
-}
-
-.ji-btn:focus-visible {
-    outline: 2px solid var(--gov-gold);
-    outline-offset: 2px;
-}
-
-.ji-btn-icon {
-    width: 44px;
-    height: 44px;
-    padding: 0;
-    color: var(--gov-white);
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: var(--h-ink-primary);
+    font-size: 18px;
+    transition: color var(--h-transition);
 }
 
 .ji-btn-icon:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.5);
+    color: var(--h-accent-gold);
 }
 
-.ji-btn-primary {
-    background: var(--gov-gold);
-    color: var(--gov-navy-dark);
-    display: none;
-    font-weight: 700;
-}
-
-@media (min-width: 768px) { .ji-btn-primary { display: inline-flex; } }
-
-.ji-btn-primary:hover {
-    background: var(--gov-gold-light);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(197, 160, 89, 0.4);
-}
-
+/* Mobile Toggle */
 .ji-mobile-toggle {
     display: flex;
-    width: 44px;
-    height: 44px;
-    color: var(--gov-white);
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 6px;
-    align-items: center;
+    flex-direction: column;
     justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    color: var(--h-ink-primary);
+    gap: 6px;
 }
 
-@media (min-width: 1024px) { .ji-mobile-toggle { display: none; } }
-
-.ji-mobile-toggle:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.5);
-}
-
-.ji-mobile-toggle:focus-visible {
-    outline: 2px solid var(--gov-gold);
-    outline-offset: 2px;
+@media (min-width: 1024px) {
+    .ji-mobile-toggle {
+        display: none;
+    }
 }
 
 .ji-hamburger {
-    width: 20px;
-    height: 14px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    width: 24px;
+    height: 2px;
+    background: currentColor;
+    transition: all var(--h-transition);
+    position: relative;
 }
 
-.ji-hamburger-line {
+.ji-hamburger::before,
+.ji-hamburger::after {
+    content: '';
+    position: absolute;
+    left: 0;
     width: 100%;
     height: 2px;
     background: currentColor;
-    border-radius: 9999px;
-    transition: all var(--transition);
-    transform-origin: center;
+    transition: all var(--h-transition);
 }
 
-.ji-mobile-toggle[aria-expanded="true"] .ji-hamburger-line:nth-child(1) {
-    transform: translateY(6px) rotate(45deg);
+.ji-hamburger::before { top: -8px; }
+.ji-hamburger::after { top: 8px; }
+
+.ji-mobile-toggle[aria-expanded="true"] .ji-hamburger {
+    background: transparent;
 }
-.ji-mobile-toggle[aria-expanded="true"] .ji-hamburger-line:nth-child(2) {
-    opacity: 0;
-    transform: scaleX(0);
+.ji-mobile-toggle[aria-expanded="true"] .ji-hamburger::before {
+    transform: rotate(45deg);
+    top: 0;
 }
-.ji-mobile-toggle[aria-expanded="true"] .ji-hamburger-line:nth-child(3) {
-    transform: translateY(-6px) rotate(-45deg);
+.ji-mobile-toggle[aria-expanded="true"] .ji-hamburger::after {
+    transform: rotate(-45deg);
+    top: 0;
 }
 
 /* ===============================================
-   SEARCH PANEL
+   SEARCH PANEL - Card Style
    =============================================== */
 .ji-search-panel {
     position: absolute;
     top: 100%;
     left: 0;
     right: 0;
-    background: var(--gov-white);
-    border-top: none;
-    box-shadow: 0 20px 50px rgba(13, 42, 82, 0.15);
-    padding: 28px 0;
+    background: var(--h-paper-bg);
+    background-image: var(--h-paper-texture);
+    border-top: 1px solid var(--h-gray-300);
+    box-shadow: var(--h-shadow-lg);
+    padding: 32px 0;
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px);
-    transition: all 0.25s ease;
-    pointer-events: none;
+    transition: all var(--h-transition);
     z-index: 9997;
 }
 
@@ -768,172 +595,114 @@ button.ji-nav-link span {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
-    pointer-events: auto;
 }
 
 .ji-search-panel-inner {
-    max-width: var(--max-width);
+    max-width: 800px;
     margin: 0 auto;
-    padding: 0 24px;
+    padding: 24px;
+    background: var(--h-white);
+    border: 1px solid var(--h-gray-300);
+    border-radius: 2px;
+    box-shadow: var(--h-shadow-book);
+    position: relative;
+}
+
+/* Binder Hole Decoration */
+.ji-search-panel-inner::before {
+    content: '';
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    width: 10px;
+    height: 10px;
+    background: var(--h-gray-300);
+    border-radius: 50%;
+    box-shadow: inset 1px 1px 2px rgba(0,0,0,0.2);
+}
+.ji-search-panel-inner::after {
+    content: '';
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    width: 10px;
+    height: 10px;
+    background: var(--h-gray-300);
+    border-radius: 50%;
+    box-shadow: inset 1px 1px 2px rgba(0,0,0,0.2);
 }
 
 .ji-search-form {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    padding-left: 24px;
 }
 
-@media (min-width: 768px) {
-    .ji-search-form { flex-direction: row; align-items: flex-start; }
+.ji-search-main {
+    position: relative;
 }
 
-.ji-search-main { flex: 1; }
-
-.ji-search-input-wrapper { position: relative; }
+.ji-search-input-wrapper {
+    position: relative;
+}
 
 .ji-search-input {
     width: 100%;
-    padding: 16px 20px 16px 52px;
-    border: 2px solid var(--gov-gray-200);
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 500;
-    color: var(--gov-text-primary);
-    background: var(--gov-white);
-    transition: all var(--transition);
-    min-height: 56px;
-}
-
-.ji-search-input:hover {
-    border-color: var(--gov-gray-300);
+    padding: 12px 16px 12px 44px;
+    border: 1px solid var(--h-gray-400);
+    border-radius: var(--h-radius);
+    font-family: var(--h-font-sans);
+    font-size: 15px;
+    color: var(--h-ink-primary);
+    background: var(--h-paper-bg);
+    transition: all var(--h-transition);
 }
 
 .ji-search-input:focus {
     outline: none;
-    border-color: var(--gov-navy);
-    box-shadow: 0 0 0 4px rgba(13, 42, 82, 0.1);
+    border-color: var(--h-accent-gold);
+    background: var(--h-white);
 }
-
-.ji-search-input::placeholder { color: var(--gov-gray-400); }
 
 .ji-search-icon {
     position: absolute;
-    left: 18px;
+    left: 14px;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--gov-gray-500);
-    font-size: 1.125rem;
-    pointer-events: none;
-}
-
-.ji-search-clear {
-    position: absolute;
-    right: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--gov-gray-400);
-    padding: 8px;
-    opacity: 0;
-    visibility: hidden;
-    transition: all var(--transition);
-    border-radius: 6px;
-}
-
-.ji-search-input:not(:placeholder-shown) ~ .ji-search-clear {
-    opacity: 1;
-    visibility: visible;
-}
-
-.ji-search-clear:hover {
-    color: var(--gov-gray-600);
-    background: var(--gov-gray-100);
+    color: var(--h-gray-400);
 }
 
 .ji-search-suggestions {
-    margin-top: 14px;
+    margin-top: 12px;
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
     align-items: center;
 }
 
 .ji-search-suggestion-label {
-    color: var(--gov-gray-600);
-    font-size: 0.8125rem;
-    font-weight: 600;
+    font-family: var(--h-font-sans);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--h-accent-gold);
 }
 
 .ji-search-suggestion {
-    background: var(--gov-gray-100);
-    color: var(--gov-gray-700);
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-size: 0.8125rem;
-    font-weight: 600;
-    transition: all var(--transition);
-    cursor: pointer;
-    min-height: 36px;
-    border: 1px solid var(--gov-gray-200);
+    background: var(--h-paper-dark);
+    color: var(--h-ink-light);
+    padding: 4px 10px;
+    border-radius: var(--h-radius);
+    font-size: 12px;
+    border: 1px solid var(--h-gray-300);
+    text-decoration: none;
+    transition: all var(--h-transition);
 }
 
 .ji-search-suggestion:hover {
-    background: var(--gov-gray-200);
-    color: var(--gov-navy);
-    border-color: var(--gov-gray-300);
-}
-
-.ji-search-filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-}
-
-.ji-search-select {
-    padding: 14px 36px 14px 16px;
-    border: 2px solid var(--gov-gray-200);
-    border-radius: 8px;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--gov-gray-700);
-    background: var(--gov-white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23475569' d='M6 8L1 3h10z'/%3E%3C/svg%3E") no-repeat right 14px center;
-    appearance: none;
-    min-width: 160px;
-    cursor: pointer;
-    transition: all var(--transition);
-    min-height: 52px;
-}
-
-.ji-search-select:hover { border-color: var(--gov-gray-300); }
-.ji-search-select:focus {
-    outline: none;
-    border-color: var(--gov-navy);
-    box-shadow: 0 0 0 4px rgba(13, 42, 82, 0.1);
-}
-
-.ji-search-submit {
-    background: var(--gov-navy);
-    color: var(--gov-white);
-    padding: 14px 28px;
-    border-radius: 8px;
-    font-size: 0.9375rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all var(--transition);
-    min-height: 52px;
-    border: none;
-}
-
-.ji-search-submit:hover {
-    background: var(--gov-navy-dark);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(13, 42, 82, 0.3);
-}
-
-.ji-search-submit:focus-visible {
-    outline: 2px solid var(--gov-gold);
-    outline-offset: 2px;
+    background: var(--h-white);
+    border-color: var(--h-accent-gold);
+    color: var(--h-accent-gold);
 }
 
 /* ===============================================
@@ -942,7 +711,8 @@ button.ji-nav-link span {
 .ji-mobile-menu {
     position: fixed;
     inset: 0;
-    background: var(--gov-navy);
+    background: var(--h-paper-bg);
+    background-image: var(--h-paper-texture);
     z-index: 99999;
     opacity: 0;
     visibility: hidden;
@@ -951,108 +721,87 @@ button.ji-nav-link span {
     -webkit-overflow-scrolling: touch;
 }
 
-.ji-mobile-menu.open { opacity: 1; visibility: visible; }
+.ji-mobile-menu.open {
+    opacity: 1;
+    visibility: visible;
+}
 
 .ji-mobile-menu-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 16px 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    border-bottom: 1px solid var(--h-gray-300);
     position: sticky;
     top: 0;
-    background: var(--gov-navy);
+    background: rgba(253, 251, 247, 0.95);
+    backdrop-filter: blur(5px);
     z-index: 10;
 }
 
 .ji-mobile-logo {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
 
 .ji-mobile-logo-icon {
     width: 32px;
     height: 32px;
-    border-radius: 6px;
+    background-color: var(--h-book-cover);
+    color: var(--h-accent-gold);
+    border-radius: 2px;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
-}
-
-.ji-mobile-logo-icon img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
+    font-family: var(--h-font-heading);
+    font-weight: 700;
+    font-size: 16px;
 }
 
 .ji-mobile-logo-text {
-    color: var(--gov-white);
-    font-size: 1rem;
+    font-family: var(--h-font-heading);
     font-weight: 700;
+    font-size: 16px;
+    color: var(--h-ink-primary);
 }
 
 .ji-mobile-close {
-    width: 44px;
-    height: 44px;
-    color: var(--gov-white);
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.25rem;
-    border-radius: 6px;
-    transition: all var(--transition);
-}
-
-.ji-mobile-close:hover {
-    background: rgba(255, 255, 255, 0.1);
+    color: var(--h-ink-primary);
+    border: 1px solid var(--h-gray-300);
+    border-radius: var(--h-radius);
 }
 
 .ji-mobile-search {
     padding: 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid var(--h-gray-200);
 }
-
-.ji-mobile-search-wrapper { position: relative; }
 
 .ji-mobile-search-input {
     width: 100%;
-    padding: 14px 18px 14px 48px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    border-radius: 8px;
-    color: var(--gov-white);
-    font-size: 1rem;
-    font-weight: 500;
-    min-height: 52px;
-    transition: all var(--transition);
-}
-
-.ji-mobile-search-input::placeholder { color: rgba(255, 255, 255, 0.6); }
-
-.ji-mobile-search-input:focus {
-    outline: none;
-    background: rgba(255, 255, 255, 0.15);
-    border-color: var(--gov-gold);
+    padding: 12px 16px 12px 40px;
+    background: var(--h-white);
+    border: 1px solid var(--h-gray-300);
+    border-radius: var(--h-radius);
+    color: var(--h-ink-primary);
+    font-size: 14px;
 }
 
 .ji-mobile-search-icon {
     position: absolute;
-    left: 16px;
+    left: 32px;
     top: 50%;
     transform: translateY(-50%);
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 1rem;
-    pointer-events: none;
+    color: var(--h-gray-400);
 }
 
-.ji-mobile-content { padding: 20px; }
-
-.ji-mobile-section { margin-bottom: 24px; }
-
-.ji-mobile-accordion {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+.ji-mobile-content {
+    padding: 0;
 }
 
 .ji-mobile-accordion-trigger {
@@ -1060,432 +809,90 @@ button.ji-nav-link span {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 18px 0;
-    color: var(--gov-white);
-    font-size: 1.0625rem;
+    padding: 16px 20px;
+    color: var(--h-ink-primary);
+    font-family: var(--h-font-serif);
     font-weight: 600;
-    text-align: left;
-    min-height: 60px;
-    transition: all var(--transition);
-    background: transparent;
-    border: none;
-}
-
-.ji-mobile-accordion-trigger:hover {
-    color: rgba(255, 255, 255, 0.85);
-}
-
-.ji-mobile-accordion-trigger i {
-    color: var(--gov-gold);
-    font-size: 0.75rem;
-    transition: transform var(--transition);
-}
-
-.ji-mobile-accordion-trigger[aria-expanded="true"] i {
-    transform: rotate(180deg);
+    border-bottom: 1px solid var(--h-gray-200);
+    background: var(--h-paper-bg);
 }
 
 .ji-mobile-accordion-content {
     display: none;
-    padding-bottom: 16px;
+    background: var(--h-white);
 }
 
 .ji-mobile-accordion-content.open {
     display: block;
-    animation: slideDown 0.25s ease;
-}
-
-@keyframes slideDown {
-    from { opacity: 0; transform: translateY(-8px); }
-    to { opacity: 1; transform: translateY(0); }
 }
 
 .ji-mobile-link {
-    display: flex;
-    align-items: center;
-    color: rgba(255, 255, 255, 0.85);
-    font-size: 1rem;
-    font-weight: 500;
-    padding: 14px 16px;
-    margin: 0 -16px;
-    border-radius: 6px;
-    transition: all var(--transition);
-    min-height: 52px;
+    display: block;
+    padding: 12px 20px 12px 40px;
+    color: var(--h-ink-light);
+    font-family: var(--h-font-sans);
+    font-size: 13px;
     text-decoration: none;
+    border-bottom: 1px solid var(--h-gray-100);
+    position: relative;
 }
 
 .ji-mobile-link::before {
-    content: '›';
-    color: var(--gov-gold);
-    font-size: 1.125rem;
-    font-weight: 700;
-    margin-right: 10px;
-}
-
-.ji-mobile-link:hover {
-    color: var(--gov-white);
-    background: rgba(255, 255, 255, 0.08);
+    content: '*';
+    position: absolute;
+    left: 24px;
+    color: var(--h-accent-gold);
 }
 
 .ji-mobile-single-link {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 18px 0;
-    color: var(--gov-white);
-    font-size: 1.0625rem;
+    padding: 16px 20px;
+    color: var(--h-ink-primary);
+    font-family: var(--h-font-serif);
     font-weight: 600;
-    text-align: left;
-    min-height: 60px;
-    transition: all var(--transition);
     text-decoration: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.ji-mobile-single-link:hover {
-    color: rgba(255, 255, 255, 0.85);
+    border-bottom: 1px solid var(--h-gray-200);
 }
 
 .ji-mobile-single-link i {
-    color: var(--gov-gold);
-    font-size: 0.75rem;
-}
-
-.ji-mobile-cta {
-    background: var(--gov-gold);
-    color: var(--gov-navy-dark);
-    padding: 18px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    font-weight: 700;
-    font-size: 1rem;
-    margin-top: 24px;
-    transition: all var(--transition);
-    min-height: 60px;
-    text-decoration: none;
-}
-
-.ji-mobile-cta:hover {
-    background: var(--gov-gold-light);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(197, 160, 89, 0.4);
-}
-
-.ji-mobile-stats {
-    display: flex;
-    justify-content: center;
-    gap: 40px;
-    padding: 28px 0;
-    margin-top: 24px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.ji-mobile-stat { text-align: center; }
-.ji-mobile-stat-value {
-    color: var(--gov-white);
-    font-size: 1.75rem;
-    font-weight: 800;
-    display: block;
-    letter-spacing: -0.02em;
-}
-.ji-mobile-stat-label {
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.ji-mobile-footer {
-    padding: 28px 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-right: 12px;
+    color: var(--h-accent-gold);
+    width: 20px;
     text-align: center;
 }
 
-.ji-mobile-social {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    margin-bottom: 20px;
-}
-
-.ji-mobile-social-link {
-    width: 48px;
-    height: 48px;
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--gov-white);
-    border-radius: 8px;
+.ji-mobile-cta {
+    margin: 24px 20px;
+    background: var(--h-ink-primary);
+    color: var(--h-white);
+    padding: 14px;
+    border-radius: var(--h-radius);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.125rem;
-    transition: all var(--transition);
+    gap: 8px;
+    font-weight: 700;
     text-decoration: none;
+    box-shadow: var(--h-shadow-book);
 }
 
-.ji-mobile-social-link:hover {
-    background: var(--gov-gold);
-    color: var(--gov-navy-dark);
-    transform: translateY(-2px);
+.ji-mobile-footer {
+    padding: 32px 20px;
+    background: var(--h-book-cover);
+    color: var(--h-gray-300);
+    text-align: center;
 }
-
-.ji-mobile-trust {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 12px;
-    margin-bottom: 20px;
-}
-
-.ji-mobile-trust-badge {
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--gov-white);
-    padding: 6px 14px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.ji-mobile-trust-badge i { color: var(--gov-gold); }
 
 .ji-mobile-copyright {
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 0.8125rem;
-}
-
-/* ===============================================
-   ACCESSIBILITY & UTILITIES
-   =============================================== */
-.sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-}
-
-body.menu-open {
-    overflow: hidden;
-    position: fixed;
-    width: 100%;
-    height: 100%;
-}
-
-:focus-visible {
-    outline: 2px solid var(--gov-gold);
-    outline-offset: 2px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        transition-duration: 0.01ms !important;
-    }
-}
-
-/* ===============================================
-   FONT SIZE ADJUSTMENTS (文字サイズ変更対応)
-   =============================================== */
-html.font-size-small {
-    font-size: 14px;
-}
-
-html.font-size-large {
-    font-size: 18px;
-}
-
-/* ==========================================================================
-   📚 補助金図鑑 - 本・辞典スタイル要素（ヘッダー用）
-   ========================================================================== */
-
-/* ヘッダーロゴの図鑑スタイル */
-.ji-logo-zukan {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.ji-logo-zukan-icon {
-    width: 36px;
-    height: 36px;
-    flex-shrink: 0;
-}
-
-.ji-logo-zukan-icon svg {
-    width: 100%;
-    height: 100%;
-}
-
-.ji-logo-zukan-text {
-    display: flex;
-    flex-direction: column;
-}
-
-.ji-logo-zukan-label {
-    font-family: var(--gov-font-mono);
-    font-size: 9px;
-    font-weight: 700;
-    color: var(--gov-gold);
-    letter-spacing: 0.12em;
-}
-
-.ji-logo-zukan-name {
-    font-family: var(--gov-font-serif);
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--gov-white);
+    font-family: var(--h-font-sans);
+    font-size: 11px;
     letter-spacing: 0.05em;
 }
 
-/* ナビゲーションの図鑑風スタイル */
-.ji-nav-zukan-item {
-    position: relative;
-    padding-left: 12px;
-}
-
-.ji-nav-zukan-item::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 3px;
-    height: 16px;
-    background: var(--gov-gold);
-    border-radius: 2px;
-    opacity: 0;
-    transition: opacity var(--gov-transition);
-}
-
-.ji-nav-zukan-item:hover::before,
-.ji-nav-zukan-item.active::before {
-    opacity: 1;
-}
-
-/* メガメニューの図鑑風ヘッダー */
-.ji-mega-zukan-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 16px;
-    background: linear-gradient(135deg, var(--gov-navy-800) 0%, var(--gov-navy-900) 100%);
-    border-radius: var(--gov-radius-lg) var(--gov-radius-lg) 0 0;
-    border-bottom: 3px solid var(--gov-gold);
-}
-
-.ji-mega-zukan-icon {
-    width: 32px;
-    height: 32px;
-}
-
-.ji-mega-zukan-icon svg {
-    width: 100%;
-    height: 100%;
-}
-
-.ji-mega-zukan-title {
-    font-family: var(--gov-font-serif);
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--gov-white);
-}
-
-.ji-mega-zukan-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 3px 8px;
-    background: var(--gov-gold);
-    color: var(--gov-navy-900);
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    border-radius: 2px;
-    margin-left: auto;
-}
-
-.ji-mega-zukan-badge svg {
-    width: 10px;
-    height: 10px;
-}
-
-/* モバイルメニューの図鑑スタイル */
-.ji-mobile-zukan-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 16px 20px;
-    background: linear-gradient(135deg, var(--gov-navy-800) 0%, var(--gov-navy-900) 100%);
-    border-bottom: 3px solid var(--gov-gold);
-}
-
-.ji-mobile-zukan-icon {
-    width: 40px;
-    height: 40px;
-}
-
-.ji-mobile-zukan-icon svg {
-    width: 100%;
-    height: 100%;
-}
-
-.ji-mobile-zukan-content {
-    flex: 1;
-}
-
-.ji-mobile-zukan-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 3px 8px;
-    background: var(--gov-gold);
-    color: var(--gov-navy-900);
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    border-radius: 2px;
-    margin-bottom: 4px;
-}
-
-.ji-mobile-zukan-label svg {
-    width: 10px;
-    height: 10px;
-}
-
-.ji-mobile-zukan-title {
-    font-family: var(--gov-font-serif);
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--gov-white);
-}
-
-/* 図鑑風しおりリボン（ヘッダー用） */
-.ji-header-ribbon {
-    position: absolute;
-    top: 100%;
-    right: 24px;
-    width: 28px;
-    height: 48px;
-    background: linear-gradient(180deg, var(--gov-gold) 0%, #b8941f 100%);
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 85%, 0 100%);
-    box-shadow: 1px 2px 6px rgba(0,0,0,0.2);
-    z-index: 5;
-}
-
-@media (max-width: 768px) {
-    .ji-header-ribbon {
-        width: 22px;
-        height: 36px;
-        right: 16px;
-    }
+/* ===============================================
+   BODY CLASS HELPERS
+   =============================================== */
+body.menu-open {
+    overflow: hidden;
 }

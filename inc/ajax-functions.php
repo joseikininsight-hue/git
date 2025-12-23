@@ -3384,7 +3384,7 @@ if (!function_exists('gi_render_card_unified')) {
         $current_view = $view;
         
         ob_start();
-        get_template_part('template-parts/grant-card-unified');
+        include(get_template_directory() . '/template-parts/grant/card-zukan.php');
         $output = ob_get_clean();
         
         // デバッグ: テンプレート出力をログに記録
@@ -4610,9 +4610,9 @@ function gi_load_grants() {
             $GLOBALS['current_view'] = $view;
             $GLOBALS['user_favorites'] = $user_favorites;
             
-            // Capture template output
+            // Capture template output - using new zukan card
             ob_start();
-            get_template_part('template-parts/grant-card-unified');
+            include(get_template_directory() . '/template-parts/grant/card-zukan.php');
             $html = ob_get_clean();
             
             $grants[] = [
