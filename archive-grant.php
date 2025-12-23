@@ -21,10 +21,14 @@ get_header();
 $template_dir = get_template_directory();
 $template_uri = get_template_directory_uri();
 $css_file = $template_dir . '/assets/css/archive-common.css';
+$zukan_css_file = $template_dir . '/assets/css/archive-zukan.css';
 $js_file = $template_dir . '/assets/js/archive-common.js';
 ?>
 <?php if (file_exists($css_file) && !wp_style_is('gi-archive-common', 'done')): ?>
 <link rel="stylesheet" href="<?php echo esc_url($template_uri . '/assets/css/archive-common.css?ver=' . filemtime($css_file)); ?>" media="all">
+<?php endif; ?>
+<?php if (file_exists($zukan_css_file)): ?>
+<link rel="stylesheet" href="<?php echo esc_url($template_uri . '/assets/css/archive-zukan.css?ver=' . filemtime($zukan_css_file)); ?>" media="all">
 <?php endif; ?>
 <?php
 
@@ -240,27 +244,19 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
 </script>
 <?php endif; // End SEO plugin check ?>
 
-<main class="grant-archive-yahoo-style" 
+<main class="grant-archive-yahoo-style zukan-archive" 
       id="grant-archive" 
       role="main"
       itemscope 
       itemtype="https://schema.org/CollectionPage">
 
-    <!-- 📚 本・図鑑風パンくずリスト -->
+    <!-- シンプルなパンくずリスト -->
     <nav class="breadcrumb-nav book-breadcrumb" 
          aria-label="パンくずリスト" 
          itemscope 
          itemtype="https://schema.org/BreadcrumbList">
-        <div class="book-breadcrumb-spine"></div>
         <div class="yahoo-container">
             <div class="book-breadcrumb-inner">
-                <div class="book-breadcrumb-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-                        <path d="M8 7h8M8 11h5"/>
-                    </svg>
-                </div>
                 <ol class="breadcrumb-list">
                     <?php foreach ($breadcrumbs as $index => $breadcrumb): ?>
                     <li class="breadcrumb-item" 
@@ -272,17 +268,11 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                                itemprop="item"
                                class="book-breadcrumb-link"
                                title="<?php echo esc_attr($breadcrumb['name']); ?>へ移動">
-                                <span class="book-breadcrumb-chapter">第<?php echo $index + 1; ?>章</span>
-                                <span itemprop="name" class="book-breadcrumb-text"><?php echo esc_html($breadcrumb['name']); ?></span>
+                                <span itemprop="name"><?php echo esc_html($breadcrumb['name']); ?></span>
                             </a>
-                            <span class="book-breadcrumb-sep" aria-hidden="true">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
-                            </span>
+                            <span class="book-breadcrumb-sep" aria-hidden="true">&gt;</span>
                         <?php else: ?>
-                            <span class="book-breadcrumb-current">
-                                <span class="book-breadcrumb-chapter">本ページ</span>
-                                <span itemprop="name" class="book-breadcrumb-text"><?php echo esc_html($breadcrumb['name']); ?></span>
-                            </span>
+                            <span class="book-breadcrumb-current" itemprop="name"><?php echo esc_html($breadcrumb['name']); ?></span>
                         <?php endif; ?>
                         <meta itemprop="position" content="<?php echo $index + 1; ?>">
                     </li>
@@ -292,124 +282,73 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
         </div>
     </nav>
 
-    <!-- ヒーローセクション（図鑑式・横長レイアウト） -->
-    <header class="yahoo-hero-section" 
-            itemscope 
-            itemtype="https://schema.org/WPHeader">
+    <!-- ヒーローセクション - シンプルなSEOテキストベース -->
+    <section class="zukan-hero zukan-hero-simple">
         <div class="yahoo-container">
-            <div class="hero-content-wrapper">
-                <div class="hero-encyclopedia-layout">
-                    
-                    <!-- 左側：タイトル・説明 -->
-                    <div class="hero-main-info">
-                        <div class="hero-region-badge">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="11" cy="11" r="8"/>
-                                <path d="m21 21-4.35-4.35"/>
-                            </svg>
-                            <span>助成金・補助金検索</span>
-                        </div>
-                        <h1 class="hero-title-encyclopedia" itemprop="headline">
-                            <span class="hero-title-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-                                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-                                    <path d="M8 7h8M8 11h5"/>
-                                </svg>
-                            </span>
-                            <?php echo esc_html($archive_title); ?>
-                        </h1>
-                        <p class="hero-subtitle" itemprop="description">
-                            <?php echo esc_html($archive_description); ?>
-                        </p>
-                    </div>
-                    
-                    <!-- 中央：統計情報 -->
-                    <div class="hero-stats-area">
-                        <div class="hero-stat-card" itemscope itemtype="https://schema.org/QuantitativeValue">
-                            <span class="hero-stat-number" itemprop="value"><?php echo $total_grants_formatted; ?></span>
-                            <span class="hero-stat-label" itemprop="unitText">件の助成金</span>
-                        </div>
-                        <div class="hero-stat-card">
-                            <span class="hero-stat-number"><?php echo $current_year; ?></span>
-                            <span class="hero-stat-label">年度版</span>
-                        </div>
-                        <div class="hero-stat-card">
-                            <span class="hero-stat-number">47</span>
-                            <span class="hero-stat-label">都道府県対応</span>
-                        </div>
-                    </div>
-                    
-                    <!-- 右側：クイックリンク -->
-                    <div class="hero-action-area">
-                        <div class="hero-quick-links">
-                            <a href="<?php echo esc_url(add_query_arg('view', 'prefectures', get_post_type_archive_link('grant'))); ?>" class="hero-quick-link">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                                    <circle cx="12" cy="10" r="3"/>
-                                </svg>
-                                都道府県から探す
-                            </a>
-                            <a href="#filter-panel" class="hero-quick-link">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
-                                </svg>
-                                絞り込み検索
-                            </a>
-                        </div>
-                    </div>
-                    
+            <div class="zukan-hero-content">
+                <div class="zukan-hero-header">
+                    <span class="zukan-hero-label">Subsidy & Grant Archive</span>
+                    <h2 class="zukan-hero-title">助成金・補助金総合検索</h2>
+                    <p class="zukan-hero-subtitle-text">令和<?php echo date('Y') - 2018; ?>年度版</p>
+                </div>
+                <p class="zukan-hero-description">
+                    本アーカイブは、全国で事業を営む<strong>中小企業および個人事業主</strong>のために編纂されたものである。
+                    複雑怪奇な申請要件を紐解き、事業成長の糧となる「知」を提供する。
+                    多くの大型補助金（ものづくり補助金や事業再構築補助金など）で、「<strong>給与支給総額の年率増加</strong>」が
+                    必須要件、あるいは強力な加点項目となっている。「投資して、稼いで、社員に還元する」サイクルを描ける企業が採択を勝ち取れる。
+                </p>
+                <div class="zukan-hero-stats-simple">
+                    <span class="zukan-hero-stat">収録制度数：<strong><?php echo $total_grants_formatted; ?></strong>件以上</span>
+                    <span class="zukan-hero-stat-divider">|</span>
+                    <span class="zukan-hero-stat">毎日更新</span>
                 </div>
             </div>
         </div>
-    </header>
+    </section>
 
     <!-- 2カラムレイアウト -->
-    <div class="yahoo-container yahoo-two-column-layout">
+    <div class="yahoo-container yahoo-two-column-layout zukan-two-column">
         
         <!-- メインコンテンツ -->
-        <div class="yahoo-main-content">
+        <div class="yahoo-main-content zukan-main-content">
             
-            <!-- 検索バー -->
-            <section class="yahoo-search-section">
-                <div class="search-bar-wrapper">
-                    <label for="keyword-search" class="visually-hidden">キーワード検索</label>
-                    <div class="search-input-container">
-                        <svg class="search-icon" 
-                             width="20" 
-                             height="20" 
-                             viewBox="0 0 24 24" 
-                             fill="none" 
-                             stroke="currentColor" 
-                             stroke-width="2" 
-                             aria-hidden="true">
-                            <circle cx="11" cy="11" r="8"/>
-                            <path d="m21 21-4.35-4.35"/>
-                        </svg>
-                        <input type="text" 
-                               id="keyword-search" 
-                               class="search-input" 
-                               placeholder="助成金名、実施機関、対象事業で検索（スペース区切りでAND検索）..."
-                               aria-label="助成金を検索"
-                               autocomplete="off">
-                        <button class="search-clear-btn" 
-                                id="search-clear-btn" 
-                                style="display: none;" 
-                                aria-label="検索をクリア"
-                                type="button">×</button>
-                        <button class="search-execute-btn" 
-                                id="search-btn" 
-                                aria-label="検索を実行"
-                                type="button">検索</button>
-                    </div>
-                    <!-- 検索候補ドロップダウン -->
-                    <div class="search-suggestions" id="search-suggestions" style="display: none;">
-                        <div class="suggestions-header">検索候補</div>
-                        <ul class="suggestions-list" id="suggestions-list"></ul>
+            <?php 
+            // アーカイブSEOコンテンツ: おすすめ記事
+            if (function_exists('gi_output_archive_featured_posts')) {
+                gi_output_archive_featured_posts();
+            }
+            
+            // アーカイブSEOコンテンツ: イントロ
+            if (function_exists('gi_output_archive_intro_content')) {
+                gi_output_archive_intro_content();
+            }
+            ?>
+            
+            <!-- 統合された検索結果ヘッダー（イントロの後に配置） -->
+            <div class="results-header zukan-results-header unified-results-header">
+                <div class="results-header-main">
+                    <h1 class="results-title"><?php echo esc_html($archive_title); ?></h1>
+                    <div class="results-meta-unified">
+                        <span class="results-count-primary">
+                            条件に合致した制度：<strong id="current-count"><?php echo $total_grants_formatted; ?></strong> 件
+                        </span>
+                        <span class="results-separator">｜</span>
+                        <span class="results-showing" id="results-showing-range">
+                            <span id="showing-from">1</span>〜<span id="showing-to"><?php echo min(12, $total_grants); ?></span>件を表示
+                        </span>
                     </div>
                 </div>
-            </section>
-
+                <div class="view-controls">
+                    <label for="unified-sort-select" class="sort-label">並び替え:</label>
+                    <select id="unified-sort-select" class="sort-select-unified">
+                        <option value="date_desc">新着順</option>
+                        <option value="deadline_asc">締切が近い順</option>
+                        <option value="amount_desc">補助額が高い順</option>
+                        <option value="popular_desc">人気順</option>
+                    </select>
+                </div>
+            </div>
+            
             <!-- モバイル用フィルター開閉ボタン -->
             <button class="mobile-filter-toggle" id="mobile-filter-toggle" type="button" aria-label="フィルターを開く">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -858,52 +797,7 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
             </section>
 
             <!-- 検索結果セクション -->
-            <section class="yahoo-results-section">
-                
-                <!-- 結果ヘッダー（ページ遷移時のスクロール先） -->
-                <div class="results-header" id="results-header">
-                    <div class="results-info">
-                        <h2 class="results-title">検索結果</h2>
-                        <div class="results-meta">
-                            <span class="total-count">
-                                <strong id="current-count">0</strong>件
-                            </span>
-                            <span class="showing-range">
-                                （<span id="showing-from">1</span>〜<span id="showing-to">12</span>件を表示）
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="view-controls">
-                        <button class="view-btn active" 
-                                data-view="single" 
-                                title="単体表示" 
-                                type="button">
-                            <svg width="18" 
-                                 height="18" 
-                                 viewBox="0 0 24 24" 
-                                 fill="currentColor" 
-                                 aria-hidden="true">
-                                <rect x="2" y="2" width="20" height="20"/>
-                            </svg>
-                        </button>
-                        <button class="view-btn" 
-                                data-view="grid" 
-                                title="カード表示" 
-                                type="button">
-                            <svg width="18" 
-                                 height="18" 
-                                 viewBox="0 0 24 24" 
-                                 fill="currentColor" 
-                                 aria-hidden="true">
-                                <rect x="3" y="3" width="7" height="7"/>
-                                <rect x="14" y="3" width="7" height="7"/>
-                                <rect x="3" y="14" width="7" height="7"/>
-                                <rect x="14" y="14" width="7" height="7"/>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
+            <section class="yahoo-results-section" id="grants-results-section">
 
                 <!-- ローディング -->
                 <div class="loading-overlay" 
@@ -1059,9 +953,11 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                     
                     if ($initial_grants_query->have_posts()) :
                         $grant_count = 0; // インフィード広告用カウンター
+                        echo '<div class="zukan-list-container">';
                         while ($initial_grants_query->have_posts()) : 
                             $initial_grants_query->the_post();
-                            include(get_template_directory() . '/template-parts/grant-card-unified.php');
+                            // 図鑑スタイルのカードを使用
+                            include(get_template_directory() . '/template-parts/grant/card-zukan.php');
                             
                             $grant_count++;
                             
@@ -1074,12 +970,12 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                             <?php endif;
                             
                         endwhile;
+                        echo '</div>'; // End .zukan-list-container
                         wp_reset_postdata();
                     else :
-                        // 結果なしの場合
-                        echo '<div class="no-results-message" style="text-align: center; padding: 60px 20px;">';
-                        echo '<p style="font-size: 1.125rem; color: #666; margin-bottom: 20px;">該当する助成金が見つかりませんでした。</p>';
-                        echo '<p style="color: #999;">検索条件を変更して再度お試しください。</p>';
+                        // 結果なしの場合（図鑑スタイル）
+                        echo '<div class="zukan-empty-state">';
+                        echo '該当する項目はこの巻には記されていないようだ...';
                         echo '</div>';
                     endif;
                     ?>
@@ -1107,9 +1003,9 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                     </p>
                 </div>
 
-                <!-- ページネーション（都道府県一覧以外） -->
+                <!-- ページネーション（都道府県一覧以外）- 図鑑スタイル -->
                 <?php if (empty($url_params['view']) || $url_params['view'] !== 'prefectures'): ?>
-                <div class="pagination-wrapper" 
+                <div class="pagination-wrapper zukan-pagination" 
                      id="pagination-wrapper">
                     <?php
                     if (isset($initial_grants_query) && $initial_grants_query->max_num_pages > 1) {
@@ -1143,10 +1039,252 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                 </div>
                 <?php endif; ?>
             </section>
+            
+            <?php 
+            // アーカイブSEOコンテンツ: アウトロ
+            if (function_exists('gi_output_archive_outro_content')) {
+                gi_output_archive_outro_content();
+            }
+            ?>
+            
+            <!-- SEO解説記事セクション（図鑑スタイル - 原稿用紙風） -->
+            <?php 
+            // SEOコンテンツがある場合はカスタム内容を表示、なければデフォルト記事を表示
+            $show_default_article = true;
+            if (function_exists('gi_has_archive_seo_content')) {
+                $show_default_article = !gi_has_archive_seo_content();
+            }
+            
+            if ($show_default_article && ($is_category_archive || $is_prefecture_archive || is_post_type_archive('grant'))): 
+            ?>
+            <section class="zukan-article-section">
+                <header class="zukan-article-header">
+                    <span class="zukan-article-label">Editorial Guide</span>
+                    <h2 class="zukan-article-title">
+                        <?php if ($is_prefecture_archive): ?>
+                        <?php echo esc_html($current_category->name); ?>の助成金・補助金申請ガイド
+                        <?php elseif ($is_category_archive): ?>
+                        <?php echo esc_html($current_category->name); ?>の申請傾向と採択のポイント
+                        <?php else: ?>
+                        助成金・補助金の選び方と申請の基礎知識
+                        <?php endif; ?>
+                    </h2>
+                </header>
+                
+                <div class="zukan-article-content">
+                    <?php if ($is_prefecture_archive): ?>
+                    <h3>申請の傾向</h3>
+                    <p><?php echo esc_html($current_category->name); ?>では、地域の産業振興や中小企業支援を目的とした独自の助成金制度が充実しています。特に創業支援、事業承継、設備投資に関する支援が手厚く、申請件数も年々増加傾向にあります。審査では地域経済への貢献度や雇用創出効果が重視される傾向があります。</p>
+                    
+                    <h3>採択のポイント</h3>
+                    <p>採択率を高めるためには、事業計画の具体性と実現可能性が鍵となります。また、<?php echo esc_html($current_category->name); ?>の産業政策との整合性を示すことも重要です。申請書類では、数値目標を明確に設定し、その達成に向けた具体的なアクションプランを提示することをお勧めします。</p>
+                    
+                    <?php elseif ($is_category_archive): ?>
+                    <h3>この分野の特徴</h3>
+                    <p><?php echo esc_html($current_category->name); ?>関連の助成金は、技術革新や事業効率化を促進することを目的としています。近年は特にデジタル化やサステナビリティへの取り組みに対する支援が拡充されており、申請の機会が広がっています。補助率も比較的高く設定されているケースが多いのが特徴です。</p>
+                    
+                    <h3>申請時の注意点</h3>
+                    <p>この分野では、導入する技術や設備の先進性・革新性を明確に示すことが求められます。また、投資対効果（ROI）を具体的な数値で示し、事業の持続可能性についても説明することが採択への近道です。専門家のサポートを受けながら申請することをお勧めします。</p>
+                    
+                    <?php else: ?>
+                    <h3>助成金・補助金とは</h3>
+                    <p>助成金・補助金は、国や地方自治体、公的機関が事業者の取り組みを支援するために給付する資金です。融資と異なり返済不要なため、新規事業の立ち上げや設備投資、人材育成など、様々な経営課題の解決に活用できます。ただし、申請要件や使途に制限があるため、事前の確認が重要です。</p>
+                    
+                    <h3>申請の基本ステップ</h3>
+                    <p>まず、自社の事業計画に合致する制度を見つけることから始めます。公募要領を熟読し、対象要件や補助対象経費を確認した上で、事業計画書を作成します。審査では計画の実現可能性や効果が評価されるため、具体的かつ現実的な内容にすることが採択への鍵となります。</p>
+                    <?php endif; ?>
+                    
+                    <div class="zukan-article-note">
+                        <p class="zukan-article-note-title">※ 専門家への相談をお勧めします</p>
+                        <p class="zukan-article-note-text">
+                            助成金の申請は要件確認から書類作成まで専門知識が必要です。<br>
+                            当サイトでは無料相談を承っておりますので、お気軽にお問い合わせください。
+                        </p>
+                    </div>
+                </div>
+            </section>
+            <?php endif; ?>
+            
         </div>
 
-        <!-- サイドバー（PC only） -->
-        <aside class="yahoo-sidebar" role="complementary" aria-label="サイドバー">
+        <!-- サイドバー（PC only） - 図鑑スタイル -->
+        <aside class="yahoo-sidebar zukan-sidebar" role="complementary" aria-label="サイドバー">
+            
+            <!-- サイドバー検索ウィジェット -->
+            <section class="sidebar-widget sidebar-search-widget">
+                <h3 class="widget-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="m21 21-4.35-4.35"/>
+                    </svg>
+                    キーワード検索
+                </h3>
+                <div class="widget-content">
+                    <div class="sidebar-search-form">
+                        <input type="text" 
+                               id="sidebar-keyword-search" 
+                               class="sidebar-search-input" 
+                               placeholder="助成金名・キーワードで検索"
+                               aria-label="キーワード検索">
+                        <button type="button" 
+                                id="sidebar-search-btn" 
+                                class="sidebar-search-btn"
+                                aria-label="検索">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"/>
+                                <path d="m21 21-4.35-4.35"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- サイドバー絞り込みウィジェット -->
+            <section class="sidebar-widget sidebar-filter-widget">
+                <h3 class="widget-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+                    </svg>
+                    絞り込み
+                </h3>
+                <div class="widget-content">
+                    
+                    <!-- カテゴリフィルター -->
+                    <div class="sidebar-filter-group" id="sidebar-category-filter">
+                        <button type="button" class="sidebar-filter-toggle" aria-expanded="false">
+                            <span class="filter-group-label">カテゴリ</span>
+                            <span class="filter-selected-count" id="category-selected-count" style="display: none;">0</span>
+                            <svg class="toggle-arrow" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M7 10l5 5 5-5z"/>
+                            </svg>
+                        </button>
+                        <div class="sidebar-filter-options" style="display: none;">
+                            <?php foreach (array_slice($all_categories, 0, 8) as $index => $category): ?>
+                            <label class="sidebar-filter-option">
+                                <input type="checkbox" 
+                                       name="sidebar_category[]" 
+                                       value="<?php echo esc_attr($category->slug); ?>">
+                                <span class="checkbox-custom"></span>
+                                <span class="option-label"><?php echo esc_html($category->name); ?></span>
+                                <span class="option-count"><?php echo $category->count; ?></span>
+                            </label>
+                            <?php endforeach; ?>
+                            <?php if (count($all_categories) > 8): ?>
+                            <button type="button" class="sidebar-filter-more" data-target="category">さらに表示</button>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <!-- 地域フィルター -->
+                    <div class="sidebar-filter-group" id="sidebar-region-filter">
+                        <button type="button" class="sidebar-filter-toggle" aria-expanded="false">
+                            <span class="filter-group-label">地域</span>
+                            <span class="filter-selected-count" id="region-selected-count" style="display: none;">0</span>
+                            <svg class="toggle-arrow" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M7 10l5 5 5-5z"/>
+                            </svg>
+                        </button>
+                        <div class="sidebar-filter-options" style="display: none;">
+                            <?php foreach ($region_groups as $region_slug => $region_name): ?>
+                            <label class="sidebar-filter-option">
+                                <input type="checkbox" 
+                                       name="sidebar_region[]" 
+                                       value="<?php echo esc_attr($region_slug); ?>">
+                                <span class="checkbox-custom"></span>
+                                <span class="option-label"><?php echo esc_html($region_name); ?></span>
+                            </label>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+
+                    <!-- 助成金額フィルター -->
+                    <div class="sidebar-filter-group" id="sidebar-amount-filter">
+                        <button type="button" class="sidebar-filter-toggle" aria-expanded="false">
+                            <span class="filter-group-label">助成金額</span>
+                            <span class="filter-selected-count" id="amount-selected-count" style="display: none;">0</span>
+                            <svg class="toggle-arrow" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M7 10l5 5 5-5z"/>
+                            </svg>
+                        </button>
+                        <div class="sidebar-filter-options" style="display: none;">
+                            <label class="sidebar-filter-option">
+                                <input type="checkbox" name="sidebar_amount[]" value="0-100">
+                                <span class="checkbox-custom"></span>
+                                <span class="option-label">〜100万円</span>
+                            </label>
+                            <label class="sidebar-filter-option">
+                                <input type="checkbox" name="sidebar_amount[]" value="100-500">
+                                <span class="checkbox-custom"></span>
+                                <span class="option-label">100万円〜500万円</span>
+                            </label>
+                            <label class="sidebar-filter-option">
+                                <input type="checkbox" name="sidebar_amount[]" value="500-1000">
+                                <span class="checkbox-custom"></span>
+                                <span class="option-label">500万円〜1000万円</span>
+                            </label>
+                            <label class="sidebar-filter-option">
+                                <input type="checkbox" name="sidebar_amount[]" value="1000-3000">
+                                <span class="checkbox-custom"></span>
+                                <span class="option-label">1000万円〜3000万円</span>
+                            </label>
+                            <label class="sidebar-filter-option">
+                                <input type="checkbox" name="sidebar_amount[]" value="3000+">
+                                <span class="checkbox-custom"></span>
+                                <span class="option-label">3000万円以上</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- 募集状況フィルター -->
+                    <div class="sidebar-filter-group" id="sidebar-status-filter">
+                        <button type="button" class="sidebar-filter-toggle" aria-expanded="false">
+                            <span class="filter-group-label">募集状況</span>
+                            <span class="filter-selected-count" id="status-selected-count" style="display: none;">0</span>
+                            <svg class="toggle-arrow" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M7 10l5 5 5-5z"/>
+                            </svg>
+                        </button>
+                        <div class="sidebar-filter-options" style="display: none;">
+                            <label class="sidebar-filter-option">
+                                <input type="checkbox" name="sidebar_status[]" value="active">
+                                <span class="checkbox-custom"></span>
+                                <span class="option-label">募集中</span>
+                            </label>
+                            <label class="sidebar-filter-option">
+                                <input type="checkbox" name="sidebar_status[]" value="upcoming">
+                                <span class="checkbox-custom"></span>
+                                <span class="option-label">募集予定</span>
+                            </label>
+                            <label class="sidebar-filter-option">
+                                <input type="checkbox" name="sidebar_status[]" value="closed">
+                                <span class="checkbox-custom"></span>
+                                <span class="option-label">募集終了</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- フィルター適用ボタン -->
+                    <div class="sidebar-filter-actions">
+                        <button type="button" id="sidebar-apply-filter" class="sidebar-apply-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            この条件で検索
+                        </button>
+                        <button type="button" id="sidebar-reset-filter" class="sidebar-reset-btn">
+                            リセット
+                        </button>
+                    </div>
+
+                </div>
+            </section>
+
+            <?php 
+            // アーカイブSEOコンテンツ: サイドバー追加コンテンツ
+            if (function_exists('gi_output_archive_sidebar_content')) {
+                gi_output_archive_sidebar_content();
+            }
+            ?>
             
             <!-- 広告枠1: サイドバー上部 -->
             <?php if (function_exists('ji_display_ad')): ?>
@@ -1339,7 +1477,312 @@ document.addEventListener('DOMContentLoaded', function() {
             fixedTag: ''
         });
     }
+    
+    // サイドバーフィルターの初期化
+    initSidebarFilters();
+    
+    // 統合ソートセレクトの初期化
+    initUnifiedSortSelect();
 });
+
+/**
+ * 統合ソートセレクトの初期化
+ */
+function initUnifiedSortSelect() {
+    var sortSelect = document.getElementById('unified-sort-select');
+    if (!sortSelect) {
+        console.log('❌ unified-sort-select not found');
+        return;
+    }
+    
+    console.log('🔄 Initializing unified sort select...');
+    
+    sortSelect.addEventListener('change', function() {
+        var sortValue = this.value;
+        console.log('📊 Sort changed to:', sortValue);
+        
+        if (typeof ArchiveCommon !== 'undefined' && ArchiveCommon.state) {
+            // ArchiveCommon の state.filters.sort を更新
+            ArchiveCommon.state.filters.sort = sortValue;
+            ArchiveCommon.state.currentPage = 1;
+            
+            // loadGrants を呼び出して検索実行
+            ArchiveCommon.loadGrants();
+            
+            console.log('✅ Sort applied via ArchiveCommon');
+        } else {
+            console.error('❌ ArchiveCommon not available');
+        }
+    });
+    
+    console.log('✅ Unified sort select initialized');
+}
+
+/**
+ * サイドバーフィルターの初期化
+ */
+function initSidebarFilters() {
+    console.log('📋 Initializing sidebar filters...');
+    
+    // フィルターグループのトグル
+    var filterToggles = document.querySelectorAll('.sidebar-filter-toggle');
+    console.log('  Found', filterToggles.length, 'filter toggles');
+    
+    filterToggles.forEach(function(toggle, index) {
+        // 最初のカテゴリフィルターのみデフォルトで開く
+        var options = toggle.nextElementSibling;
+        if (index === 0 && options) {
+            toggle.setAttribute('aria-expanded', 'true');
+            options.style.display = 'block';
+        }
+        
+        toggle.addEventListener('click', function() {
+            var isExpanded = this.getAttribute('aria-expanded') === 'true';
+            var opts = this.nextElementSibling;
+            
+            this.setAttribute('aria-expanded', !isExpanded);
+            if (opts) {
+                opts.style.display = isExpanded ? 'none' : 'block';
+            }
+        });
+    });
+    
+    // チェックボックス変更時のカウント更新
+    var checkboxes = document.querySelectorAll('.sidebar-filter-option input[type="checkbox"]');
+    console.log('  Found', checkboxes.length, 'checkboxes');
+    
+    checkboxes.forEach(function(checkbox) {
+        checkbox.addEventListener('change', function() {
+            updateFilterCounts();
+        });
+    });
+    
+    // サイドバー検索ボタン
+    var sidebarSearchBtn = document.getElementById('sidebar-search-btn');
+    var sidebarSearchInput = document.getElementById('sidebar-keyword-search');
+    
+    if (sidebarSearchBtn && sidebarSearchInput) {
+        console.log('  Search widgets found');
+        sidebarSearchBtn.addEventListener('click', function() {
+            applySidebarFilters();
+        });
+        
+        sidebarSearchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                applySidebarFilters();
+            }
+        });
+    }
+    
+    // フィルター適用ボタン
+    var applyBtn = document.getElementById('sidebar-apply-filter');
+    if (applyBtn) {
+        console.log('  Apply button found');
+        applyBtn.addEventListener('click', function() {
+            applySidebarFilters();
+        });
+    }
+    
+    // リセットボタン
+    var resetBtn = document.getElementById('sidebar-reset-filter');
+    if (resetBtn) {
+        console.log('  Reset button found');
+        resetBtn.addEventListener('click', function() {
+            resetSidebarFilters();
+        });
+    }
+    
+    // 「さらに表示」ボタン - カテゴリ追加読み込み
+    var moreButtons = document.querySelectorAll('.sidebar-filter-more');
+    moreButtons.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var target = this.getAttribute('data-target');
+            var button = this;
+            console.log('Show more clicked for:', target);
+            
+            if (target === 'category') {
+                button.textContent = '読み込み中...';
+                button.disabled = true;
+                
+                // 残りのカテゴリを表示
+                loadMoreCategories(button);
+            }
+        });
+    });
+    
+    console.log('✅ Sidebar filters initialized');
+}
+
+/**
+ * カテゴリの追加読み込み
+ */
+function loadMoreCategories(button) {
+    // AJAXでカテゴリを取得
+    var formData = new FormData();
+    formData.append('action', 'gi_get_all_categories');
+    formData.append('nonce', '<?php echo wp_create_nonce("gi_ajax_nonce"); ?>');
+    formData.append('offset', 8); // 既に表示している8件をスキップ
+    
+    fetch('<?php echo admin_url("admin-ajax.php"); ?>', {
+        method: 'POST',
+        body: formData
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        if (data.success && data.data.categories) {
+            var optionsContainer = document.querySelector('#sidebar-category-filter .sidebar-filter-options');
+            var categories = data.data.categories;
+            
+            categories.forEach(function(category) {
+                var label = document.createElement('label');
+                label.className = 'sidebar-filter-option';
+                label.innerHTML = 
+                    '<input type="checkbox" name="sidebar_category[]" value="' + category.slug + '">' +
+                    '<span class="checkbox-custom"></span>' +
+                    '<span class="option-label">' + category.name + '</span>' +
+                    '<span class="option-count">' + category.count + '</span>';
+                
+                // チェックボックスの変更イベント
+                label.querySelector('input').addEventListener('change', function() {
+                    updateFilterCounts();
+                });
+                
+                // ボタンの前に挿入
+                optionsContainer.insertBefore(label, button);
+            });
+            
+            // ボタンを削除
+            button.remove();
+            console.log('✅ Loaded', categories.length, 'more categories');
+        } else {
+            button.textContent = 'カテゴリの取得に失敗しました';
+            setTimeout(function() {
+                button.textContent = 'さらに表示';
+                button.disabled = false;
+            }, 2000);
+        }
+    })
+    .catch(function(error) {
+        console.error('カテゴリ取得エラー:', error);
+        button.textContent = 'エラーが発生しました';
+        setTimeout(function() {
+            button.textContent = 'さらに表示';
+            button.disabled = false;
+        }, 2000);
+    });
+}
+
+/**
+ * フィルターカウントを更新
+ */
+function updateFilterCounts() {
+    var filterGroups = document.querySelectorAll('.sidebar-filter-group');
+    filterGroups.forEach(function(group) {
+        var checkedCount = group.querySelectorAll('input[type="checkbox"]:checked').length;
+        var countBadge = group.querySelector('.filter-selected-count');
+        if (countBadge) {
+            if (checkedCount > 0) {
+                countBadge.textContent = checkedCount;
+                countBadge.style.display = 'inline-flex';
+            } else {
+                countBadge.style.display = 'none';
+            }
+        }
+    });
+}
+
+/**
+ * サイドバーフィルターを適用
+ */
+function applySidebarFilters() {
+    if (typeof ArchiveCommon === 'undefined') {
+        console.error('ArchiveCommon is not defined');
+        return;
+    }
+    
+    console.log('🔍 Applying sidebar filters...');
+    
+    var state = ArchiveCommon.state;
+    
+    // キーワード検索
+    var searchInput = document.getElementById('sidebar-keyword-search');
+    if (searchInput) {
+        var searchValue = searchInput.value.trim();
+        state.filters.search = searchValue;
+        // メインの検索欄にも反映
+        var mainSearch = document.getElementById('keyword-search');
+        if (mainSearch) mainSearch.value = searchValue;
+        console.log('  Search:', searchValue);
+    }
+    
+    // カテゴリ
+    var categoryCheckboxes = document.querySelectorAll('input[name="sidebar_category[]"]:checked');
+    state.filters.category = Array.from(categoryCheckboxes).map(function(cb) { return cb.value; });
+    console.log('  Categories:', state.filters.category);
+    
+    // 地域（都道府県フィルタリング用）
+    var regionCheckboxes = document.querySelectorAll('input[name="sidebar_region[]"]:checked');
+    if (regionCheckboxes.length > 0) {
+        state.filters.region = regionCheckboxes[0].value;
+    } else {
+        state.filters.region = '';
+    }
+    console.log('  Region:', state.filters.region);
+    
+    // 助成金額
+    var amountCheckboxes = document.querySelectorAll('input[name="sidebar_amount[]"]:checked');
+    if (amountCheckboxes.length > 0) {
+        state.filters.amount = amountCheckboxes[0].value;
+    } else {
+        state.filters.amount = '';
+    }
+    console.log('  Amount:', state.filters.amount);
+    
+    // 募集状況
+    var statusCheckboxes = document.querySelectorAll('input[name="sidebar_status[]"]:checked');
+    if (statusCheckboxes.length > 0) {
+        state.filters.status = statusCheckboxes[0].value;
+    } else {
+        state.filters.status = '';
+    }
+    console.log('  Status:', state.filters.status);
+    
+    // 検索実行
+    state.currentPage = 1;
+    console.log('  Calling loadGrants()...');
+    ArchiveCommon.loadGrants();
+    ArchiveCommon.updateActiveFiltersDisplay();
+    
+    // 結果エリアへスクロール
+    var resultsHeader = document.querySelector('.zukan-results-header');
+    if (resultsHeader) {
+        setTimeout(function() {
+            resultsHeader.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+    }
+}
+
+/**
+ * サイドバーフィルターをリセット
+ */
+function resetSidebarFilters() {
+    // 全チェックボックスをリセット
+    var checkboxes = document.querySelectorAll('.sidebar-filter-option input[type="checkbox"]');
+    checkboxes.forEach(function(cb) { cb.checked = false; });
+    
+    // 検索欄をクリア
+    var searchInput = document.getElementById('sidebar-keyword-search');
+    if (searchInput) searchInput.value = '';
+    
+    // カウントバッジをリセット
+    updateFilterCounts();
+    
+    // ArchiveCommonのリセットを呼び出し
+    if (typeof ArchiveCommon !== 'undefined') {
+        ArchiveCommon.resetAllFilters();
+    }
+}
 </script>
 
 <?php 

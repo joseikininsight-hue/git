@@ -312,6 +312,18 @@ $keywords_string = implode(',', $keywords);
         <!-- メインコンテンツ -->
         <div class="yahoo-main-content">
             
+            <?php 
+            // アーカイブSEOコンテンツ: おすすめ記事
+            if (function_exists('gi_output_archive_featured_posts')) {
+                gi_output_archive_featured_posts();
+            }
+            
+            // アーカイブSEOコンテンツ: イントロ
+            if (function_exists('gi_output_archive_intro_content')) {
+                gi_output_archive_intro_content();
+            }
+            ?>
+            
             <!-- 検索バー -->
             <section class="yahoo-search-section">
                 <div class="search-bar-wrapper">
@@ -875,10 +887,24 @@ $keywords_string = implode(',', $keywords);
                     ?>
                 </div>
             </section>
+            
+            <?php 
+            // アーカイブSEOコンテンツ: アウトロ
+            if (function_exists('gi_output_archive_outro_content')) {
+                gi_output_archive_outro_content();
+            }
+            ?>
         </div>
 
         <!-- サイドバー（PC only） -->
         <aside class="yahoo-sidebar" role="complementary" aria-label="サイドバー">
+            
+            <?php 
+            // アーカイブSEOコンテンツ: サイドバー追加コンテンツ
+            if (function_exists('gi_output_archive_sidebar_content')) {
+                gi_output_archive_sidebar_content();
+            }
+            ?>
             
             <!-- 広告枠1: サイドバー上部 -->
             <?php if (function_exists('ji_display_ad')): ?>

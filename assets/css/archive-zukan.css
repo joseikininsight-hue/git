@@ -1,0 +1,2267 @@
+/**
+ * Archive ZUKAN CSS - 補助金図鑑スタイル v6.0
+ * 白背景ベースのクリーンなアーカイブデザイン
+ * パンくずリスト修正 + SEO記事セクション統一
+ * 
+ * @package Grant_Insight_Perfect
+ * @version 6.0.0
+ */
+
+/* ==========================================================================
+   Google Fonts Import
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap');
+
+/* ==========================================================================
+   CSS Variables - クリーンなカラーパレット
+   ========================================================================== */
+:root {
+    /* メインカラー */
+    --zukan-paper-white: #fdfbf7;
+    --zukan-paper-dark: #f2efe9;
+    --zukan-ink-primary: #2b2b2b;
+    --zukan-ink-light: #595959;
+    --zukan-accent-gold: #c5a059;
+    --zukan-accent-red: #a63737;
+    --zukan-link-blue: #2c5282;
+    
+    /* ランキングカラー */
+    --zukan-rank-1: #c5a059;
+    --zukan-rank-2: #9ca3af;
+    --zukan-rank-3: #b45309;
+    
+    /* タイポグラフィ */
+    --zukan-font-serif: "Shippori Mincho", "Yu Mincho", serif;
+    --zukan-font-sans: "Noto Sans JP", -apple-system, sans-serif;
+    
+    /* シャドウ */
+    --zukan-shadow-card-sm: 0 2px 4px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1);
+    --zukan-shadow-card-hover: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+    --zukan-shadow-sticky-nav: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    
+    /* トランジション */
+    --zukan-transition: 0.3s ease;
+}
+
+/* ==========================================================================
+   Body - 純白背景
+   ========================================================================== */
+body.zukan-theme,
+.zukan-archive,
+.grant-archive-yahoo-style.zukan-archive {
+    background-color: #ffffff;
+    background-image: none;
+    color: var(--zukan-ink-primary);
+    font-family: var(--zukan-font-sans);
+    line-height: 1.7;
+}
+
+/* 背表紙エフェクトを無効化 */
+.grant-archive-yahoo-style.zukan-archive::before {
+    display: none;
+}
+
+/* ==========================================================================
+   Container - シンプルなコンテナ
+   ========================================================================== */
+.zukan-archive .yahoo-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 16px;
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .yahoo-container {
+        padding: 0 32px;
+    }
+}
+
+/* ==========================================================================
+   Breadcrumb - シンプルなパンくずリスト
+   ========================================================================== */
+.zukan-archive .book-breadcrumb,
+.zukan-archive .breadcrumb-nav {
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 12px 16px;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .book-breadcrumb,
+    .zukan-archive .breadcrumb-nav {
+        padding: 12px 32px;
+    }
+}
+
+/* スパインライン・アイコンを非表示 */
+.zukan-archive .book-breadcrumb-spine,
+.zukan-archive .book-breadcrumb-icon {
+    display: none;
+}
+
+.zukan-archive .book-breadcrumb-inner {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.zukan-archive .breadcrumb-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.zukan-archive .breadcrumb-item {
+    display: flex;
+    align-items: center;
+}
+
+.zukan-archive .book-breadcrumb-link,
+.zukan-archive .breadcrumb-item a {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    padding: 4px 0;
+    font-size: 13px;
+    font-family: var(--zukan-font-sans);
+    color: #6b7280;
+    transition: color var(--zukan-transition);
+}
+
+.zukan-archive .book-breadcrumb-link:hover,
+.zukan-archive .breadcrumb-item a:hover {
+    color: var(--zukan-link-blue);
+    text-decoration: underline;
+}
+
+/* 章番号を非表示 */
+.zukan-archive .book-breadcrumb-chapter {
+    display: none;
+}
+
+.zukan-archive .book-breadcrumb-text {
+    font-size: 13px;
+    font-family: var(--zukan-font-sans);
+}
+
+.zukan-archive .book-breadcrumb-sep {
+    display: flex;
+    align-items: center;
+    color: #9ca3af;
+    margin: 0 6px;
+    font-size: 12px;
+}
+
+.zukan-archive .book-breadcrumb-sep svg {
+    width: 12px;
+    height: 12px;
+}
+
+.zukan-archive .book-breadcrumb-current,
+.zukan-archive .breadcrumb-item:last-child span:not(.book-breadcrumb-sep) {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 0;
+    font-size: 13px;
+    font-family: var(--zukan-font-sans);
+    color: var(--zukan-ink-primary);
+    font-weight: 500;
+}
+
+/* 現在ページの背景を削除 */
+.zukan-archive .book-breadcrumb-current {
+    background: transparent;
+    border-radius: 0;
+}
+
+.zukan-archive .book-breadcrumb-current .book-breadcrumb-chapter {
+    display: none;
+}
+
+.zukan-archive .book-breadcrumb-current .book-breadcrumb-text {
+    color: var(--zukan-ink-primary);
+}
+
+/* ==========================================================================
+   Hero Section - シンプルなSEOテキストベース
+   ========================================================================== */
+.zukan-archive .zukan-hero.zukan-hero-simple {
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 32px 16px;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .zukan-hero.zukan-hero-simple {
+        padding: 48px 32px;
+    }
+}
+
+.zukan-archive .zukan-hero-simple .zukan-hero-content {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.zukan-archive .zukan-hero-header {
+    margin-bottom: 20px;
+}
+
+.zukan-archive .zukan-hero-label {
+    display: inline-block;
+    font-size: 10px;
+    font-family: var(--zukan-font-sans);
+    color: var(--zukan-accent-gold);
+    background: var(--zukan-ink-primary);
+    padding: 4px 12px;
+    border-radius: 2px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+
+.zukan-archive .zukan-hero-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    font-family: var(--zukan-font-serif);
+    color: var(--zukan-ink-primary);
+    margin: 0 0 8px;
+    line-height: 1.3;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .zukan-hero-title {
+        font-size: 2rem;
+    }
+}
+
+.zukan-archive .zukan-hero-subtitle-text {
+    font-size: 13px;
+    font-family: var(--zukan-font-sans);
+    color: #6b7280;
+    margin: 0;
+}
+
+.zukan-archive .zukan-hero-description {
+    font-size: 14px;
+    font-family: var(--zukan-font-sans);
+    color: var(--zukan-ink-light);
+    line-height: 1.9;
+    margin: 0 0 20px;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .zukan-hero-description {
+        font-size: 15px;
+    }
+}
+
+.zukan-archive .zukan-hero-description strong {
+    color: var(--zukan-accent-red);
+    font-weight: 700;
+}
+
+.zukan-archive .zukan-hero-stats-simple {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    font-family: var(--zukan-font-sans);
+    color: #6b7280;
+}
+
+.zukan-archive .zukan-hero-stat strong {
+    color: var(--zukan-accent-red);
+    font-weight: 700;
+}
+
+.zukan-archive .zukan-hero-stat-divider {
+    color: #d1d5db;
+}
+
+/* ==========================================================================
+   Hero Section - 旧書籍スタイル（非表示・互換性のため残す）
+   ========================================================================== */
+.zukan-archive .zukan-hero.zukan-hero-book {
+    display: none;
+}
+
+.zukan-archive .zukan-hero-main-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    font-family: var(--zukan-font-serif);
+    color: var(--zukan-ink-primary);
+    letter-spacing: 0.15em;
+    margin: 0 0 8px;
+    line-height: 1.3;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .zukan-hero-main-title {
+        font-size: 2.5rem;
+    }
+}
+
+.zukan-archive .zukan-hero-main-subtitle {
+    font-size: 1.125rem;
+    font-weight: 600;
+    font-family: var(--zukan-font-serif);
+    color: var(--zukan-ink-light);
+    letter-spacing: 0.2em;
+    margin: 0 0 24px;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .zukan-hero-main-subtitle {
+        font-size: 1.5rem;
+    }
+}
+
+.zukan-archive .zukan-hero-divider {
+    width: 80px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--zukan-accent-gold), transparent);
+    margin: 24px auto;
+}
+
+.zukan-archive .zukan-hero-tagline {
+    font-size: 13px;
+    font-family: var(--zukan-font-sans);
+    color: var(--zukan-ink-light);
+    margin: 0 0 20px;
+    letter-spacing: 0.05em;
+}
+
+/* 統計表示 */
+.zukan-archive .zukan-hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+}
+
+.zukan-archive .zukan-hero-stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.zukan-archive .zukan-hero-stat-item .stat-number {
+    font-size: 1.5rem;
+    font-weight: 800;
+    font-family: var(--zukan-font-serif);
+    color: var(--zukan-accent-red);
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .zukan-hero-stat-item .stat-number {
+        font-size: 2rem;
+    }
+}
+
+.zukan-archive .zukan-hero-stat-item .stat-label {
+    font-size: 11px;
+    font-family: var(--zukan-font-sans);
+    color: var(--zukan-ink-light);
+}
+
+/* 旧ヒーローセクション（互換性のため残す） */
+.zukan-archive .zukan-hero:not(.zukan-hero-book) {
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 32px 16px;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .zukan-hero:not(.zukan-hero-book) {
+        padding: 48px 32px;
+    }
+}
+
+.zukan-archive .zukan-hero-content {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.zukan-archive .zukan-hero-lead {
+    font-size: 14px;
+    font-family: var(--zukan-font-sans);
+    color: var(--zukan-ink-light);
+    line-height: 1.9;
+    margin: 0;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .zukan-hero-lead {
+        font-size: 15px;
+    }
+}
+
+.zukan-archive .zukan-hero-lead strong {
+    color: var(--zukan-accent-red);
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-color: var(--zukan-accent-gold);
+    text-underline-offset: 3px;
+}
+
+/* ==========================================================================
+   Two Column Layout
+   ========================================================================== */
+.zukan-archive .yahoo-two-column-layout,
+.zukan-archive .zukan-two-column {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    padding: 32px 0;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+@media (min-width: 1024px) {
+    .zukan-archive .yahoo-two-column-layout,
+    .zukan-archive .zukan-two-column {
+        flex-direction: row;
+        padding: 48px 0;
+    }
+}
+
+/* Main Content */
+.zukan-archive .yahoo-main-content,
+.zukan-archive .zukan-main-content {
+    flex: 1;
+    min-width: 0;
+}
+
+@media (min-width: 1024px) {
+    .zukan-archive .yahoo-main-content,
+    .zukan-archive .zukan-main-content {
+        flex: 3;
+    }
+}
+
+/* ==========================================================================
+   Page Title Area - 統合検索結果ヘッダー
+   ========================================================================== */
+.zukan-archive .results-header {
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #f3f4f6;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+/* 統合されたヘッダースタイル */
+.zukan-archive .unified-results-header {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-left: 4px solid var(--zukan-ink-primary);
+    border-radius: 2px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    box-shadow: var(--zukan-shadow-card-sm);
+}
+
+.zukan-archive .unified-results-header .results-header-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.zukan-archive .results-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    font-family: var(--zukan-font-serif);
+    color: var(--zukan-ink-primary);
+    margin: 0 0 8px 0;
+    line-height: 1.3;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .results-title {
+        font-size: 1.5rem;
+    }
+}
+
+/* 統合検索結果メタ情報 */
+.zukan-archive .results-meta-unified {
+    font-size: 13px;
+    color: #6b7280;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.zukan-archive .results-count-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.zukan-archive .results-count-primary strong,
+.zukan-archive #current-count {
+    color: var(--zukan-accent-red);
+    font-weight: 700;
+    font-size: 1.25rem;
+    font-family: var(--zukan-font-sans);
+}
+
+.zukan-archive .results-separator {
+    color: #d1d5db;
+}
+
+.zukan-archive .results-showing {
+    color: #9ca3af;
+    font-size: 12px;
+}
+
+.zukan-archive .results-showing #showing-from,
+.zukan-archive .results-showing #showing-to {
+    color: var(--zukan-ink-primary);
+    font-weight: 600;
+}
+
+/* ソートセレクト（統合版） */
+.zukan-archive .view-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.zukan-archive .sort-label {
+    font-size: 12px;
+    color: #9ca3af;
+    white-space: nowrap;
+}
+
+.zukan-archive .sort-select-unified {
+    background: #fff;
+    border: 1px solid #d1d5db;
+    font-size: 13px;
+    border-radius: 2px;
+    padding: 8px 12px;
+    color: var(--zukan-ink-primary);
+    cursor: pointer;
+    transition: all var(--zukan-transition);
+    font-family: var(--zukan-font-sans);
+}
+
+.zukan-archive .sort-select-unified:hover,
+.zukan-archive .sort-select-unified:focus {
+    border-color: var(--zukan-accent-gold);
+    outline: none;
+}
+
+/* 旧スタイル（互換性） */
+.zukan-archive .results-meta {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.zukan-archive .total-count strong,
+.zukan-archive #result-count {
+    color: var(--zukan-accent-red);
+    font-weight: 700;
+    font-size: 1.25rem;
+    font-family: var(--zukan-font-sans);
+}
+
+.zukan-archive .results-info {
+    flex: 1;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 767px) {
+    .zukan-archive .unified-results-header {
+        padding: 16px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .zukan-archive .results-meta-unified {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+    
+    .zukan-archive .results-separator {
+        display: none;
+    }
+    
+    .zukan-archive .view-controls {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .zukan-archive .sort-select-unified {
+        flex: 1;
+    }
+}
+
+.zukan-archive .yahoo-results-section .results-header {
+    margin-bottom: 24px;
+}
+
+.zukan-archive .yahoo-results-section .results-title {
+    font-size: 1.125rem;
+    margin-bottom: 4px;
+}
+
+/* Sort Control */
+.zukan-archive .view-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.zukan-archive .view-btn {
+    padding: 8px 12px;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 2px;
+    cursor: pointer;
+    color: #6b7280;
+    transition: all var(--zukan-transition);
+    font-size: 12px;
+}
+
+.zukan-archive .view-btn:hover {
+    background: #f9fafb;
+}
+
+.zukan-archive .view-btn.active {
+    background: var(--zukan-ink-primary);
+    border-color: var(--zukan-ink-primary);
+    color: #fff;
+}
+
+/* ==========================================================================
+   Search Section - 検索バー（メインコンテンツ内）- デスクトップでは非表示
+   ========================================================================== */
+.zukan-archive .yahoo-search-section {
+    margin-bottom: 24px;
+    display: none; /* サイドバーに移動したため非表示 */
+}
+
+@media (max-width: 1023px) {
+    .zukan-archive .yahoo-search-section {
+        display: block;
+    }
+}
+
+.zukan-archive .search-bar-wrapper {
+    position: relative;
+}
+
+.zukan-archive .search-input-container {
+    display: flex;
+    align-items: center;
+    background: #f9fafb;
+    border: 1px solid #d1d5db;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.zukan-archive .search-input-container:focus-within {
+    border-color: var(--zukan-accent-gold);
+}
+
+.zukan-archive .search-icon {
+    flex-shrink: 0;
+    margin: 0 12px;
+    color: #9ca3af;
+}
+
+.zukan-archive .search-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 12px 8px;
+    font-size: 14px;
+    font-family: var(--zukan-font-sans);
+    color: var(--zukan-ink-primary);
+}
+
+.zukan-archive .search-input::placeholder {
+    color: #9ca3af;
+}
+
+.zukan-archive .search-input:focus {
+    outline: none;
+}
+
+.zukan-archive .search-execute-btn {
+    background: var(--zukan-ink-primary);
+    color: #fff;
+    border: none;
+    padding: 12px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color var(--zukan-transition);
+}
+
+.zukan-archive .search-execute-btn:hover {
+    background: #374151;
+}
+
+/* ==========================================================================
+   Filter Section - フィルター
+   ========================================================================== */
+.zukan-archive .yahoo-filter-section {
+    margin-bottom: 24px;
+    padding: 20px 24px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 2px;
+}
+
+.zukan-archive .filter-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.zukan-archive .filter-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--zukan-ink-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+.zukan-archive .filter-title svg {
+    color: #6b7280;
+}
+
+.zukan-archive .filter-reset-all {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: transparent;
+    border: 1px solid #d1d5db;
+    color: #6b7280;
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all var(--zukan-transition);
+}
+
+.zukan-archive .filter-reset-all:hover {
+    background: #fff;
+    border-color: var(--zukan-accent-red);
+    color: var(--zukan-accent-red);
+}
+
+.zukan-archive .yahoo-filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .yahoo-filters-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+}
+
+/* フィルタードロップダウン */
+.zukan-archive .filter-dropdown-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.zukan-archive .filter-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 6px;
+    font-family: var(--zukan-font-sans);
+}
+
+.zukan-archive .custom-select {
+    position: relative;
+}
+
+.zukan-archive .select-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 2px;
+    font-size: 13px;
+    color: var(--zukan-ink-primary);
+    cursor: pointer;
+    transition: all var(--zukan-transition);
+}
+
+.zukan-archive .select-trigger:hover {
+    border-color: var(--zukan-accent-gold);
+}
+
+.zukan-archive .select-value {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.zukan-archive .select-arrow {
+    flex-shrink: 0;
+    color: #9ca3af;
+}
+
+.zukan-archive .select-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-top: none;
+    border-radius: 0 0 2px 2px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 100;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.zukan-archive .select-option {
+    padding: 8px 12px;
+    font-size: 13px;
+    color: var(--zukan-ink-primary);
+    cursor: pointer;
+    transition: background-color var(--zukan-transition);
+}
+
+.zukan-archive .select-option:hover {
+    background: #f3f4f6;
+}
+
+.zukan-archive .select-option.active {
+    background: var(--zukan-ink-primary);
+    color: #fff;
+}
+
+/* 複数選択バッジ */
+.zukan-archive .multi-select-badge {
+    background: var(--zukan-accent-red);
+    color: #fff;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 4px;
+}
+
+/* 選択中フィルター表示 */
+.zukan-archive .active-filters-display {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.zukan-archive .active-filters-label {
+    font-size: 12px;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.zukan-archive .active-filter-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+/* モバイルフィルタートグル */
+.zukan-archive .mobile-filter-toggle {
+    display: none;
+}
+
+@media (max-width: 767px) {
+    .zukan-archive .mobile-filter-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        padding: 12px;
+        background: #fff;
+        border: 1px solid #d1d5db;
+        border-radius: 2px;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--zukan-ink-primary);
+        cursor: pointer;
+        margin-bottom: 16px;
+    }
+    
+    .zukan-archive .yahoo-filter-section {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1000;
+        background: #fff;
+        overflow-y: auto;
+        padding: 20px;
+        margin-bottom: 0;
+    }
+    
+    .zukan-archive .yahoo-filter-section.is-open {
+        display: block;
+    }
+    
+    .zukan-archive .mobile-filter-close {
+        display: block;
+        background: transparent;
+        border: none;
+        font-size: 24px;
+        color: #6b7280;
+        cursor: pointer;
+    }
+    
+    .zukan-archive .mobile-filter-apply-section {
+        position: sticky;
+        bottom: 0;
+        background: #fff;
+        padding: 16px 0;
+        border-top: 1px solid #e5e7eb;
+        margin-top: 20px;
+    }
+    
+    .zukan-archive .mobile-apply-filters-btn {
+        width: 100%;
+        padding: 14px;
+        background: var(--zukan-ink-primary);
+        color: #fff;
+        border: none;
+        border-radius: 2px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .mobile-filter-close,
+    .zukan-archive .mobile-filter-apply-section {
+        display: none;
+    }
+}
+
+/* ==========================================================================
+   Grant List Container
+   ========================================================================== */
+.zukan-archive .grants-container-yahoo,
+.zukan-archive .zukan-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* ==========================================================================
+   Grant Card - 左アクセントライン付きカード（HTMLリファレンス準拠）
+   ========================================================================== */
+.zukan-archive .zukan-grant-card {
+    position: relative;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 2px;
+    padding: 24px;
+    box-shadow: var(--zukan-shadow-card-sm);
+    transition: all var(--zukan-transition);
+    overflow: hidden;
+}
+
+.zukan-archive .zukan-grant-card:hover {
+    box-shadow: var(--zukan-shadow-card-hover);
+    border-color: var(--zukan-accent-gold);
+}
+
+/* 左側アクセントライン */
+.zukan-archive .zukan-grant-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--zukan-ink-primary);
+}
+
+/* ペーパークリップエフェクトを無効化 */
+.zukan-archive .zukan-grant-card::after {
+    display: none;
+}
+
+.zukan-archive .zukan-grant-card-link {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    gap: 16px;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .zukan-grant-card-link {
+        flex-direction: row;
+        gap: 24px;
+    }
+}
+
+/* バッジエリア - カテゴリと実施機関 */
+.zukan-archive .zukan-grant-badges {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.zukan-archive .zukan-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 2px;
+    font-family: var(--zukan-font-sans);
+}
+
+.zukan-archive .zukan-badge-featured,
+.zukan-archive .zukan-grant-category-badge {
+    background: var(--zukan-ink-primary);
+    color: #fff;
+}
+
+.zukan-archive .zukan-badge-urgent {
+    background: var(--zukan-accent-red);
+    color: #fff;
+}
+
+.zukan-archive .zukan-badge-new {
+    background: #10b981;
+    color: #fff;
+}
+
+.zukan-archive .zukan-badge-status {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.zukan-archive .zukan-badge-status.upcoming {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.zukan-archive .zukan-badge-status.closed {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+/* カードコンテンツ - メイン部分 */
+.zukan-archive .zukan-grant-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+    padding-left: 8px;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .zukan-grant-content {
+        flex-direction: row;
+        gap: 24px;
+    }
+}
+
+/* 左側カテゴリエリア（カード内で非表示、バッジに統合） */
+.zukan-archive .zukan-grant-category-area {
+    display: none;
+}
+
+/* メインコンテンツ */
+.zukan-archive .zukan-grant-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.zukan-archive .zukan-grant-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    font-family: var(--zukan-font-serif);
+    color: var(--zukan-ink-primary);
+    margin-bottom: 12px;
+    line-height: 1.4;
+    transition: color var(--zukan-transition);
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .zukan-grant-title {
+        font-size: 1.25rem;
+    }
+}
+
+.zukan-archive .zukan-grant-card:hover .zukan-grant-title {
+    color: var(--zukan-accent-red);
+}
+
+.zukan-archive .zukan-grant-description {
+    font-size: 14px;
+    font-family: var(--zukan-font-serif);
+    color: var(--zukan-ink-light);
+    line-height: 1.7;
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* タグ */
+.zukan-archive .zukan-grant-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.zukan-archive .zukan-grant-tag {
+    display: inline-block;
+    background: #f3f4f6;
+    color: #6b7280;
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius: 2px;
+    font-family: var(--zukan-font-serif);
+}
+
+.zukan-archive .zukan-grant-tag::before {
+    content: '#';
+}
+
+/* 右側メタ情報 */
+.zukan-archive .zukan-grant-amount-area {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-top: 16px;
+    border-top: 1px solid #f3f4f6;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .zukan-grant-amount-area {
+        width: 180px;
+        padding-top: 0;
+        padding-left: 24px;
+        border-top: none;
+        border-left: 1px solid #f3f4f6;
+    }
+}
+
+.zukan-archive .zukan-grant-amount-label {
+    font-size: 10px;
+    color: #9ca3af;
+    font-family: var(--zukan-font-sans);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 2px;
+}
+
+.zukan-archive .zukan-grant-amount {
+    font-size: 1.125rem;
+    font-weight: 700;
+    font-family: var(--zukan-font-serif);
+    color: var(--zukan-accent-red);
+}
+
+.zukan-archive .zukan-grant-amount-unit {
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.zukan-archive .zukan-grant-rate {
+    font-size: 13px;
+    font-weight: 700;
+    font-family: var(--zukan-font-serif);
+    color: var(--zukan-ink-primary);
+}
+
+.zukan-archive .zukan-grant-deadline {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--zukan-ink-light);
+}
+
+.zukan-archive .zukan-grant-deadline.urgent {
+    color: var(--zukan-accent-red);
+    font-weight: 600;
+}
+
+/* 詳細ボタン */
+.zukan-archive .zukan-grant-more {
+    display: block;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: var(--zukan-font-sans);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 10px 16px;
+    border: 1px solid var(--zukan-ink-primary);
+    color: var(--zukan-ink-primary);
+    transition: all var(--zukan-transition);
+    margin-top: 8px;
+}
+
+.zukan-archive .zukan-grant-card:hover .zukan-grant-more {
+    background: var(--zukan-ink-primary);
+    color: #fff;
+}
+
+/* フッター - 非表示 */
+.zukan-archive .zukan-grant-footer {
+    display: none;
+}
+
+/* 実施機関表示 */
+.zukan-archive .zukan-grant-organizer {
+    font-size: 12px;
+    color: #6b7280;
+    font-family: var(--zukan-font-sans);
+}
+
+.zukan-archive .zukan-grant-prefecture {
+    font-size: 11px;
+    color: #9ca3af;
+}
+
+/* Empty State */
+.zukan-archive .zukan-empty-state,
+.zukan-archive .no-results {
+    padding: 64px 24px;
+    text-align: center;
+    background: #fff;
+    border: 1px dashed #d1d5db;
+    border-radius: 2px;
+}
+
+.zukan-archive .no-results-title {
+    font-size: 1.125rem;
+    color: #9ca3af;
+    margin-bottom: 8px;
+}
+
+/* ==========================================================================
+   Article Section - SEO解説記事（シンプルなスタイル）
+   ========================================================================== */
+.zukan-archive .zukan-article-section {
+    margin-top: 48px;
+    padding: 32px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 2px;
+    box-shadow: var(--zukan-shadow-card-sm);
+}
+
+/* 装飾記号を非表示 */
+.zukan-archive .zukan-article-section::before {
+    display: none;
+}
+
+.zukan-archive .zukan-article-header {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #f3f4f6;
+}
+
+.zukan-archive .zukan-article-label {
+    font-size: 10px;
+    font-weight: 700;
+    font-family: var(--zukan-font-sans);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--zukan-accent-gold);
+    margin-bottom: 8px;
+    display: block;
+}
+
+.zukan-archive .zukan-article-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    font-family: var(--zukan-font-serif);
+    color: var(--zukan-ink-primary);
+    line-height: 1.4;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .zukan-article-title {
+        font-size: 1.5rem;
+    }
+}
+
+.zukan-archive .zukan-article-content {
+    font-family: var(--zukan-font-serif);
+}
+
+.zukan-archive .zukan-article-content h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--zukan-ink-primary);
+    margin: 24px 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.zukan-archive .zukan-article-content h3:first-child {
+    margin-top: 0;
+}
+
+.zukan-archive .zukan-article-content p {
+    font-size: 14px;
+    line-height: 1.9;
+    color: var(--zukan-ink-light);
+    margin-bottom: 16px;
+}
+
+.zukan-archive .zukan-article-note {
+    margin-top: 32px;
+    padding: 20px 24px;
+    background: var(--zukan-ink-primary);
+    color: #fff;
+    border-radius: 2px;
+    text-align: center;
+}
+
+.zukan-archive .zukan-article-note-title {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #fff;
+}
+
+.zukan-archive .zukan-article-note-text {
+    font-size: 12px;
+    color: #fff;
+    line-height: 1.7;
+}
+
+.zukan-archive .zukan-article-note-text br + br {
+    display: none;
+}
+
+/* ==========================================================================
+   SEO Content Box - アーカイブSEOコンテンツ（統一スタイル）
+   ========================================================================== */
+/* イントロ・アウトロコンテンツ共通 */
+.zukan-archive .gi-archive-seo-intro,
+.zukan-archive .gi-archive-seo-outro {
+    margin: 32px 0;
+}
+
+.zukan-archive .gi-seo-content-box {
+    background: #fff !important;
+    padding: 32px !important;
+    border-radius: 2px !important;
+    border-left: 4px solid var(--zukan-ink-primary) !important;
+    box-shadow: var(--zukan-shadow-card-sm) !important;
+    border: 1px solid #e5e7eb !important;
+    border-left: 4px solid var(--zukan-ink-primary) !important;
+}
+
+.zukan-archive .gi-seo-content-box h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    font-family: var(--zukan-font-serif);
+    color: var(--zukan-ink-primary);
+    margin: 0 0 20px 0;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f3f4f6;
+}
+
+.zukan-archive .gi-seo-content-box h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--zukan-ink-primary);
+    margin: 24px 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.zukan-archive .gi-seo-content-box h3:first-child {
+    margin-top: 0;
+}
+
+.zukan-archive .gi-seo-content-box p {
+    font-size: 14px;
+    line-height: 1.9;
+    color: var(--zukan-ink-light);
+    margin-bottom: 16px;
+    font-family: var(--zukan-font-sans);
+}
+
+.zukan-archive .gi-seo-content-box strong {
+    color: var(--zukan-ink-primary);
+    font-weight: 700;
+}
+
+.zukan-archive .gi-seo-content-box ul,
+.zukan-archive .gi-seo-content-box ol {
+    margin: 16px 0;
+    padding-left: 24px;
+    font-size: 14px;
+    line-height: 1.9;
+    color: var(--zukan-ink-light);
+}
+
+.zukan-archive .gi-seo-content-box li {
+    margin-bottom: 8px;
+}
+
+/* おすすめ記事セクション */
+.zukan-archive .gi-archive-featured-posts {
+    margin: 32px 0;
+    padding: 32px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 2px;
+    box-shadow: var(--zukan-shadow-card-sm);
+}
+
+.zukan-archive .gi-archive-featured-posts h2 {
+    font-family: var(--zukan-font-serif) !important;
+    font-size: 1.25rem !important;
+    color: var(--zukan-ink-primary) !important;
+    margin-bottom: 24px !important;
+    padding-left: 0 !important;
+    padding-bottom: 12px !important;
+    border-left: none !important;
+    border-bottom: 2px solid #f3f4f6 !important;
+}
+
+.zukan-archive .gi-featured-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+    gap: 16px !important;
+}
+
+.zukan-archive .gi-featured-card {
+    background: #f9fafb !important;
+    border-radius: 2px !important;
+    padding: 20px !important;
+    text-decoration: none !important;
+    color: inherit !important;
+    box-shadow: none !important;
+    border: 1px solid #e5e7eb !important;
+    transition: all var(--zukan-transition) !important;
+}
+
+.zukan-archive .gi-featured-card:hover {
+    transform: none !important;
+    box-shadow: var(--zukan-shadow-card-hover) !important;
+    border-color: var(--zukan-accent-gold) !important;
+}
+
+.zukan-archive .gi-featured-card h3 {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: var(--zukan-ink-primary) !important;
+    font-family: var(--zukan-font-sans) !important;
+    margin: 0 0 12px !important;
+    line-height: 1.5 !important;
+    border-bottom: none !important;
+    padding-bottom: 0 !important;
+}
+
+.zukan-archive .gi-featured-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.zukan-archive .gi-featured-prefecture {
+    background: var(--zukan-ink-primary);
+    color: #fff;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 2px;
+    font-family: var(--zukan-font-sans);
+}
+
+.zukan-archive .gi-featured-deadline {
+    color: var(--zukan-accent-red);
+    font-size: 11px;
+    font-family: var(--zukan-font-sans);
+}
+
+.zukan-archive .gi-featured-amount {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--zukan-accent-red);
+    font-family: var(--zukan-font-sans);
+}
+
+/* サイドバー追加コンテンツ */
+.zukan-archive .gi-archive-seo-sidebar {
+    margin-bottom: 24px;
+}
+
+.zukan-archive .gi-archive-seo-sidebar .gi-seo-content-box {
+    padding: 20px !important;
+}
+
+/* ==========================================================================
+   Sidebar - ウィジェットスタイル
+   ========================================================================== */
+.zukan-archive .yahoo-sidebar,
+.zukan-archive .zukan-sidebar {
+    flex-shrink: 0;
+}
+
+@media (min-width: 1024px) {
+    .zukan-archive .yahoo-sidebar,
+    .zukan-archive .zukan-sidebar {
+        width: 300px;
+    }
+}
+
+/* サイドバー装飾ラインを非表示 */
+.zukan-archive .yahoo-sidebar::before,
+.zukan-archive .zukan-sidebar::before {
+    display: none;
+}
+
+/* Widget Box */
+.zukan-archive .sidebar-widget {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 2px;
+    margin-bottom: 24px;
+    padding: 24px;
+    position: relative;
+    box-shadow: var(--zukan-shadow-card-sm);
+}
+
+/* ウィジェット上部のアクセントライン */
+.zukan-archive .sidebar-widget::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--zukan-ink-primary);
+}
+
+.zukan-archive .widget-title {
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: var(--zukan-font-serif);
+    color: var(--zukan-ink-primary);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.zukan-archive .widget-title svg {
+    color: var(--zukan-accent-gold);
+}
+
+/* Ranking Tabs */
+.zukan-archive .ranking-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 16px;
+}
+
+.zukan-archive .ranking-tab {
+    flex: 1;
+    padding: 8px 12px;
+    background: #f3f4f6;
+    border: none;
+    border-radius: 2px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: var(--zukan-font-sans);
+    color: var(--zukan-ink-light);
+    cursor: pointer;
+    transition: all var(--zukan-transition);
+}
+
+.zukan-archive .ranking-tab:hover {
+    background: #e5e7eb;
+}
+
+.zukan-archive .ranking-tab.active {
+    background: var(--zukan-ink-primary);
+    color: #fff;
+}
+
+/* Ranking List */
+.zukan-archive .ranking-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.zukan-archive .ranking-item {
+    margin-bottom: 0;
+}
+
+.zukan-archive .ranking-link {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    text-decoration: none;
+    color: inherit;
+    border-bottom: 1px solid #f3f4f6;
+    transition: background-color var(--zukan-transition);
+}
+
+.zukan-archive .ranking-item:last-child .ranking-link {
+    border-bottom: none;
+}
+
+.zukan-archive .ranking-link:hover {
+    background: #fafafa;
+    margin: 0 -12px;
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.zukan-archive .ranking-number {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: var(--zukan-font-serif);
+    color: #fff;
+    border-radius: 2px;
+    background: #d1d5db;
+}
+
+.zukan-archive .rank-1 .ranking-number {
+    background: var(--zukan-rank-1);
+}
+
+.zukan-archive .rank-2 .ranking-number {
+    background: var(--zukan-rank-2);
+}
+
+.zukan-archive .rank-3 .ranking-number {
+    background: var(--zukan-rank-3);
+}
+
+.zukan-archive .ranking-title {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: var(--zukan-font-serif);
+    color: var(--zukan-ink-primary);
+    line-height: 1.4;
+}
+
+.zukan-archive .ranking-link:hover .ranking-title {
+    color: var(--zukan-accent-red);
+}
+
+.zukan-archive .ranking-views {
+    font-size: 11px;
+    color: #9ca3af;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Topics List */
+.zukan-archive .topics-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.zukan-archive .topics-item {
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+    border-bottom: 1px dashed #e5e7eb;
+}
+
+.zukan-archive .topics-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.zukan-archive .topics-link {
+    display: block;
+    text-decoration: none;
+}
+
+.zukan-archive .topics-date {
+    display: block;
+    font-size: 10px;
+    color: #9ca3af;
+    font-family: var(--zukan-font-sans);
+    margin-bottom: 4px;
+}
+
+.zukan-archive .topics-title {
+    font-size: 13px;
+    font-family: var(--zukan-font-serif);
+    color: var(--zukan-ink-primary);
+    line-height: 1.5;
+    transition: color var(--zukan-transition);
+}
+
+.zukan-archive .topics-link:hover .topics-title {
+    color: var(--zukan-link-blue);
+}
+
+/* Categories List */
+.zukan-archive .categories-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.zukan-archive .categories-item {
+    margin-bottom: 0;
+}
+
+.zukan-archive .categories-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    text-decoration: none;
+    color: var(--zukan-ink-primary);
+    font-size: 13px;
+    font-family: var(--zukan-font-serif);
+    border-bottom: 1px solid #f3f4f6;
+    transition: all var(--zukan-transition);
+}
+
+.zukan-archive .categories-item:last-child .categories-link {
+    border-bottom: none;
+}
+
+.zukan-archive .categories-link:hover {
+    color: var(--zukan-accent-red);
+    padding-left: 8px;
+}
+
+.zukan-archive .categories-count {
+    font-size: 11px;
+    color: #9ca3af;
+}
+
+/* ==========================================================================
+   Sidebar Search Widget - サイドバー検索
+   ========================================================================== */
+.zukan-archive .sidebar-search-widget {
+    position: relative;
+}
+
+.zukan-archive .sidebar-search-form {
+    display: flex;
+    border: 1px solid #d1d5db;
+    border-radius: 2px;
+    overflow: hidden;
+    background: #f9fafb;
+}
+
+.zukan-archive .sidebar-search-input {
+    flex: 1;
+    border: none;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-family: var(--zukan-font-sans);
+    background: transparent;
+    color: var(--zukan-ink-primary);
+    min-width: 0;
+}
+
+.zukan-archive .sidebar-search-input::placeholder {
+    color: #9ca3af;
+}
+
+.zukan-archive .sidebar-search-input:focus {
+    outline: none;
+}
+
+.zukan-archive .sidebar-search-form:focus-within {
+    border-color: var(--zukan-accent-gold);
+}
+
+.zukan-archive .sidebar-search-btn {
+    flex-shrink: 0;
+    padding: 10px 14px;
+    background: var(--zukan-ink-primary);
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color var(--zukan-transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.zukan-archive .sidebar-search-btn:hover {
+    background: #374151;
+}
+
+/* ==========================================================================
+   Sidebar Filter Widget - サイドバー絞り込み
+   ========================================================================== */
+.zukan-archive .sidebar-filter-widget {
+    position: relative;
+}
+
+.zukan-archive .sidebar-filter-group {
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.zukan-archive .sidebar-filter-group:last-of-type {
+    border-bottom: none;
+}
+
+.zukan-archive .sidebar-filter-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: var(--zukan-font-sans);
+    transition: color var(--zukan-transition);
+}
+
+.zukan-archive .sidebar-filter-toggle:hover {
+    color: var(--zukan-accent-red);
+}
+
+.zukan-archive .filter-group-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--zukan-ink-primary);
+}
+
+.zukan-archive .filter-selected-count {
+    background: var(--zukan-accent-red);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 8px;
+}
+
+.zukan-archive .toggle-arrow {
+    color: #9ca3af;
+    transition: transform var(--zukan-transition);
+}
+
+.zukan-archive .sidebar-filter-toggle[aria-expanded="true"] .toggle-arrow {
+    transform: rotate(180deg);
+}
+
+.zukan-archive .sidebar-filter-options {
+    padding: 0 0 12px;
+    max-height: 240px;
+    overflow-y: auto;
+}
+
+/* Custom Checkbox スタイル */
+.zukan-archive .sidebar-filter-option {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--zukan-ink-light);
+    transition: color var(--zukan-transition);
+}
+
+.zukan-archive .sidebar-filter-option:hover {
+    color: var(--zukan-ink-primary);
+}
+
+.zukan-archive .sidebar-filter-option input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.zukan-archive .checkbox-custom {
+    width: 16px;
+    height: 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 2px;
+    margin-right: 10px;
+    flex-shrink: 0;
+    background: #fff;
+    position: relative;
+    transition: all var(--zukan-transition);
+}
+
+.zukan-archive .sidebar-filter-option input[type="checkbox"]:checked + .checkbox-custom {
+    background: var(--zukan-ink-primary);
+    border-color: var(--zukan-ink-primary);
+}
+
+.zukan-archive .sidebar-filter-option input[type="checkbox"]:checked + .checkbox-custom::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 4px;
+    height: 8px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.zukan-archive .sidebar-filter-option input[type="checkbox"]:focus + .checkbox-custom {
+    box-shadow: 0 0 0 2px rgba(197, 160, 89, 0.3);
+}
+
+.zukan-archive .option-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.zukan-archive .option-count {
+    color: #9ca3af;
+    font-size: 11px;
+    margin-left: 4px;
+}
+
+.zukan-archive .sidebar-filter-more {
+    display: block;
+    width: 100%;
+    padding: 8px;
+    background: transparent;
+    border: 1px dashed #d1d5db;
+    border-radius: 2px;
+    color: #6b7280;
+    font-size: 12px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: all var(--zukan-transition);
+}
+
+.zukan-archive .sidebar-filter-more:hover {
+    background: #f9fafb;
+    border-color: var(--zukan-accent-gold);
+    color: var(--zukan-ink-primary);
+}
+
+/* フィルターアクションボタン */
+.zukan-archive .sidebar-filter-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.zukan-archive .sidebar-apply-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 12px;
+    background: var(--zukan-ink-primary);
+    color: #fff;
+    border: none;
+    border-radius: 2px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: var(--zukan-font-sans);
+    cursor: pointer;
+    transition: all var(--zukan-transition);
+}
+
+.zukan-archive .sidebar-apply-btn:hover {
+    background: #374151;
+}
+
+.zukan-archive .sidebar-reset-btn {
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    color: #6b7280;
+    border: 1px solid #d1d5db;
+    border-radius: 2px;
+    font-size: 12px;
+    font-family: var(--zukan-font-sans);
+    cursor: pointer;
+    transition: all var(--zukan-transition);
+}
+
+.zukan-archive .sidebar-reset-btn:hover {
+    background: #f9fafb;
+    border-color: var(--zukan-accent-red);
+    color: var(--zukan-accent-red);
+}
+
+/* ==========================================================================
+   Main Content Filter (hidden on desktop, visible on mobile)
+   ========================================================================== */
+@media (min-width: 1024px) {
+    .zukan-archive .yahoo-filter-section {
+        display: none;
+    }
+    
+    .zukan-archive .mobile-filter-toggle {
+        display: none;
+    }
+}
+
+@media (max-width: 1023px) {
+    .zukan-archive .sidebar-search-widget,
+    .zukan-archive .sidebar-filter-widget {
+        display: none;
+    }
+    
+    .zukan-archive .yahoo-filter-section {
+        display: block;
+    }
+}
+
+/* Ad Space */
+.zukan-archive .sidebar-ad-space {
+    margin-bottom: 24px;
+}
+
+/* CTA Banner */
+.zukan-archive .sidebar-cta-banner {
+    background: var(--zukan-ink-primary);
+    color: #fff;
+    padding: 24px;
+    border-radius: 2px;
+    text-align: center;
+}
+
+.zukan-archive .sidebar-cta-banner h3 {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.zukan-archive .sidebar-cta-banner p {
+    font-size: 12px;
+    color: #d1d5db;
+    margin-bottom: 16px;
+    line-height: 1.6;
+}
+
+.zukan-archive .sidebar-cta-banner button {
+    background: var(--zukan-accent-gold);
+    color: var(--zukan-ink-primary);
+    font-weight: 700;
+    font-size: 12px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background-color var(--zukan-transition);
+    width: 100%;
+}
+
+.zukan-archive .sidebar-cta-banner button:hover {
+    background: #fff;
+}
+
+/* ==========================================================================
+   Pagination
+   ========================================================================== */
+.zukan-archive .zukan-pagination,
+.zukan-archive .pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 48px;
+    font-family: var(--zukan-font-sans);
+}
+
+.zukan-archive .zukan-pagination .page-numbers,
+.zukan-archive .pagination-wrapper .page-numbers {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    padding: 0 8px;
+    font-size: 13px;
+    color: #6b7280;
+    text-decoration: none;
+    border: 1px solid #d1d5db;
+    border-radius: 2px;
+    background: #fff;
+    transition: all var(--zukan-transition);
+}
+
+.zukan-archive .zukan-pagination .page-numbers:hover,
+.zukan-archive .pagination-wrapper .page-numbers:hover {
+    background: #f9fafb;
+}
+
+.zukan-archive .zukan-pagination .page-numbers.current,
+.zukan-archive .pagination-wrapper .page-numbers.current {
+    background: var(--zukan-ink-primary);
+    color: #fff;
+    border-color: var(--zukan-ink-primary);
+    font-weight: 700;
+}
+
+/* ==========================================================================
+   Loading
+   ========================================================================== */
+.zukan-archive .loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.zukan-archive .loading-spinner {
+    text-align: center;
+}
+
+.zukan-archive .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e5e7eb;
+    border-top-color: var(--zukan-ink-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 12px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.zukan-archive .loading-text {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+@media (max-width: 768px) {
+    .zukan-archive .zukan-grant-card {
+        padding: 20px;
+    }
+    
+    .zukan-archive .sidebar-widget {
+        padding: 20px;
+    }
+    
+    .zukan-archive .zukan-article-section {
+        padding: 24px;
+    }
+}
+
+/* ==========================================================================
+   Print
+   ========================================================================== */
+@media print {
+    .zukan-archive {
+        background: white !important;
+    }
+    
+    .zukan-archive .yahoo-sidebar,
+    .zukan-archive .zukan-sidebar {
+        display: none;
+    }
+}
+
+/* ==========================================================================
+   Accessibility
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+    .zukan-archive *,
+    .zukan-archive *::before,
+    .zukan-archive *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+.zukan-archive a:focus-visible,
+.zukan-archive button:focus-visible {
+    outline: 2px solid var(--zukan-accent-gold);
+    outline-offset: 2px;
+}
+
+.zukan-archive .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}

@@ -815,6 +815,26 @@ function gi_enqueue_external_assets() {
             ));
         }
     }
+    
+    // 補助金図鑑 (ZUKAN) Pages
+    // subsidy アーカイブおよび関連タクソノミー
+    if (is_post_type_archive('subsidy') || 
+        is_singular('subsidy') ||
+        is_tax('zukan_region') || 
+        is_tax('zukan_purpose') || 
+        is_tax('zukan_industry')) {
+        
+        // Subsidy ZUKAN CSS
+        if (file_exists($template_dir . '/assets/css/subsidy-zukan.css')) {
+            wp_enqueue_style(
+                'gi-subsidy-zukan',
+                $template_uri . '/assets/css/subsidy-zukan.css',
+                array('wp-block-library', 'gi-tailwind'),
+                filemtime($template_dir . '/assets/css/subsidy-zukan.css'),
+                'all'
+            );
+        }
+    }
 }
 add_action('wp_enqueue_scripts', 'gi_enqueue_external_assets', 1);
 
@@ -1003,6 +1023,12 @@ if (file_exists($critical_css_file)) {
 $image_optimization_file = get_template_directory() . '/inc/image-optimization.php';
 if (file_exists($image_optimization_file)) {
     require_once $image_optimization_file;
+}
+
+// アーカイブSEOコンテンツ管理システム - 既存アーカイブページの個別編集
+$archive_seo_content_file = get_template_directory() . '/inc/archive-seo-content.php';
+if (file_exists($archive_seo_content_file)) {
+    require_once $archive_seo_content_file;
 }
 
 /**
