@@ -282,13 +282,32 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
         </div>
     </nav>
 
-    <!-- ヒーローセクション -->
-    <section class="zukan-hero">
+    <!-- ヒーローセクション - 書籍タイトルページ風デザイン -->
+    <section class="zukan-hero zukan-hero-book">
         <div class="yahoo-container">
-            <div class="zukan-hero-content">
-                <p class="zukan-hero-lead">
-                    多くの大型補助金（ものづくり補助金や事業再構築補助金など）で、「<strong>給与支給総額の年率増加</strong>」が必須要件、あるいは強力な加点項目となっています。「投資して、稼いで、社員に還元する」サイクルを描ける企業が採択を勝ち取れます。この「補助金図鑑」では、膨大な公募情報の中から、特に実用性が高く、採択の可能性がある制度を厳選して掲載しています。自社の課題に合った制度を「目的」や「地域」から探してみてください。
-                </p>
+            <div class="zukan-hero-book-cover">
+                <div class="zukan-hero-book-inner">
+                    <div class="zukan-hero-book-decoration top-left"></div>
+                    <div class="zukan-hero-book-decoration top-right"></div>
+                    <div class="zukan-hero-book-decoration bottom-left"></div>
+                    <div class="zukan-hero-book-decoration bottom-right"></div>
+                    
+                    <div class="zukan-hero-book-content">
+                        <span class="zukan-hero-subtitle">令和<?php echo date('Y') - 2018; ?>年度版</span>
+                        <h2 class="zukan-hero-main-title">補助金・助成金</h2>
+                        <p class="zukan-hero-main-subtitle">総合図鑑</p>
+                        <div class="zukan-hero-divider"></div>
+                        <p class="zukan-hero-tagline">全国の支援制度を網羅した決定版</p>
+                        <div class="zukan-hero-stats">
+                            <span class="zukan-hero-stat-item">
+                                <span class="stat-number"><?php echo $total_grants_formatted; ?></span>
+                                <span class="stat-label">件以上の制度を収録</span>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="zukan-hero-book-spine"></div>
+                </div>
             </div>
         </div>
     </section>
@@ -311,17 +330,23 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
             }
             ?>
             
-            <!-- ページタイトルエリア（イントロの後に配置） -->
-            <div class="results-header zukan-results-header" style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #f3f4f6;">
-                <div>
-                    <h1 class="results-title" style="font-size: 1.5rem; font-weight: 700; margin-bottom: 8px;"><?php echo esc_html($archive_title); ?></h1>
-                    <p class="results-meta" style="font-size: 14px; color: #6b7280;">
-                        条件に合致した制度：<strong style="color: #a63737; font-size: 1.25rem; font-weight: 700;" id="current-count"><?php echo $total_grants_formatted; ?></strong> 件
-                    </p>
+            <!-- 統合された検索結果ヘッダー（イントロの後に配置） -->
+            <div class="results-header zukan-results-header unified-results-header">
+                <div class="results-header-main">
+                    <h1 class="results-title"><?php echo esc_html($archive_title); ?></h1>
+                    <div class="results-meta-unified">
+                        <span class="results-count-primary">
+                            条件に合致した制度：<strong id="current-count"><?php echo $total_grants_formatted; ?></strong> 件
+                        </span>
+                        <span class="results-separator">｜</span>
+                        <span class="results-showing" id="results-showing-range">
+                            <span id="showing-from">1</span>〜<span id="showing-to"><?php echo min(12, $total_grants); ?></span>件を表示
+                        </span>
+                    </div>
                 </div>
-                <div class="view-controls" style="display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 12px; color: #9ca3af;">並び替え:</span>
-                    <select id="sort-select-simple" style="background: #fff; border: 1px solid #d1d5db; font-size: 13px; border-radius: 2px; padding: 6px 10px; color: #6b7280; cursor: pointer;">
+                <div class="view-controls">
+                    <label for="sort-select-simple" class="sort-label">並び替え:</label>
+                    <select id="sort-select-simple" class="sort-select-unified">
                         <option value="date_desc">新着順</option>
                         <option value="deadline_asc">締切が近い順</option>
                         <option value="amount_desc">補助額が高い順</option>
@@ -778,58 +803,7 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
             </section>
 
             <!-- 検索結果セクション -->
-            <section class="yahoo-results-section">
-                
-                <!-- 結果ヘッダー（ページ遷移時のスクロール先） -->
-                <div class="results-header" id="results-header">
-                    <div class="results-info">
-                        <h2 class="results-title">検索結果</h2>
-                        <div class="results-meta">
-                            <span class="total-count">
-                                <strong id="result-count"><?php echo isset($initial_grants_query) ? $initial_grants_query->found_posts : $total_grants; ?></strong>件
-                            </span>
-                            <?php 
-                            $current_page = max(1, get_query_var('paged'));
-                            $per_page = 12;
-                            $from = ($current_page - 1) * $per_page + 1;
-                            $to = min($current_page * $per_page, isset($initial_grants_query) ? $initial_grants_query->found_posts : $total_grants);
-                            ?>
-                            <span class="showing-range">
-                                （<span id="showing-from"><?php echo $from; ?></span>〜<span id="showing-to"><?php echo $to; ?></span>件を表示）
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="view-controls">
-                        <button class="view-btn active" 
-                                data-view="single" 
-                                title="単体表示" 
-                                type="button">
-                            <svg width="18" 
-                                 height="18" 
-                                 viewBox="0 0 24 24" 
-                                 fill="currentColor" 
-                                 aria-hidden="true">
-                                <rect x="2" y="2" width="20" height="20"/>
-                            </svg>
-                        </button>
-                        <button class="view-btn" 
-                                data-view="grid" 
-                                title="カード表示" 
-                                type="button">
-                            <svg width="18" 
-                                 height="18" 
-                                 viewBox="0 0 24 24" 
-                                 fill="currentColor" 
-                                 aria-hidden="true">
-                                <rect x="3" y="3" width="7" height="7"/>
-                                <rect x="14" y="3" width="7" height="7"/>
-                                <rect x="3" y="14" width="7" height="7"/>
-                                <rect x="14" y="14" width="7" height="7"/>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
+            <section class="yahoo-results-section" id="grants-results-section">
 
                 <!-- ローディング -->
                 <div class="loading-overlay" 
@@ -1589,19 +1563,84 @@ function initSidebarFilters() {
         });
     }
     
-    // 「さらに表示」ボタン
+    // 「さらに表示」ボタン - カテゴリ追加読み込み
     var moreButtons = document.querySelectorAll('.sidebar-filter-more');
     moreButtons.forEach(function(btn) {
         btn.addEventListener('click', function() {
             var target = this.getAttribute('data-target');
+            var button = this;
             console.log('Show more clicked for:', target);
-            // TODO: Load more options via AJAX or show hidden options
-            this.textContent = '読み込み中...';
-            this.disabled = true;
+            
+            if (target === 'category') {
+                button.textContent = '読み込み中...';
+                button.disabled = true;
+                
+                // 残りのカテゴリを表示
+                loadMoreCategories(button);
+            }
         });
     });
     
     console.log('✅ Sidebar filters initialized');
+}
+
+/**
+ * カテゴリの追加読み込み
+ */
+function loadMoreCategories(button) {
+    // AJAXでカテゴリを取得
+    var formData = new FormData();
+    formData.append('action', 'gi_get_all_categories');
+    formData.append('nonce', '<?php echo wp_create_nonce("gi_ajax_nonce"); ?>');
+    formData.append('offset', 8); // 既に表示している8件をスキップ
+    
+    fetch('<?php echo admin_url("admin-ajax.php"); ?>', {
+        method: 'POST',
+        body: formData
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        if (data.success && data.data.categories) {
+            var optionsContainer = document.querySelector('#sidebar-category-filter .sidebar-filter-options');
+            var categories = data.data.categories;
+            
+            categories.forEach(function(category) {
+                var label = document.createElement('label');
+                label.className = 'sidebar-filter-option';
+                label.innerHTML = 
+                    '<input type="checkbox" name="sidebar_category[]" value="' + category.slug + '">' +
+                    '<span class="checkbox-custom"></span>' +
+                    '<span class="option-label">' + category.name + '</span>' +
+                    '<span class="option-count">' + category.count + '</span>';
+                
+                // チェックボックスの変更イベント
+                label.querySelector('input').addEventListener('change', function() {
+                    updateFilterCounts();
+                });
+                
+                // ボタンの前に挿入
+                optionsContainer.insertBefore(label, button);
+            });
+            
+            // ボタンを削除
+            button.remove();
+            console.log('✅ Loaded', categories.length, 'more categories');
+        } else {
+            button.textContent = 'カテゴリの取得に失敗しました';
+            setTimeout(function() {
+                button.textContent = 'さらに表示';
+                button.disabled = false;
+            }, 2000);
+        }
+    })
+    .catch(function(error) {
+        console.error('カテゴリ取得エラー:', error);
+        button.textContent = 'エラーが発生しました';
+        setTimeout(function() {
+            button.textContent = 'さらに表示';
+            button.disabled = false;
+        }, 2000);
+    });
 }
 
 /**

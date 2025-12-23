@@ -114,11 +114,62 @@ add_action('wp_ajax_nopriv_gi_search_grants', 'gi_ajax_search_grants');
 add_action('wp_ajax_gi_get_search_suggestions', 'gi_ajax_get_search_suggestions_handler');
 add_action('wp_ajax_nopriv_gi_get_search_suggestions', 'gi_ajax_get_search_suggestions_handler');
 
+// 全カテゴリ取得機能（サイドバーフィルター用）
+add_action('wp_ajax_gi_get_all_categories', 'gi_ajax_get_all_categories');
+add_action('wp_ajax_nopriv_gi_get_all_categories', 'gi_ajax_get_all_categories');
+
 /**
  * =============================================================================
  * 主要なAJAXハンドラー関数 - 完全版
  * =============================================================================
  */
+
+/**
+ * 全カテゴリ取得 - サイドバー「さらに表示」用
+ * 
+ * @since 6.1.0
+ */
+function gi_ajax_get_all_categories() {
+    // セキュリティチェック
+    if (!gi_verify_ajax_nonce()) {
+        wp_send_json_error(['message' => 'セキュリティチェックに失敗しました']);
+        return;
+    }
+    
+    // オフセット取得（既に表示済みの件数）
+    $offset = isset($_POST['offset']) ? intval($_POST['offset']) : 0;
+    
+    // 全カテゴリを取得
+    $all_categories = get_terms([
+        'taxonomy' => 'grant_category',
+        'hide_empty' => false,
+        'orderby' => 'count',
+        'order' => 'DESC'
+    ]);
+    
+    if (is_wp_error($all_categories)) {
+        wp_send_json_error(['message' => 'カテゴリの取得に失敗しました']);
+        return;
+    }
+    
+    // オフセット以降のカテゴリのみ返す
+    $remaining_categories = array_slice($all_categories, $offset);
+    
+    // レスポンス用に整形
+    $categories = array_map(function($cat) {
+        return [
+            'slug' => $cat->slug,
+            'name' => $cat->name,
+            'count' => $cat->count
+        ];
+    }, $remaining_categories);
+    
+    wp_send_json_success([
+        'categories' => $categories,
+        'total' => count($all_categories),
+        'remaining' => count($remaining_categories)
+    ]);
+}
 
 /**
  * Enhanced AI検索処理 - セマンティック検索付き
