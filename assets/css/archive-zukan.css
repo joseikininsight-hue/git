@@ -1,0 +1,2262 @@
+/**
+ * Archive ZUKAN CSS - 補助金図鑑スタイル v4.0
+ * 本・図鑑をコンセプトにした洗練されたデザイン
+ * 提供されたHTMLデザインを忠実に再現（ペーパークリップカード、ヒーロー、記事セクション）
+ * 
+ * @package Grant_Insight_Perfect
+ * @version 4.0.0
+ */
+
+/* ==========================================================================
+   Google Fonts Import
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap');
+
+/* ==========================================================================
+   CSS Variables - 図鑑カラーパレット（HTMLリファレンス準拠）
+   ========================================================================== */
+:root {
+    /* 本・図鑑カラー */
+    --zukan-desk-wood: #2c241b;
+    --zukan-book-cover: #1a2634;
+    --zukan-paper-warm: #fdfbf6;
+    --zukan-paper-shadow: #e3dac9;
+    --zukan-ink-primary: #2b2b2b;
+    --zukan-ink-secondary: #595959;
+    --zukan-accent-gold: #c5a059;
+    --zukan-accent-red: #a63737;
+    --zukan-highlight-blue: #3d5a80;
+    
+    /* タイポグラフィ */
+    --zukan-font-serif: "Shippori Mincho", "Yu Mincho", serif;
+    --zukan-font-sans: "Noto Sans JP", -apple-system, sans-serif;
+    
+    /* シャドウ */
+    --zukan-shadow-book: 0 20px 30px -10px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0,0,0,0.05);
+    --zukan-shadow-page: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --zukan-shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    
+    /* トランジション */
+    --zukan-transition: 0.3s ease;
+}
+
+/* ==========================================================================
+   Body - 木目調の机（本を開くデスク）
+   ========================================================================== */
+body.zukan-theme,
+.zukan-archive {
+    background-color: var(--zukan-desk-wood);
+    background-image: 
+        linear-gradient(rgba(44, 36, 27, 0.9), rgba(44, 36, 27, 0.9)),
+        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    color: var(--zukan-ink-primary);
+    font-family: var(--zukan-font-sans);
+    line-height: 1.7;
+}
+
+/* ==========================================================================
+   The Book Container - 本の形状
+   ========================================================================== */
+.zukan-archive .the-book,
+.zukan-archive.the-book,
+.zukan-archive .yahoo-container {
+    position: relative;
+    background-color: var(--zukan-paper-warm);
+    box-shadow: 
+        0 0 0 2px #5c4b37,
+        0 0 0 6px var(--zukan-desk-wood),
+        0 30px 60px rgba(0, 0, 0, 0.6);
+    margin: 40px auto;
+    max-width: 1200px;
+    min-height: 100vh;
+    border-radius: 4px 16px 16px 4px;
+}
+
+.zukan-archive .yahoo-two-column-layout {
+    margin-top: 0;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+/* 背表紙エフェクト */
+.zukan-archive .the-book::before,
+.zukan-archive.the-book::before,
+.grant-archive-yahoo-style.zukan-archive::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 40px;
+    background: linear-gradient(to right, 
+        rgba(0,0,0,0.2) 0%, 
+        rgba(0,0,0,0.05) 15%, 
+        rgba(0,0,0,0) 100%);
+    z-index: 10;
+    pointer-events: none;
+    border-left: 1px solid rgba(0,0,0,0.1);
+}
+
+/* 紙テクスチャ */
+.zukan-archive .paper-texture {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 5;
+    border-radius: inherit;
+}
+
+/* ==========================================================================
+   Book Breadcrumb - パンくずリスト（本の章立て風）
+   ========================================================================== */
+.zukan-archive .book-breadcrumb {
+    position: relative;
+    background: linear-gradient(135deg, rgba(253, 251, 246, 0.98) 0%, rgba(247, 244, 236, 0.98) 100%);
+    padding: 16px 24px;
+    border-bottom: 1px solid rgba(197, 160, 89, 0.2);
+}
+
+.zukan-archive .book-breadcrumb-spine {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, var(--zukan-accent-gold) 0%, var(--zukan-accent-red) 100%);
+}
+
+.zukan-archive .book-breadcrumb-inner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.zukan-archive .book-breadcrumb-icon {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    background: var(--zukan-book-cover);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.zukan-archive .book-breadcrumb-icon svg {
+    width: 18px;
+    height: 18px;
+    color: var(--zukan-accent-gold);
+}
+
+.zukan-archive .breadcrumb-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.zukan-archive .breadcrumb-item {
+    display: flex;
+    align-items: center;
+}
+
+.zukan-archive .book-breadcrumb-link {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background-color var(--zukan-transition);
+}
+
+.zukan-archive .book-breadcrumb-link:hover {
+    background: rgba(197, 160, 89, 0.1);
+}
+
+.zukan-archive .book-breadcrumb-chapter {
+    font-size: 9px;
+    font-family: var(--zukan-font-sans);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--zukan-accent-gold);
+    line-height: 1;
+}
+
+.zukan-archive .book-breadcrumb-text {
+    font-size: 13px;
+    font-family: var(--zukan-font-serif);
+    color: var(--zukan-ink-primary);
+    line-height: 1.3;
+}
+
+.zukan-archive .book-breadcrumb-sep {
+    display: flex;
+    align-items: center;
+    margin: 0 4px;
+    color: #ccc;
+}
+
+.zukan-archive .book-breadcrumb-sep svg {
+    width: 14px;
+    height: 14px;
+}
+
+.zukan-archive .book-breadcrumb-current {
+    display: flex;
+    flex-direction: column;
+    padding: 4px 8px;
+    background: rgba(197, 160, 89, 0.15);
+    border-radius: 4px;
+}
+
+.zukan-archive .book-breadcrumb-current .book-breadcrumb-text {
+    font-weight: 600;
+}
+
+/* ==========================================================================
+   Hero Section - タイトルページ風（HTMLリファレンス準拠）
+   ========================================================================== */
+.zukan-archive .zukan-hero {
+    text-align: center;
+    padding: 80px 24px 60px;
+    margin-bottom: 0;
+    border-bottom: 3px double var(--zukan-accent-gold);
+    position: relative;
+    background: linear-gradient(180deg, var(--zukan-paper-warm) 0%, rgba(253, 251, 246, 0.9) 100%);
+}
+
+/* 装飾コーナー */
+.zukan-archive .zukan-hero::before,
+.zukan-archive .zukan-hero::after {
+    content: '❧';
+    position: absolute;
+    font-size: 32px;
+    color: var(--zukan-accent-gold);
+    opacity: 0.4;
+}
+
+.zukan-archive .zukan-hero::before {
+    top: 24px;
+    left: 24px;
+}
+
+.zukan-archive .zukan-hero::after {
+    bottom: 24px;
+    right: 24px;
+    transform: rotate(180deg);
+}
+
+.zukan-archive .zukan-hero-badge {
+    display: inline-block;
+    padding: 10px 24px;
+    margin-bottom: 28px;
+    border: 2px solid var(--zukan-accent-gold);
+    color: var(--zukan-accent-gold);
+    font-size: 12px;
+    font-family: var(--zukan-font-serif);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    position: relative;
+}
+
+.zukan-archive .zukan-hero-badge::before,
+.zukan-archive .zukan-hero-badge::after {
+    content: '◆';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 8px;
+}
+
+.zukan-archive .zukan-hero-badge::before {
+    left: 8px;
+}
+
+.zukan-archive .zukan-hero-badge::after {
+    right: 8px;
+}
+
+.zukan-archive .zukan-hero-title {
+    font-size: clamp(36px, 7vw, 64px);
+    font-family: var(--zukan-font-serif);
+    font-weight: 700;
+    color: var(--zukan-ink-primary);
+    margin-bottom: 20px;
+    line-height: 1.2;
+    letter-spacing: 0.05em;
+}
+
+.zukan-archive .zukan-hero-subtitle {
+    display: block;
+    font-size: clamp(18px, 3vw, 24px);
+    font-family: var(--zukan-font-serif);
+    font-weight: 400;
+    color: var(--zukan-ink-secondary);
+    margin-top: 16px;
+    letter-spacing: 0.1em;
+}
+
+.zukan-archive .zukan-hero-description {
+    font-size: 15px;
+    font-family: var(--zukan-font-serif);
+    color: #666;
+    max-width: 650px;
+    margin: 28px auto 0;
+    line-height: 2;
+    font-style: italic;
+    text-align: center;
+}
+
+/* 装飾ライン - Ornament */
+.zukan-archive .zukan-ornament {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 36px 0;
+    color: var(--zukan-accent-gold);
+}
+
+.zukan-archive .zukan-ornament::before,
+.zukan-archive .zukan-ornament::after {
+    content: '';
+    height: 1px;
+    background: linear-gradient(90deg, transparent, currentColor, transparent);
+    flex-grow: 1;
+    max-width: 120px;
+    margin: 0 20px;
+}
+
+.zukan-archive .zukan-ornament-symbol {
+    font-size: 28px;
+}
+
+/* 統計グリッド */
+.zukan-archive .zukan-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    max-width: 500px;
+    margin: 0 auto;
+    padding-top: 20px;
+}
+
+.zukan-archive .zukan-stat-item {
+    text-align: center;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 8px;
+    border: 1px solid rgba(197, 160, 89, 0.2);
+}
+
+.zukan-archive .zukan-stat-number {
+    display: block;
+    font-size: clamp(24px, 4vw, 32px);
+    font-family: var(--zukan-font-serif);
+    font-weight: 700;
+    color: var(--zukan-book-cover);
+    line-height: 1;
+    margin-bottom: 6px;
+}
+
+.zukan-archive .zukan-stat-label {
+    font-size: 12px;
+    color: var(--zukan-ink-secondary);
+    letter-spacing: 0.05em;
+}
+
+/* ==========================================================================
+   Index Tabs - 右側インデックスタブ（しおり風）
+   ========================================================================== */
+.zukan-archive .index-tabs {
+    position: fixed;
+    right: calc((100vw - 1200px) / 2 - 36px);
+    top: 150px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 30;
+}
+
+@media (max-width: 1300px) {
+    .zukan-archive .index-tabs {
+        right: 0;
+    }
+}
+
+@media (max-width: 1024px) {
+    .zukan-archive .index-tabs {
+        display: none;
+    }
+}
+
+.zukan-archive .index-tab {
+    width: 40px;
+    height: 100px;
+    background-color: var(--zukan-paper-shadow);
+    border-radius: 0 8px 8px 0;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform var(--zukan-transition), background-color var(--zukan-transition), width var(--zukan-transition);
+    font-family: var(--zukan-font-serif);
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--zukan-ink-secondary);
+    border: 1px solid rgba(0,0,0,0.05);
+    border-left: none;
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    letter-spacing: 0.1em;
+}
+
+.zukan-archive .index-tab:hover {
+    transform: translateX(4px);
+    background-color: #eee6d3;
+}
+
+.zukan-archive .index-tab.active {
+    width: 48px;
+    background-color: var(--zukan-accent-red);
+    color: #fff;
+    transform: translateX(4px);
+    z-index: 20;
+}
+
+/* ==========================================================================
+   Content Container
+   ========================================================================== */
+.zukan-archive .zukan-content,
+.zukan-archive .yahoo-main-content {
+    padding: 40px 24px;
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 10;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .zukan-content,
+    .zukan-archive .yahoo-main-content {
+        padding: 48px 32px;
+    }
+}
+
+/* ==========================================================================
+   Section Headers - 章立てスタイル
+   ========================================================================== */
+.zukan-archive .zukan-section {
+    margin-bottom: 80px;
+}
+
+.zukan-archive .zukan-section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.zukan-archive .zukan-section-number {
+    font-size: clamp(32px, 5vw, 48px);
+    font-family: var(--zukan-font-serif);
+    font-weight: 700;
+    color: #e5e5e5;
+    line-height: 1;
+    margin-right: 16px;
+    margin-top: -8px;
+}
+
+.zukan-archive .zukan-section-title {
+    font-size: clamp(20px, 3vw, 26px);
+    font-family: var(--zukan-font-serif);
+    font-weight: 700;
+    color: var(--zukan-ink-primary);
+    border-bottom: 1px solid var(--zukan-accent-gold);
+    padding-bottom: 8px;
+    flex: 1;
+}
+
+/* ==========================================================================
+   Search Section - 検索セクション
+   ========================================================================== */
+.zukan-archive .yahoo-search-section {
+    margin: 32px 0;
+    padding: 24px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: var(--zukan-shadow-card);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.zukan-archive .search-bar-wrapper {
+    position: relative;
+}
+
+.zukan-archive .search-input-container {
+    display: flex;
+    align-items: center;
+    background: var(--zukan-paper-warm);
+    border: 2px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 4px;
+    transition: border-color var(--zukan-transition), box-shadow var(--zukan-transition);
+}
+
+.zukan-archive .search-input-container:focus-within {
+    border-color: var(--zukan-accent-gold);
+    box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.1);
+}
+
+.zukan-archive .search-icon {
+    flex-shrink: 0;
+    margin: 0 12px;
+    color: var(--zukan-ink-secondary);
+}
+
+.zukan-archive .search-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 12px 8px;
+    font-size: 15px;
+    font-family: var(--zukan-font-sans);
+    color: var(--zukan-ink-primary);
+}
+
+.zukan-archive .search-input::placeholder {
+    color: #999;
+}
+
+.zukan-archive .search-input:focus {
+    outline: none;
+}
+
+.zukan-archive .search-clear-btn {
+    background: #e5e5e5;
+    border: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+    color: #666;
+    margin-right: 8px;
+    transition: background-color var(--zukan-transition);
+}
+
+.zukan-archive .search-clear-btn:hover {
+    background: #d5d5d5;
+}
+
+.zukan-archive .search-execute-btn {
+    background: var(--zukan-book-cover);
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color var(--zukan-transition);
+}
+
+.zukan-archive .search-execute-btn:hover {
+    background: #2a3f52;
+}
+
+/* ==========================================================================
+   Filter Section - フィルターセクション
+   ========================================================================== */
+.zukan-archive .yahoo-filter-section {
+    margin: 24px 0;
+    padding: 24px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: var(--zukan-shadow-card);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.zukan-archive .filter-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.zukan-archive .filter-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    font-family: var(--zukan-font-serif);
+    font-weight: 700;
+    color: var(--zukan-ink-primary);
+    margin: 0;
+}
+
+.zukan-archive .title-icon {
+    color: var(--zukan-accent-gold);
+}
+
+.zukan-archive .yahoo-filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+}
+
+.zukan-archive .filter-dropdown-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.zukan-archive .filter-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--zukan-ink-secondary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.zukan-archive .multi-select-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    background: var(--zukan-accent-gold);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 50%;
+}
+
+.zukan-archive .custom-select {
+    position: relative;
+}
+
+.zukan-archive .select-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--zukan-paper-warm);
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: border-color var(--zukan-transition);
+    font-size: 13px;
+    color: var(--zukan-ink-primary);
+}
+
+.zukan-archive .select-trigger:hover {
+    border-color: var(--zukan-accent-gold);
+}
+
+.zukan-archive .select-arrow {
+    color: #999;
+    transition: transform var(--zukan-transition);
+}
+
+.zukan-archive .custom-select[aria-expanded="true"] .select-arrow {
+    transform: rotate(180deg);
+}
+
+.zukan-archive .select-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 4px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    z-index: 100;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.zukan-archive .select-search-wrapper {
+    padding: 8px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.zukan-archive .select-search-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.zukan-archive .select-option {
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: background-color var(--zukan-transition);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.zukan-archive .select-option:hover {
+    background: rgba(197, 160, 89, 0.1);
+}
+
+.zukan-archive .select-option.active {
+    background: rgba(197, 160, 89, 0.15);
+    font-weight: 600;
+}
+
+.zukan-archive .select-actions {
+    display: flex;
+    gap: 8px;
+    padding: 8px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.zukan-archive .select-action-btn {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color var(--zukan-transition);
+}
+
+.zukan-archive .clear-btn {
+    background: #f5f5f5;
+    border: 1px solid #e0e0e0;
+    color: #666;
+}
+
+.zukan-archive .apply-btn {
+    background: var(--zukan-book-cover);
+    border: none;
+    color: #fff;
+}
+
+/* Active Filters Display */
+.zukan-archive .active-filters-display {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px dashed #e0e0e0;
+}
+
+.zukan-archive .active-filters-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--zukan-ink-secondary);
+    margin-bottom: 8px;
+}
+
+.zukan-archive .active-filter-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* ==========================================================================
+   Results Section - 検索結果セクション
+   ========================================================================== */
+.zukan-archive .yahoo-results-section {
+    margin-top: 32px;
+}
+
+.zukan-archive .results-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding-bottom: 20px;
+    margin-bottom: 24px;
+    border-bottom: 2px solid var(--zukan-book-cover);
+}
+
+.zukan-archive .results-title {
+    font-size: 20px;
+    font-family: var(--zukan-font-serif);
+    font-weight: 700;
+    color: var(--zukan-ink-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.zukan-archive .results-title::before {
+    content: '◆';
+    color: var(--zukan-accent-gold);
+    font-size: 12px;
+}
+
+.zukan-archive .results-meta {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--zukan-ink-secondary);
+}
+
+.zukan-archive .total-count strong {
+    font-size: 24px;
+    font-family: var(--zukan-font-serif);
+    font-weight: 700;
+    color: var(--zukan-accent-red);
+}
+
+.zukan-archive .view-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.zukan-archive .view-btn {
+    padding: 8px 12px;
+    background: #f5f5f5;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #999;
+    transition: all var(--zukan-transition);
+}
+
+.zukan-archive .view-btn:hover {
+    background: #eee;
+}
+
+.zukan-archive .view-btn.active {
+    background: var(--zukan-book-cover);
+    border-color: var(--zukan-book-cover);
+    color: var(--zukan-accent-gold);
+}
+
+/* ==========================================================================
+   Grant Card - 補助金カード（ペーパークリップ風 - HTMLリファレンス準拠）
+   ========================================================================== */
+.zukan-archive .zukan-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+/* ペーパークリップカード */
+.zukan-archive .zukan-grant-card {
+    position: relative;
+    background: #fff;
+    padding: 32px;
+    box-shadow: var(--zukan-shadow-card);
+    border: 1px solid #e5e5e5;
+    transform: rotate(0.3deg);
+    transition: transform var(--zukan-transition), box-shadow var(--zukan-transition);
+}
+
+.zukan-archive .zukan-grant-card:nth-child(even) {
+    transform: rotate(-0.3deg);
+}
+
+.zukan-archive .zukan-grant-card:hover {
+    transform: rotate(0deg) translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+}
+
+/* ペーパークリップエフェクト */
+.zukan-archive .zukan-grant-card::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 24px;
+    background: linear-gradient(135deg, #d0d0d0 0%, #e8e8e8 50%, #d0d0d0 100%);
+    border-radius: 4px;
+    box-shadow: 
+        inset 0 2px 4px rgba(0,0,0,0.1),
+        0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* クリップの3D効果 */
+.zukan-archive .zukan-grant-card::after {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90px;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+    border-radius: 2px;
+}
+
+.zukan-archive .zukan-grant-card-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+/* バッジエリア */
+.zukan-archive .zukan-grant-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.zukan-archive .zukan-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 3px;
+}
+
+.zukan-archive .zukan-badge-featured {
+    background: linear-gradient(135deg, var(--zukan-accent-gold) 0%, #d4af61 100%);
+    color: #fff;
+}
+
+.zukan-archive .zukan-badge-urgent {
+    background: linear-gradient(135deg, var(--zukan-accent-red) 0%, #c44d4d 100%);
+    color: #fff;
+    animation: zukan-pulse 2s infinite;
+}
+
+.zukan-archive .zukan-badge-new {
+    background: var(--zukan-book-cover);
+    color: var(--zukan-accent-gold);
+}
+
+.zukan-archive .zukan-badge-status {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #a5d6a7;
+}
+
+.zukan-archive .zukan-badge-status.upcoming {
+    background: #fff3e0;
+    color: #e65100;
+    border: 1px solid #ffcc80;
+}
+
+.zukan-archive .zukan-badge-status.closed {
+    background: #f5f5f5;
+    color: #757575;
+    border: 1px solid #e0e0e0;
+}
+
+@keyframes zukan-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* カードコンテンツ */
+.zukan-archive .zukan-grant-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .zukan-grant-content {
+        grid-template-columns: 120px 1fr 140px;
+        gap: 24px;
+    }
+}
+
+/* 左側 - カテゴリエリア */
+.zukan-archive .zukan-grant-category-area {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .zukan-grant-category-area {
+        text-align: center;
+        padding-right: 16px;
+        border-right: 1px solid #f0f0f0;
+    }
+}
+
+.zukan-archive .zukan-grant-category-badge {
+    display: inline-block;
+    background: var(--zukan-book-cover);
+    color: #fff;
+    font-size: 11px;
+    font-family: var(--zukan-font-serif);
+    font-weight: 600;
+    padding: 8px 12px;
+    border-radius: 3px;
+}
+
+.zukan-archive .zukan-grant-prefecture {
+    font-size: 11px;
+    color: var(--zukan-ink-secondary);
+    margin-top: 4px;
+}
+
+/* 中央 - メインコンテンツ */
+.zukan-archive .zukan-grant-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.zukan-archive .zukan-grant-title {
+    font-size: 18px;
+    font-family: var(--zukan-font-serif);
+    font-weight: 700;
+    color: var(--zukan-ink-primary);
+    margin-bottom: 12px;
+    line-height: 1.5;
+    transition: color var(--zukan-transition);
+}
+
+.zukan-archive .zukan-grant-card:hover .zukan-grant-title {
+    color: var(--zukan-accent-red);
+}
+
+.zukan-archive .zukan-grant-description {
+    font-size: 14px;
+    font-family: var(--zukan-font-sans);
+    color: #666;
+    line-height: 1.8;
+    margin-bottom: 14px;
+}
+
+.zukan-archive .zukan-grant-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.zukan-archive .zukan-grant-tag {
+    display: inline-block;
+    background: rgba(61, 90, 128, 0.08);
+    color: var(--zukan-highlight-blue);
+    font-size: 11px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    transition: background-color var(--zukan-transition);
+}
+
+.zukan-archive .zukan-grant-card:hover .zukan-grant-tag {
+    background: rgba(61, 90, 128, 0.12);
+}
+
+/* 右側 - 金額エリア */
+.zukan-archive .zukan-grant-amount-area {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    text-align: right;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .zukan-grant-amount-area {
+        padding-left: 16px;
+        border-left: 1px solid #f0f0f0;
+    }
+}
+
+.zukan-archive .zukan-grant-amount-label {
+    font-size: 11px;
+    color: var(--zukan-ink-secondary);
+}
+
+.zukan-archive .zukan-grant-amount {
+    font-size: 22px;
+    font-family: var(--zukan-font-serif);
+    font-weight: 700;
+    color: var(--zukan-ink-primary);
+    line-height: 1.2;
+}
+
+.zukan-archive .zukan-grant-amount-unit {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--zukan-ink-secondary);
+}
+
+.zukan-archive .zukan-grant-rate {
+    font-size: 12px;
+    color: var(--zukan-highlight-blue);
+    font-weight: 500;
+}
+
+.zukan-archive .zukan-grant-deadline {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--zukan-ink-secondary);
+    margin-top: 4px;
+}
+
+.zukan-archive .zukan-grant-deadline.urgent {
+    color: var(--zukan-accent-red);
+    font-weight: 600;
+}
+
+.zukan-archive .zukan-grant-deadline svg {
+    flex-shrink: 0;
+}
+
+/* フッター */
+.zukan-archive .zukan-grant-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px dashed #e5e5e5;
+}
+
+.zukan-archive .zukan-grant-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 12px;
+    color: #999;
+}
+
+.zukan-archive .zukan-grant-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.zukan-archive .zukan-grant-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--zukan-highlight-blue);
+    transition: color var(--zukan-transition);
+}
+
+.zukan-archive .zukan-grant-more::after {
+    content: '→';
+    transition: transform var(--zukan-transition);
+}
+
+.zukan-archive .zukan-grant-card:hover .zukan-grant-more {
+    color: var(--zukan-accent-red);
+}
+
+.zukan-archive .zukan-grant-card:hover .zukan-grant-more::after {
+    transform: translateX(4px);
+}
+
+/* Empty State */
+.zukan-archive .zukan-empty-state {
+    padding: 80px 24px;
+    text-align: center;
+    font-family: var(--zukan-font-serif);
+    font-style: italic;
+    font-size: 16px;
+    color: #999;
+}
+
+/* ==========================================================================
+   Trend Analysis Section - 傾向分析（エッセイスタイル）
+   ========================================================================== */
+.zukan-archive .zukan-trend-content {
+    font-family: var(--zukan-font-serif);
+    text-align: justify;
+    line-height: 2;
+}
+
+.zukan-archive .zukan-drop-cap {
+    float: left;
+    font-family: var(--zukan-font-serif);
+    font-size: 64px;
+    line-height: 0.8;
+    padding-right: 16px;
+    padding-top: 10px;
+    color: var(--zukan-accent-red);
+    font-weight: 800;
+}
+
+.zukan-archive .zukan-trend-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    margin-top: 32px;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .zukan-trend-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 32px;
+    }
+}
+
+.zukan-archive .zukan-trend-card {
+    background: #fff;
+    padding: 28px;
+    box-shadow: var(--zukan-shadow-card);
+    border: 1px solid #f0f0f0;
+    position: relative;
+    transition: box-shadow var(--zukan-transition);
+}
+
+.zukan-archive .zukan-trend-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--zukan-highlight-blue);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s ease;
+}
+
+.zukan-archive .zukan-trend-card:hover {
+    box-shadow: 0 12px 32px rgba(0,0,0,0.1);
+}
+
+.zukan-archive .zukan-trend-card:hover::before {
+    transform: scaleX(1);
+}
+
+.zukan-archive .zukan-trend-card.accent-red::before {
+    background: var(--zukan-accent-red);
+}
+
+.zukan-archive .zukan-trend-card-title {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.zukan-archive .zukan-trend-card-title::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    background: var(--zukan-highlight-blue);
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.zukan-archive .zukan-trend-card.accent-red .zukan-trend-card-title::before {
+    background: var(--zukan-accent-red);
+}
+
+.zukan-archive .zukan-trend-card-text {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.9;
+}
+
+/* ==========================================================================
+   Pickup Section - 編集部推奨（ペーパークリップ風）
+   ========================================================================== */
+.zukan-archive .zukan-pickup-list {
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+}
+
+.zukan-archive .zukan-pickup-card {
+    position: relative;
+    background: #fff;
+    padding: 36px;
+    box-shadow: var(--zukan-shadow-book);
+    border: 1px solid #e5e5e5;
+    transform: rotate(0.5deg);
+    transition: transform var(--zukan-transition);
+}
+
+.zukan-archive .zukan-pickup-card:nth-child(even) {
+    transform: rotate(-0.5deg);
+}
+
+.zukan-archive .zukan-pickup-card:hover {
+    transform: rotate(0deg);
+}
+
+/* クリップエフェクト */
+.zukan-archive .zukan-pickup-card::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 140px;
+    height: 24px;
+    background: linear-gradient(135deg, #d0d0d0 0%, #e8e8e8 50%, #d0d0d0 100%);
+    border-radius: 4px;
+    box-shadow: 
+        inset 0 2px 4px rgba(0,0,0,0.1),
+        0 2px 4px rgba(0,0,0,0.1);
+}
+
+.zukan-archive .zukan-pickup-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .zukan-pickup-inner {
+        flex-direction: row;
+    }
+}
+
+.zukan-archive .zukan-pickup-meta {
+    flex-shrink: 0;
+    text-align: center;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .zukan-pickup-meta {
+        width: 200px;
+        padding-right: 28px;
+        padding-bottom: 0;
+        border-right: 1px solid #f0f0f0;
+        border-bottom: none;
+        text-align: right;
+    }
+}
+
+.zukan-archive .zukan-pickup-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: #999;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.zukan-archive .zukan-pickup-title {
+    font-size: 22px;
+    font-family: var(--zukan-font-serif);
+    font-weight: 700;
+    color: var(--zukan-ink-primary);
+    margin-bottom: 10px;
+}
+
+.zukan-archive .zukan-pickup-difficulty {
+    font-size: 12px;
+    color: var(--zukan-accent-gold);
+    font-weight: 600;
+    margin-bottom: 14px;
+}
+
+.zukan-archive .zukan-pickup-amount {
+    display: inline-block;
+    background: var(--zukan-highlight-blue);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 10px 18px;
+    border-radius: 3px;
+}
+
+.zukan-archive .zukan-pickup-amount.high {
+    background: var(--zukan-accent-red);
+}
+
+.zukan-archive .zukan-pickup-content {
+    flex: 1;
+}
+
+.zukan-archive .zukan-pickup-description {
+    font-size: 15px;
+    font-family: var(--zukan-font-serif);
+    color: #555;
+    line-height: 2;
+    margin-bottom: 18px;
+}
+
+.zukan-archive .zukan-pickup-details {
+    background: rgba(253, 251, 246, 0.8);
+    padding: 16px 20px;
+    border-radius: 6px;
+    border-left: 3px solid var(--zukan-accent-gold);
+    font-size: 13px;
+    color: #666;
+}
+
+.zukan-archive .zukan-pickup-details li {
+    margin-bottom: 6px;
+    padding-left: 18px;
+    position: relative;
+}
+
+.zukan-archive .zukan-pickup-details li::before {
+    content: '●';
+    position: absolute;
+    left: 0;
+    color: var(--zukan-accent-gold);
+    font-size: 8px;
+    line-height: 1.8;
+}
+
+/* ==========================================================================
+   Article Section - 解説記事（原稿用紙風 - HTMLリファレンス準拠）
+   ========================================================================== */
+.zukan-archive .zukan-article-section {
+    position: relative;
+    padding: 56px 32px;
+    margin-top: 64px;
+    background: linear-gradient(180deg, var(--zukan-paper-warm) 0%, #fff 100%);
+    border-top: 4px double var(--zukan-accent-gold);
+    border-bottom: 4px double var(--zukan-accent-gold);
+}
+
+.zukan-archive .zukan-article-section::before {
+    content: '❦';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    background: var(--zukan-paper-warm);
+    padding: 0 20px;
+    font-size: 28px;
+    color: var(--zukan-accent-gold);
+}
+
+.zukan-archive .zukan-article-header {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.zukan-archive .zukan-article-label {
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    color: var(--zukan-accent-gold);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: block;
+}
+
+.zukan-archive .zukan-article-title {
+    font-size: clamp(26px, 4vw, 36px);
+    font-family: var(--zukan-font-serif);
+    font-weight: 700;
+    color: var(--zukan-ink-primary);
+    line-height: 1.3;
+}
+
+.zukan-archive .zukan-article-content {
+    column-count: 1;
+    column-gap: 48px;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .zukan-article-content {
+        column-count: 2;
+    }
+}
+
+.zukan-archive .zukan-article-content h3 {
+    font-size: 18px;
+    font-family: var(--zukan-font-serif);
+    font-weight: 700;
+    color: var(--zukan-accent-red);
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 10px;
+    margin-bottom: 16px;
+    break-after: avoid;
+}
+
+.zukan-archive .zukan-article-content p {
+    font-size: 15px;
+    font-family: var(--zukan-font-serif);
+    line-height: 2.1;
+    text-align: justify;
+    margin-bottom: 28px;
+    text-indent: 1em;
+}
+
+.zukan-archive .zukan-article-note {
+    margin-top: 48px;
+    padding: 24px 28px;
+    background: linear-gradient(135deg, rgba(197, 160, 89, 0.08) 0%, rgba(197, 160, 89, 0.03) 100%);
+    border: 1px solid rgba(197, 160, 89, 0.3);
+    border-radius: 6px;
+    text-align: center;
+    break-inside: avoid;
+}
+
+.zukan-archive .zukan-article-note-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--zukan-accent-gold);
+    margin-bottom: 10px;
+}
+
+.zukan-archive .zukan-article-note-text {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.8;
+}
+
+/* ==========================================================================
+   Sidebar - サイドバー（インデックスリスト風）
+   ========================================================================== */
+.zukan-archive .yahoo-sidebar,
+.zukan-archive .zukan-sidebar {
+    background: linear-gradient(180deg, #f8f6f2 0%, var(--zukan-paper-warm) 100%);
+    padding: 40px 24px;
+    position: relative;
+}
+
+.zukan-archive .yahoo-sidebar::before,
+.zukan-archive .zukan-sidebar::before {
+    content: '';
+    position: absolute;
+    top: 40px;
+    left: 0;
+    width: 4px;
+    height: calc(100% - 80px);
+    background: linear-gradient(180deg, 
+        var(--zukan-accent-gold) 0%, 
+        transparent 50%, 
+        var(--zukan-accent-gold) 100%);
+}
+
+.zukan-archive .sidebar-widget {
+    margin-bottom: 36px;
+    background: #fff;
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: var(--zukan-shadow-card);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.zukan-archive .widget-title {
+    font-size: 15px;
+    font-family: var(--zukan-font-serif);
+    font-weight: 700;
+    color: var(--zukan-ink-primary);
+    padding-bottom: 12px;
+    margin-bottom: 18px;
+    border-bottom: 2px solid var(--zukan-accent-gold);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.zukan-archive .widget-title svg {
+    color: var(--zukan-accent-gold);
+}
+
+/* Ranking Tabs */
+.zukan-archive .ranking-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 16px;
+    background: #f5f5f5;
+    border-radius: 6px;
+    padding: 4px;
+}
+
+.zukan-archive .ranking-tab {
+    flex: 1;
+    padding: 8px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--zukan-ink-secondary);
+    cursor: pointer;
+    transition: all var(--zukan-transition);
+}
+
+.zukan-archive .ranking-tab:hover {
+    color: var(--zukan-ink-primary);
+}
+
+.zukan-archive .ranking-tab.active {
+    background: var(--zukan-book-cover);
+    color: var(--zukan-accent-gold);
+}
+
+/* Ranking List */
+.zukan-archive .ranking-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.zukan-archive .ranking-item {
+    margin-bottom: 0;
+}
+
+.zukan-archive .ranking-link {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 0;
+    text-decoration: none;
+    color: inherit;
+    border-bottom: 1px dotted #e0e0e0;
+    transition: background-color var(--zukan-transition);
+}
+
+.zukan-archive .ranking-item:last-child .ranking-link {
+    border-bottom: none;
+}
+
+.zukan-archive .ranking-link:hover {
+    background: rgba(197, 160, 89, 0.05);
+    margin: 0 -12px;
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.zukan-archive .ranking-number {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    background: var(--zukan-book-cover);
+    color: var(--zukan-accent-gold);
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+}
+
+.zukan-archive .rank-1 .ranking-number,
+.zukan-archive .rank-2 .ranking-number,
+.zukan-archive .rank-3 .ranking-number {
+    background: linear-gradient(135deg, var(--zukan-accent-gold) 0%, #d4af61 100%);
+    color: #fff;
+}
+
+.zukan-archive .ranking-title {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--zukan-ink-primary);
+    line-height: 1.5;
+}
+
+.zukan-archive .ranking-views {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: #999;
+}
+
+/* Category List */
+.zukan-archive .categories-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.zukan-archive .categories-item {
+    margin-bottom: 0;
+}
+
+.zukan-archive .categories-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    text-decoration: none;
+    color: var(--zukan-ink-primary);
+    font-size: 14px;
+    border-bottom: 1px dotted #e0e0e0;
+    transition: all var(--zukan-transition);
+}
+
+.zukan-archive .categories-item:last-child .categories-link {
+    border-bottom: none;
+}
+
+.zukan-archive .categories-link:hover {
+    color: var(--zukan-accent-red);
+    padding-left: 8px;
+}
+
+.zukan-archive .categories-count {
+    font-size: 12px;
+    color: #999;
+}
+
+/* Topics List */
+.zukan-archive .topics-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.zukan-archive .topics-item {
+    margin-bottom: 0;
+}
+
+.zukan-archive .topics-link {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 0;
+    text-decoration: none;
+    border-bottom: 1px dotted #e0e0e0;
+    transition: background-color var(--zukan-transition);
+}
+
+.zukan-archive .topics-item:last-child .topics-link {
+    border-bottom: none;
+}
+
+.zukan-archive .topics-link:hover {
+    background: rgba(197, 160, 89, 0.05);
+    margin: 0 -12px;
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.zukan-archive .topics-date {
+    font-size: 11px;
+    color: var(--zukan-accent-gold);
+    font-weight: 500;
+}
+
+.zukan-archive .topics-title {
+    font-size: 13px;
+    color: var(--zukan-ink-primary);
+    line-height: 1.5;
+}
+
+/* ==========================================================================
+   Pagination - ページネーション
+   ========================================================================== */
+.zukan-archive .zukan-pagination,
+.zukan-archive .pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 56px;
+    padding: 36px 0;
+    border-top: 2px solid #e5e5e5;
+}
+
+.zukan-archive .zukan-pagination .page-numbers,
+.zukan-archive .pagination-wrapper .page-numbers {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    height: 44px;
+    padding: 0 14px;
+    font-size: 14px;
+    font-family: var(--zukan-font-serif);
+    color: var(--zukan-ink-primary);
+    text-decoration: none;
+    border: 2px solid #d0d0d0;
+    border-radius: 6px;
+    background: #fff;
+    transition: all var(--zukan-transition);
+}
+
+.zukan-archive .zukan-pagination .page-numbers:hover,
+.zukan-archive .pagination-wrapper .page-numbers:hover {
+    border-color: var(--zukan-accent-gold);
+    color: var(--zukan-accent-gold);
+    background: rgba(197, 160, 89, 0.05);
+}
+
+.zukan-archive .zukan-pagination .page-numbers.current,
+.zukan-archive .pagination-wrapper .page-numbers.current {
+    background: var(--zukan-book-cover);
+    color: var(--zukan-accent-gold);
+    border-color: var(--zukan-book-cover);
+    font-weight: 700;
+}
+
+.zukan-archive .zukan-pagination .prev,
+.zukan-archive .zukan-pagination .next,
+.zukan-archive .pagination-wrapper .prev,
+.zukan-archive .pagination-wrapper .next {
+    font-size: 13px;
+}
+
+/* ==========================================================================
+   Footer - フッター
+   ========================================================================== */
+.zukan-archive .zukan-footer {
+    margin-top: 80px;
+    padding: 56px 24px 72px;
+    text-align: center;
+    border-top: 3px double var(--zukan-accent-gold);
+    background: linear-gradient(180deg, rgba(227, 218, 201, 0.4) 0%, var(--zukan-paper-warm) 100%);
+}
+
+.zukan-archive .zukan-footer-logo {
+    font-size: 22px;
+    font-family: var(--zukan-font-serif);
+    font-weight: 700;
+    color: var(--zukan-ink-primary);
+    margin-bottom: 14px;
+}
+
+.zukan-archive .zukan-footer-text {
+    font-size: 13px;
+    font-family: var(--zukan-font-serif);
+    color: #999;
+    margin-bottom: 28px;
+}
+
+.zukan-archive .zukan-footer-copyright {
+    font-size: 10px;
+    color: #bbb;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+}
+
+/* ==========================================================================
+   Two Column Layout
+   ========================================================================== */
+.zukan-archive .yahoo-two-column-layout,
+.zukan-archive .zukan-two-column {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+}
+
+@media (min-width: 1024px) {
+    .zukan-archive .yahoo-two-column-layout,
+    .zukan-archive .zukan-two-column {
+        grid-template-columns: 1fr 300px;
+    }
+}
+
+.zukan-archive .zukan-main-content,
+.zukan-archive .yahoo-main-content {
+    min-width: 0;
+}
+
+/* ==========================================================================
+   Loading Overlay
+   ========================================================================== */
+.zukan-archive .loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(253, 251, 246, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.zukan-archive .loading-spinner {
+    text-align: center;
+}
+
+.zukan-archive .spinner {
+    width: 48px;
+    height: 48px;
+    border: 3px solid #e5e5e5;
+    border-top-color: var(--zukan-accent-gold);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 16px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.zukan-archive .loading-text {
+    font-size: 14px;
+    font-family: var(--zukan-font-serif);
+    color: var(--zukan-ink-secondary);
+}
+
+/* ==========================================================================
+   Mobile Filter
+   ========================================================================== */
+.zukan-archive .mobile-filter-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 14px 20px;
+    margin-bottom: 20px;
+    background: var(--zukan-book-cover);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .mobile-filter-toggle {
+        display: none;
+    }
+}
+
+.zukan-archive .mobile-filter-close {
+    display: none;
+    width: 32px;
+    height: 32px;
+    background: #f5f5f5;
+    border: none;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+@media (max-width: 767px) {
+    .zukan-archive .mobile-filter-close {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+.zukan-archive .filter-panel-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 99;
+}
+
+@media (max-width: 767px) {
+    .zukan-archive .yahoo-filter-section {
+        position: fixed;
+        inset: 0;
+        margin: 0;
+        border-radius: 0;
+        z-index: 100;
+        overflow-y: auto;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+    }
+    
+    .zukan-archive .yahoo-filter-section.open {
+        transform: translateX(0);
+    }
+    
+    .zukan-archive .filter-panel-overlay.open {
+        display: block;
+    }
+    
+    .zukan-archive .mobile-filter-apply-section {
+        position: sticky;
+        bottom: 0;
+        background: #fff;
+        padding: 16px;
+        border-top: 1px solid #e5e5e5;
+        margin: 24px -24px -24px;
+    }
+    
+    .zukan-archive .mobile-apply-filters-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        padding: 16px 24px;
+        background: var(--zukan-accent-red);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .mobile-filter-apply-section {
+        display: none;
+    }
+}
+
+/* ==========================================================================
+   Mobile Adjustments
+   ========================================================================== */
+@media (max-width: 768px) {
+    .zukan-archive .the-book,
+    .zukan-archive.the-book,
+    .zukan-archive .yahoo-container {
+        margin: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+    
+    .zukan-archive .the-book::before,
+    .zukan-archive.the-book::before,
+    .grant-archive-yahoo-style.zukan-archive::before {
+        display: none;
+    }
+    
+    .zukan-archive .zukan-hero {
+        padding: 48px 20px 40px;
+    }
+    
+    .zukan-archive .zukan-hero::before,
+    .zukan-archive .zukan-hero::after {
+        display: none;
+    }
+    
+    .zukan-archive .zukan-stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+    }
+    
+    .zukan-archive .zukan-stat-item {
+        padding: 12px 8px;
+    }
+    
+    .zukan-archive .book-breadcrumb {
+        padding: 12px 16px;
+    }
+    
+    .zukan-archive .book-breadcrumb-icon {
+        display: none;
+    }
+    
+    .zukan-archive .book-breadcrumb-chapter {
+        display: none;
+    }
+    
+    .zukan-archive .zukan-grant-card {
+        transform: none !important;
+        padding: 24px 20px;
+        margin-top: 16px;
+    }
+    
+    .zukan-archive .zukan-grant-card::before {
+        width: 80px;
+        height: 20px;
+    }
+    
+    .zukan-archive .zukan-pickup-card {
+        transform: none !important;
+        padding: 24px 20px;
+    }
+    
+    .zukan-archive .zukan-pickup-card::before {
+        width: 100px;
+    }
+    
+    .zukan-archive .zukan-article-content {
+        column-count: 1;
+    }
+    
+    .zukan-archive .zukan-article-section {
+        padding: 40px 20px;
+    }
+    
+    .zukan-archive .yahoo-sidebar,
+    .zukan-archive .zukan-sidebar {
+        padding: 32px 16px;
+    }
+    
+    .zukan-archive .yahoo-sidebar::before,
+    .zukan-archive .zukan-sidebar::before {
+        display: none;
+    }
+}
+
+/* ==========================================================================
+   Print Styles
+   ========================================================================== */
+@media print {
+    .zukan-archive {
+        background: white !important;
+    }
+    
+    .zukan-archive .the-book,
+    .zukan-archive .yahoo-container {
+        box-shadow: none;
+        margin: 0;
+    }
+    
+    .zukan-archive .index-tabs,
+    .zukan-archive .zukan-sticky-header,
+    .zukan-archive .mobile-filter-toggle {
+        display: none;
+    }
+    
+    .zukan-archive .yahoo-sidebar,
+    .zukan-archive .zukan-sidebar {
+        display: none;
+    }
+    
+    .zukan-archive .zukan-grant-card {
+        transform: none !important;
+        page-break-inside: avoid;
+    }
+}
+
+/* ==========================================================================
+   Accessibility
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+    .zukan-archive *,
+    .zukan-archive *::before,
+    .zukan-archive *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+.zukan-archive a:focus-visible,
+.zukan-archive button:focus-visible {
+    outline: 3px solid var(--zukan-accent-gold);
+    outline-offset: 2px;
+}
+
+/* Visually Hidden */
+.zukan-archive .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ==========================================================================
+   Ad Spaces
+   ========================================================================== */
+.zukan-archive .sidebar-ad-space {
+    margin-bottom: 24px;
+    padding: 16px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    text-align: center;
+    min-height: 250px;
+}
+
+.zukan-archive .archive-infeed-ad {
+    margin: 32px 0;
+    padding: 20px;
+    background: var(--zukan-paper-warm);
+    border-radius: 8px;
+    border: 1px dashed #e0e0e0;
+}
+
+/* ==========================================================================
+   No Results
+   ========================================================================== */
+.zukan-archive .no-results {
+    text-align: center;
+    padding: 80px 24px;
+}
+
+.zukan-archive .no-results-icon {
+    color: #e0e0e0;
+    margin-bottom: 24px;
+}
+
+.zukan-archive .no-results-title {
+    font-size: 20px;
+    font-family: var(--zukan-font-serif);
+    font-weight: 700;
+    color: var(--zukan-ink-primary);
+    margin-bottom: 12px;
+}
+
+.zukan-archive .no-results-message {
+    font-size: 14px;
+    color: #666;
+}
+
+/* ==========================================================================
+   Filter Reset
+   ========================================================================== */
+.zukan-archive .filter-reset-all {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: #f5f5f5;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    cursor: pointer;
+    transition: all var(--zukan-transition);
+}
+
+.zukan-archive .filter-reset-all:hover {
+    background: #eee;
+    color: var(--zukan-accent-red);
+}
+
+/* ==========================================================================
+   Grid View Support
+   ========================================================================== */
+.zukan-archive .grants-container-yahoo[data-view="grid"] {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+}
+
+.zukan-archive .grants-container-yahoo[data-view="grid"] .zukan-list-container {
+    display: contents;
+}
+
+.zukan-archive .grants-container-yahoo[data-view="grid"] .zukan-grant-card {
+    transform: none;
+}
+
+.zukan-archive .grants-container-yahoo[data-view="grid"] .zukan-grant-content {
+    grid-template-columns: 1fr;
+}
+
+.zukan-archive .grants-container-yahoo[data-view="grid"] .zukan-grant-category-area {
+    text-align: left;
+    padding-right: 0;
+    border-right: none;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.zukan-archive .grants-container-yahoo[data-view="grid"] .zukan-grant-amount-area {
+    text-align: left;
+    padding-left: 0;
+    border-left: none;
+    padding-top: 12px;
+    border-top: 1px solid #f0f0f0;
+}

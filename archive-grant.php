@@ -21,10 +21,14 @@ get_header();
 $template_dir = get_template_directory();
 $template_uri = get_template_directory_uri();
 $css_file = $template_dir . '/assets/css/archive-common.css';
+$zukan_css_file = $template_dir . '/assets/css/archive-zukan.css';
 $js_file = $template_dir . '/assets/js/archive-common.js';
 ?>
 <?php if (file_exists($css_file) && !wp_style_is('gi-archive-common', 'done')): ?>
 <link rel="stylesheet" href="<?php echo esc_url($template_uri . '/assets/css/archive-common.css?ver=' . filemtime($css_file)); ?>" media="all">
+<?php endif; ?>
+<?php if (file_exists($zukan_css_file)): ?>
+<link rel="stylesheet" href="<?php echo esc_url($template_uri . '/assets/css/archive-zukan.css?ver=' . filemtime($zukan_css_file)); ?>" media="all">
 <?php endif; ?>
 <?php
 
@@ -240,7 +244,7 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
 </script>
 <?php endif; // End SEO plugin check ?>
 
-<main class="grant-archive-yahoo-style" 
+<main class="grant-archive-yahoo-style zukan-archive" 
       id="grant-archive" 
       role="main"
       itemscope 
@@ -292,83 +296,54 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
         </div>
     </nav>
 
-    <!-- ヒーローセクション（図鑑式・横長レイアウト） -->
-    <header class="yahoo-hero-section" 
+    <!-- ヒーローセクション（図鑑式・タイトルページ風） -->
+    <header class="zukan-hero" 
             itemscope 
             itemtype="https://schema.org/WPHeader">
-        <div class="yahoo-container">
-            <div class="hero-content-wrapper">
-                <div class="hero-encyclopedia-layout">
-                    
-                    <!-- 左側：タイトル・説明 -->
-                    <div class="hero-main-info">
-                        <div class="hero-region-badge">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="11" cy="11" r="8"/>
-                                <path d="m21 21-4.35-4.35"/>
-                            </svg>
-                            <span>助成金・補助金検索</span>
-                        </div>
-                        <h1 class="hero-title-encyclopedia" itemprop="headline">
-                            <span class="hero-title-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-                                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-                                    <path d="M8 7h8M8 11h5"/>
-                                </svg>
-                            </span>
-                            <?php echo esc_html($archive_title); ?>
-                        </h1>
-                        <p class="hero-subtitle" itemprop="description">
-                            <?php echo esc_html($archive_description); ?>
-                        </p>
-                    </div>
-                    
-                    <!-- 中央：統計情報 -->
-                    <div class="hero-stats-area">
-                        <div class="hero-stat-card" itemscope itemtype="https://schema.org/QuantitativeValue">
-                            <span class="hero-stat-number" itemprop="value"><?php echo $total_grants_formatted; ?></span>
-                            <span class="hero-stat-label" itemprop="unitText">件の助成金</span>
-                        </div>
-                        <div class="hero-stat-card">
-                            <span class="hero-stat-number"><?php echo $current_year; ?></span>
-                            <span class="hero-stat-label">年度版</span>
-                        </div>
-                        <div class="hero-stat-card">
-                            <span class="hero-stat-number">47</span>
-                            <span class="hero-stat-label">都道府県対応</span>
-                        </div>
-                    </div>
-                    
-                    <!-- 右側：クイックリンク -->
-                    <div class="hero-action-area">
-                        <div class="hero-quick-links">
-                            <a href="<?php echo esc_url(add_query_arg('view', 'prefectures', get_post_type_archive_link('grant'))); ?>" class="hero-quick-link">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                                    <circle cx="12" cy="10" r="3"/>
-                                </svg>
-                                都道府県から探す
-                            </a>
-                            <a href="#filter-panel" class="hero-quick-link">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
-                                </svg>
-                                絞り込み検索
-                            </a>
-                        </div>
-                    </div>
-                    
-                </div>
+        <span class="zukan-hero-badge">Subsidy Archive <?php echo $current_year; ?></span>
+        <h1 class="zukan-hero-title" itemprop="headline">
+            <?php echo esc_html($archive_title); ?>
+            <span class="zukan-hero-subtitle">令和<?php echo $current_year - 2018; ?>年度版 図鑑</span>
+        </h1>
+        <p class="zukan-hero-description" itemprop="description">
+            <?php echo esc_html($archive_description); ?>
+        </p>
+        <div class="zukan-ornament"><span class="zukan-ornament-symbol">❦</span></div>
+        
+        <!-- 統計情報 -->
+        <div class="zukan-stats-grid">
+            <div class="zukan-stat-item" itemscope itemtype="https://schema.org/QuantitativeValue">
+                <span class="zukan-stat-number" itemprop="value"><?php echo $total_grants_formatted; ?></span>
+                <span class="zukan-stat-label" itemprop="unitText">件の助成金</span>
+            </div>
+            <div class="zukan-stat-item">
+                <span class="zukan-stat-number"><?php echo $current_year; ?></span>
+                <span class="zukan-stat-label">年度版</span>
+            </div>
+            <div class="zukan-stat-item">
+                <span class="zukan-stat-number">47</span>
+                <span class="zukan-stat-label">都道府県対応</span>
             </div>
         </div>
     </header>
 
-    <!-- 2カラムレイアウト -->
-    <div class="yahoo-container yahoo-two-column-layout">
+    <!-- 2カラムレイアウト（図鑑スタイル） -->
+    <div class="yahoo-container yahoo-two-column-layout zukan-two-column">
         
         <!-- メインコンテンツ -->
-        <div class="yahoo-main-content">
+        <div class="yahoo-main-content zukan-main-content">
+            
+            <?php 
+            // アーカイブSEOコンテンツ: おすすめ記事
+            if (function_exists('gi_output_archive_featured_posts')) {
+                gi_output_archive_featured_posts();
+            }
+            
+            // アーカイブSEOコンテンツ: イントロ
+            if (function_exists('gi_output_archive_intro_content')) {
+                gi_output_archive_intro_content();
+            }
+            ?>
             
             <!-- 検索バー -->
             <section class="yahoo-search-section">
@@ -1059,9 +1034,11 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                     
                     if ($initial_grants_query->have_posts()) :
                         $grant_count = 0; // インフィード広告用カウンター
+                        echo '<div class="zukan-list-container">';
                         while ($initial_grants_query->have_posts()) : 
                             $initial_grants_query->the_post();
-                            include(get_template_directory() . '/template-parts/grant-card-unified.php');
+                            // 図鑑スタイルのカードを使用
+                            include(get_template_directory() . '/template-parts/grant/card-zukan.php');
                             
                             $grant_count++;
                             
@@ -1074,12 +1051,12 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                             <?php endif;
                             
                         endwhile;
+                        echo '</div>'; // End .zukan-list-container
                         wp_reset_postdata();
                     else :
-                        // 結果なしの場合
-                        echo '<div class="no-results-message" style="text-align: center; padding: 60px 20px;">';
-                        echo '<p style="font-size: 1.125rem; color: #666; margin-bottom: 20px;">該当する助成金が見つかりませんでした。</p>';
-                        echo '<p style="color: #999;">検索条件を変更して再度お試しください。</p>';
+                        // 結果なしの場合（図鑑スタイル）
+                        echo '<div class="zukan-empty-state">';
+                        echo '該当する項目はこの巻には記されていないようだ...';
                         echo '</div>';
                     endif;
                     ?>
@@ -1107,9 +1084,9 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                     </p>
                 </div>
 
-                <!-- ページネーション（都道府県一覧以外） -->
+                <!-- ページネーション（都道府県一覧以外）- 図鑑スタイル -->
                 <?php if (empty($url_params['view']) || $url_params['view'] !== 'prefectures'): ?>
-                <div class="pagination-wrapper" 
+                <div class="pagination-wrapper zukan-pagination" 
                      id="pagination-wrapper">
                     <?php
                     if (isset($initial_grants_query) && $initial_grants_query->max_num_pages > 1) {
@@ -1143,10 +1120,83 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                 </div>
                 <?php endif; ?>
             </section>
+            
+            <?php 
+            // アーカイブSEOコンテンツ: アウトロ
+            if (function_exists('gi_output_archive_outro_content')) {
+                gi_output_archive_outro_content();
+            }
+            ?>
+            
+            <!-- SEO解説記事セクション（図鑑スタイル - 原稿用紙風） -->
+            <?php 
+            // SEOコンテンツがある場合はカスタム内容を表示、なければデフォルト記事を表示
+            $show_default_article = true;
+            if (function_exists('gi_has_archive_seo_content')) {
+                $show_default_article = !gi_has_archive_seo_content();
+            }
+            
+            if ($show_default_article && ($is_category_archive || $is_prefecture_archive || is_post_type_archive('grant'))): 
+            ?>
+            <section class="zukan-article-section">
+                <header class="zukan-article-header">
+                    <span class="zukan-article-label">Editorial Guide</span>
+                    <h2 class="zukan-article-title">
+                        <?php if ($is_prefecture_archive): ?>
+                        <?php echo esc_html($current_category->name); ?>の助成金・補助金申請ガイド
+                        <?php elseif ($is_category_archive): ?>
+                        <?php echo esc_html($current_category->name); ?>の申請傾向と採択のポイント
+                        <?php else: ?>
+                        助成金・補助金の選び方と申請の基礎知識
+                        <?php endif; ?>
+                    </h2>
+                </header>
+                
+                <div class="zukan-article-content">
+                    <?php if ($is_prefecture_archive): ?>
+                    <h3>申請の傾向</h3>
+                    <p><?php echo esc_html($current_category->name); ?>では、地域の産業振興や中小企業支援を目的とした独自の助成金制度が充実しています。特に創業支援、事業承継、設備投資に関する支援が手厚く、申請件数も年々増加傾向にあります。審査では地域経済への貢献度や雇用創出効果が重視される傾向があります。</p>
+                    
+                    <h3>採択のポイント</h3>
+                    <p>採択率を高めるためには、事業計画の具体性と実現可能性が鍵となります。また、<?php echo esc_html($current_category->name); ?>の産業政策との整合性を示すことも重要です。申請書類では、数値目標を明確に設定し、その達成に向けた具体的なアクションプランを提示することをお勧めします。</p>
+                    
+                    <?php elseif ($is_category_archive): ?>
+                    <h3>この分野の特徴</h3>
+                    <p><?php echo esc_html($current_category->name); ?>関連の助成金は、技術革新や事業効率化を促進することを目的としています。近年は特にデジタル化やサステナビリティへの取り組みに対する支援が拡充されており、申請の機会が広がっています。補助率も比較的高く設定されているケースが多いのが特徴です。</p>
+                    
+                    <h3>申請時の注意点</h3>
+                    <p>この分野では、導入する技術や設備の先進性・革新性を明確に示すことが求められます。また、投資対効果（ROI）を具体的な数値で示し、事業の持続可能性についても説明することが採択への近道です。専門家のサポートを受けながら申請することをお勧めします。</p>
+                    
+                    <?php else: ?>
+                    <h3>助成金・補助金とは</h3>
+                    <p>助成金・補助金は、国や地方自治体、公的機関が事業者の取り組みを支援するために給付する資金です。融資と異なり返済不要なため、新規事業の立ち上げや設備投資、人材育成など、様々な経営課題の解決に活用できます。ただし、申請要件や使途に制限があるため、事前の確認が重要です。</p>
+                    
+                    <h3>申請の基本ステップ</h3>
+                    <p>まず、自社の事業計画に合致する制度を見つけることから始めます。公募要領を熟読し、対象要件や補助対象経費を確認した上で、事業計画書を作成します。審査では計画の実現可能性や効果が評価されるため、具体的かつ現実的な内容にすることが採択への鍵となります。</p>
+                    <?php endif; ?>
+                    
+                    <div class="zukan-article-note">
+                        <p class="zukan-article-note-title">※ 専門家への相談をお勧めします</p>
+                        <p class="zukan-article-note-text">
+                            助成金の申請は要件確認から書類作成まで専門知識が必要です。<br>
+                            当サイトでは無料相談を承っておりますので、お気軽にお問い合わせください。
+                        </p>
+                    </div>
+                </div>
+            </section>
+            <?php endif; ?>
+            
         </div>
 
-        <!-- サイドバー（PC only） -->
-        <aside class="yahoo-sidebar" role="complementary" aria-label="サイドバー">
+        <!-- サイドバー（PC only） - 図鑑スタイル -->
+        <aside class="yahoo-sidebar zukan-sidebar" role="complementary" aria-label="サイドバー">
+            
+            <?php 
+            // アーカイブSEOコンテンツ: サイドバー追加コンテンツ
+            if (function_exists('gi_output_archive_sidebar_content')) {
+                gi_output_archive_sidebar_content();
+            }
+            ?>
             
             <!-- 広告枠1: サイドバー上部 -->
             <?php if (function_exists('ji_display_ad')): ?>

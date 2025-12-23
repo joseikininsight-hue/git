@@ -26,12 +26,39 @@ module.exports = {
           light: '#fff9c4',
           dark: '#fbc02d',
         },
+        // Book Theme - 補助金図鑑デザインシステム
+        'book': {
+          'cover': '#2c3e50',        // 濃紺（本の表紙）
+          'cover-dark': '#1a252f',   // 濃紺ダーク
+          'gold': '#d4af37',         // 金箔
+          'gold-light': '#e6c85c',   // 金箔ライト
+          'paper': '#fdfbf7',        // 和紙・クリーム
+          'paper-dark': '#f5f0e6',   // 和紙ダーク
+          'ink': '#2c3e50',          // インク色
+          'spine': '#1e3a5f',        // 背表紙
+        },
+        // 難易度カラー
+        'difficulty': {
+          'low': '#10b981',          // 緑（易しい）
+          'medium': '#f59e0b',       // オレンジ（普通）
+          'high': '#ef4444',         // 赤（難しい）
+        },
+        // ステータスカラー
+        'status': {
+          'open': '#10b981',         // 募集中
+          'closing': '#f59e0b',      // 締切間近
+          'closed': '#6b7280',       // 募集終了
+          'upcoming': '#3b82f6',     // 募集予定
+        }
       },
       fontFamily: {
         'inter': ['Inter', 'sans-serif'],
         'outfit': ['Outfit', 'sans-serif'],
         'space': ['Space Grotesk', 'sans-serif'],
         'noto': ['Noto Sans JP', 'sans-serif'],
+        // Book Theme フォント
+        'serif': ['Noto Serif JP', 'Georgia', 'serif'],
+        'sans': ['Noto Sans JP', 'Helvetica Neue', 'sans-serif'],
       },
       fontSize: {
         'h1': 'clamp(28px, 4vw, 36px)',
