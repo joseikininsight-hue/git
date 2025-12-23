@@ -282,31 +282,25 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
         </div>
     </nav>
 
-    <!-- ヒーローセクション - 書籍タイトルページ風デザイン -->
-    <section class="zukan-hero zukan-hero-book">
+    <!-- ヒーローセクション - シンプルなSEOテキストベース -->
+    <section class="zukan-hero zukan-hero-simple">
         <div class="yahoo-container">
-            <div class="zukan-hero-book-cover">
-                <div class="zukan-hero-book-inner">
-                    <div class="zukan-hero-book-decoration top-left"></div>
-                    <div class="zukan-hero-book-decoration top-right"></div>
-                    <div class="zukan-hero-book-decoration bottom-left"></div>
-                    <div class="zukan-hero-book-decoration bottom-right"></div>
-                    
-                    <div class="zukan-hero-book-content">
-                        <span class="zukan-hero-subtitle">令和<?php echo date('Y') - 2018; ?>年度版</span>
-                        <h2 class="zukan-hero-main-title">補助金・助成金</h2>
-                        <p class="zukan-hero-main-subtitle">総合図鑑</p>
-                        <div class="zukan-hero-divider"></div>
-                        <p class="zukan-hero-tagline">全国の支援制度を網羅した決定版</p>
-                        <div class="zukan-hero-stats">
-                            <span class="zukan-hero-stat-item">
-                                <span class="stat-number"><?php echo $total_grants_formatted; ?></span>
-                                <span class="stat-label">件以上の制度を収録</span>
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <div class="zukan-hero-book-spine"></div>
+            <div class="zukan-hero-content">
+                <div class="zukan-hero-header">
+                    <span class="zukan-hero-label">Subsidy & Grant Archive</span>
+                    <h2 class="zukan-hero-title">助成金・補助金総合検索</h2>
+                    <p class="zukan-hero-subtitle-text">令和<?php echo date('Y') - 2018; ?>年度版</p>
+                </div>
+                <p class="zukan-hero-description">
+                    本アーカイブは、全国で事業を営む<strong>中小企業および個人事業主</strong>のために編纂されたものである。
+                    複雑怪奇な申請要件を紐解き、事業成長の糧となる「知」を提供する。
+                    多くの大型補助金（ものづくり補助金や事業再構築補助金など）で、「<strong>給与支給総額の年率増加</strong>」が
+                    必須要件、あるいは強力な加点項目となっている。「投資して、稼いで、社員に還元する」サイクルを描ける企業が採択を勝ち取れる。
+                </p>
+                <div class="zukan-hero-stats-simple">
+                    <span class="zukan-hero-stat">収録制度数：<strong><?php echo $total_grants_formatted; ?></strong>件以上</span>
+                    <span class="zukan-hero-stat-divider">|</span>
+                    <span class="zukan-hero-stat">毎日更新</span>
                 </div>
             </div>
         </div>
@@ -345,8 +339,8 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                     </div>
                 </div>
                 <div class="view-controls">
-                    <label for="sort-select-simple" class="sort-label">並び替え:</label>
-                    <select id="sort-select-simple" class="sort-select-unified">
+                    <label for="unified-sort-select" class="sort-label">並び替え:</label>
+                    <select id="unified-sort-select" class="sort-select-unified">
                         <option value="date_desc">新着順</option>
                         <option value="deadline_asc">締切が近い順</option>
                         <option value="amount_desc">補助額が高い順</option>
@@ -1486,7 +1480,43 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // サイドバーフィルターの初期化
     initSidebarFilters();
+    
+    // 統合ソートセレクトの初期化
+    initUnifiedSortSelect();
 });
+
+/**
+ * 統合ソートセレクトの初期化
+ */
+function initUnifiedSortSelect() {
+    var sortSelect = document.getElementById('unified-sort-select');
+    if (!sortSelect) {
+        console.log('❌ unified-sort-select not found');
+        return;
+    }
+    
+    console.log('🔄 Initializing unified sort select...');
+    
+    sortSelect.addEventListener('change', function() {
+        var sortValue = this.value;
+        console.log('📊 Sort changed to:', sortValue);
+        
+        if (typeof ArchiveCommon !== 'undefined' && ArchiveCommon.state) {
+            // ArchiveCommon の state.filters.sort を更新
+            ArchiveCommon.state.filters.sort = sortValue;
+            ArchiveCommon.state.currentPage = 1;
+            
+            // loadGrants を呼び出して検索実行
+            ArchiveCommon.loadGrants();
+            
+            console.log('✅ Sort applied via ArchiveCommon');
+        } else {
+            console.error('❌ ArchiveCommon not available');
+        }
+    });
+    
+    console.log('✅ Unified sort select initialized');
+}
 
 /**
  * サイドバーフィルターの初期化

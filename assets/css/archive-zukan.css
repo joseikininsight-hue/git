@@ -192,137 +192,107 @@ body.zukan-theme,
 }
 
 /* ==========================================================================
-   Hero Section - 書籍タイトルページ風デザイン
+   Hero Section - シンプルなSEOテキストベース
    ========================================================================== */
-.zukan-archive .zukan-hero.zukan-hero-book {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-    padding: 40px 16px;
-    border-bottom: none;
-    position: relative;
-    overflow: hidden;
+.zukan-archive .zukan-hero.zukan-hero-simple {
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 32px 16px;
 }
 
 @media (min-width: 768px) {
-    .zukan-archive .zukan-hero.zukan-hero-book {
-        padding: 60px 32px;
+    .zukan-archive .zukan-hero.zukan-hero-simple {
+        padding: 48px 32px;
     }
 }
 
-/* 背景装飾パターン */
-.zukan-archive .zukan-hero.zukan-hero-book::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: 
-        radial-gradient(circle at 20% 80%, rgba(197, 160, 89, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(197, 160, 89, 0.1) 0%, transparent 50%);
-    pointer-events: none;
-}
-
-/* 書籍カバー */
-.zukan-archive .zukan-hero-book-cover {
-    max-width: 600px;
+.zukan-archive .zukan-hero-simple .zukan-hero-content {
+    max-width: 1200px;
     margin: 0 auto;
-    perspective: 1000px;
 }
 
-.zukan-archive .zukan-hero-book-inner {
-    position: relative;
-    background: linear-gradient(135deg, #fdfbf7 0%, #f5f0e6 100%);
-    border: 1px solid var(--zukan-accent-gold);
-    border-radius: 4px;
-    padding: 40px 32px;
-    box-shadow: 
-        0 25px 50px -12px rgba(0, 0, 0, 0.5),
-        0 10px 20px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.5);
-    transform: rotateY(-2deg);
-    transition: transform 0.5s ease;
+.zukan-archive .zukan-hero-header {
+    margin-bottom: 20px;
 }
 
-@media (min-width: 768px) {
-    .zukan-archive .zukan-hero-book-inner {
-        padding: 60px 48px;
-    }
-}
-
-.zukan-archive .zukan-hero-book-inner:hover {
-    transform: rotateY(0deg);
-}
-
-/* 書籍の背（左側） */
-.zukan-archive .zukan-hero-book-spine {
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 24px;
-    background: linear-gradient(90deg, 
-        #c5a059 0%, 
-        #d4b06a 20%, 
-        #c5a059 40%, 
-        #b8954d 60%,
-        #c5a059 100%);
-    border-radius: 4px 0 0 4px;
-    box-shadow: inset -3px 0 10px rgba(0, 0, 0, 0.2);
-}
-
-/* コーナー装飾 */
-.zukan-archive .zukan-hero-book-decoration {
-    position: absolute;
-    width: 40px;
-    height: 40px;
-    border: 2px solid var(--zukan-accent-gold);
-    opacity: 0.6;
-}
-
-.zukan-archive .zukan-hero-book-decoration.top-left {
-    top: 16px;
-    left: 40px;
-    border-right: none;
-    border-bottom: none;
-}
-
-.zukan-archive .zukan-hero-book-decoration.top-right {
-    top: 16px;
-    right: 16px;
-    border-left: none;
-    border-bottom: none;
-}
-
-.zukan-archive .zukan-hero-book-decoration.bottom-left {
-    bottom: 16px;
-    left: 40px;
-    border-right: none;
-    border-top: none;
-}
-
-.zukan-archive .zukan-hero-book-decoration.bottom-right {
-    bottom: 16px;
-    right: 16px;
-    border-left: none;
-    border-top: none;
-}
-
-/* 書籍コンテンツ */
-.zukan-archive .zukan-hero-book-content {
-    text-align: center;
-    padding-left: 24px; /* 背の分 */
-}
-
-.zukan-archive .zukan-hero-subtitle {
+.zukan-archive .zukan-hero-label {
     display: inline-block;
-    font-size: 11px;
+    font-size: 10px;
     font-family: var(--zukan-font-sans);
     color: var(--zukan-accent-gold);
     background: var(--zukan-ink-primary);
-    padding: 4px 16px;
+    padding: 4px 12px;
     border-radius: 2px;
     letter-spacing: 0.15em;
-    margin-bottom: 20px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+
+.zukan-archive .zukan-hero-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    font-family: var(--zukan-font-serif);
+    color: var(--zukan-ink-primary);
+    margin: 0 0 8px;
+    line-height: 1.3;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .zukan-hero-title {
+        font-size: 2rem;
+    }
+}
+
+.zukan-archive .zukan-hero-subtitle-text {
+    font-size: 13px;
+    font-family: var(--zukan-font-sans);
+    color: #6b7280;
+    margin: 0;
+}
+
+.zukan-archive .zukan-hero-description {
+    font-size: 14px;
+    font-family: var(--zukan-font-sans);
+    color: var(--zukan-ink-light);
+    line-height: 1.9;
+    margin: 0 0 20px;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .zukan-hero-description {
+        font-size: 15px;
+    }
+}
+
+.zukan-archive .zukan-hero-description strong {
+    color: var(--zukan-accent-red);
+    font-weight: 700;
+}
+
+.zukan-archive .zukan-hero-stats-simple {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    font-family: var(--zukan-font-sans);
+    color: #6b7280;
+}
+
+.zukan-archive .zukan-hero-stat strong {
+    color: var(--zukan-accent-red);
+    font-weight: 700;
+}
+
+.zukan-archive .zukan-hero-stat-divider {
+    color: #d1d5db;
+}
+
+/* ==========================================================================
+   Hero Section - 旧書籍スタイル（非表示・互換性のため残す）
+   ========================================================================== */
+.zukan-archive .zukan-hero.zukan-hero-book {
+    display: none;
 }
 
 .zukan-archive .zukan-hero-main-title {
