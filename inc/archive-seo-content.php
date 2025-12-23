@@ -1485,7 +1485,7 @@ function gi_output_archive_outro_content() {
     }
 }
 
-// おすすめ記事出力
+// おすすめ記事出力 - Editor's Pick デザイン
 function gi_output_archive_featured_posts() {
     $content = gi_get_current_archive_seo_content();
     
@@ -1493,11 +1493,17 @@ function gi_output_archive_featured_posts() {
         $posts = gi_get_featured_posts_for_archive($content['featured_posts']);
         
         if (!empty($posts)) {
-            echo '<div class="gi-archive-featured-posts">';
-            echo '<h2>おすすめの助成金・補助金</h2>';
-            echo '<div class="gi-featured-grid">';
+            echo '<section class="editors-pick-section">';
+            echo '<div class="editors-pick-container">';
+            echo '<div class="editors-pick-header">';
+            echo '<span class="editors-pick-badge">★ EDITOR\'S PICK</span>';
+            echo '<h2 class="editors-pick-title">おすすめの助成金・補助金</h2>';
+            echo '<p class="editors-pick-subtitle">専門家が厳選した、今注目の助成金をご紹介します</p>';
+            echo '</div>';
+            echo '<div class="editors-pick-grid">';
             
             foreach ($posts as $post) {
+                // 助成金メタデータ取得
                 $max_amount = get_post_meta($post->ID, 'grant_amount_max', true);
                 $max_amount_display = $max_amount ? number_format($max_amount) . '万円' : '要確認';
                 $deadline = get_post_meta($post->ID, 'deadline_date', true);
@@ -1505,20 +1511,134 @@ function gi_output_archive_featured_posts() {
                 $prefecture_terms = get_the_terms($post->ID, 'grant_prefecture');
                 $prefecture_name = ($prefecture_terms && !is_wp_error($prefecture_terms)) ? $prefecture_terms[0]->name : '全国';
                 
-                echo '<a href="' . get_permalink($post->ID) . '" class="gi-featured-card">';
-                echo '<div class="gi-featured-card-header">';
-                echo '<span class="gi-featured-prefecture">' . esc_html($prefecture_name) . '</span>';
+                // 難易度取得（カスタムフィールドまたはデフォルト）
+                $difficulty = get_post_meta($post->ID, 'grant_difficulty', true);
+                if (!$difficulty) {
+                    // 金額に基づいてデフォルト難易度を設定
+                    if ($max_amount && $max_amount >= 5000) {
+                        $difficulty = 'medium';
+                    } elseif ($max_amount && $max_amount >= 1000) {
+                        $difficulty = 'medium';
+                    } else {
+                        $difficulty = 'high';
+                    }
+                }
+                
+                // 難易度表示設定
+                $difficulty_label = '';
+                $difficulty_class = '';
+                $difficulty_stars = '';
+                switch ($difficulty) {
+                    case 'low':
+                        $difficulty_label = '易しい';
+                        $difficulty_class = 'difficulty-low';
+                        $difficulty_stars = '<span class="star filled">★</span><span class="star">★</span><span class="star">★</span>';
+                        break;
+                    case 'medium':
+                        $difficulty_label = '普通';
+                        $difficulty_class = 'difficulty-medium';
+                        $difficulty_stars = '<span class="star filled">★</span><span class="star filled">★</span><span class="star">★</span>';
+                        break;
+                    case 'high':
+                    default:
+                        $difficulty_label = '難しい';
+                        $difficulty_class = 'difficulty-high';
+                        $difficulty_stars = '<span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span>';
+                        break;
+                }
+                
+                // 対象者・条件取得
+                $target_business = get_post_meta($post->ID, 'target_business', true);
+                $requirements = get_post_meta($post->ID, 'requirements', true);
+                $category_terms = get_the_terms($post->ID, 'grant_category');
+                $category_name = ($category_terms && !is_wp_error($category_terms)) ? $category_terms[0]->name : '';
+                
+                // 概要取得
+                $excerpt = get_the_excerpt($post->ID);
+                if (!$excerpt) {
+                    $excerpt = wp_trim_words($post->post_content, 40, '...');
+                }
+                
+                echo '<article class="editors-pick-card">';
+                echo '<a href="' . get_permalink($post->ID) . '" class="editors-pick-card-link">';
+                
+                // カードヘッダー
+                echo '<div class="editors-pick-card-header">';
+                echo '<div class="card-badges">';
+                if ($category_name) {
+                    echo '<span class="category-badge">' . esc_html($category_name) . '</span>';
+                }
+                echo '<span class="prefecture-badge">' . esc_html($prefecture_name) . '</span>';
+                echo '</div>';
+                echo '<div class="difficulty-badge ' . esc_attr($difficulty_class) . '">';
+                echo '<span class="difficulty-label">難易度: ' . esc_html($difficulty_label) . '</span>';
+                echo '<span class="difficulty-stars">' . $difficulty_stars . '</span>';
+                echo '</div>';
+                echo '</div>';
+                
+                // カードタイトル
+                echo '<h3 class="editors-pick-card-title">' . esc_html($post->post_title) . '</h3>';
+                
+                // 金額バッジ
+                echo '<div class="amount-badge-wrapper">';
+                echo '<span class="amount-badge">';
+                echo '<span class="amount-label">上限</span>';
+                echo '<span class="amount-value">' . esc_html($max_amount_display) . '</span>';
+                echo '</span>';
                 if ($deadline_display) {
-                    echo '<span class="gi-featured-deadline">締切: ' . esc_html($deadline_display) . '</span>';
+                    echo '<span class="deadline-badge">';
+                    echo '<svg class="deadline-icon" viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.2 14.2L11 13V7h1.5v5.2l4.5 2.7-.8 1.3z"/></svg>';
+                    echo '<span>締切: ' . esc_html($deadline_display) . '</span>';
+                    echo '</span>';
                 }
                 echo '</div>';
-                echo '<h3>' . esc_html($post->post_title) . '</h3>';
-                echo '<div class="gi-featured-amount">上限 ' . esc_html($max_amount_display) . '</div>';
+                
+                // カードコンテンツ
+                echo '<div class="editors-pick-card-content">';
+                
+                // 対象者セクション
+                if ($target_business) {
+                    echo '<div class="info-section target-section">';
+                    echo '<div class="info-header">';
+                    echo '<svg class="info-icon" viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
+                    echo '<span class="info-title">対象</span>';
+                    echo '</div>';
+                    echo '<p class="info-text">' . esc_html(wp_trim_words($target_business, 30, '...')) . '</p>';
+                    echo '</div>';
+                }
+                
+                // 条件セクション
+                if ($requirements) {
+                    echo '<div class="info-section conditions-section">';
+                    echo '<div class="info-header">';
+                    echo '<svg class="info-icon" viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+                    echo '<span class="info-title">条件</span>';
+                    echo '</div>';
+                    echo '<p class="info-text">' . esc_html(wp_trim_words($requirements, 30, '...')) . '</p>';
+                    echo '</div>';
+                }
+                
+                // 概要（対象・条件がない場合のフォールバック）
+                if (!$target_business && !$requirements && $excerpt) {
+                    echo '<div class="info-section excerpt-section">';
+                    echo '<p class="info-text excerpt-text">' . esc_html($excerpt) . '</p>';
+                    echo '</div>';
+                }
+                
+                echo '</div>';
+                
+                // カードフッター
+                echo '<div class="editors-pick-card-footer">';
+                echo '<span class="view-details">詳細を見る <svg class="arrow-icon" viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg></span>';
+                echo '</div>';
+                
                 echo '</a>';
+                echo '</article>';
             }
             
             echo '</div>';
             echo '</div>';
+            echo '</section>';
         }
     }
 }
