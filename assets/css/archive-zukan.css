@@ -192,10 +192,45 @@ body.zukan-theme,
 }
 
 /* ==========================================================================
-   Hero Section - シンプルなヘッダー（非表示または最小化）
+   Hero Section - ヒーローセクション
    ========================================================================== */
 .zukan-archive .zukan-hero {
-    display: none;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 32px 16px;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .zukan-hero {
+        padding: 48px 32px;
+    }
+}
+
+.zukan-archive .zukan-hero-content {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.zukan-archive .zukan-hero-lead {
+    font-size: 14px;
+    font-family: var(--zukan-font-sans);
+    color: var(--zukan-ink-light);
+    line-height: 1.9;
+    margin: 0;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .zukan-hero-lead {
+        font-size: 15px;
+    }
+}
+
+.zukan-archive .zukan-hero-lead strong {
+    color: var(--zukan-accent-red);
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-color: var(--zukan-accent-gold);
+    text-underline-offset: 3px;
 }
 
 /* ==========================================================================

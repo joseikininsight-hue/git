@@ -282,7 +282,16 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
         </div>
     </nav>
 
-    <!-- ヒーローセクションは非表示（CSSで制御） -->
+    <!-- ヒーローセクション -->
+    <section class="zukan-hero">
+        <div class="yahoo-container">
+            <div class="zukan-hero-content">
+                <p class="zukan-hero-lead">
+                    多くの大型補助金（ものづくり補助金や事業再構築補助金など）で、「<strong>給与支給総額の年率増加</strong>」が必須要件、あるいは強力な加点項目となっています。「投資して、稼いで、社員に還元する」サイクルを描ける企業が採択を勝ち取れます。この「補助金図鑑」では、膨大な公募情報の中から、特に実用性が高く、採択の可能性がある制度を厳選して掲載しています。自社の課題に合った制度を「目的」や「地域」から探してみてください。
+                </p>
+            </div>
+        </div>
+    </section>
 
     <!-- 2カラムレイアウト -->
     <div class="yahoo-container yahoo-two-column-layout zukan-two-column">
@@ -290,8 +299,20 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
         <!-- メインコンテンツ -->
         <div class="yahoo-main-content zukan-main-content">
             
-            <!-- ページタイトルエリア -->
-            <div class="results-header" style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #f3f4f6;">
+            <?php 
+            // アーカイブSEOコンテンツ: おすすめ記事
+            if (function_exists('gi_output_archive_featured_posts')) {
+                gi_output_archive_featured_posts();
+            }
+            
+            // アーカイブSEOコンテンツ: イントロ
+            if (function_exists('gi_output_archive_intro_content')) {
+                gi_output_archive_intro_content();
+            }
+            ?>
+            
+            <!-- ページタイトルエリア（イントロの後に配置） -->
+            <div class="results-header zukan-results-header" style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #f3f4f6;">
                 <div>
                     <h1 class="results-title" style="font-size: 1.5rem; font-weight: 700; margin-bottom: 8px;"><?php echo esc_html($archive_title); ?></h1>
                     <p class="results-meta" style="font-size: 14px; color: #6b7280;">
@@ -308,18 +329,6 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                     </select>
                 </div>
             </div>
-            
-            <?php 
-            // アーカイブSEOコンテンツ: おすすめ記事
-            if (function_exists('gi_output_archive_featured_posts')) {
-                gi_output_archive_featured_posts();
-            }
-            
-            // アーカイブSEOコンテンツ: イントロ
-            if (function_exists('gi_output_archive_intro_content')) {
-                gi_output_archive_intro_content();
-            }
-            ?>
             
             <!-- モバイル用フィルター開閉ボタン -->
             <button class="mobile-filter-toggle" id="mobile-filter-toggle" type="button" aria-label="フィルターを開く">
@@ -1509,22 +1518,35 @@ document.addEventListener('DOMContentLoaded', function() {
  * サイドバーフィルターの初期化
  */
 function initSidebarFilters() {
+    console.log('📋 Initializing sidebar filters...');
+    
     // フィルターグループのトグル
     var filterToggles = document.querySelectorAll('.sidebar-filter-toggle');
-    filterToggles.forEach(function(toggle) {
+    console.log('  Found', filterToggles.length, 'filter toggles');
+    
+    filterToggles.forEach(function(toggle, index) {
+        // 最初のカテゴリフィルターのみデフォルトで開く
+        var options = toggle.nextElementSibling;
+        if (index === 0 && options) {
+            toggle.setAttribute('aria-expanded', 'true');
+            options.style.display = 'block';
+        }
+        
         toggle.addEventListener('click', function() {
             var isExpanded = this.getAttribute('aria-expanded') === 'true';
-            var options = this.nextElementSibling;
+            var opts = this.nextElementSibling;
             
             this.setAttribute('aria-expanded', !isExpanded);
-            if (options) {
-                options.style.display = isExpanded ? 'none' : 'block';
+            if (opts) {
+                opts.style.display = isExpanded ? 'none' : 'block';
             }
         });
     });
     
     // チェックボックス変更時のカウント更新
     var checkboxes = document.querySelectorAll('.sidebar-filter-option input[type="checkbox"]');
+    console.log('  Found', checkboxes.length, 'checkboxes');
+    
     checkboxes.forEach(function(checkbox) {
         checkbox.addEventListener('change', function() {
             updateFilterCounts();
@@ -1536,6 +1558,7 @@ function initSidebarFilters() {
     var sidebarSearchInput = document.getElementById('sidebar-keyword-search');
     
     if (sidebarSearchBtn && sidebarSearchInput) {
+        console.log('  Search widgets found');
         sidebarSearchBtn.addEventListener('click', function() {
             applySidebarFilters();
         });
@@ -1551,6 +1574,7 @@ function initSidebarFilters() {
     // フィルター適用ボタン
     var applyBtn = document.getElementById('sidebar-apply-filter');
     if (applyBtn) {
+        console.log('  Apply button found');
         applyBtn.addEventListener('click', function() {
             applySidebarFilters();
         });
@@ -1559,10 +1583,25 @@ function initSidebarFilters() {
     // リセットボタン
     var resetBtn = document.getElementById('sidebar-reset-filter');
     if (resetBtn) {
+        console.log('  Reset button found');
         resetBtn.addEventListener('click', function() {
             resetSidebarFilters();
         });
     }
+    
+    // 「さらに表示」ボタン
+    var moreButtons = document.querySelectorAll('.sidebar-filter-more');
+    moreButtons.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var target = this.getAttribute('data-target');
+            console.log('Show more clicked for:', target);
+            // TODO: Load more options via AJAX or show hidden options
+            this.textContent = '読み込み中...';
+            this.disabled = true;
+        });
+    });
+    
+    console.log('✅ Sidebar filters initialized');
 }
 
 /**
@@ -1588,54 +1627,70 @@ function updateFilterCounts() {
  * サイドバーフィルターを適用
  */
 function applySidebarFilters() {
-    if (typeof ArchiveCommon === 'undefined') return;
+    if (typeof ArchiveCommon === 'undefined') {
+        console.error('ArchiveCommon is not defined');
+        return;
+    }
+    
+    console.log('🔍 Applying sidebar filters...');
     
     var state = ArchiveCommon.state;
     
     // キーワード検索
     var searchInput = document.getElementById('sidebar-keyword-search');
-    if (searchInput && searchInput.value.trim()) {
-        state.filters.search = searchInput.value.trim();
+    if (searchInput) {
+        var searchValue = searchInput.value.trim();
+        state.filters.search = searchValue;
         // メインの検索欄にも反映
         var mainSearch = document.getElementById('keyword-search');
-        if (mainSearch) mainSearch.value = searchInput.value.trim();
+        if (mainSearch) mainSearch.value = searchValue;
+        console.log('  Search:', searchValue);
     }
     
     // カテゴリ
     var categoryCheckboxes = document.querySelectorAll('input[name="sidebar_category[]"]:checked');
-    if (categoryCheckboxes.length > 0) {
-        state.filters.category = Array.from(categoryCheckboxes).map(function(cb) { return cb.value; });
-    } else {
-        state.filters.category = [];
-    }
+    state.filters.category = Array.from(categoryCheckboxes).map(function(cb) { return cb.value; });
+    console.log('  Categories:', state.filters.category);
     
     // 地域（都道府県フィルタリング用）
     var regionCheckboxes = document.querySelectorAll('input[name="sidebar_region[]"]:checked');
     if (regionCheckboxes.length > 0) {
-        state.filters.region = regionCheckboxes[0].value; // 最初の選択のみ使用
+        state.filters.region = regionCheckboxes[0].value;
+    } else {
+        state.filters.region = '';
     }
+    console.log('  Region:', state.filters.region);
     
     // 助成金額
     var amountCheckboxes = document.querySelectorAll('input[name="sidebar_amount[]"]:checked');
     if (amountCheckboxes.length > 0) {
-        state.filters.amount = amountCheckboxes[0].value; // 最初の選択のみ使用
+        state.filters.amount = amountCheckboxes[0].value;
+    } else {
+        state.filters.amount = '';
     }
+    console.log('  Amount:', state.filters.amount);
     
     // 募集状況
     var statusCheckboxes = document.querySelectorAll('input[name="sidebar_status[]"]:checked');
     if (statusCheckboxes.length > 0) {
         state.filters.status = statusCheckboxes[0].value;
+    } else {
+        state.filters.status = '';
     }
+    console.log('  Status:', state.filters.status);
     
     // 検索実行
     state.currentPage = 1;
+    console.log('  Calling loadGrants()...');
     ArchiveCommon.loadGrants();
     ArchiveCommon.updateActiveFiltersDisplay();
     
     // 結果エリアへスクロール
-    var resultsHeader = document.querySelector('.results-header');
+    var resultsHeader = document.querySelector('.zukan-results-header');
     if (resultsHeader) {
-        resultsHeader.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setTimeout(function() {
+            resultsHeader.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
     }
 }
 
