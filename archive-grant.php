@@ -18,17 +18,14 @@
 get_header();
 
 // CSS/JS を直接出力（テンプレート読み込み時点では wp_enqueue_scripts は実行済みのため）
+// archive-zukan.css は archive-common.css に統合済み
 $template_dir = get_template_directory();
 $template_uri = get_template_directory_uri();
 $css_file = $template_dir . '/assets/css/archive-common.css';
-$zukan_css_file = $template_dir . '/assets/css/archive-zukan.css';
 $js_file = $template_dir . '/assets/js/archive-common.js';
 ?>
 <?php if (file_exists($css_file) && !wp_style_is('gi-archive-common', 'done')): ?>
 <link rel="stylesheet" href="<?php echo esc_url($template_uri . '/assets/css/archive-common.css?ver=' . filemtime($css_file)); ?>" media="all">
-<?php endif; ?>
-<?php if (file_exists($zukan_css_file)): ?>
-<link rel="stylesheet" href="<?php echo esc_url($template_uri . '/assets/css/archive-zukan.css?ver=' . filemtime($zukan_css_file)); ?>" media="all">
 <?php endif; ?>
 <?php
 
@@ -325,495 +322,39 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
             ?>
             
             <!-- 統合された検索結果ヘッダー（イントロの後に配置） -->
-            <div class="results-header zukan-results-header unified-results-header">
-                <div class="results-header-main">
-                    <h1 class="results-title"><?php echo esc_html($archive_title); ?></h1>
-                    <div class="results-meta-unified">
-                        <span class="results-count-primary">
-                            条件に合致した制度：<strong id="current-count"><?php echo $total_grants_formatted; ?></strong> 件
-                        </span>
-                        <span class="results-separator">｜</span>
-                        <span class="results-showing" id="results-showing-range">
-                            <span id="showing-from">1</span>〜<span id="showing-to"><?php echo min(12, $total_grants); ?></span>件を表示
-                        </span>
-                    </div>
-                </div>
-                <div class="view-controls">
-                    <label for="unified-sort-select" class="sort-label">並び替え:</label>
-                    <select id="unified-sort-select" class="sort-select-unified">
-                        <option value="date_desc">新着順</option>
-                        <option value="deadline_asc">締切が近い順</option>
-                        <option value="amount_desc">補助額が高い順</option>
-                        <option value="popular_desc">人気順</option>
-                    </select>
+            <div class="results-header zukan-results-header unified-results-header mb-0">
+                <div class="flex items-center mb-8">
+                    <span class="text-4xl text-gray-200 font-serif font-bold mr-4 -mt-2">03</span>
+                    <h2 class="text-2xl font-serif font-bold text-ink-primary border-b border-accent-gold pb-1 w-full flex justify-between items-end">
+                        <span>補助金図鑑一覧</span>
+                        <div class="text-xs font-normal text-gray-500 mb-1 hidden md:flex items-center gap-4">
+                             <span class="results-count-primary">
+                                条件に合致：<strong id="current-count"><?php echo $total_grants_formatted; ?></strong> 件
+                            </span>
+                        </div>
+                    </h2>
                 </div>
             </div>
             
-            <!-- モバイル用フィルター開閉ボタン -->
-            <button class="mobile-filter-toggle" id="mobile-filter-toggle" type="button" aria-label="フィルターを開く">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
-                </svg>
-                <span>絞り込み</span>
-            </button>
-
-            <!-- フィルターパネル背景オーバーレイ -->
-            <div class="filter-panel-overlay" id="filter-panel-overlay"></div>
-
-            <!-- プルダウン式フィルターセクション -->
-            <section class="yahoo-filter-section" id="filter-panel" 
-                     role="search" 
-                     aria-label="助成金検索フィルター">
-                
-                <!-- フィルターヘッダー -->
-                <!-- FIX: Changed h2 to h3 for better heading hierarchy (h1: page title, h2: major sections, h3: subsections) -->
-                <div class="filter-header">
-                    <h3 class="filter-title">
-                        <svg class="title-icon" 
-                             width="18" 
-                             height="18" 
-                             viewBox="0 0 24 24" 
-                             fill="none" 
-                             stroke="currentColor" 
-                             stroke-width="2" 
-                             aria-hidden="true">
-                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
-                        </svg>
-                        絞り込み
-                    </h3>
-                    <button class="mobile-filter-close" 
-                            id="mobile-filter-close"
-                            aria-label="フィルターを閉じる"
-                            type="button">×</button>
-                    <button class="filter-reset-all" 
-                            id="reset-all-filters-btn" 
-                            style="display: none;" 
-                            aria-label="すべてのフィルターをリセット"
-                            type="button">
-                        <svg width="14" 
-                             height="14" 
-                             viewBox="0 0 24 24" 
-                             fill="none" 
-                             stroke="currentColor" 
-                             stroke-width="2" 
-                             aria-hidden="true">
-                            <polyline points="1 4 1 10 7 10"/>
-                            <polyline points="23 20 23 14 17 14"/>
-                            <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/>
-                        </svg>
-                        リセット
-                    </button>
+            <!-- Mobile Filter (Simplified) -->
+            <div class="md:hidden bg-paper-shadow p-4 border-b border-gray-200 mb-8 rounded-sm">
+                <p class="text-xs font-bold mb-2 text-gray-600 font-serif">カテゴリ絞り込み</p>
+                <div class="flex flex-wrap gap-2 mobile-filters">
+                    <a href="?category=" class="text-xs px-3 py-1 bg-book-cover text-white rounded-full">すべて</a>
+                    <a href="?category=startup" class="text-xs px-3 py-1 bg-white border border-gray-300 rounded-full">創業</a>
+                    <a href="?category=facility" class="text-xs px-3 py-1 bg-white border border-gray-300 rounded-full">設備</a>
+                    <a href="?category=it" class="text-xs px-3 py-1 bg-white border border-gray-300 rounded-full">IT/DX</a>
+                    <a href="?category=energy" class="text-xs px-3 py-1 bg-white border border-gray-300 rounded-full">省エネ</a>
                 </div>
+            </div>
 
-                <!-- プルダウンフィルターグリッド -->
-                <div class="yahoo-filters-grid">
-                    
-                    <!-- カテゴリ選択 -->
-                    <div class="filter-dropdown-wrapper">
-                        <label class="filter-label" id="category-label">カテゴリ
-                            <span class="multi-select-badge" 
-                                  id="category-count-badge" 
-                                  style="display: none;">0</span>
-                        </label>
-                        <div class="custom-select multi-select" 
-                             id="category-select" 
-                             role="combobox" 
-                             aria-labelledby="category-label" 
-                             aria-expanded="false">
-                            <button class="select-trigger" 
-                                    type="button" 
-                                    aria-haspopup="listbox">
-                                <span class="select-value">選択</span>
-                                <svg class="select-arrow" 
-                                     width="14" 
-                                     height="14" 
-                                     viewBox="0 0 24 24" 
-                                     fill="currentColor" 
-                                     aria-hidden="true">
-                                    <path d="M7 10l5 5 5-5z"/>
-                                </svg>
-                            </button>
-                            <div class="select-dropdown multi-select-dropdown" 
-                                 role="listbox" 
-                                 style="display: none;">
-                                <div class="select-search-wrapper">
-                                    <input type="search" 
-                                           class="select-search-input" 
-                                           placeholder="検索..."
-                                           id="category-search"
-                                           autocomplete="off">
-                                </div>
-                                <div class="select-options-wrapper" id="category-options">
-                                    <div class="select-option all-option" 
-                                         data-value="" 
-                                         role="option">
-                                        <input type="checkbox" 
-                                               id="cat-all" 
-                                               class="option-checkbox">
-                                        <label for="cat-all">すべて</label>
-                                    </div>
-                                    <?php foreach ($all_categories as $index => $category): ?>
-                                        <div class="select-option" 
-                                             data-value="<?php echo esc_attr($category->slug); ?>"
-                                             data-name="<?php echo esc_attr($category->name); ?>"
-                                             role="option">
-                                            <input type="checkbox" 
-                                                   id="cat-<?php echo $index; ?>" 
-                                                   class="option-checkbox" 
-                                                   value="<?php echo esc_attr($category->slug); ?>">
-                                            <label for="cat-<?php echo $index; ?>">
-                                                <?php echo esc_html($category->name); ?> (<?php echo $category->count; ?>)
-                                            </label>
-                                        </div>
-                                    <?php endforeach; ?>
-                                </div>
-                                <div class="select-actions">
-                                    <button class="select-action-btn clear-btn" 
-                                            id="clear-category-btn" 
-                                            type="button">クリア</button>
-                                    <button class="select-action-btn apply-btn" 
-                                            id="apply-category-btn" 
-                                            type="button">適用</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 地域選択 -->
-                    <div class="filter-dropdown-wrapper">
-                        <label class="filter-label" id="region-label">地域</label>
-                        <div class="custom-select" 
-                             id="region-select" 
-                             role="combobox" 
-                             aria-labelledby="region-label" 
-                             aria-expanded="false">
-                            <button class="select-trigger" 
-                                    type="button" 
-                                    aria-haspopup="listbox">
-                                <span class="select-value">全国</span>
-                                <svg class="select-arrow" 
-                                     width="14" 
-                                     height="14" 
-                                     viewBox="0 0 24 24" 
-                                     fill="currentColor" 
-                                     aria-hidden="true">
-                                    <path d="M7 10l5 5 5-5z"/>
-                                </svg>
-                            </button>
-                            <div class="select-dropdown" 
-                                 role="listbox" 
-                                 style="display: none;">
-                                <div class="select-option active" 
-                                     data-value="" 
-                                     role="option">全国</div>
-                                <?php foreach ($region_groups as $region_slug => $region_name): ?>
-                                    <div class="select-option" 
-                                         data-value="<?php echo esc_attr($region_slug); ?>" 
-                                         role="option">
-                                        <?php echo esc_html($region_name); ?>
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 都道府県選択 -->
-                    <div class="filter-dropdown-wrapper">
-                        <label class="filter-label" id="prefecture-label">都道府県
-                            <span class="multi-select-badge" 
-                                  id="prefecture-count-badge" 
-                                  style="display: none;">0</span>
-                        </label>
-                        <div class="custom-select multi-select" 
-                             id="prefecture-select" 
-                             role="combobox" 
-                             aria-labelledby="prefecture-label" 
-                             aria-expanded="false">
-                            <button class="select-trigger" 
-                                    type="button" 
-                                    aria-haspopup="listbox">
-                                <span class="select-value">選択</span>
-                                <svg class="select-arrow" 
-                                     width="14" 
-                                     height="14" 
-                                     viewBox="0 0 24 24" 
-                                     fill="currentColor" 
-                                     aria-hidden="true">
-                                    <path d="M7 10l5 5 5-5z"/>
-                                </svg>
-                            </button>
-                            <div class="select-dropdown multi-select-dropdown" 
-                                 role="listbox" 
-                                 style="display: none;">
-                                <div class="select-search-wrapper">
-                                    <input type="search" 
-                                           class="select-search-input" 
-                                           placeholder="検索..."
-                                           id="prefecture-search"
-                                           autocomplete="off">
-                                </div>
-                                <div class="select-options-wrapper" id="prefecture-options">
-                                    <div class="select-option all-option" 
-                                         data-value="" 
-                                         role="option">
-                                        <input type="checkbox" 
-                                               id="pref-all" 
-                                               class="option-checkbox">
-                                        <label for="pref-all">すべて</label>
-                                    </div>
-                                    <?php foreach ($prefectures as $index => $pref): ?>
-                                        <div class="select-option" 
-                                             data-value="<?php echo esc_attr($pref['slug']); ?>"
-                                             data-region="<?php echo esc_attr($pref['region']); ?>"
-                                             data-name="<?php echo esc_attr($pref['name']); ?>"
-                                             role="option">
-                                            <input type="checkbox" 
-                                                   id="pref-<?php echo $index; ?>" 
-                                                   class="option-checkbox" 
-                                                   value="<?php echo esc_attr($pref['slug']); ?>">
-                                            <label for="pref-<?php echo $index; ?>">
-                                                <?php echo esc_html($pref['name']); ?>
-                                            </label>
-                                        </div>
-                                    <?php endforeach; ?>
-                                </div>
-                                <div class="select-actions">
-                                    <button class="select-action-btn clear-btn" 
-                                            id="clear-prefecture-btn" 
-                                            type="button">クリア</button>
-                                    <button class="select-action-btn apply-btn" 
-                                            id="apply-prefecture-btn" 
-                                            type="button">適用</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 市町村選択 -->
-                    <div class="filter-dropdown-wrapper" 
-                         id="municipality-wrapper" 
-                         style="display: none;">
-                        <label class="filter-label" id="municipality-label">市町村
-                            <span class="selected-prefecture-name" 
-                                  id="selected-prefecture-name"></span>
-                        </label>
-                        <div class="custom-select" 
-                             id="municipality-select" 
-                             role="combobox" 
-                             aria-labelledby="municipality-label" 
-                             aria-expanded="false">
-                            <button class="select-trigger" 
-                                    type="button" 
-                                    aria-haspopup="listbox">
-                                <span class="select-value">すべて</span>
-                                <svg class="select-arrow" 
-                                     width="14" 
-                                     height="14" 
-                                     viewBox="0 0 24 24" 
-                                     fill="currentColor" 
-                                     aria-hidden="true">
-                                    <path d="M7 10l5 5 5-5z"/>
-                                </svg>
-                            </button>
-                            <div class="select-dropdown" 
-                                 role="listbox" 
-                                 style="display: none;">
-                                <div class="select-search-wrapper">
-                                    <input type="search" 
-                                           class="select-search-input" 
-                                           placeholder="検索..."
-                                           id="municipality-search"
-                                           autocomplete="off">
-                                </div>
-                                <div class="select-options-wrapper" id="municipality-options">
-                                    <div class="select-option active" 
-                                         data-value="" 
-                                         role="option">すべて</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 助成金額 -->
-                    <div class="filter-dropdown-wrapper">
-                        <label class="filter-label" id="amount-label">助成金額</label>
-                        <div class="custom-select" 
-                             id="amount-select" 
-                             role="combobox" 
-                             aria-labelledby="amount-label" 
-                             aria-expanded="false">
-                            <button class="select-trigger" 
-                                    type="button" 
-                                    aria-haspopup="listbox">
-                                <span class="select-value">指定なし</span>
-                                <svg class="select-arrow" 
-                                     width="14" 
-                                     height="14" 
-                                     viewBox="0 0 24 24" 
-                                     fill="currentColor" 
-                                     aria-hidden="true">
-                                    <path d="M7 10l5 5 5-5z"/>
-                                </svg>
-                            </button>
-                            <div class="select-dropdown" 
-                                 role="listbox" 
-                                 style="display: none;">
-                                <div class="select-option active" 
-                                     data-value="" 
-                                     role="option">指定なし</div>
-                                <div class="select-option" 
-                                     data-value="0-100" 
-                                     role="option">〜100万円</div>
-                                <div class="select-option" 
-                                     data-value="100-500" 
-                                     role="option">100万円〜500万円</div>
-                                <div class="select-option" 
-                                     data-value="500-1000" 
-                                     role="option">500万円〜1000万円</div>
-                                <div class="select-option" 
-                                     data-value="1000-3000" 
-                                     role="option">1000万円〜3000万円</div>
-                                <div class="select-option" 
-                                     data-value="3000+" 
-                                     role="option">3000万円以上</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 募集状況 -->
-                    <div class="filter-dropdown-wrapper">
-                        <label class="filter-label" id="status-label">募集状況</label>
-                        <div class="custom-select" 
-                             id="status-select" 
-                             role="combobox" 
-                             aria-labelledby="status-label" 
-                             aria-expanded="false">
-                            <button class="select-trigger" 
-                                    type="button" 
-                                    aria-haspopup="listbox">
-                                <span class="select-value">すべて</span>
-                                <svg class="select-arrow" 
-                                     width="14" 
-                                     height="14" 
-                                     viewBox="0 0 24 24" 
-                                     fill="currentColor" 
-                                     aria-hidden="true">
-                                    <path d="M7 10l5 5 5-5z"/>
-                                </svg>
-                            </button>
-                            <div class="select-dropdown" 
-                                 role="listbox" 
-                                 style="display: none;">
-                                <div class="select-option active" 
-                                     data-value="" 
-                                     role="option">すべて</div>
-                                <div class="select-option" 
-                                     data-value="active" 
-                                     role="option">募集中</div>
-                                <div class="select-option" 
-                                     data-value="upcoming" 
-                                     role="option">募集予定</div>
-                                <div class="select-option" 
-                                     data-value="closed" 
-                                     role="option">募集終了</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 並び順 -->
-                    <div class="filter-dropdown-wrapper">
-                        <label class="filter-label" id="sort-label">並び順</label>
-                        <div class="custom-select" 
-                             id="sort-select" 
-                             role="combobox" 
-                             aria-labelledby="sort-label" 
-                             aria-expanded="false">
-                            <button class="select-trigger" 
-                                    type="button" 
-                                    aria-haspopup="listbox">
-                                <span class="select-value">新着順</span>
-                                <svg class="select-arrow" 
-                                     width="14" 
-                                     height="14" 
-                                     viewBox="0 0 24 24" 
-                                     fill="currentColor" 
-                                     aria-hidden="true">
-                                    <path d="M7 10l5 5 5-5z"/>
-                                </svg>
-                            </button>
-                            <div class="select-dropdown" 
-                                 role="listbox" 
-                                 style="display: none;">
-                                <div class="select-option active" 
-                                     data-value="date_desc" 
-                                     role="option">新着順</div>
-                                <div class="select-option" 
-                                     data-value="amount_desc" 
-                                     role="option">金額が高い順</div>
-                                <div class="select-option" 
-                                     data-value="deadline_asc" 
-                                     role="option">締切が近い順</div>
-                                <div class="select-option" 
-                                     data-value="popular_desc" 
-                                     role="option">人気順</div>
-                                <div class="select-option" 
-                                     data-value="featured_first" 
-                                     role="option">注目順</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 選択中のフィルター表示 -->
-                <div class="active-filters-display" 
-                     id="active-filters" 
-                     style="display: none;">
-                    <div class="active-filters-label">
-                        <svg width="14" 
-                             height="14" 
-                             viewBox="0 0 24 24" 
-                             fill="none" 
-                             stroke="currentColor" 
-                             stroke-width="2" 
-                             aria-hidden="true">
-                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
-                        </svg>
-                        適用中:
-                    </div>
-                    <div class="active-filter-tags" id="active-filter-tags"></div>
-                </div>
-                
-                <!-- モバイル用フィルター適用ボタン -->
-                <div class="mobile-filter-apply-section" id="mobile-filter-apply-section">
-                    <button class="mobile-apply-filters-btn" 
-                            id="mobile-apply-filters-btn" 
-                            type="button">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                            <polyline points="20 6 9 17 4 12"/>
-                        </svg>
-                        フィルターを適用
-                    </button>
-                </div>
-            </section>
-
-            <!-- 検索結果セクション -->
+            <!-- Results Section -->
             <section class="yahoo-results-section" id="grants-results-section">
-
-                <!-- ローディング -->
-                <div class="loading-overlay" 
-                     id="loading-overlay" 
-                     style="display: none;">
-                    <div class="loading-spinner">
-                        <div class="spinner"></div>
-                        <p class="loading-text">検索中...</p>
-                    </div>
-                </div>
-
-                <!-- 都道府県一覧表示（view=prefectures の場合） -->
+                
                 <?php if (!empty($url_params['view']) && $url_params['view'] === 'prefectures'): ?>
                 <div class="prefectures-grid-container" style="padding: 40px 0;">
-                    <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 30px; color: #000;">都道府県から助成金を探す</h2>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px;">
+                    <h2 class="text-xl font-bold mb-6 text-ink-primary font-serif">都道府県から助成金を探す</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <?php
                         $all_prefectures = get_terms(array(
                             'taxonomy' => 'grant_prefecture',
@@ -825,10 +366,9 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                         if ($all_prefectures && !is_wp_error($all_prefectures)) {
                             foreach ($all_prefectures as $pref) {
                                 $pref_link = get_term_link($pref);
-                                $pref_count = $pref->count;
-                                echo '<a href="' . esc_url($pref_link) . '" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; text-decoration: none; transition: all 0.15s; color: #000;">';
-                                echo '<span style="font-weight: 600; font-size: 0.9375rem;">' . esc_html($pref->name) . '</span>';
-                                echo '<span style="color: #666; font-size: 0.875rem;">' . number_format($pref_count) . '件</span>';
+                                echo '<a href="' . esc_url($pref_link) . '" class="block p-4 bg-white border border-gray-200 rounded hover:shadow-md transition-shadow text-ink-primary">';
+                                echo '<span class="font-bold">' . esc_html($pref->name) . '</span>';
+                                echo '<span class="text-gray-500 text-xs ml-2">(' . $pref->count . ')</span>';
                                 echo '</a>';
                             }
                         }
@@ -836,11 +376,9 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                     </div>
                 </div>
                 <?php else: ?>
-                
-                <!-- 助成金表示エリア -->
-                <div class="grants-container-yahoo" 
-                     id="grants-container" 
-                     data-view="single">
+            
+                <!-- List Container: Dictionary Layout -->
+                <div id="subsidy-list" class="grid gap-0 border-t border-gray-200 mb-20">
                     <?php
                     // WP_Queryの引数を構築
                     $query_args = array(
@@ -1057,10 +595,14 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
             
             if ($show_default_article && ($is_category_archive || $is_prefecture_archive || is_post_type_archive('grant'))): 
             ?>
-            <section class="zukan-article-section">
-                <header class="zukan-article-header">
-                    <span class="zukan-article-label">Editorial Guide</span>
-                    <h2 class="zukan-article-title">
+            <section class="relative pt-12 mt-12 border-t-4 border-double border-gray-300">
+                <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-paper-warm px-4 text-ink-secondary text-2xl">
+                    ❦
+                </div>
+
+                <article class="prose prose-stone font-serif max-w-none">
+                    <h2 class="text-3xl font-bold text-center mb-10 text-ink-primary">
+                        <span class="block text-sm font-normal text-gray-500 tracking-widest mb-2 uppercase">Editorial Guide</span>
                         <?php if ($is_prefecture_archive): ?>
                         <?php echo esc_html($current_category->name); ?>の助成金・補助金申請ガイド
                         <?php elseif ($is_category_archive): ?>
@@ -1069,39 +611,39 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                         助成金・補助金の選び方と申請の基礎知識
                         <?php endif; ?>
                     </h2>
-                </header>
-                
-                <div class="zukan-article-content">
-                    <?php if ($is_prefecture_archive): ?>
-                    <h3>申請の傾向</h3>
-                    <p><?php echo esc_html($current_category->name); ?>では、地域の産業振興や中小企業支援を目的とした独自の助成金制度が充実しています。特に創業支援、事業承継、設備投資に関する支援が手厚く、申請件数も年々増加傾向にあります。審査では地域経済への貢献度や雇用創出効果が重視される傾向があります。</p>
                     
-                    <h3>採択のポイント</h3>
-                    <p>採択率を高めるためには、事業計画の具体性と実現可能性が鍵となります。また、<?php echo esc_html($current_category->name); ?>の産業政策との整合性を示すことも重要です。申請書類では、数値目標を明確に設定し、その達成に向けた具体的なアクションプランを提示することをお勧めします。</p>
-                    
-                    <?php elseif ($is_category_archive): ?>
-                    <h3>この分野の特徴</h3>
-                    <p><?php echo esc_html($current_category->name); ?>関連の助成金は、技術革新や事業効率化を促進することを目的としています。近年は特にデジタル化やサステナビリティへの取り組みに対する支援が拡充されており、申請の機会が広がっています。補助率も比較的高く設定されているケースが多いのが特徴です。</p>
-                    
-                    <h3>申請時の注意点</h3>
-                    <p>この分野では、導入する技術や設備の先進性・革新性を明確に示すことが求められます。また、投資対効果（ROI）を具体的な数値で示し、事業の持続可能性についても説明することが採択への近道です。専門家のサポートを受けながら申請することをお勧めします。</p>
-                    
-                    <?php else: ?>
-                    <h3>助成金・補助金とは</h3>
-                    <p>助成金・補助金は、国や地方自治体、公的機関が事業者の取り組みを支援するために給付する資金です。融資と異なり返済不要なため、新規事業の立ち上げや設備投資、人材育成など、様々な経営課題の解決に活用できます。ただし、申請要件や使途に制限があるため、事前の確認が重要です。</p>
-                    
-                    <h3>申請の基本ステップ</h3>
-                    <p>まず、自社の事業計画に合致する制度を見つけることから始めます。公募要領を熟読し、対象要件や補助対象経費を確認した上で、事業計画書を作成します。審査では計画の実現可能性や効果が評価されるため、具体的かつ現実的な内容にすることが採択への鍵となります。</p>
-                    <?php endif; ?>
-                    
-                    <div class="zukan-article-note">
-                        <p class="zukan-article-note-title">※ 専門家への相談をお勧めします</p>
-                        <p class="zukan-article-note-text">
-                            助成金の申請は要件確認から書類作成まで専門知識が必要です。<br>
-                            当サイトでは無料相談を承っておりますので、お気軽にお問い合わせください。
-                        </p>
+                    <div class="zukan-article-content text-justify leading-loose">
+                        <?php if ($is_prefecture_archive): ?>
+                        <h3 class="font-bold text-lg border-b border-gray-200 pb-2 mb-3 mt-6">申請の傾向</h3>
+                        <p><?php echo esc_html($current_category->name); ?>では、地域の産業振興や中小企業支援を目的とした独自の助成金制度が充実しています。特に創業支援、事業承継、設備投資に関する支援が手厚く、申請件数も年々増加傾向にあります。審査では地域経済への貢献度や雇用創出効果が重視される傾向があります。</p>
+                        
+                        <h3 class="font-bold text-lg border-b border-gray-200 pb-2 mb-3 mt-6">採択のポイント</h3>
+                        <p>採択率を高めるためには、事業計画の具体性と実現可能性が鍵となります。また、<?php echo esc_html($current_category->name); ?>の産業政策との整合性を示すことも重要です。申請書類では、数値目標を明確に設定し、その達成に向けた具体的なアクションプランを提示することをお勧めします。</p>
+                        
+                        <?php elseif ($is_category_archive): ?>
+                        <h3 class="font-bold text-lg border-b border-gray-200 pb-2 mb-3 mt-6">この分野の特徴</h3>
+                        <p><?php echo esc_html($current_category->name); ?>関連の助成金は、技術革新や事業効率化を促進することを目的としています。近年は特にデジタル化やサステナビリティへの取り組みに対する支援が拡充されており、申請の機会が広がっています。補助率も比較的高く設定されているケースが多いのが特徴です。</p>
+                        
+                        <h3 class="font-bold text-lg border-b border-gray-200 pb-2 mb-3 mt-6">申請時の注意点</h3>
+                        <p>この分野では、導入する技術や設備の先進性・革新性を明確に示すことが求められます。また、投資対効果（ROI）を具体的な数値で示し、事業の持続可能性についても説明することが採択への近道です。専門家のサポートを受けながら申請することをお勧めします。</p>
+                        
+                        <?php else: ?>
+                        <h3 class="font-bold text-lg border-b border-gray-200 pb-2 mb-3 mt-6">助成金・補助金とは</h3>
+                        <p>助成金・補助金は、国や地方自治体、公的機関が事業者の取り組みを支援するために給付する資金です。融資と異なり返済不要なため、新規事業の立ち上げや設備投資、人材育成など、様々な経営課題の解決に活用できます。ただし、申請要件や使途に制限があるため、事前の確認が重要です。</p>
+                        
+                        <h3 class="font-bold text-lg border-b border-gray-200 pb-2 mb-3 mt-6">申請の基本ステップ</h3>
+                        <p>まず、自社の事業計画に合致する制度を見つけることから始めます。公募要領を熟読し、対象要件や補助対象経費を確認した上で、事業計画書を作成します。審査では計画の実現可能性や効果が評価されるため、具体的かつ現実的な内容にすることが採択への鍵となります。</p>
+                        <?php endif; ?>
+                        
+                        <div class="mt-10 p-6 bg-gray-100 border border-gray-300 rounded-sm text-center">
+                            <p class="font-bold text-sm text-gray-800">※ 専門家への相談をお勧めします</p>
+                            <p class="text-xs text-gray-600 mt-2 leading-relaxed">
+                                助成金の申請は要件確認から書類作成まで専門知識が必要です。<br>
+                                当サイトでは無料相談を承っておりますので、お気軽にお問い合わせください。
+                            </p>
+                        </div>
                     </div>
-                </div>
+                </article>
             </section>
             <?php endif; ?>
             
@@ -1462,9 +1004,10 @@ $js_uri = get_template_directory_uri() . '/assets/js/archive-common.js';
 <script src="<?php echo esc_url($js_uri . '?ver=' . filemtime($js_file)); ?>"></script>
 <?php endif; ?>
 
-<!-- 初期化スクリプト -->
+<!-- 初期化スクリプト（archive-common.jsに統合済み） -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // ArchiveCommon の初期化（サイドバーフィルター、統合ソートは自動的に初期化）
     if (typeof ArchiveCommon !== 'undefined') {
         ArchiveCommon.init({
             ajaxUrl: '<?php echo admin_url("admin-ajax.php"); ?>',
@@ -1477,312 +1020,7 @@ document.addEventListener('DOMContentLoaded', function() {
             fixedTag: ''
         });
     }
-    
-    // サイドバーフィルターの初期化
-    initSidebarFilters();
-    
-    // 統合ソートセレクトの初期化
-    initUnifiedSortSelect();
 });
-
-/**
- * 統合ソートセレクトの初期化
- */
-function initUnifiedSortSelect() {
-    var sortSelect = document.getElementById('unified-sort-select');
-    if (!sortSelect) {
-        console.log('❌ unified-sort-select not found');
-        return;
-    }
-    
-    console.log('🔄 Initializing unified sort select...');
-    
-    sortSelect.addEventListener('change', function() {
-        var sortValue = this.value;
-        console.log('📊 Sort changed to:', sortValue);
-        
-        if (typeof ArchiveCommon !== 'undefined' && ArchiveCommon.state) {
-            // ArchiveCommon の state.filters.sort を更新
-            ArchiveCommon.state.filters.sort = sortValue;
-            ArchiveCommon.state.currentPage = 1;
-            
-            // loadGrants を呼び出して検索実行
-            ArchiveCommon.loadGrants();
-            
-            console.log('✅ Sort applied via ArchiveCommon');
-        } else {
-            console.error('❌ ArchiveCommon not available');
-        }
-    });
-    
-    console.log('✅ Unified sort select initialized');
-}
-
-/**
- * サイドバーフィルターの初期化
- */
-function initSidebarFilters() {
-    console.log('📋 Initializing sidebar filters...');
-    
-    // フィルターグループのトグル
-    var filterToggles = document.querySelectorAll('.sidebar-filter-toggle');
-    console.log('  Found', filterToggles.length, 'filter toggles');
-    
-    filterToggles.forEach(function(toggle, index) {
-        // 最初のカテゴリフィルターのみデフォルトで開く
-        var options = toggle.nextElementSibling;
-        if (index === 0 && options) {
-            toggle.setAttribute('aria-expanded', 'true');
-            options.style.display = 'block';
-        }
-        
-        toggle.addEventListener('click', function() {
-            var isExpanded = this.getAttribute('aria-expanded') === 'true';
-            var opts = this.nextElementSibling;
-            
-            this.setAttribute('aria-expanded', !isExpanded);
-            if (opts) {
-                opts.style.display = isExpanded ? 'none' : 'block';
-            }
-        });
-    });
-    
-    // チェックボックス変更時のカウント更新
-    var checkboxes = document.querySelectorAll('.sidebar-filter-option input[type="checkbox"]');
-    console.log('  Found', checkboxes.length, 'checkboxes');
-    
-    checkboxes.forEach(function(checkbox) {
-        checkbox.addEventListener('change', function() {
-            updateFilterCounts();
-        });
-    });
-    
-    // サイドバー検索ボタン
-    var sidebarSearchBtn = document.getElementById('sidebar-search-btn');
-    var sidebarSearchInput = document.getElementById('sidebar-keyword-search');
-    
-    if (sidebarSearchBtn && sidebarSearchInput) {
-        console.log('  Search widgets found');
-        sidebarSearchBtn.addEventListener('click', function() {
-            applySidebarFilters();
-        });
-        
-        sidebarSearchInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                applySidebarFilters();
-            }
-        });
-    }
-    
-    // フィルター適用ボタン
-    var applyBtn = document.getElementById('sidebar-apply-filter');
-    if (applyBtn) {
-        console.log('  Apply button found');
-        applyBtn.addEventListener('click', function() {
-            applySidebarFilters();
-        });
-    }
-    
-    // リセットボタン
-    var resetBtn = document.getElementById('sidebar-reset-filter');
-    if (resetBtn) {
-        console.log('  Reset button found');
-        resetBtn.addEventListener('click', function() {
-            resetSidebarFilters();
-        });
-    }
-    
-    // 「さらに表示」ボタン - カテゴリ追加読み込み
-    var moreButtons = document.querySelectorAll('.sidebar-filter-more');
-    moreButtons.forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            var target = this.getAttribute('data-target');
-            var button = this;
-            console.log('Show more clicked for:', target);
-            
-            if (target === 'category') {
-                button.textContent = '読み込み中...';
-                button.disabled = true;
-                
-                // 残りのカテゴリを表示
-                loadMoreCategories(button);
-            }
-        });
-    });
-    
-    console.log('✅ Sidebar filters initialized');
-}
-
-/**
- * カテゴリの追加読み込み
- */
-function loadMoreCategories(button) {
-    // AJAXでカテゴリを取得
-    var formData = new FormData();
-    formData.append('action', 'gi_get_all_categories');
-    formData.append('nonce', '<?php echo wp_create_nonce("gi_ajax_nonce"); ?>');
-    formData.append('offset', 8); // 既に表示している8件をスキップ
-    
-    fetch('<?php echo admin_url("admin-ajax.php"); ?>', {
-        method: 'POST',
-        body: formData
-    })
-    .then(function(response) { return response.json(); })
-    .then(function(data) {
-        if (data.success && data.data.categories) {
-            var optionsContainer = document.querySelector('#sidebar-category-filter .sidebar-filter-options');
-            var categories = data.data.categories;
-            
-            categories.forEach(function(category) {
-                var label = document.createElement('label');
-                label.className = 'sidebar-filter-option';
-                label.innerHTML = 
-                    '<input type="checkbox" name="sidebar_category[]" value="' + category.slug + '">' +
-                    '<span class="checkbox-custom"></span>' +
-                    '<span class="option-label">' + category.name + '</span>' +
-                    '<span class="option-count">' + category.count + '</span>';
-                
-                // チェックボックスの変更イベント
-                label.querySelector('input').addEventListener('change', function() {
-                    updateFilterCounts();
-                });
-                
-                // ボタンの前に挿入
-                optionsContainer.insertBefore(label, button);
-            });
-            
-            // ボタンを削除
-            button.remove();
-            console.log('✅ Loaded', categories.length, 'more categories');
-        } else {
-            button.textContent = 'カテゴリの取得に失敗しました';
-            setTimeout(function() {
-                button.textContent = 'さらに表示';
-                button.disabled = false;
-            }, 2000);
-        }
-    })
-    .catch(function(error) {
-        console.error('カテゴリ取得エラー:', error);
-        button.textContent = 'エラーが発生しました';
-        setTimeout(function() {
-            button.textContent = 'さらに表示';
-            button.disabled = false;
-        }, 2000);
-    });
-}
-
-/**
- * フィルターカウントを更新
- */
-function updateFilterCounts() {
-    var filterGroups = document.querySelectorAll('.sidebar-filter-group');
-    filterGroups.forEach(function(group) {
-        var checkedCount = group.querySelectorAll('input[type="checkbox"]:checked').length;
-        var countBadge = group.querySelector('.filter-selected-count');
-        if (countBadge) {
-            if (checkedCount > 0) {
-                countBadge.textContent = checkedCount;
-                countBadge.style.display = 'inline-flex';
-            } else {
-                countBadge.style.display = 'none';
-            }
-        }
-    });
-}
-
-/**
- * サイドバーフィルターを適用
- */
-function applySidebarFilters() {
-    if (typeof ArchiveCommon === 'undefined') {
-        console.error('ArchiveCommon is not defined');
-        return;
-    }
-    
-    console.log('🔍 Applying sidebar filters...');
-    
-    var state = ArchiveCommon.state;
-    
-    // キーワード検索
-    var searchInput = document.getElementById('sidebar-keyword-search');
-    if (searchInput) {
-        var searchValue = searchInput.value.trim();
-        state.filters.search = searchValue;
-        // メインの検索欄にも反映
-        var mainSearch = document.getElementById('keyword-search');
-        if (mainSearch) mainSearch.value = searchValue;
-        console.log('  Search:', searchValue);
-    }
-    
-    // カテゴリ
-    var categoryCheckboxes = document.querySelectorAll('input[name="sidebar_category[]"]:checked');
-    state.filters.category = Array.from(categoryCheckboxes).map(function(cb) { return cb.value; });
-    console.log('  Categories:', state.filters.category);
-    
-    // 地域（都道府県フィルタリング用）
-    var regionCheckboxes = document.querySelectorAll('input[name="sidebar_region[]"]:checked');
-    if (regionCheckboxes.length > 0) {
-        state.filters.region = regionCheckboxes[0].value;
-    } else {
-        state.filters.region = '';
-    }
-    console.log('  Region:', state.filters.region);
-    
-    // 助成金額
-    var amountCheckboxes = document.querySelectorAll('input[name="sidebar_amount[]"]:checked');
-    if (amountCheckboxes.length > 0) {
-        state.filters.amount = amountCheckboxes[0].value;
-    } else {
-        state.filters.amount = '';
-    }
-    console.log('  Amount:', state.filters.amount);
-    
-    // 募集状況
-    var statusCheckboxes = document.querySelectorAll('input[name="sidebar_status[]"]:checked');
-    if (statusCheckboxes.length > 0) {
-        state.filters.status = statusCheckboxes[0].value;
-    } else {
-        state.filters.status = '';
-    }
-    console.log('  Status:', state.filters.status);
-    
-    // 検索実行
-    state.currentPage = 1;
-    console.log('  Calling loadGrants()...');
-    ArchiveCommon.loadGrants();
-    ArchiveCommon.updateActiveFiltersDisplay();
-    
-    // 結果エリアへスクロール
-    var resultsHeader = document.querySelector('.zukan-results-header');
-    if (resultsHeader) {
-        setTimeout(function() {
-            resultsHeader.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
-    }
-}
-
-/**
- * サイドバーフィルターをリセット
- */
-function resetSidebarFilters() {
-    // 全チェックボックスをリセット
-    var checkboxes = document.querySelectorAll('.sidebar-filter-option input[type="checkbox"]');
-    checkboxes.forEach(function(cb) { cb.checked = false; });
-    
-    // 検索欄をクリア
-    var searchInput = document.getElementById('sidebar-keyword-search');
-    if (searchInput) searchInput.value = '';
-    
-    // カウントバッジをリセット
-    updateFilterCounts();
-    
-    // ArchiveCommonのリセットを呼び出し
-    if (typeof ArchiveCommon !== 'undefined') {
-        ArchiveCommon.resetAllFilters();
-    }
-}
 </script>
 
 <?php 

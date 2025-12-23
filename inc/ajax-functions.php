@@ -4383,13 +4383,18 @@ function gi_ajax_load_grants() {
     $total_found = !empty($additional_keywords) ? $actual_count : $query->found_posts;
     $total_pages = !empty($additional_keywords) ? 1 : $query->max_num_pages;
     
+    // FIX: ページネーション表示範囲を正しく計算
+    // 例: 1ページ目 = 1-12, 2ページ目 = 13-24, 3ページ目 = 25-36
+    $showing_from = $total_found > 0 ? (($page - 1) * $posts_per_page) + 1 : 0;
+    $showing_to = min($page * $posts_per_page, $total_found);
+    
     $stats = [
         'total_found' => $total_found,
         'current_page' => $page,
         'total_pages' => $total_pages,
         'posts_per_page' => $posts_per_page,
-        'showing_from' => $actual_count > 0 ? 1 : 0,
-        'showing_to' => $actual_count,
+        'showing_from' => $showing_from,
+        'showing_to' => $showing_to,
     ];
 
     // ===== レスポンス送信 =====

@@ -1464,11 +1464,21 @@ function gi_output_archive_intro_content() {
     $content = gi_get_current_archive_seo_content();
     
     if ($content && !empty($content['intro_content'])) {
-        echo '<div class="gi-archive-seo-intro">';
-        echo '<div class="gi-seo-content-box">';
-        echo wp_kses_post($content['intro_content']);
-        echo '</div>';
-        echo '</div>';
+        ?>
+        <!-- Section 1: Trend Analysis (Essay Style) -->
+        <section id="trend" class="mb-20">
+            <div class="flex items-center mb-8">
+                <span class="text-4xl text-gray-200 font-serif font-bold mr-4 -mt-2">01</span>
+                <h2 class="text-2xl font-serif font-bold text-ink-primary border-b border-accent-gold pb-1 w-full">
+                    傾向と対策
+                </h2>
+            </div>
+            
+            <div class="prose prose-stone font-serif max-w-none text-justify leading-loose">
+                <?php echo wp_kses_post($content['intro_content']); ?>
+            </div>
+        </section>
+        <?php
     }
 }
 
@@ -1477,15 +1487,35 @@ function gi_output_archive_outro_content() {
     $content = gi_get_current_archive_seo_content();
     
     if ($content && !empty($content['outro_content'])) {
-        echo '<div class="gi-archive-seo-outro">';
-        echo '<div class="gi-seo-content-box">';
-        echo wp_kses_post($content['outro_content']);
-        echo '</div>';
-        echo '</div>';
+        ?>
+        <!-- Section 4: Article (Manuscript Style) -->
+        <section id="guide" class="relative pt-12 mt-12 border-t-4 border-double border-gray-300">
+            <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-paper-warm px-4 text-ink-secondary text-2xl">
+                ❦
+            </div>
+
+            <article class="prose prose-stone font-serif max-w-none">
+                <h2 class="text-3xl font-bold text-center mb-10 text-ink-primary">
+                    <span class="block text-sm font-normal text-gray-500 tracking-widest mb-2 uppercase">Special Feature</span>
+                    解説記事
+                </h2>
+                
+                <?php echo wp_kses_post($content['outro_content']); ?>
+                
+                <div class="mt-10 p-6 bg-gray-100 border border-gray-300 rounded-sm text-center">
+                    <p class="font-bold text-sm text-gray-800">※ 注意書き</p>
+                    <p class="text-xs text-gray-600 mt-2 leading-relaxed">
+                        本図鑑の記述は最新の情報に基づく。制度は生き物であり、常に変化する。
+                        最新の公募要領は、必ず公式の布告（公式サイト）にて確認されたし。
+                    </p>
+                </div>
+            </article>
+        </section>
+        <?php
     }
 }
 
-// おすすめ記事出力
+// おすすめ記事出力 - Editor's Pick デザイン
 function gi_output_archive_featured_posts() {
     $content = gi_get_current_archive_seo_content();
     
@@ -1493,32 +1523,159 @@ function gi_output_archive_featured_posts() {
         $posts = gi_get_featured_posts_for_archive($content['featured_posts']);
         
         if (!empty($posts)) {
-            echo '<div class="gi-archive-featured-posts">';
-            echo '<h2>おすすめの助成金・補助金</h2>';
-            echo '<div class="gi-featured-grid">';
-            
-            foreach ($posts as $post) {
-                $max_amount = get_post_meta($post->ID, 'grant_amount_max', true);
-                $max_amount_display = $max_amount ? number_format($max_amount) . '万円' : '要確認';
-                $deadline = get_post_meta($post->ID, 'deadline_date', true);
-                $deadline_display = $deadline ? date('Y/m/d', strtotime($deadline)) : '';
-                $prefecture_terms = get_the_terms($post->ID, 'grant_prefecture');
-                $prefecture_name = ($prefecture_terms && !is_wp_error($prefecture_terms)) ? $prefecture_terms[0]->name : '全国';
-                
-                echo '<a href="' . get_permalink($post->ID) . '" class="gi-featured-card">';
-                echo '<div class="gi-featured-card-header">';
-                echo '<span class="gi-featured-prefecture">' . esc_html($prefecture_name) . '</span>';
-                if ($deadline_display) {
-                    echo '<span class="gi-featured-deadline">締切: ' . esc_html($deadline_display) . '</span>';
-                }
-                echo '</div>';
-                echo '<h3>' . esc_html($post->post_title) . '</h3>';
-                echo '<div class="gi-featured-amount">上限 ' . esc_html($max_amount_display) . '</div>';
-                echo '</a>';
-            }
-            
-            echo '</div>';
-            echo '</div>';
+            ?>
+            <!-- Section 2: Editor's Pick (Cards with Paper clip effect) -->
+            <section id="pickup" class="mb-20">
+                <div class="flex items-center mb-8">
+                    <span class="text-4xl text-gray-200 font-serif font-bold mr-4 -mt-2">02</span>
+                    <h2 class="text-2xl font-serif font-bold text-ink-primary border-b border-accent-gold pb-1 w-full">
+                        編集部選定・推奨制度
+                    </h2>
+                </div>
+
+                <div class="space-y-12">
+                    <?php 
+                    $counter = 0;
+                    foreach ($posts as $post): 
+                        $counter++;
+                        $is_even = ($counter % 2 === 0);
+                        $rotate_class = $is_even ? '-rotate-1' : 'rotate-1';
+                        
+                        // Meta data
+                        $max_amount = get_post_meta($post->ID, 'max_amount', true);
+                        if (!$max_amount) $max_amount = get_post_meta($post->ID, 'grant_amount_max', true);
+                        
+                        $max_amount_numeric = get_post_meta($post->ID, 'max_amount_numeric', true);
+                        
+                        // Format amount
+                        $amount_display = '要確認';
+                        $badge_class = 'bg-highlight-blue';
+                        
+                        if ($max_amount_numeric) {
+                             if ($max_amount_numeric >= 100000000) {
+                                 $amount_display = '最大' . number_format($max_amount_numeric / 100000000, 1) . '億円';
+                                 $badge_class = 'bg-accent-red'; // 1億円以上は赤
+                             } elseif ($max_amount_numeric >= 10000) {
+                                 $amount_display = '最大' . number_format($max_amount_numeric / 10000) . '万円';
+                                 if ($max_amount_numeric >= 30000000) {
+                                     $badge_class = 'bg-accent-red'; // 3000万円以上は赤
+                                 }
+                             } else {
+                                 $amount_display = '最大' . number_format($max_amount_numeric) . '円';
+                             }
+                        } elseif ($max_amount) {
+                            $amount_display = '最大' . $max_amount;
+                            // 文字列で億が含まれていれば赤にする簡易判定
+                            if (strpos($max_amount, '億') !== false) {
+                                $badge_class = 'bg-accent-red';
+                            }
+                        }
+
+                        // Difficulty
+                        $difficulty = get_post_meta($post->ID, 'grant_difficulty', true);
+                        if (!$difficulty) $difficulty = 'high'; // Default
+                        
+                        $difficulty_stars = '★ 難易度：高';
+                        
+                        switch ($difficulty) {
+                            case 'low':
+                                $difficulty_stars = '★ 難易度：低';
+                                break;
+                            case 'medium':
+                                $difficulty_stars = '★ 難易度：中';
+                                break;
+                            case 'high':
+                            default:
+                                $difficulty_stars = '★ 難易度：高';
+                                break;
+                        }
+                        
+                        // Description
+                        $excerpt = get_the_excerpt($post->ID);
+                        if (!$excerpt) {
+                            $excerpt = wp_trim_words($post->post_content, 120, '...');
+                        }
+                        
+                        // Fields
+                        $target_business = get_post_meta($post->ID, 'target_business', true);
+                        if (!$target_business) $target_business = get_post_meta($post->ID, 'grant_target', true);
+                        
+                        $eligible_expenses = get_post_meta($post->ID, 'eligible_expenses', true);
+                        $requirements = get_post_meta($post->ID, 'requirements', true);
+                        
+                        // List items builder
+                        $list_items = [];
+                        
+                        // Item 1 (Target) is always shown if available
+                        if ($target_business) {
+                            $list_items[] = ['label' => '対象', 'value' => wp_trim_words($target_business, 30, '...')];
+                        }
+                        
+                        // Item 2 (Usage or Conditions)
+                        // If expenses are available, prefer them for "Usage"
+                        if ($eligible_expenses) {
+                            $list_items[] = ['label' => '用途', 'value' => wp_trim_words($eligible_expenses, 30, '...')];
+                        } 
+                        // If no expenses but requirements, use that
+                        elseif ($requirements) {
+                            $list_items[] = ['label' => '条件', 'value' => wp_trim_words($requirements, 30, '...')];
+                        }
+                        // If both expenses and requirements exist, maybe show requirements as 3rd item if we want, but design has 2.
+                        // Let's stick to max 2 items for consistency with design, or 3 if space allows.
+                        // The design has 2 items in the ul.
+                        
+                        // Force add requirements if we only have target so far and requirements exist
+                        if (count($list_items) < 2 && $requirements && !$eligible_expenses) {
+                             // Already handled in elseif above
+                        } elseif (count($list_items) < 2 && $requirements) {
+                             $list_items[] = ['label' => '条件', 'value' => wp_trim_words($requirements, 30, '...')];
+                        }
+                        
+                        // Fallback
+                        if (empty($list_items)) {
+                            $list_items[] = ['label' => '詳細', 'value' => '詳細ページをご確認ください'];
+                        }
+                    ?>
+                    <div class="relative bg-white p-8 shadow-book-depth <?php echo $rotate_class; ?> hover:rotate-0 transition-transform duration-300 border border-gray-200 group">
+                        <!-- Clip effect -->
+                        <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 w-32 h-6 bg-gray-200 rounded-sm opacity-50 shadow-inner z-10"></div>
+                        
+                        <a href="<?php echo get_permalink($post->ID); ?>" class="absolute inset-0 z-0" aria-label="<?php echo esc_attr($post->post_title); ?>"></a>
+
+                        <div class="flex flex-col md:flex-row gap-6 relative z-10 pointer-events-none">
+                            <div class="md:w-1/3 border-r border-gray-100 pr-6 flex flex-col justify-center text-center md:text-right">
+                                <span class="block text-xs font-bold tracking-widest text-gray-400 uppercase mb-2">PICK UP NO.<?php echo $counter; ?></span>
+                                <h3 class="text-xl font-serif font-bold text-ink-primary mb-2 pointer-events-auto">
+                                    <a href="<?php echo get_permalink($post->ID); ?>" class="hover:text-accent-gold transition-colors">
+                                        <?php echo esc_html($post->post_title); ?>
+                                    </a>
+                                </h3>
+                                <div class="text-accent-gold text-xs font-bold mb-4"><?php echo esc_html($difficulty_stars); ?></div>
+                                <span class="inline-block <?php echo $badge_class; ?> text-white text-xs px-3 py-1 rounded-sm mx-auto md:ml-auto md:mr-0 font-bold shadow-sm tracking-wide">
+                                    <?php echo esc_html($amount_display); ?>
+                                </span>
+                            </div>
+                            <div class="md:w-2/3">
+                                <p class="text-sm leading-7 font-serif text-gray-700 mb-4 text-justify">
+                                    <?php echo esc_html($excerpt); ?>
+                                </p>
+                                <div class="bg-paper-warm p-4 rounded-sm border border-gray-100">
+                                    <ul class="text-xs text-gray-600 space-y-2 font-sans">
+                                        <?php foreach ($list_items as $item): ?>
+                                        <li class="flex items-start">
+                                            <span class="font-bold w-12 shrink-0 text-gray-400"><?php echo esc_html($item['label']); ?>：</span>
+                                            <span><?php echo esc_html($item['value']); ?></span>
+                                        </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </section>
+            <?php
         }
     }
 }

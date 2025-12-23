@@ -1,17 +1,50 @@
 /**
- * Archive Common CSS - Government Official Design v55.0
+ * Archive Common CSS - Unified v7.0
  * 助成金・補助金アーカイブページ共通スタイル
  * archive-grant.php, taxonomy-*.php 共通使用
  * 
+ * 統合版: archive-common.css + archive-zukan.css (zukan優先)
+ * 
  * @package Grant_Insight_Perfect
- * @version 1.0.0
+ * @version 7.0.0
  */
 
 /* ==========================================================================
-   CSS Variables - 官公庁カラーパレット
+   Google Fonts Import (from zukan)
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap');
+
+/* ==========================================================================
+   CSS Variables - クリーンなカラーパレット (Zukan優先)
    ========================================================================== */
 :root {
-    /* 官公庁カラーパレット - メイン */
+    /* Zukan メインカラー */
+    --zukan-paper-white: #fdfbf7;
+    --zukan-paper-dark: #f2efe9;
+    --zukan-ink-primary: #2b2b2b;
+    --zukan-ink-light: #595959;
+    --zukan-accent-gold: #c5a059;
+    --zukan-accent-red: #a63737;
+    --zukan-link-blue: #2c5282;
+    
+    /* Zukan ランキングカラー */
+    --zukan-rank-1: #c5a059;
+    --zukan-rank-2: #9ca3af;
+    --zukan-rank-3: #b45309;
+    
+    /* Zukan タイポグラフィ */
+    --zukan-font-serif: "Shippori Mincho", "Yu Mincho", serif;
+    --zukan-font-sans: "Noto Sans JP", -apple-system, sans-serif;
+    
+    /* Zukan シャドウ */
+    --zukan-shadow-card-sm: 0 2px 4px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1);
+    --zukan-shadow-card-hover: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+    --zukan-shadow-sticky-nav: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    
+    /* Zukan トランジション */
+    --zukan-transition: 0.3s ease;
+    
+    /* Legacy Gov Variables (互換性のため) */
     --gov-navy-900: #0d1b2a;
     --gov-navy-800: #1b263b;
     --gov-navy-700: #2c3e50;
@@ -22,21 +55,15 @@
     --gov-navy-200: #cfd8e3;
     --gov-navy-100: #e8ecf1;
     --gov-navy-50: #f4f6f8;
-    
-    /* アクセントカラー - 金 */
     --gov-gold: #c9a227;
     --gov-gold-light: #d4b77a;
     --gov-gold-pale: #f0e6c8;
-    
-    /* セマンティックカラー */
     --gov-green: #2e7d32;
     --gov-green-light: #e8f5e9;
     --gov-red: #c62828;
     --gov-red-light: #ffebee;
     --gov-blue: #1565c0;
     --gov-blue-light: #e3f2fd;
-    
-    /* ニュートラル */
     --gov-white: #ffffff;
     --gov-black: #1a1a1a;
     --gov-gray-900: #212529;
@@ -48,13 +75,9 @@
     --gov-gray-300: #dee2e6;
     --gov-gray-200: #e9ecef;
     --gov-gray-100: #f8f9fa;
-    
-    /* タイポグラフィ */
     --gov-font-serif: "Shippori Mincho", "Yu Mincho", "YuMincho", "Hiragino Mincho ProN", serif;
     --gov-font-sans: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     --gov-font-mono: 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
-    
-    /* エフェクト */
     --gov-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     --gov-transition-slow: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     --gov-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
@@ -66,8 +89,24 @@
 }
 
 /* ==========================================================================
-   Base Styles
+   Body - 純白背景 (Zukan Style)
    ========================================================================== */
+body.zukan-theme,
+.zukan-archive,
+.grant-archive-yahoo-style.zukan-archive {
+    background-color: #ffffff;
+    background-image: none;
+    color: var(--zukan-ink-primary);
+    font-family: var(--zukan-font-sans);
+    line-height: 1.7;
+}
+
+/* 背表紙エフェクトを無効化 (Zukan) */
+.grant-archive-yahoo-style.zukan-archive::before {
+    display: none;
+}
+
+/* Legacy Base Styles */
 .grant-archive-yahoo-style,
 .grant-category-archive,
 .grant-prefecture-archive,
@@ -82,7 +121,7 @@
     position: relative;
 }
 
-/* 上部アクセントライン（官公庁風） */
+/* 上部アクセントライン（官公庁風）- Legacy */
 .grant-archive-yahoo-style::before,
 .grant-category-archive::before,
 .grant-prefecture-archive::before,
@@ -100,14 +139,31 @@
     z-index: 9999;
 }
 
+/* ==========================================================================
+   Container - シンプルなコンテナ (Zukan)
+   ========================================================================== */
 .yahoo-container {
     max-width: 1280px;
     margin: 0 auto;
     padding: 0 24px;
 }
 
+.zukan-archive .yahoo-container {
+    max-width: 1200px;
+    padding: 0 16px;
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .yahoo-container {
+        padding: 0 32px;
+    }
+}
+
 /* ==========================================================================
-   📚 本・図鑑風パンくずリスト
+   Breadcrumb - シンプルなパンくずリスト (Zukan優先)
    ========================================================================== */
 .breadcrumb-nav {
     padding: 16px 0;
@@ -115,60 +171,32 @@
     border-bottom: 1px solid var(--gov-gray-200);
 }
 
-/* 本風パンくずリスト */
-.book-breadcrumb {
-    padding: 0;
-    background: linear-gradient(180deg, #faf8f5 0%, #fff 100%);
-    border-bottom: none;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    position: relative;
+.zukan-archive .book-breadcrumb,
+.zukan-archive .breadcrumb-nav {
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 12px 16px;
 }
 
-/* 本の背表紙装飾（左端） */
-.book-breadcrumb-spine {
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 8px;
-    background: linear-gradient(180deg, var(--gov-navy-800) 0%, var(--gov-navy-900) 100%);
-    box-shadow: 2px 0 6px rgba(0, 50, 100, 0.15);
+@media (min-width: 768px) {
+    .zukan-archive .book-breadcrumb,
+    .zukan-archive .breadcrumb-nav {
+        padding: 12px 32px;
+    }
 }
 
-.book-breadcrumb-spine::after {
-    content: '';
-    position: absolute;
-    left: 100%;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: linear-gradient(180deg, var(--gov-gold) 0%, var(--gov-gold-light, #D4B57A) 100%);
+/* スパインライン・アイコンを非表示 (Zukan) */
+.zukan-archive .book-breadcrumb-spine,
+.zukan-archive .book-breadcrumb-icon {
+    display: none;
 }
 
-.book-breadcrumb-inner {
+.zukan-archive .book-breadcrumb-inner {
     display: flex;
     align-items: center;
-    padding: 14px 24px 14px 24px;
-    gap: 12px;
-}
-
-/* 本のアイコン */
-.book-breadcrumb-icon {
-    width: 32px;
-    height: 32px;
-    background: linear-gradient(135deg, var(--gov-navy-800) 0%, var(--gov-navy-900) 100%);
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    box-shadow: 0 2px 4px rgba(0, 50, 100, 0.2);
-}
-
-.book-breadcrumb-icon svg {
-    width: 18px;
-    height: 18px;
-    color: var(--gov-gold);
+    gap: 0;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .breadcrumb-list {
@@ -180,6 +208,10 @@
     padding: 0;
     list-style: none;
     font-size: 13px;
+}
+
+.zukan-archive .breadcrumb-list {
+    gap: 0;
 }
 
 .breadcrumb-item {
@@ -195,655 +227,163 @@
     font-weight: 300;
 }
 
-/* 本風リンク用 - 通常の矢印を非表示 */
-.book-breadcrumb .breadcrumb-item:not(:last-child)::after {
-    display: none;
-}
-
-.book-breadcrumb-link {
-    display: flex;
-    flex-direction: column;
-    color: var(--gov-gray-600);
-    text-decoration: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    transition: all var(--gov-transition);
-    background: rgba(0, 50, 100, 0.03);
-    border: 1px solid transparent;
-}
-
-.book-breadcrumb-link:hover {
-    background: rgba(0, 50, 100, 0.08);
-    border-color: var(--gov-navy-200, #c5d4e8);
-    color: var(--gov-navy-800);
-    text-decoration: none;
-}
-
-.book-breadcrumb-chapter {
-    font-size: 9px;
-    font-weight: 600;
-    color: var(--gov-gold);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    line-height: 1;
-    margin-bottom: 2px;
-}
-
-.book-breadcrumb-text {
-    font-size: 12px;
-    font-weight: 500;
-    line-height: 1.3;
-    max-width: 150px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.book-breadcrumb-sep {
-    color: var(--gov-gray-400);
-    display: flex;
+.zukan-archive .book-breadcrumb-link,
+.zukan-archive .breadcrumb-item a {
+    display: inline-flex;
     align-items: center;
-}
-
-.book-breadcrumb-sep svg {
-    width: 14px;
-    height: 14px;
-}
-
-.book-breadcrumb-current {
-    display: flex;
-    flex-direction: column;
-    padding: 6px 12px;
-    background: linear-gradient(135deg, var(--gov-navy-800) 0%, var(--gov-navy-900) 100%);
-    border-radius: 4px;
-    border: 1px solid var(--gov-navy-700, #1a3d6e);
-}
-
-.book-breadcrumb-current .book-breadcrumb-chapter {
-    color: var(--gov-gold);
-}
-
-.book-breadcrumb-current .book-breadcrumb-text {
-    color: var(--gov-white);
-    font-weight: 600;
-    max-width: 200px;
-}
-
-@media (max-width: 768px) {
-    .book-breadcrumb-spine {
-        width: 6px;
-    }
-    
-    .book-breadcrumb-spine::after {
-        width: 2px;
-    }
-    
-    .book-breadcrumb-inner {
-        padding: 10px 12px 10px 16px;
-        gap: 8px;
-        flex-wrap: wrap;
-    }
-    
-    .book-breadcrumb-icon {
-        display: none;
-    }
-    
-    .breadcrumb-list {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-    }
-    
-    .breadcrumb-list::-webkit-scrollbar {
-        display: none;
-    }
-    
-    .book-breadcrumb-link,
-    .book-breadcrumb-current {
-        padding: 4px 8px;
-        flex-direction: row;
-        gap: 4px;
-        align-items: center;
-    }
-    
-    .book-breadcrumb-chapter {
-        font-size: 9px;
-        margin-bottom: 0;
-        white-space: nowrap;
-    }
-    
-    .book-breadcrumb-text {
-        font-size: 11px;
-        max-width: 90px;
-    }
-    
-    .book-breadcrumb-current .book-breadcrumb-text {
-        max-width: 110px;
-    }
-    
-    .book-breadcrumb-sep svg {
-        width: 10px;
-        height: 10px;
-    }
-}
-
-.breadcrumb-item a {
-    color: var(--gov-navy-600);
     text-decoration: none;
-    transition: color var(--gov-transition);
+    padding: 4px 0;
+    font-size: 13px;
+    font-family: var(--zukan-font-sans);
+    color: #6b7280;
+    transition: color var(--zukan-transition);
 }
 
-.breadcrumb-item a:hover {
-    color: var(--gov-navy-900);
+.zukan-archive .book-breadcrumb-link:hover,
+.zukan-archive .breadcrumb-item a:hover {
+    color: var(--zukan-link-blue);
     text-decoration: underline;
 }
 
-.breadcrumb-item span {
-    color: var(--gov-navy-900);
-    font-weight: 600;
+/* 章番号を非表示 (Zukan) */
+.zukan-archive .book-breadcrumb-chapter {
+    display: none;
+}
+
+.zukan-archive .book-breadcrumb-text {
+    font-size: 13px;
+    font-family: var(--zukan-font-sans);
+}
+
+.zukan-archive .book-breadcrumb-sep {
+    display: flex;
+    align-items: center;
+    color: #9ca3af;
+    margin: 0 6px;
+    font-size: 12px;
+}
+
+.zukan-archive .book-breadcrumb-current,
+.zukan-archive .breadcrumb-item:last-child span:not(.book-breadcrumb-sep) {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 0;
+    font-size: 13px;
+    font-family: var(--zukan-font-sans);
+    color: var(--zukan-ink-primary);
+    font-weight: 500;
+}
+
+/* 現在ページの背景を削除 (Zukan) */
+.zukan-archive .book-breadcrumb-current {
+    background: transparent;
+    border-radius: 0;
 }
 
 /* ==========================================================================
-   Hero Section - ヒーローセクション（図鑑式・横長レイアウト）
+   Hero Section - シンプルなSEOテキストベース (Zukan優先)
    ========================================================================== */
-.yahoo-hero-section {
-    background: linear-gradient(135deg, var(--gov-navy-800) 0%, var(--gov-navy-900) 100%);
-    color: var(--gov-white);
-    padding: 32px 0;
-    border-bottom: 4px solid var(--gov-gold);
-    position: relative;
-    overflow: hidden;
+.zukan-archive .zukan-hero.zukan-hero-simple {
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 32px 16px;
 }
 
-/* 背景パターン - 図鑑風グリッド */
-.yahoo-hero-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: 
-        linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
-    background-size: 30px 30px;
-    pointer-events: none;
-}
-
-/* 左サイドの図鑑背表紙 */
-.yahoo-hero-section::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 8px;
-    background: linear-gradient(180deg, var(--gov-gold) 0%, var(--gov-gold-light) 50%, var(--gov-gold) 100%);
-    box-shadow: 2px 0 8px rgba(201, 162, 39, 0.3);
-}
-
-.hero-content-wrapper {
-    position: relative;
-    z-index: 1;
-    max-width: 100%;
-}
-
-/* ==========================================================================
-   📚 図鑑式ヒーローレイアウト（横長・コンパクト）
-   ========================================================================== */
-.hero-encyclopedia-layout {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    gap: 32px;
-    align-items: center;
-    padding: 0 16px;
-}
-
-/* 左側：タイトル・説明エリア */
-.hero-main-info {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-/* 中央：統計・メタ情報 */
-.hero-stats-area {
-    display: flex;
-    gap: 24px;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-/* 右側：アクション・関連エリア */
-.hero-action-area {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    align-items: flex-end;
-}
-
-/* 統計カード（図鑑式） */
-.hero-stat-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 16px 24px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 8px;
-    min-width: 100px;
-    transition: all var(--gov-transition);
-}
-
-.hero-stat-card:hover {
-    background: rgba(255, 255, 255, 0.12);
-    transform: translateY(-2px);
-}
-
-.hero-stat-number {
-    font-family: var(--gov-font-mono);
-    font-size: 32px;
-    font-weight: 900;
-    color: var(--gov-gold);
-    line-height: 1;
-    margin-bottom: 4px;
-}
-
-.hero-stat-label {
-    font-size: 11px;
-    color: rgba(255, 255, 255, 0.7);
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-}
-
-/* 図鑑式タイトル */
-.hero-title-encyclopedia {
-    font-family: var(--gov-font-serif);
-    font-size: clamp(24px, 4vw, 36px);
-    font-weight: 700;
-    color: var(--gov-white);
-    margin: 0;
-    line-height: 1.2;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.hero-title-icon {
-    width: 40px;
-    height: 40px;
-    background: var(--gov-gold);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.hero-title-icon svg {
-    width: 22px;
-    height: 22px;
-    color: var(--gov-navy-900);
-}
-
-.hero-subtitle {
-    font-size: 14px;
-    color: rgba(255, 255, 255, 0.75);
-    margin: 0;
-    line-height: 1.5;
-    max-width: 500px;
-}
-
-/* 地域バッジ（横長） */
-.hero-region-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
-    background: rgba(201, 162, 39, 0.2);
-    border: 1px solid var(--gov-gold);
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--gov-gold);
-    letter-spacing: 0.05em;
-}
-
-.hero-region-badge svg {
-    width: 14px;
-    height: 14px;
-}
-
-/* クイックリンクボタン */
-.hero-quick-links {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-.hero-quick-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 14px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 6px;
-    color: var(--gov-white);
-    font-size: 12px;
-    font-weight: 500;
-    text-decoration: none;
-    transition: all var(--gov-transition);
-}
-
-.hero-quick-link:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.3);
-    color: var(--gov-white);
-    text-decoration: none;
-}
-
-.hero-quick-link svg {
-    width: 14px;
-    height: 14px;
-}
-
-/* モバイル対応 */
-@media (max-width: 992px) {
-    .hero-encyclopedia-layout {
-        grid-template-columns: 1fr;
-        gap: 20px;
-        text-align: center;
-    }
-    
-    .hero-main-info {
-        align-items: center;
-    }
-    
-    .hero-action-area {
-        align-items: center;
-    }
-    
-    .hero-title-encyclopedia {
-        justify-content: center;
-        font-size: clamp(22px, 5vw, 32px);
-    }
-    
-    .hero-subtitle {
-        text-align: center;
-    }
-    
-    .hero-stat-card {
-        padding: 12px 18px;
-        min-width: 80px;
-    }
-    
-    .hero-stat-number {
-        font-size: 26px;
+@media (min-width: 768px) {
+    .zukan-archive .zukan-hero.zukan-hero-simple {
+        padding: 48px 32px;
     }
 }
 
-@media (max-width: 576px) {
-    .yahoo-hero-section {
-        padding: 24px 0;
-    }
-    
-    .yahoo-hero-section::after {
-        width: 5px;
-    }
-    
-    .hero-encyclopedia-layout {
-        gap: 16px;
-        padding: 0 8px;
-    }
-    
-    .hero-stats-area {
-        gap: 12px;
-    }
-    
-    .hero-stat-card {
-        padding: 10px 14px;
-        min-width: 70px;
-    }
-    
-    .hero-stat-number {
-        font-size: 22px;
-    }
-    
-    .hero-stat-label {
-        font-size: 10px;
-    }
-    
-    .hero-title-icon {
-        width: 32px;
-        height: 32px;
-    }
-    
-    .hero-title-icon svg {
-        width: 18px;
-        height: 18px;
-    }
-    
-    .hero-quick-links {
-        justify-content: center;
-    }
-}
-
-.category-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    background: rgba(201, 162, 39, 0.15);
-    border: 1px solid var(--gov-gold);
-    border-radius: var(--gov-radius);
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--gov-gold);
-    letter-spacing: 0.1em;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-}
-
-.category-badge .badge-icon {
-    color: var(--gov-gold);
-}
-
-/* ==========================================================================
-   📚 Book Encyclopedia Title Styles - 補助金図鑑タイトル
-   ========================================================================== */
-.book-badge {
-    background: linear-gradient(135deg, rgba(201, 162, 39, 0.2) 0%, rgba(139, 115, 85, 0.15) 100%);
-    border: 2px solid var(--gov-gold);
-    border-radius: 6px;
-    padding: 10px 18px;
-    position: relative;
-}
-
-.book-badge::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-    background: var(--gov-gold);
-    border-radius: 4px 0 0 4px;
-}
-
-.book-encyclopedia-title {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 12px;
-}
-
-.book-title-prefix {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--gov-gold) !important;
-    background: rgba(0, 0, 0, 0.3);
-    padding: 6px 14px;
-    border-radius: 4px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    font-family: var(--gov-font-sans);
-}
-
-.category-name-highlight {
-    font-size: clamp(32px, 6vw, 52px);
-    font-weight: 900;
-    color: var(--gov-white) !important;
-    font-family: var(--gov-font-serif);
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-    letter-spacing: 0.05em;
-}
-
-.yahoo-main-title .title-text {
-    font-size: clamp(20px, 3.5vw, 28px);
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.95) !important;
-}
-
-.year-badge {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--gov-navy-900) !important;
-    background: var(--gov-gold);
-    padding: 6px 14px;
-    border-radius: 20px;
-    margin-left: 8px;
-    display: inline-block;
-    vertical-align: middle;
-}
-
-.seo-catchphrase {
-    font-size: 14px;
-    color: rgba(255, 255, 255, 0.75) !important;
-    font-weight: 500;
-    margin: -8px 0 20px;
-    padding: 10px 16px;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
-    border-left: 4px solid var(--gov-gold);
-    display: inline-block;
-}
-
-/* 動的コンテンツラッパー */
-.gi-dynamic-wrapper {
-    padding: 0;
+.zukan-archive .zukan-hero-simple .zukan-hero-content {
+    max-width: 1200px;
     margin: 0 auto;
 }
 
-@media (max-width: 768px) {
-    .book-encyclopedia-title {
-        gap: 8px;
-    }
-    
-    .book-title-prefix {
-        font-size: 11px;
-        padding: 4px 10px;
-        width: 100%;
-        text-align: center;
-    }
-    
-    .category-name-highlight {
-        font-size: clamp(24px, 8vw, 36px);
-    }
-    
-    .yahoo-main-title .title-text {
-        font-size: clamp(16px, 4vw, 20px);
-    }
-    
-    .year-badge {
-        font-size: 10px;
-        padding: 4px 10px;
-    }
-    
-    .seo-catchphrase {
-        font-size: 12px;
-        padding: 8px 12px;
-        display: block;
-    }
+.zukan-archive .zukan-hero-header {
+    margin-bottom: 20px;
 }
 
-.yahoo-hero-section .yahoo-main-title,
-.grant-archive-yahoo-style .yahoo-main-title,
-.column-archive-yahoo-style .yahoo-main-title {
-    font-family: var(--gov-font-serif);
-    font-size: clamp(28px, 5vw, 44px);
+.zukan-archive .zukan-hero-label {
+    display: inline-block;
+    font-size: 10px;
+    font-family: var(--zukan-font-sans);
+    color: var(--zukan-accent-gold);
+    background: var(--zukan-ink-primary);
+    padding: 4px 12px;
+    border-radius: 2px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+
+.zukan-archive .zukan-hero-title {
+    font-size: 1.5rem;
     font-weight: 700;
-    color: var(--gov-white) !important;
-    margin: 0 0 16px 0;
+    font-family: var(--zukan-font-serif);
+    color: var(--zukan-ink-primary);
+    margin: 0 0 8px;
     line-height: 1.3;
-    letter-spacing: 0.02em;
 }
 
-.yahoo-hero-section .yahoo-lead-text,
-.yahoo-hero-section .yahoo-lead-section,
-.grant-archive-yahoo-style .yahoo-lead-text,
-.grant-archive-yahoo-style .yahoo-lead-section,
-.column-archive-yahoo-style .yahoo-lead-text,
-.column-archive-yahoo-style .yahoo-lead-section {
-    font-size: 15px;
-    color: rgba(255, 255, 255, 0.9) !important;
-    margin: 0 0 24px 0;
-    line-height: 1.9;
-    max-width: 700px;
+@media (min-width: 768px) {
+    .zukan-archive .zukan-hero-title {
+        font-size: 2rem;
+    }
 }
 
-.yahoo-hero-section .yahoo-description-rich,
-.grant-archive-yahoo-style .yahoo-description-rich,
-.column-archive-yahoo-style .yahoo-description-rich {
-    font-size: 15px;
-    color: rgba(255, 255, 255, 0.9) !important;
-    line-height: 1.8;
-    margin-bottom: 16px;
+.zukan-archive .zukan-hero-subtitle-text {
+    font-size: 13px;
+    font-family: var(--zukan-font-sans);
+    color: #6b7280;
+    margin: 0;
 }
 
-.yahoo-description-rich p {
-    margin: 0 0 12px 0;
-}
-
-.yahoo-hero-section .yahoo-meta-info,
-.grant-archive-yahoo-style .yahoo-meta-info,
-.column-archive-yahoo-style .yahoo-meta-info {
-    display: flex;
-    align-items: center;
-    gap: 28px;
-    flex-wrap: wrap;
-    padding-top: 24px;
-    border-top: 1px solid rgba(255,255,255,0.15);
-}
-
-.yahoo-hero-section .meta-item,
-.yahoo-meta-info .meta-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+.zukan-archive .zukan-hero-description {
     font-size: 14px;
-    color: rgba(255, 255, 255, 0.85) !important;
+    font-family: var(--zukan-font-sans);
+    color: var(--zukan-ink-light);
+    line-height: 1.9;
+    margin: 0 0 20px;
 }
 
-.yahoo-hero-section .meta-icon,
-.yahoo-meta-info .meta-icon {
-    color: var(--gov-gold) !important;
+@media (min-width: 768px) {
+    .zukan-archive .zukan-hero-description {
+        font-size: 15px;
+    }
 }
 
-.yahoo-hero-section .meta-item strong,
-.yahoo-meta-info .meta-item strong {
-    font-family: var(--gov-font-mono);
-    font-size: 28px;
-    font-weight: 900;
-    color: var(--gov-white) !important;
-    line-height: 1;
+.zukan-archive .zukan-hero-description strong {
+    color: var(--zukan-accent-red);
+    font-weight: 700;
+}
+
+.zukan-archive .zukan-hero-stats-simple {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    font-family: var(--zukan-font-sans);
+    color: #6b7280;
+}
+
+.zukan-archive .zukan-hero-stat strong {
+    color: var(--zukan-accent-red);
+    font-weight: 700;
+}
+
+.zukan-archive .zukan-hero-stat-divider {
+    color: #d1d5db;
+}
+
+/* 旧書籍スタイル（非表示） */
+.zukan-archive .zukan-hero.zukan-hero-book {
+    display: none;
 }
 
 /* ==========================================================================
-   Two Column Layout - 2カラムレイアウト
+   Two Column Layout (Zukan優先)
    ========================================================================== */
 .yahoo-two-column-layout {
     display: grid;
@@ -853,8 +393,39 @@
     align-items: start;
 }
 
+.zukan-archive .yahoo-two-column-layout,
+.zukan-archive .zukan-two-column {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    padding: 32px 0;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+@media (min-width: 1024px) {
+    .zukan-archive .yahoo-two-column-layout,
+    .zukan-archive .zukan-two-column {
+        flex-direction: row;
+        padding: 48px 0;
+    }
+}
+
 .yahoo-main-content {
     min-width: 0;
+}
+
+.zukan-archive .yahoo-main-content,
+.zukan-archive .zukan-main-content {
+    flex: 1;
+    min-width: 0;
+}
+
+@media (min-width: 1024px) {
+    .zukan-archive .yahoo-main-content,
+    .zukan-archive .zukan-main-content {
+        flex: 3;
+    }
 }
 
 .yahoo-sidebar {
@@ -866,10 +437,165 @@
 }
 
 /* ==========================================================================
-   Search Section - 検索セクション
+   Page Title Area - 統合検索結果ヘッダー (Zukan)
+   ========================================================================== */
+.zukan-archive .results-header {
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #f3f4f6;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+/* 統合されたヘッダースタイル (Zukan) */
+.zukan-archive .unified-results-header {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-left: 4px solid var(--zukan-ink-primary);
+    border-radius: 2px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    box-shadow: var(--zukan-shadow-card-sm);
+}
+
+.zukan-archive .unified-results-header .results-header-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.zukan-archive .results-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    font-family: var(--zukan-font-serif);
+    color: var(--zukan-ink-primary);
+    margin: 0 0 8px 0;
+    line-height: 1.3;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .results-title {
+        font-size: 1.5rem;
+    }
+}
+
+/* 統合検索結果メタ情報 (Zukan) */
+.zukan-archive .results-meta-unified {
+    font-size: 13px;
+    color: #6b7280;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.zukan-archive .results-count-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.zukan-archive .results-count-primary strong,
+.zukan-archive #current-count {
+    color: var(--zukan-accent-red);
+    font-weight: 700;
+    font-size: 1.25rem;
+    font-family: var(--zukan-font-sans);
+}
+
+.zukan-archive .results-separator {
+    color: #d1d5db;
+}
+
+.zukan-archive .results-showing {
+    color: #9ca3af;
+    font-size: 12px;
+}
+
+.zukan-archive .results-showing #showing-from,
+.zukan-archive .results-showing #showing-to {
+    color: var(--zukan-ink-primary);
+    font-weight: 600;
+}
+
+/* ソートセレクト（統合版）(Zukan) */
+.zukan-archive .view-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.zukan-archive .sort-label {
+    font-size: 12px;
+    color: #9ca3af;
+    white-space: nowrap;
+}
+
+.zukan-archive .sort-select-unified {
+    background: #fff;
+    border: 1px solid #d1d5db;
+    font-size: 13px;
+    border-radius: 2px;
+    padding: 8px 12px;
+    color: var(--zukan-ink-primary);
+    cursor: pointer;
+    transition: all var(--zukan-transition);
+    font-family: var(--zukan-font-sans);
+}
+
+.zukan-archive .sort-select-unified:hover,
+.zukan-archive .sort-select-unified:focus {
+    border-color: var(--zukan-accent-gold);
+    outline: none;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 767px) {
+    .zukan-archive .unified-results-header {
+        padding: 16px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .zukan-archive .results-meta-unified {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+    
+    .zukan-archive .results-separator {
+        display: none;
+    }
+    
+    .zukan-archive .view-controls {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .zukan-archive .sort-select-unified {
+        flex: 1;
+    }
+}
+
+/* ==========================================================================
+   Search Section - 検索バー (Zukan優先)
    ========================================================================== */
 .yahoo-search-section {
     margin-bottom: 24px;
+}
+
+.zukan-archive .yahoo-search-section {
+    display: none; /* サイドバーに移動したため非表示 */
+}
+
+@media (max-width: 1023px) {
+    .zukan-archive .yahoo-search-section {
+        display: block;
+    }
 }
 
 .search-bar-wrapper {
@@ -878,6 +604,11 @@
     border: 1px solid var(--gov-gray-200);
     border-radius: var(--gov-radius-lg);
     box-shadow: var(--gov-shadow-sm);
+    position: relative;
+}
+
+.zukan-archive .search-bar-wrapper {
+    position: relative;
 }
 
 .search-input-container {
@@ -891,9 +622,14 @@
     transition: border-color var(--gov-transition), box-shadow var(--gov-transition);
 }
 
-.search-input-container:focus-within {
-    border-color: var(--gov-navy-700);
-    box-shadow: 0 0 0 3px rgba(27, 38, 59, 0.1);
+.zukan-archive .search-input-container {
+    background: #f9fafb;
+    border: 1px solid #d1d5db;
+    border-radius: 2px;
+}
+
+.zukan-archive .search-input-container:focus-within {
+    border-color: var(--zukan-accent-gold);
 }
 
 .search-icon {
@@ -901,6 +637,14 @@
     left: 16px;
     color: var(--gov-gray-500);
     pointer-events: none;
+}
+
+.zukan-archive .search-icon {
+    position: relative;
+    left: auto;
+    flex-shrink: 0;
+    margin: 0 12px;
+    color: #9ca3af;
 }
 
 .search-input {
@@ -914,7 +658,22 @@
     background: transparent;
 }
 
-/* Hide browser default search cancel button to avoid double X */
+.zukan-archive .search-input {
+    padding: 12px 8px;
+    font-size: 14px;
+    font-family: var(--zukan-font-sans);
+    color: var(--zukan-ink-primary);
+}
+
+.search-input::placeholder {
+    color: var(--gov-gray-500);
+}
+
+.zukan-archive .search-input::placeholder {
+    color: #9ca3af;
+}
+
+/* Hide browser default search cancel button */
 .search-input::-webkit-search-cancel-button,
 .search-input::-webkit-search-decoration,
 .search-input::-webkit-search-results-button,
@@ -929,10 +688,6 @@
     display: none;
     width: 0;
     height: 0;
-}
-
-.search-input::placeholder {
-    color: var(--gov-gray-500);
 }
 
 .search-clear-btn {
@@ -966,22 +721,20 @@
     transition: all var(--gov-transition);
 }
 
-.search-execute-btn:hover {
-    background: linear-gradient(135deg, var(--gov-navy-900) 0%, var(--gov-navy-800) 100%);
+.zukan-archive .search-execute-btn {
+    background: var(--zukan-ink-primary);
+    padding: 12px 20px;
+    font-size: 13px;
+    font-weight: 500;
 }
 
-.search-execute-btn:focus-visible {
-    outline: 3px solid var(--gov-gold);
-    outline-offset: 2px;
+.zukan-archive .search-execute-btn:hover {
+    background: #374151;
 }
 
 /* ==========================================================================
    Search Suggestions - 検索候補
    ========================================================================== */
-.search-bar-wrapper {
-    position: relative;
-}
-
 .search-suggestions {
     position: absolute;
     top: 100%;
@@ -1072,7 +825,7 @@
 }
 
 /* ==========================================================================
-   Filter Section - フィルターセクション (FIX: Compact & Clean Design)
+   Filter Section - フィルターセクション (Zukan優先)
    ========================================================================== */
 .yahoo-filter-section {
     background: var(--gov-white);
@@ -1085,7 +838,13 @@
     z-index: 100;
 }
 
-/* FIX: Compact filter header */
+.zukan-archive .yahoo-filter-section {
+    padding: 20px 24px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 2px;
+}
+
 .filter-header {
     display: flex;
     justify-content: space-between;
@@ -1095,6 +854,13 @@
     border-bottom: 2px solid var(--gov-navy-700);
     flex-wrap: wrap;
     gap: 10px;
+}
+
+.zukan-archive .filter-header {
+    margin-bottom: 16px;
+    padding: 0;
+    background: transparent;
+    border-bottom: none;
 }
 
 .filter-title {
@@ -1108,10 +874,15 @@
     margin: 0;
 }
 
-.filter-title .title-icon {
-    color: var(--gov-navy-600);
-    width: 22px;
-    height: 22px;
+.zukan-archive .filter-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--zukan-ink-primary);
+    gap: 8px;
+}
+
+.zukan-archive .filter-title svg {
+    color: #6b7280;
 }
 
 .filter-reset-all {
@@ -1130,15 +901,19 @@
     transition: all var(--gov-transition);
 }
 
-.filter-reset-all:hover {
-    background: var(--gov-navy-50);
-    border-color: var(--gov-navy-400);
-    color: var(--gov-navy-800);
+.zukan-archive .filter-reset-all {
+    gap: 4px;
+    background: transparent;
+    padding: 6px 12px;
+    border-radius: 2px;
 }
 
-/* ==========================================================================
-   FIX: Redesigned Filter Grid - Compact horizontal inline layout
-   ========================================================================== */
+.zukan-archive .filter-reset-all:hover {
+    background: #fff;
+    border-color: var(--zukan-accent-red);
+    color: var(--zukan-accent-red);
+}
+
 .yahoo-filters-grid {
     display: flex;
     flex-wrap: wrap;
@@ -1147,6 +922,20 @@
     overflow: visible;
     background: var(--gov-gray-50);
     align-items: flex-end;
+}
+
+.zukan-archive .yahoo-filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+    padding: 0;
+    background: transparent;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .yahoo-filters-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
 }
 
 /* PC: 横並びインラインレイアウト */
@@ -1168,7 +957,7 @@
     }
 }
 
-/* FIX: Compact filter dropdown wrapper with proper z-index stacking */
+/* フィルタードロップダウン */
 .filter-dropdown-wrapper {
     display: flex;
     flex-direction: column;
@@ -1178,7 +967,6 @@
     z-index: 1;
 }
 
-/* When dropdown is open, increase z-index to appear above other filters */
 .filter-dropdown-wrapper:focus-within,
 .filter-dropdown-wrapper:has(.custom-select.active) {
     z-index: 100;
@@ -1190,7 +978,6 @@
     }
 }
 
-/* FIX: Small, clean filter labels */
 .filter-label {
     display: flex;
     align-items: center;
@@ -1201,6 +988,15 @@
     letter-spacing: 0.03em;
     text-transform: uppercase;
     white-space: nowrap;
+}
+
+.zukan-archive .filter-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 6px;
+    font-family: var(--zukan-font-sans);
+    text-transform: none;
 }
 
 .multi-select-badge {
@@ -1217,15 +1013,11 @@
     border-radius: 10px;
 }
 
-.selected-prefecture-name {
-    font-size: 11px;
-    color: var(--gov-gray-500);
-    font-weight: 400;
+.zukan-archive .multi-select-badge {
+    background: var(--zukan-accent-red);
 }
 
-/* ==========================================================================
-   Custom Select - カスタムセレクト (PC版大幅改善)
-   ========================================================================== */
+/* Custom Select */
 .custom-select {
     position: relative;
     width: 100%;
@@ -1236,7 +1028,6 @@
     z-index: 1000;
 }
 
-/* FIX: Compact select trigger for inline layout */
 .select-trigger {
     width: 100%;
     display: flex;
@@ -1255,15 +1046,15 @@
     min-height: 38px;
 }
 
-.select-trigger:hover {
-    border-color: var(--gov-navy-500);
-    background: var(--gov-navy-50);
+.zukan-archive .select-trigger {
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 2px;
+    color: var(--zukan-ink-primary);
 }
 
-.custom-select.active .select-trigger {
-    border-color: var(--gov-navy-700);
-    box-shadow: 0 0 0 4px rgba(27, 38, 59, 0.12);
-    background: var(--gov-white);
+.zukan-archive .select-trigger:hover {
+    border-color: var(--zukan-accent-gold);
 }
 
 .select-value {
@@ -1279,11 +1070,14 @@
     transition: transform var(--gov-transition);
 }
 
+.zukan-archive .select-arrow {
+    color: #9ca3af;
+}
+
 .custom-select.active .select-arrow {
     transform: rotate(180deg);
 }
 
-/* FIX: Compact dropdown with high z-index */
 .select-dropdown {
     position: absolute;
     top: calc(100% + 4px);
@@ -1300,7 +1094,16 @@
     z-index: 9999;
 }
 
-/* FIX: Compact options */
+.zukan-archive .select-dropdown {
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-top: none;
+    border-radius: 0 0 2px 2px;
+    max-height: 200px;
+    z-index: 100;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
 .select-option {
     padding: 8px 12px;
     cursor: pointer;
@@ -1321,18 +1124,30 @@
     background: var(--gov-navy-50);
 }
 
+.zukan-archive .select-option {
+    color: var(--zukan-ink-primary);
+}
+
+.zukan-archive .select-option:hover {
+    background: #f3f4f6;
+}
+
 .select-option.active {
     background: var(--gov-navy-100);
     color: var(--gov-navy-900);
     font-weight: 600;
 }
 
-/* Multi Select - Compact */
+.zukan-archive .select-option.active {
+    background: var(--zukan-ink-primary);
+    color: #fff;
+}
+
+/* Multi Select */
 .multi-select-dropdown {
     max-height: 280px;
 }
 
-/* FIX: Compact search wrapper */
 .select-search-wrapper {
     padding: 8px 10px;
     border-bottom: 1px solid var(--gov-gray-200);
@@ -1342,7 +1157,6 @@
     z-index: 1;
 }
 
-/* FIX: Compact search input */
 .select-search-input {
     width: 100%;
     padding: 8px 10px;
@@ -1358,13 +1172,11 @@
     border-color: var(--gov-navy-700);
 }
 
-/* FIX: Reduced options wrapper height */
 .select-options-wrapper {
     max-height: 200px;
     overflow-y: auto;
 }
 
-/* FIX: Compact checkbox */
 .select-option .option-checkbox {
     width: 16px;
     height: 16px;
@@ -1379,7 +1191,6 @@
     font-size: 13px;
 }
 
-/* FIX: Compact action buttons */
 .select-actions {
     display: flex;
     gap: 6px;
@@ -1434,6 +1245,15 @@
     flex-wrap: wrap;
 }
 
+.zukan-archive .active-filters-display {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+    background: transparent;
+    padding: 0;
+    padding-top: 16px;
+}
+
 .active-filters-label {
     display: flex;
     align-items: center;
@@ -1443,11 +1263,20 @@
     color: var(--gov-navy-800);
 }
 
+.zukan-archive .active-filters-label {
+    color: #6b7280;
+    gap: 4px;
+}
+
 .active-filter-tags {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     flex: 1;
+}
+
+.zukan-archive .active-filter-tags {
+    gap: 6px;
 }
 
 .filter-tag {
@@ -1527,6 +1356,11 @@
     color: var(--gov-gray-600);
 }
 
+.zukan-archive .results-meta {
+    font-size: 14px;
+    color: #6b7280;
+}
+
 .total-count strong {
     font-family: var(--gov-font-mono);
     font-size: 20px;
@@ -1534,7 +1368,15 @@
     color: var(--gov-navy-900);
 }
 
-/* View Controls - 表示切替 */
+.zukan-archive .total-count strong,
+.zukan-archive #result-count {
+    color: var(--zukan-accent-red);
+    font-weight: 700;
+    font-size: 1.25rem;
+    font-family: var(--zukan-font-sans);
+}
+
+/* View Controls */
 .view-controls {
     display: flex;
     gap: 4px;
@@ -1567,6 +1409,25 @@
     color: var(--gov-white);
 }
 
+.zukan-archive .view-btn {
+    padding: 8px 12px;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 2px;
+    color: #6b7280;
+    font-size: 12px;
+}
+
+.zukan-archive .view-btn:hover {
+    background: #f9fafb;
+}
+
+.zukan-archive .view-btn.active {
+    background: var(--zukan-ink-primary);
+    border-color: var(--zukan-ink-primary);
+    color: #fff;
+}
+
 .view-btn svg {
     width: 18px;
     height: 18px;
@@ -1583,6 +1444,12 @@
     min-height: 400px;
 }
 
+.zukan-archive .grants-container-yahoo,
+.zukan-archive .zukan-list-container {
+    gap: 24px;
+    padding: 0;
+}
+
 .grants-container-yahoo[data-view="grid"] {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -1594,7 +1461,299 @@
 }
 
 /* ==========================================================================
-   Favorite Button - お気に入りボタン（オプティミスティックUI）
+   Grant Card - 左アクセントライン付きカード (Zukan優先)
+   ========================================================================== */
+.zukan-archive .zukan-grant-card {
+    position: relative;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 2px;
+    padding: 24px;
+    box-shadow: var(--zukan-shadow-card-sm);
+    transition: all var(--zukan-transition);
+    overflow: hidden;
+}
+
+.zukan-archive .zukan-grant-card:hover {
+    box-shadow: var(--zukan-shadow-card-hover);
+    border-color: var(--zukan-accent-gold);
+}
+
+/* 左側アクセントライン */
+.zukan-archive .zukan-grant-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--zukan-ink-primary);
+}
+
+/* ペーパークリップエフェクトを無効化 */
+.zukan-archive .zukan-grant-card::after {
+    display: none;
+}
+
+.zukan-archive .zukan-grant-card-link {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    gap: 16px;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .zukan-grant-card-link {
+        flex-direction: row;
+        gap: 24px;
+    }
+}
+
+/* バッジエリア */
+.zukan-archive .zukan-grant-badges {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.zukan-archive .zukan-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 2px;
+    font-family: var(--zukan-font-sans);
+}
+
+.zukan-archive .zukan-badge-featured,
+.zukan-archive .zukan-grant-category-badge {
+    background: var(--zukan-ink-primary);
+    color: #fff;
+}
+
+.zukan-archive .zukan-badge-urgent {
+    background: var(--zukan-accent-red);
+    color: #fff;
+}
+
+.zukan-archive .zukan-badge-new {
+    background: #10b981;
+    color: #fff;
+}
+
+.zukan-archive .zukan-badge-status {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.zukan-archive .zukan-badge-status.upcoming {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.zukan-archive .zukan-badge-status.closed {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+/* カードコンテンツ */
+.zukan-archive .zukan-grant-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+    padding-left: 8px;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .zukan-grant-content {
+        flex-direction: row;
+        gap: 24px;
+    }
+}
+
+.zukan-archive .zukan-grant-category-area {
+    display: none;
+}
+
+.zukan-archive .zukan-grant-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.zukan-archive .zukan-grant-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    font-family: var(--zukan-font-serif);
+    color: var(--zukan-ink-primary);
+    margin-bottom: 12px;
+    line-height: 1.4;
+    transition: color var(--zukan-transition);
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .zukan-grant-title {
+        font-size: 1.25rem;
+    }
+}
+
+.zukan-archive .zukan-grant-card:hover .zukan-grant-title {
+    color: var(--zukan-accent-red);
+}
+
+.zukan-archive .zukan-grant-description {
+    font-size: 14px;
+    font-family: var(--zukan-font-serif);
+    color: var(--zukan-ink-light);
+    line-height: 1.7;
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* タグ */
+.zukan-archive .zukan-grant-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.zukan-archive .zukan-grant-tag {
+    display: inline-block;
+    background: #f3f4f6;
+    color: #6b7280;
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius: 2px;
+    font-family: var(--zukan-font-serif);
+}
+
+.zukan-archive .zukan-grant-tag::before {
+    content: '#';
+}
+
+/* 右側メタ情報 */
+.zukan-archive .zukan-grant-amount-area {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-top: 16px;
+    border-top: 1px solid #f3f4f6;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .zukan-grant-amount-area {
+        width: 180px;
+        padding-top: 0;
+        padding-left: 24px;
+        border-top: none;
+        border-left: 1px solid #f3f4f6;
+    }
+}
+
+.zukan-archive .zukan-grant-amount-label {
+    font-size: 10px;
+    color: #9ca3af;
+    font-family: var(--zukan-font-sans);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 2px;
+}
+
+.zukan-archive .zukan-grant-amount {
+    font-size: 1.125rem;
+    font-weight: 700;
+    font-family: var(--zukan-font-serif);
+    color: var(--zukan-accent-red);
+}
+
+.zukan-archive .zukan-grant-amount-unit {
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.zukan-archive .zukan-grant-rate {
+    font-size: 13px;
+    font-weight: 700;
+    font-family: var(--zukan-font-serif);
+    color: var(--zukan-ink-primary);
+}
+
+.zukan-archive .zukan-grant-deadline {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--zukan-ink-light);
+}
+
+.zukan-archive .zukan-grant-deadline.urgent {
+    color: var(--zukan-accent-red);
+    font-weight: 600;
+}
+
+/* 詳細ボタン */
+.zukan-archive .zukan-grant-more {
+    display: block;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: var(--zukan-font-sans);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 10px 16px;
+    border: 1px solid var(--zukan-ink-primary);
+    color: var(--zukan-ink-primary);
+    transition: all var(--zukan-transition);
+    margin-top: 8px;
+}
+
+.zukan-archive .zukan-grant-card:hover .zukan-grant-more {
+    background: var(--zukan-ink-primary);
+    color: #fff;
+}
+
+.zukan-archive .zukan-grant-footer {
+    display: none;
+}
+
+.zukan-archive .zukan-grant-organizer {
+    font-size: 12px;
+    color: #6b7280;
+    font-family: var(--zukan-font-sans);
+}
+
+.zukan-archive .zukan-grant-prefecture {
+    font-size: 11px;
+    color: #9ca3af;
+}
+
+/* Empty State */
+.zukan-archive .zukan-empty-state,
+.zukan-archive .no-results {
+    padding: 64px 24px;
+    text-align: center;
+    background: #fff;
+    border: 1px dashed #d1d5db;
+    border-radius: 2px;
+}
+
+.zukan-archive .no-results-title {
+    font-size: 1.125rem;
+    color: #9ca3af;
+    margin-bottom: 8px;
+}
+
+/* ==========================================================================
+   Favorite Button - お気に入りボタン
    ========================================================================== */
 .favorite-btn {
     position: absolute;
@@ -1646,7 +1805,6 @@
     color: #e74c3c;
 }
 
-/* ホバー時の色変化 */
 .favorite-btn:hover .favorite-icon {
     color: #e74c3c;
 }
@@ -1656,7 +1814,7 @@
 }
 
 /* ==========================================================================
-   Skeleton Loading - スケルトンローディング（モダンUX）
+   Skeleton Loading - スケルトンローディング
    ========================================================================== */
 @keyframes skeleton-shimmer {
     0% { background-position: -200% 0; }
@@ -1729,7 +1887,6 @@
     border-radius: 12px;
 }
 
-/* スケルトンコンテナ */
 .skeleton-container {
     display: flex;
     flex-direction: column;
@@ -1748,23 +1905,8 @@
     gap: 0;
 }
 
-.skeleton-container[data-view="compact"] .skeleton-card {
-    border-radius: 0;
-    border-bottom: 1px solid var(--gov-gray-200);
-    padding: 12px 16px;
-}
-
-.skeleton-container[data-view="compact"] .skeleton-card:first-child {
-    border-radius: var(--gov-radius-lg) var(--gov-radius-lg) 0 0;
-}
-
-.skeleton-container[data-view="compact"] .skeleton-card:last-child {
-    border-radius: 0 0 var(--gov-radius-lg) var(--gov-radius-lg);
-    border-bottom: none;
-}
-
 /* ==========================================================================
-   Loading - ローディング（従来版・フォールバック）
+   Loading - ローディング
    ========================================================================== */
 .loading-overlay {
     position: fixed;
@@ -1778,6 +1920,12 @@
     align-items: center;
     justify-content: center;
     z-index: 9999;
+}
+
+.zukan-archive .loading-overlay {
+    background: rgba(255, 255, 255, 0.9);
+    inset: 0;
+    z-index: 1000;
 }
 
 .loading-spinner {
@@ -1794,7 +1942,20 @@
     margin: 0 auto 16px;
 }
 
+.zukan-archive .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e5e7eb;
+    border-top-color: var(--zukan-ink-primary);
+    animation: spin 1s linear infinite;
+    margin: 0 auto 12px;
+}
+
 @keyframes govSpin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes spin {
     to { transform: rotate(360deg); }
 }
 
@@ -1803,6 +1964,11 @@
     color: var(--gov-gray-600);
     font-weight: 600;
     margin: 0;
+}
+
+.zukan-archive .loading-text {
+    font-size: 13px;
+    color: #6b7280;
 }
 
 /* ==========================================================================
@@ -1844,7 +2010,7 @@
 }
 
 /* ==========================================================================
-   Pagination - ページネーション (Consolidated)
+   Pagination - ページネーション (Zukan優先)
    ========================================================================== */
 .pagination-wrapper {
     display: flex;
@@ -1855,6 +2021,19 @@
     border-top: 1px solid var(--gov-gray-200);
     background: var(--gov-navy-50);
     flex-wrap: wrap;
+}
+
+.zukan-archive .zukan-pagination,
+.zukan-archive .pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 48px;
+    font-family: var(--zukan-font-sans);
+    padding: 0;
+    border-top: none;
+    background: transparent;
 }
 
 .pagination-wrapper .page-numbers {
@@ -1875,16 +2054,41 @@
     gap: 4px;
 }
 
+.zukan-archive .zukan-pagination .page-numbers,
+.zukan-archive .pagination-wrapper .page-numbers {
+    min-width: 32px;
+    height: 32px;
+    padding: 0 8px;
+    font-size: 13px;
+    color: #6b7280;
+    border: 1px solid #d1d5db;
+    border-radius: 2px;
+    background: #fff;
+}
+
 .pagination-wrapper .page-numbers:hover {
     border-color: var(--gov-navy-400);
     color: var(--gov-navy-800);
     background: var(--gov-navy-50);
 }
 
+.zukan-archive .zukan-pagination .page-numbers:hover,
+.zukan-archive .pagination-wrapper .page-numbers:hover {
+    background: #f9fafb;
+}
+
 .pagination-wrapper .page-numbers.current {
     background: var(--gov-navy-800);
     border-color: var(--gov-navy-800);
     color: var(--gov-white);
+}
+
+.zukan-archive .zukan-pagination .page-numbers.current,
+.zukan-archive .pagination-wrapper .page-numbers.current {
+    background: var(--zukan-ink-primary);
+    color: #fff;
+    border-color: var(--zukan-ink-primary);
+    font-weight: 700;
 }
 
 .pagination-wrapper .page-numbers.dots {
@@ -1897,10 +2101,28 @@
 }
 
 /* ==========================================================================
-   Sidebar - サイドバー
+   Sidebar - サイドバー (Zukan優先)
    ========================================================================== */
 .yahoo-sidebar {
     background: transparent;
+}
+
+.zukan-archive .yahoo-sidebar,
+.zukan-archive .zukan-sidebar {
+    flex-shrink: 0;
+}
+
+@media (min-width: 1024px) {
+    .zukan-archive .yahoo-sidebar,
+    .zukan-archive .zukan-sidebar {
+        width: 300px;
+    }
+}
+
+/* サイドバー装飾ラインを非表示 (Zukan) */
+.zukan-archive .yahoo-sidebar::before,
+.zukan-archive .zukan-sidebar::before {
+    display: none;
 }
 
 .sidebar-widget {
@@ -1909,6 +2131,27 @@
     border-radius: var(--gov-radius-lg);
     box-shadow: var(--gov-shadow-sm);
     overflow: hidden;
+}
+
+.zukan-archive .sidebar-widget {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 2px;
+    margin-bottom: 24px;
+    padding: 24px;
+    position: relative;
+    box-shadow: var(--zukan-shadow-card-sm);
+}
+
+/* ウィジェット上部のアクセントライン (Zukan) */
+.zukan-archive .sidebar-widget::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--zukan-ink-primary);
 }
 
 .widget-title {
@@ -1925,9 +2168,25 @@
     margin: 0;
 }
 
+.zukan-archive .widget-title {
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: var(--zukan-font-serif);
+    color: var(--zukan-ink-primary);
+    margin-bottom: 16px;
+    padding: 0;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f3f4f6;
+    background: transparent;
+}
+
 .widget-title svg {
     color: var(--gov-navy-600);
     flex-shrink: 0;
+}
+
+.zukan-archive .widget-title svg {
+    color: var(--zukan-accent-gold);
 }
 
 .widget-content {
@@ -1942,84 +2201,400 @@
 }
 
 /* ==========================================================================
-   Sidebar Ad Space - 広告枠スタイル
+   Sidebar Search Widget - サイドバー検索 (Zukan)
    ========================================================================== */
-.sidebar-ad-space {
-    background: linear-gradient(135deg, var(--gov-gray-50) 0%, var(--gov-gray-100) 100%);
-    border: 1px dashed var(--gov-gray-300);
-    border-radius: var(--gov-radius-lg);
-    min-height: 100px;
+.zukan-archive .sidebar-search-widget {
+    position: relative;
+}
+
+.zukan-archive .sidebar-search-form {
+    display: flex;
+    border: 1px solid #d1d5db;
+    border-radius: 2px;
+    overflow: hidden;
+    background: #f9fafb;
+}
+
+.zukan-archive .sidebar-search-input {
+    flex: 1;
+    border: none;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-family: var(--zukan-font-sans);
+    background: transparent;
+    color: var(--zukan-ink-primary);
+    min-width: 0;
+}
+
+.zukan-archive .sidebar-search-input::placeholder {
+    color: #9ca3af;
+}
+
+.zukan-archive .sidebar-search-input:focus {
+    outline: none;
+}
+
+.zukan-archive .sidebar-search-form:focus-within {
+    border-color: var(--zukan-accent-gold);
+}
+
+.zukan-archive .sidebar-search-btn {
+    flex-shrink: 0;
+    padding: 10px 14px;
+    background: var(--zukan-ink-primary);
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color var(--zukan-transition);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--gov-gray-400);
-    font-size: 12px;
-    margin-bottom: 20px;
-    position: relative;
-    overflow: hidden;
 }
 
-.sidebar-ad-space::before {
-    content: 'PR';
-    position: absolute;
-    top: 8px;
-    left: 8px;
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--gov-gray-400);
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-}
-
-.sidebar-ad-space:empty::after {
-    content: '広告枠';
-}
-
-/* 広告位置別スタイル */
-.sidebar-ad-top {
-    margin-top: 0;
-}
-
-.sidebar-ad-middle {
-    margin: 20px 0;
-}
-
-.sidebar-ad-bottom {
-    margin-bottom: 0;
-}
-
-/* 広告コンテンツ */
-.sidebar-ad-space .ji-affiliate-ad {
-    width: 100%;
-    padding: 12px;
-}
-
-.sidebar-ad-space .ji-affiliate-ad img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-}
-
-.sidebar-ad-space .ji-affiliate-ad a {
-    display: block;
-    transition: opacity 0.2s ease;
-}
-
-.sidebar-ad-space .ji-affiliate-ad a:hover {
-    opacity: 0.9;
-}
-
-/* スティッキー広告（オプション） */
-.sidebar-ad-sticky {
-    position: sticky;
-    top: 100px;
-    z-index: 10;
+.zukan-archive .sidebar-search-btn:hover {
+    background: #374151;
 }
 
 /* ==========================================================================
-   Ranking Widget - ランキングウィジェット
-   FIX: Removed excessive !important - using higher specificity selectors
+   Sidebar Filter Widget - サイドバー絞り込み (Zukan)
    ========================================================================== */
+.zukan-archive .sidebar-filter-widget {
+    position: relative;
+}
+
+.zukan-archive .sidebar-filter-group {
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.zukan-archive .sidebar-filter-group:last-of-type {
+    border-bottom: none;
+}
+
+.zukan-archive .sidebar-filter-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: var(--zukan-font-sans);
+    transition: color var(--zukan-transition);
+}
+
+.zukan-archive .sidebar-filter-toggle:hover {
+    color: var(--zukan-accent-red);
+}
+
+.zukan-archive .filter-group-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--zukan-ink-primary);
+}
+
+.zukan-archive .filter-selected-count {
+    background: var(--zukan-accent-red);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 8px;
+}
+
+.zukan-archive .toggle-arrow {
+    color: #9ca3af;
+    transition: transform var(--zukan-transition);
+}
+
+.zukan-archive .sidebar-filter-toggle[aria-expanded="true"] .toggle-arrow {
+    transform: rotate(180deg);
+}
+
+.zukan-archive .sidebar-filter-options {
+    padding: 0 0 12px;
+    max-height: 240px;
+    overflow-y: auto;
+}
+
+/* Custom Checkbox スタイル (Zukan) */
+.zukan-archive .sidebar-filter-option {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--zukan-ink-light);
+    transition: color var(--zukan-transition);
+}
+
+.zukan-archive .sidebar-filter-option:hover {
+    color: var(--zukan-ink-primary);
+}
+
+.zukan-archive .sidebar-filter-option input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.zukan-archive .checkbox-custom {
+    width: 16px;
+    height: 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 2px;
+    margin-right: 10px;
+    flex-shrink: 0;
+    background: #fff;
+    position: relative;
+    transition: all var(--zukan-transition);
+}
+
+.zukan-archive .sidebar-filter-option input[type="checkbox"]:checked + .checkbox-custom {
+    background: var(--zukan-ink-primary);
+    border-color: var(--zukan-ink-primary);
+}
+
+.zukan-archive .sidebar-filter-option input[type="checkbox"]:checked + .checkbox-custom::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 4px;
+    height: 8px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.zukan-archive .sidebar-filter-option input[type="checkbox"]:focus + .checkbox-custom {
+    box-shadow: 0 0 0 2px rgba(197, 160, 89, 0.3);
+}
+
+.zukan-archive .option-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.zukan-archive .option-count {
+    color: #9ca3af;
+    font-size: 11px;
+    margin-left: 4px;
+}
+
+.zukan-archive .sidebar-filter-more {
+    display: block;
+    width: 100%;
+    padding: 8px;
+    background: transparent;
+    border: 1px dashed #d1d5db;
+    border-radius: 2px;
+    color: #6b7280;
+    font-size: 12px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: all var(--zukan-transition);
+}
+
+.zukan-archive .sidebar-filter-more:hover {
+    background: #f9fafb;
+    border-color: var(--zukan-accent-gold);
+    color: var(--zukan-ink-primary);
+}
+
+/* フィルターアクションボタン (Zukan) */
+.zukan-archive .sidebar-filter-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.zukan-archive .sidebar-apply-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 12px;
+    background: var(--zukan-ink-primary);
+    color: #fff;
+    border: none;
+    border-radius: 2px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: var(--zukan-font-sans);
+    cursor: pointer;
+    transition: all var(--zukan-transition);
+}
+
+.zukan-archive .sidebar-apply-btn:hover {
+    background: #374151;
+}
+
+.zukan-archive .sidebar-reset-btn {
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    color: #6b7280;
+    border: 1px solid #d1d5db;
+    border-radius: 2px;
+    font-size: 12px;
+    font-family: var(--zukan-font-sans);
+    cursor: pointer;
+    transition: all var(--zukan-transition);
+}
+
+.zukan-archive .sidebar-reset-btn:hover {
+    background: #f9fafb;
+    border-color: var(--zukan-accent-red);
+    color: var(--zukan-accent-red);
+}
+
+/* ==========================================================================
+   Main Content Filter (hidden on desktop, visible on mobile) - Zukan
+   ========================================================================== */
+@media (min-width: 1024px) {
+    .zukan-archive .yahoo-filter-section {
+        display: none;
+    }
+    
+    .zukan-archive .mobile-filter-toggle {
+        display: none;
+    }
+}
+
+@media (max-width: 1023px) {
+    .zukan-archive .sidebar-search-widget,
+    .zukan-archive .sidebar-filter-widget {
+        display: none;
+    }
+    
+    .zukan-archive .yahoo-filter-section {
+        display: block;
+    }
+}
+
+/* ==========================================================================
+   Ranking Widget - ランキングウィジェット (Zukan優先)
+   ========================================================================== */
+.zukan-archive .ranking-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 16px;
+}
+
+.zukan-archive .ranking-tab {
+    flex: 1;
+    padding: 8px 12px;
+    background: #f3f4f6;
+    border: none;
+    border-radius: 2px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: var(--zukan-font-sans);
+    color: var(--zukan-ink-light);
+    cursor: pointer;
+    transition: all var(--zukan-transition);
+}
+
+.zukan-archive .ranking-tab:hover {
+    background: #e5e7eb;
+}
+
+.zukan-archive .ranking-tab.active {
+    background: var(--zukan-ink-primary);
+    color: #fff;
+}
+
+.zukan-archive .ranking-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.zukan-archive .ranking-item {
+    margin-bottom: 0;
+}
+
+.zukan-archive .ranking-link {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    text-decoration: none;
+    color: inherit;
+    border-bottom: 1px solid #f3f4f6;
+    transition: background-color var(--zukan-transition);
+}
+
+.zukan-archive .ranking-item:last-child .ranking-link {
+    border-bottom: none;
+}
+
+.zukan-archive .ranking-link:hover {
+    background: #fafafa;
+    margin: 0 -12px;
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.zukan-archive .ranking-number {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: var(--zukan-font-serif);
+    color: #fff;
+    border-radius: 2px;
+    background: #d1d5db;
+}
+
+.zukan-archive .rank-1 .ranking-number {
+    background: var(--zukan-rank-1);
+}
+
+.zukan-archive .rank-2 .ranking-number {
+    background: var(--zukan-rank-2);
+}
+
+.zukan-archive .rank-3 .ranking-number {
+    background: var(--zukan-rank-3);
+}
+
+.zukan-archive .ranking-title {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: var(--zukan-font-serif);
+    color: var(--zukan-ink-primary);
+    line-height: 1.4;
+}
+
+.zukan-archive .ranking-link:hover .ranking-title {
+    color: var(--zukan-accent-red);
+}
+
+.zukan-archive .ranking-views {
+    font-size: 11px;
+    color: #9ca3af;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Legacy Ranking Styles */
 .yahoo-sidebar .sidebar-ranking {
     background: var(--gov-white);
     border: 1px solid var(--gov-gray-200);
@@ -2039,11 +2614,6 @@
     font-size: 15px;
     font-weight: 700;
     color: var(--gov-navy-900);
-}
-
-.yahoo-sidebar .sidebar-ranking .widget-title svg {
-    flex-shrink: 0;
-    color: var(--gov-navy-600);
 }
 
 .yahoo-sidebar .ranking-tabs {
@@ -2181,10 +2751,6 @@
     color: var(--gov-gray-500);
 }
 
-.yahoo-sidebar .ranking-views svg {
-    flex-shrink: 0;
-}
-
 .yahoo-sidebar .ranking-loading {
     padding: 40px 20px;
     text-align: center;
@@ -2196,34 +2762,6 @@
     text-align: center;
     padding: 32px 20px;
     color: var(--gov-gray-600);
-}
-
-.yahoo-sidebar .ranking-empty svg {
-    margin: 0 auto 12px;
-    opacity: 0.3;
-    display: block;
-    color: var(--gov-gray-400);
-}
-
-.yahoo-sidebar .ranking-empty p {
-    margin: 0;
-}
-
-.yahoo-sidebar .ranking-empty p:first-of-type {
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.yahoo-sidebar .ranking-empty p:last-of-type {
-    font-size: 12px;
-    opacity: 0.7;
-    margin-top: 6px;
-}
-
-.yahoo-sidebar .ranking-error {
-    text-align: center;
-    padding: 32px 20px;
-    color: var(--gov-gray-500);
 }
 
 /* ==========================================================================
@@ -2238,14 +2776,28 @@
     gap: 14px;
 }
 
+.zukan-archive .topics-list {
+    gap: 0;
+}
+
 .topics-item {
     border-bottom: 1px solid var(--gov-gray-100);
     padding-bottom: 14px;
 }
 
+.zukan-archive .topics-item {
+    border-bottom: 1px dashed #e5e7eb;
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+}
+
 .topics-item:last-child {
     border-bottom: none;
     padding-bottom: 0;
+}
+
+.zukan-archive .topics-item:last-child {
+    margin-bottom: 0;
 }
 
 .topics-link {
@@ -2260,10 +2812,20 @@
     color: var(--gov-blue);
 }
 
+.zukan-archive .topics-link:hover .topics-title {
+    color: var(--zukan-link-blue);
+}
+
 .topics-date {
     font-size: 11px;
     font-family: var(--gov-font-mono);
     color: var(--gov-gray-500);
+}
+
+.zukan-archive .topics-date {
+    font-family: var(--zukan-font-sans);
+    color: #9ca3af;
+    margin-bottom: 4px;
 }
 
 .topics-title {
@@ -2277,6 +2839,11 @@
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     transition: color var(--gov-transition);
+}
+
+.zukan-archive .topics-title {
+    font-family: var(--zukan-font-serif);
+    color: var(--zukan-ink-primary);
 }
 
 /* ==========================================================================
@@ -2295,6 +2862,10 @@
     border-bottom: 1px solid var(--gov-gray-100);
 }
 
+.zukan-archive .categories-item {
+    border-bottom: 1px solid #f3f4f6;
+}
+
 .categories-item:last-child {
     border-bottom: none;
 }
@@ -2311,9 +2882,20 @@
     transition: all var(--gov-transition);
 }
 
+.zukan-archive .categories-link {
+    color: var(--zukan-ink-primary);
+    font-size: 13px;
+    font-family: var(--zukan-font-serif);
+    padding: 10px 0;
+}
+
 .categories-link:hover {
     color: var(--gov-blue);
     padding-left: 8px;
+}
+
+.zukan-archive .categories-link:hover {
+    color: var(--zukan-accent-red);
 }
 
 .categories-count {
@@ -2325,8 +2907,574 @@
     border-radius: 12px;
 }
 
+.zukan-archive .categories-count {
+    font-size: 11px;
+    color: #9ca3af;
+    background: transparent;
+}
+
 /* ==========================================================================
-   Mobile Filter - モバイルフィルター（モダンUX改善版）
+   SEO Content Box - アーカイブSEOコンテンツ (Zukan)
+   ========================================================================== */
+.zukan-archive .zukan-article-section {
+    margin-top: 48px;
+    padding: 32px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 2px;
+    box-shadow: var(--zukan-shadow-card-sm);
+}
+
+.zukan-archive .zukan-article-section::before {
+    display: none;
+}
+
+.zukan-archive .zukan-article-header {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #f3f4f6;
+}
+
+.zukan-archive .zukan-article-label {
+    font-size: 10px;
+    font-weight: 700;
+    font-family: var(--zukan-font-sans);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--zukan-accent-gold);
+    margin-bottom: 8px;
+    display: block;
+}
+
+.zukan-archive .zukan-article-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    font-family: var(--zukan-font-serif);
+    color: var(--zukan-ink-primary);
+    line-height: 1.4;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .zukan-article-title {
+        font-size: 1.5rem;
+    }
+}
+
+.zukan-archive .zukan-article-content {
+    font-family: var(--zukan-font-serif);
+}
+
+.zukan-archive .zukan-article-content h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--zukan-ink-primary);
+    margin: 24px 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.zukan-archive .zukan-article-content h3:first-child {
+    margin-top: 0;
+}
+
+.zukan-archive .zukan-article-content p {
+    font-size: 14px;
+    line-height: 1.9;
+    color: var(--zukan-ink-light);
+    margin-bottom: 16px;
+}
+
+.zukan-archive .zukan-article-note {
+    margin-top: 32px;
+    padding: 20px 24px;
+    background: var(--zukan-ink-primary);
+    color: #fff;
+    border-radius: 2px;
+    text-align: center;
+}
+
+.zukan-archive .zukan-article-note-title {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #fff;
+}
+
+.zukan-archive .zukan-article-note-text {
+    font-size: 12px;
+    color: #fff;
+    line-height: 1.7;
+}
+
+.zukan-archive .gi-archive-seo-intro,
+.zukan-archive .gi-archive-seo-outro {
+    margin: 32px 0;
+}
+
+.zukan-archive .gi-seo-content-box {
+    background: #fff !important;
+    padding: 32px !important;
+    border-radius: 2px !important;
+    border: 1px solid #e5e7eb !important;
+    border-left: 4px solid var(--zukan-ink-primary) !important;
+    box-shadow: var(--zukan-shadow-card-sm) !important;
+}
+
+.zukan-archive .gi-seo-content-box h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    font-family: var(--zukan-font-serif);
+    color: var(--zukan-ink-primary);
+    margin: 0 0 20px 0;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f3f4f6;
+}
+
+.zukan-archive .gi-seo-content-box h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--zukan-ink-primary);
+    margin: 24px 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.zukan-archive .gi-seo-content-box p {
+    font-size: 14px;
+    line-height: 1.9;
+    color: var(--zukan-ink-light);
+    margin-bottom: 16px;
+    font-family: var(--zukan-font-sans);
+}
+
+.zukan-archive .gi-seo-content-box strong {
+    color: var(--zukan-ink-primary);
+    font-weight: 700;
+}
+
+.zukan-archive .gi-seo-content-box ul,
+.zukan-archive .gi-seo-content-box ol {
+    margin: 16px 0;
+    padding-left: 24px;
+    font-size: 14px;
+    line-height: 1.9;
+    color: var(--zukan-ink-light);
+}
+
+.zukan-archive .gi-seo-content-box li {
+    margin-bottom: 8px;
+}
+
+/* ==========================================================================
+   Editor's Pick - おすすめの助成金・補助金 (v6.5 - New Design)
+   ========================================================================== */
+
+/* Section Container */
+.editors-pick-section {
+    margin: 32px 0;
+    padding: 0;
+}
+
+.editors-pick-container {
+    max-width: 100%;
+}
+
+/* Header Styles */
+.editors-pick-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.editors-pick-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    color: #1f2937;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    border-radius: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(251, 191, 36, 0.4);
+}
+
+.editors-pick-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    font-family: var(--zukan-font-serif, 'Noto Serif JP', serif);
+    color: var(--zukan-ink-primary, #1f2937);
+    margin: 0 0 12px 0;
+    line-height: 1.3;
+}
+
+.editors-pick-subtitle {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+    font-family: var(--zukan-font-sans, 'Noto Sans JP', sans-serif);
+}
+
+/* Grid Layout */
+.editors-pick-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+}
+
+@media (min-width: 768px) {
+    .editors-pick-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1200px) {
+    .editors-pick-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Card Styles */
+.editors-pick-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+.editors-pick-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15);
+    border-color: #fbbf24;
+}
+
+.editors-pick-card-link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 24px;
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Card Header */
+.editors-pick-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.card-badges {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.category-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    color: #1e40af;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.prefecture-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    background: #f3f4f6;
+    color: #4b5563;
+    font-size: 10px;
+    font-weight: 600;
+    border-radius: 6px;
+}
+
+/* Difficulty Badge */
+.difficulty-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.difficulty-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #6b7280;
+}
+
+.difficulty-stars {
+    display: flex;
+    gap: 2px;
+}
+
+.difficulty-stars .star {
+    font-size: 12px;
+    color: #d1d5db;
+}
+
+.difficulty-stars .star.filled {
+    color: #fbbf24;
+}
+
+.difficulty-high .difficulty-label {
+    color: #dc2626;
+}
+
+.difficulty-medium .difficulty-label {
+    color: #f59e0b;
+}
+
+.difficulty-low .difficulty-label {
+    color: #10b981;
+}
+
+/* Card Title */
+.editors-pick-card-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    font-family: var(--zukan-font-serif, 'Noto Serif JP', serif);
+    color: var(--zukan-ink-primary, #1f2937);
+    line-height: 1.5;
+    margin: 0 0 16px 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.editors-pick-card:hover .editors-pick-card-title {
+    color: #b45309;
+}
+
+/* Amount Badge */
+.amount-badge-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.amount-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    border: 1px solid #a7f3d0;
+    border-radius: 8px;
+}
+
+.amount-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #059669;
+}
+
+.amount-value {
+    font-size: 18px;
+    font-weight: 800;
+    color: #047857;
+    font-family: var(--zukan-font-sans, 'Noto Sans JP', sans-serif);
+}
+
+.deadline-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #dc2626;
+}
+
+.deadline-icon {
+    flex-shrink: 0;
+}
+
+/* Card Content */
+.editors-pick-card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Info Sections */
+.info-section {
+    padding: 16px;
+    background: #f9fafb;
+    border-radius: 10px;
+    border-left: 3px solid #e5e7eb;
+}
+
+.target-section {
+    border-left-color: #3b82f6;
+    background: linear-gradient(135deg, #eff6ff 0%, #f9fafb 100%);
+}
+
+.conditions-section {
+    border-left-color: #10b981;
+    background: linear-gradient(135deg, #ecfdf5 0%, #f9fafb 100%);
+}
+
+.info-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.info-icon {
+    flex-shrink: 0;
+    color: #6b7280;
+}
+
+.target-section .info-icon {
+    color: #3b82f6;
+}
+
+.conditions-section .info-icon {
+    color: #10b981;
+}
+
+.info-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #374151;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.info-text {
+    font-size: 13px;
+    line-height: 1.7;
+    color: #4b5563;
+    margin: 0;
+    font-family: var(--zukan-font-sans, 'Noto Sans JP', sans-serif);
+}
+
+.excerpt-section {
+    border-left-color: #8b5cf6;
+    background: linear-gradient(135deg, #f5f3ff 0%, #f9fafb 100%);
+}
+
+.excerpt-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Card Footer */
+.editors-pick-card-footer {
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px dashed #e5e7eb;
+}
+
+.view-details {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #b45309;
+    transition: all 0.2s ease;
+}
+
+.editors-pick-card:hover .view-details {
+    gap: 10px;
+    color: #92400e;
+}
+
+.arrow-icon {
+    transition: transform 0.2s ease;
+}
+
+.editors-pick-card:hover .arrow-icon {
+    transform: translateX(4px);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 640px) {
+    .editors-pick-header {
+        margin-bottom: 24px;
+    }
+    
+    .editors-pick-title {
+        font-size: 1.375rem;
+    }
+    
+    .editors-pick-card-link {
+        padding: 20px;
+    }
+    
+    .editors-pick-card-title {
+        font-size: 1rem;
+    }
+    
+    .amount-value {
+        font-size: 16px;
+    }
+    
+    .info-section {
+        padding: 12px;
+    }
+}
+
+/* Dark Mode Support (Optional) */
+@media (prefers-color-scheme: dark) {
+    .editors-pick-card {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .editors-pick-card-title {
+        color: #f9fafb;
+    }
+    
+    .info-section {
+        background: #111827;
+    }
+    
+    .info-text {
+        color: #d1d5db;
+    }
+}
+
+/* Legacy Support - Keep old classes for backward compatibility */
+.zukan-archive .gi-archive-featured-posts {
+    margin: 32px 0;
+}
+
+.zukan-archive .gi-featured-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .gi-featured-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ==========================================================================
+   Mobile Filter - モバイルフィルター
    ========================================================================== */
 .mobile-filter-toggle {
     display: none;
@@ -2363,7 +3511,6 @@
     color: var(--gov-gold);
 }
 
-/* フィルター件数バッジ */
 .filter-count-badge {
     display: inline-flex;
     align-items: center;
@@ -2444,6 +3591,94 @@
     background: var(--gov-navy-900);
 }
 
+/* Zukan Mobile Filter */
+.zukan-archive .mobile-filter-toggle {
+    display: none;
+}
+
+@media (max-width: 767px) {
+    .zukan-archive .mobile-filter-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: calc(100% - 32px);
+        left: 16px;
+        right: 16px;
+        transform: none;
+        padding: 12px;
+        background: #fff;
+        border: 1px solid #d1d5db;
+        border-radius: 2px;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--zukan-ink-primary);
+        box-shadow: var(--zukan-shadow-card-sm);
+        position: fixed;
+        bottom: 24px;
+    }
+    
+    .zukan-archive .yahoo-filter-section {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1000;
+        background: #fff;
+        overflow-y: auto;
+        padding: 20px;
+        margin-bottom: 0;
+        display: none;
+    }
+    
+    .zukan-archive .yahoo-filter-section.is-open {
+        display: block;
+    }
+    
+    .zukan-archive .mobile-filter-close {
+        display: block;
+        background: transparent;
+        border: none;
+        font-size: 24px;
+        color: #6b7280;
+        cursor: pointer;
+    }
+    
+    .zukan-archive .mobile-filter-apply-section {
+        position: sticky;
+        bottom: 0;
+        background: #fff;
+        padding: 16px 0;
+        border-top: 1px solid #e5e7eb;
+        margin-top: 20px;
+        display: block;
+    }
+    
+    .zukan-archive .mobile-apply-filters-btn {
+        width: 100%;
+        padding: 14px;
+        background: var(--zukan-ink-primary);
+        color: #fff;
+        border: none;
+        border-radius: 2px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .mobile-filter-close,
+    .zukan-archive .mobile-filter-apply-section {
+        display: none;
+    }
+}
+
 /* ==========================================================================
    Responsive - レスポンシブ
    ========================================================================== */
@@ -2461,7 +3696,6 @@
         grid-template-columns: 1fr;
     }
     
-    /* FIX: 768px-1024px でフィルターボタンを表示 */
     .mobile-filter-toggle {
         display: flex;
     }
@@ -2476,7 +3710,6 @@
         padding: 24px 16px 80px;
     }
     
-    /* FIX: Reduced !important usage - using specificity instead */
     .mobile-filter-close {
         display: block;
     }
@@ -2575,6 +3808,129 @@
     .grants-container-yahoo {
         padding: 16px;
     }
+    
+    .zukan-archive .zukan-grant-card {
+        padding: 20px;
+    }
+    
+    .zukan-archive .sidebar-widget {
+        padding: 20px;
+    }
+    
+    .zukan-archive .zukan-article-section {
+        padding: 24px;
+    }
+}
+
+/* ==========================================================================
+   Toast Notification Styles
+   ========================================================================== */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 400px;
+}
+
+.toast {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 18px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    transform: translateX(120%);
+    transition: transform 0.3s ease;
+    border-left: 4px solid #6b7280;
+}
+
+.toast.show {
+    transform: translateX(0);
+}
+
+.toast-error {
+    border-left-color: var(--gov-red);
+}
+
+.toast-success {
+    border-left-color: var(--gov-green);
+}
+
+.toast-warning {
+    border-left-color: #f59e0b;
+}
+
+.toast-info {
+    border-left-color: var(--gov-blue);
+}
+
+.toast-icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+}
+
+.toast-error .toast-icon {
+    color: var(--gov-red);
+}
+
+.toast-success .toast-icon {
+    color: var(--gov-green);
+}
+
+.toast-warning .toast-icon {
+    color: #f59e0b;
+}
+
+.toast-info .toast-icon {
+    color: var(--gov-blue);
+}
+
+.toast-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.toast-content {
+    flex: 1;
+}
+
+.toast-title {
+    margin: 0 0 4px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gov-gray-900);
+}
+
+.toast-message {
+    margin: 0;
+    font-size: 13px;
+    color: var(--gov-gray-600);
+    line-height: 1.5;
+}
+
+.toast-close {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    padding: 2px;
+    cursor: pointer;
+    color: var(--gov-gray-400);
+    transition: color 0.2s;
+}
+
+.toast-close:hover {
+    color: var(--gov-gray-600);
+}
+
+.toast-close svg {
+    width: 16px;
+    height: 16px;
 }
 
 /* ==========================================================================
@@ -2616,6 +3972,12 @@
 .column-category-archive input:focus-visible,
 .column-category-archive select:focus-visible {
     outline: 3px solid var(--gov-gold);
+    outline-offset: 2px;
+}
+
+.zukan-archive a:focus-visible,
+.zukan-archive button:focus-visible {
+    outline: 2px solid var(--zukan-accent-gold);
     outline-offset: 2px;
 }
 
@@ -2669,6 +4031,15 @@
     .grants-container-yahoo {
         display: block !important;
     }
+    
+    .zukan-archive {
+        background: white !important;
+    }
+    
+    .zukan-archive .yahoo-sidebar,
+    .zukan-archive .zukan-sidebar {
+        display: none;
+    }
 }
 
 /* ==========================================================================
@@ -2697,1762 +4068,4 @@
 
 .grants-container-yahoo[data-view="grid"] {
     display: grid !important;
-}
-
-/* ==========================================================================
-   Column Archive Specific Styles
-   コラムアーカイブページ専用スタイル（archive-column.phpから移行）
-   ========================================================================== */
-/* ==========================================================================
-   Column Archive - Government Official Design v20.0
-   コラムアーカイブページ - 官公庁風デザイン
-   修正版：絞り込み表示領域 + SVGアイコン対応
-   ========================================================================== */
-
-/* NOTE: CSS Variables are defined once at the top of this file (line 13-66)
-   Duplicate :root block removed to reduce file size and prevent conflicts */
-
-/* ==========================================================================
-   Base Styles
-   ========================================================================== */
-.column-archive-yahoo-style {
-    font-family: var(--gov-font-sans);
-    color: var(--gov-gray-900);
-    background: linear-gradient(180deg, var(--gov-navy-50) 0%, var(--gov-white) 100%);
-    line-height: 1.7;
-    position: relative;
-}
-
-.column-archive-yahoo-style::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--gov-navy-800) 0%, var(--gov-gold) 50%, var(--gov-navy-800) 100%);
-    z-index: 9999;
-}
-
-.yahoo-container {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 0 24px;
-}
-
-/* ==========================================================================
-   Breadcrumb
-   ========================================================================== */
-.breadcrumb-nav {
-    padding: 16px 0;
-    background: var(--gov-white);
-    border-bottom: 1px solid var(--gov-gray-200);
-}
-
-.breadcrumb-list {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    font-size: 13px;
-}
-
-.breadcrumb-item {
-    display: flex;
-    align-items: center;
-}
-
-.breadcrumb-item:not(:last-child)::after {
-    content: '›';
-    margin-left: 8px;
-    color: var(--gov-gray-400);
-}
-
-.breadcrumb-item a {
-    color: var(--gov-navy-600);
-    text-decoration: none;
-    transition: color var(--gov-transition);
-}
-
-.breadcrumb-item a:hover {
-    color: var(--gov-navy-900);
-    text-decoration: underline;
-}
-
-.breadcrumb-item span {
-    color: var(--gov-navy-900);
-    font-weight: 600;
-}
-
-/* ==========================================================================
-   Hero Section
-   ========================================================================== */
-.yahoo-hero-section {
-    background: linear-gradient(135deg, var(--gov-navy-800) 0%, var(--gov-navy-900) 100%);
-    color: var(--gov-white);
-    padding: 48px 0;
-    border-bottom: 4px solid var(--gov-gold);
-    position: relative;
-    overflow: hidden;
-}
-
-.yahoo-hero-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: 
-        linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-}
-
-.hero-content-wrapper {
-    position: relative;
-    z-index: 1;
-    max-width: 800px;
-}
-
-.category-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    background: rgba(201, 162, 39, 0.15);
-    border: 1px solid var(--gov-gold);
-    border-radius: var(--gov-radius);
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--gov-gold);
-    letter-spacing: 0.1em;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-}
-
-/* Column Archive Hero - Higher specificity to override theme styles */
-.column-archive-yahoo-style .yahoo-main-title {
-    font-family: var(--gov-font-serif);
-    font-size: clamp(28px, 5vw, 44px);
-    font-weight: 700;
-    color: var(--gov-white) !important;
-    margin: 0 0 16px 0;
-    line-height: 1.3;
-}
-
-.column-archive-yahoo-style .yahoo-lead-text {
-    font-size: 15px;
-    color: rgba(255, 255, 255, 0.9) !important;
-    margin: 0 0 24px 0;
-    line-height: 1.9;
-}
-
-.column-archive-yahoo-style .yahoo-meta-info {
-    display: flex;
-    align-items: center;
-    gap: 28px;
-    flex-wrap: wrap;
-    padding-top: 24px;
-    border-top: 1px solid rgba(255,255,255,0.15);
-}
-
-.column-archive-yahoo-style .meta-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    color: rgba(255, 255, 255, 0.85) !important;
-}
-
-.column-archive-yahoo-style .meta-icon {
-    color: var(--gov-gold) !important;
-}
-
-.column-archive-yahoo-style .meta-item strong {
-    font-family: var(--gov-font-mono);
-    font-size: 28px;
-    font-weight: 900;
-    color: var(--gov-white) !important;
-}
-
-/* ==========================================================================
-   Two Column Layout
-   ========================================================================== */
-.yahoo-two-column-layout {
-    display: grid;
-    grid-template-columns: 1fr 320px;
-    gap: 32px;
-    padding: 32px 24px 80px;
-    align-items: start;
-}
-
-.yahoo-main-content {
-    min-width: 0;
-}
-
-.yahoo-sidebar {
-    position: sticky;
-    top: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-}
-
-/* NOTE: Duplicate Search Section styles removed - using definitions from line 308-430 */
-
-/* ==========================================================================
-   Category Tabs
-   ========================================================================== */
-.yahoo-category-tabs {
-    margin-bottom: 24px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-}
-
-.category-tabs-list {
-    display: flex;
-    gap: 4px;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    border-bottom: 2px solid var(--gov-navy-800);
-}
-
-.category-tabs-list li {
-    flex-shrink: 0;
-}
-
-.category-tab {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 12px 16px;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--gov-gray-700);
-    background: var(--gov-gray-100);
-    border: 1px solid var(--gov-gray-200);
-    border-bottom: none;
-    text-decoration: none;
-    transition: all var(--gov-transition);
-    white-space: nowrap;
-}
-
-.category-tab:hover {
-    background: var(--gov-white);
-    color: var(--gov-navy-900);
-}
-
-.category-tab.active {
-    color: var(--gov-navy-900);
-    background: var(--gov-white);
-    border-color: var(--gov-navy-800);
-    position: relative;
-}
-
-.category-tab.active::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: var(--gov-white);
-}
-
-/* SVGアイコン用スタイル */
-.tab-icon,
-.cat-icon,
-.option-icon,
-.category-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.tab-icon svg,
-.cat-icon svg,
-.option-icon svg,
-.category-icon svg {
-    width: 16px;
-    height: 16px;
-}
-
-.tab-count {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 22px;
-    height: 20px;
-    padding: 0 6px;
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--gov-white);
-    background: var(--gov-gray-500);
-    border-radius: 10px;
-}
-
-.category-tab.active .tab-count {
-    background: var(--gov-navy-800);
-}
-
-/* ==========================================================================
-   Filter Section - 修正版
-   ========================================================================== */
-.yahoo-filter-section {
-    background: var(--gov-white);
-    border: 1px solid var(--gov-gray-200);
-    border-radius: var(--gov-radius-lg);
-    margin-bottom: 24px;
-    box-shadow: var(--gov-shadow-sm);
-    overflow: visible; /* 重要：ドロップダウンが見えるように */
-    position: relative;
-    z-index: 50;
-}
-
-/* FIX: More compact filter header */
-.filter-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 20px;
-    background: var(--gov-navy-50);
-    border-bottom: 2px solid var(--gov-navy-800);
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.filter-title {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-family: var(--gov-font-serif);
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--gov-navy-900);
-    margin: 0;
-}
-
-.filter-reset-all {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 14px;
-    background: var(--gov-white);
-    border: 1px solid var(--gov-gray-300);
-    border-radius: var(--gov-radius);
-    font-family: var(--gov-font-sans);
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--gov-gray-700);
-    cursor: pointer;
-    transition: all var(--gov-transition);
-}
-
-.filter-reset-all:hover {
-    background: var(--gov-navy-50);
-    border-color: var(--gov-navy-400);
-}
-
-/* NOTE: Duplicate filter styles removed - using compact versions from line 460+ */
-
-/* ==========================================================================
-   Active Filters
-   ========================================================================== */
-.active-filters-display {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 16px 24px;
-    background: var(--gov-gold-pale);
-    border-top: 1px solid var(--gov-gold-light);
-    flex-wrap: wrap;
-}
-
-.active-filters-label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--gov-navy-800);
-}
-
-.active-filter-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    flex: 1;
-}
-
-.filter-tag {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 12px;
-    background: var(--gov-navy-800);
-    color: var(--gov-white);
-    font-size: 12px;
-    font-weight: 500;
-    border-radius: var(--gov-radius);
-}
-
-.filter-tag-remove {
-    background: none;
-    border: none;
-    color: var(--gov-white);
-    cursor: pointer;
-    padding: 0;
-    font-size: 14px;
-    opacity: 0.7;
-    transition: opacity var(--gov-transition);
-}
-
-.filter-tag-remove:hover {
-    opacity: 1;
-}
-
-/* ==========================================================================
-   Results Section
-   ========================================================================== */
-.yahoo-results-section {
-    background: var(--gov-white);
-    border: 1px solid var(--gov-gray-200);
-    border-radius: var(--gov-radius-lg);
-    box-shadow: var(--gov-shadow-sm);
-    overflow: hidden;
-    position: relative;
-    z-index: 1;
-}
-
-.results-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 24px;
-    background: var(--gov-navy-50);
-    border-bottom: 2px solid var(--gov-navy-800);
-    flex-wrap: wrap;
-    gap: 16px;
-}
-
-.results-info {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.results-title {
-    font-family: var(--gov-font-serif);
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--gov-navy-900);
-    margin: 0;
-}
-
-.results-meta {
-    font-size: 14px;
-    color: var(--gov-gray-600);
-}
-
-.total-count strong {
-    font-family: var(--gov-font-mono);
-    font-size: 20px;
-    font-weight: 900;
-    color: var(--gov-navy-900);
-}
-
-/* View Controls */
-.view-controls {
-    display: flex;
-    gap: 4px;
-    background: var(--gov-white);
-    padding: 4px;
-    border-radius: var(--gov-radius);
-    border: 1px solid var(--gov-gray-300);
-}
-
-.view-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px 14px;
-    background: transparent;
-    border: none;
-    border-radius: var(--gov-radius);
-    cursor: pointer;
-    color: var(--gov-gray-600);
-    transition: all var(--gov-transition);
-}
-
-.view-btn:hover {
-    color: var(--gov-navy-800);
-    background: var(--gov-navy-50);
-}
-
-.view-btn.active {
-    background: var(--gov-navy-800);
-    color: var(--gov-white);
-}
-
-/* ==========================================================================
-   Columns Container
-   ========================================================================== */
-.columns-container-yahoo {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-    padding: 24px;
-    min-height: 400px;
-}
-
-.columns-container-yahoo[data-view="list"] {
-    grid-template-columns: 1fr;
-    gap: 16px;
-}
-
-/* ==========================================================================
-   Column Card
-   ========================================================================== */
-.column-card {
-    display: flex;
-    flex-direction: column;
-    background: var(--gov-white);
-    border: 1px solid var(--gov-gray-200);
-    border-radius: var(--gov-radius-lg);
-    overflow: hidden;
-    transition: all var(--gov-transition);
-}
-
-.column-card:hover {
-    box-shadow: var(--gov-shadow);
-    transform: translateY(-2px);
-}
-
-.column-card-featured {
-    border-color: var(--gov-green);
-    border-width: 2px;
-}
-
-.columns-container-yahoo[data-view="list"] .column-card {
-    flex-direction: row;
-}
-
-.column-card-thumb {
-    position: relative;
-    display: block;
-    aspect-ratio: 16 / 9;
-    background: var(--gov-gray-100);
-    overflow: hidden;
-}
-
-.columns-container-yahoo[data-view="list"] .column-card-thumb {
-    width: 200px;
-    flex-shrink: 0;
-    aspect-ratio: auto;
-    height: 100%;
-}
-
-.column-card-thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform var(--gov-transition);
-}
-
-.column-card:hover .column-card-thumb img {
-    transform: scale(1.05);
-}
-
-.thumb-placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-    color: var(--gov-gray-300);
-}
-
-.featured-label {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 10px;
-    background: var(--gov-green);
-    color: var(--gov-white);
-    font-size: 11px;
-    font-weight: 700;
-    border-radius: var(--gov-radius);
-}
-
-.column-card-body {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 16px;
-}
-
-.column-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.column-card-cat {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 3px 10px;
-    background: var(--gov-gray-100);
-    color: var(--gov-gray-700);
-    font-size: 11px;
-    font-weight: 600;
-    text-decoration: none;
-    border-radius: var(--gov-radius);
-    transition: all var(--gov-transition);
-}
-
-.column-card-cat:hover {
-    background: var(--gov-gray-200);
-    color: var(--gov-navy-900);
-}
-
-.column-card-cat .cat-icon {
-    display: inline-flex;
-}
-
-.column-card-cat .cat-icon svg {
-    width: 12px;
-    height: 12px;
-}
-
-.column-card-time {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    font-size: 11px;
-    color: var(--gov-gray-500);
-}
-
-.column-card-title {
-    margin: 0 0 10px;
-    font-size: 16px;
-    font-weight: 700;
-    line-height: 1.4;
-}
-
-.column-card-title a {
-    color: var(--gov-navy-900);
-    text-decoration: none;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    transition: color var(--gov-transition);
-}
-
-.column-card-title a:hover {
-    color: var(--gov-blue);
-}
-
-.column-card-excerpt {
-    flex: 1;
-    margin: 0 0 12px;
-    font-size: 13px;
-    color: var(--gov-gray-600);
-    line-height: 1.6;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-.column-card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 12px;
-    border-top: 1px solid var(--gov-gray-200);
-}
-
-.column-card-date {
-    font-size: 12px;
-    color: var(--gov-gray-500);
-}
-
-.column-card-stats {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.stat-views {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    font-size: 11px;
-    color: var(--gov-gray-500);
-}
-
-.stat-level {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 2px 8px;
-    font-size: 10px;
-    font-weight: 600;
-    border-radius: var(--gov-radius);
-}
-
-.stat-level svg {
-    width: 12px;
-    height: 12px;
-}
-
-.stat-level-green {
-    background: var(--gov-green-light);
-    color: var(--gov-green);
-}
-
-.stat-level-orange {
-    background: var(--gov-orange-light);
-    color: var(--gov-orange);
-}
-
-.stat-level-red {
-    background: var(--gov-red-light);
-    color: var(--gov-red);
-}
-
-/* ==========================================================================
-   No Results
-   ========================================================================== */
-.no-results-message {
-    grid-column: 1 / -1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 80px 24px;
-    text-align: center;
-}
-
-.no-results-message .no-results-icon {
-    width: 80px;
-    height: 80px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--gov-navy-50);
-    border-radius: 50%;
-    color: var(--gov-navy-300);
-    margin-bottom: 24px;
-}
-
-.no-results-message h3 {
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--gov-navy-900);
-    margin: 0 0 12px 0;
-}
-
-.no-results-message p {
-    font-size: 14px;
-    color: var(--gov-gray-600);
-    margin: 0 0 24px 0;
-}
-
-.back-to-all-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 14px 28px;
-    background: var(--gov-navy-800);
-    color: var(--gov-white);
-    font-size: 14px;
-    font-weight: 700;
-    text-decoration: none;
-    border-radius: var(--gov-radius);
-    transition: all var(--gov-transition);
-}
-
-.back-to-all-btn:hover {
-    background: var(--gov-navy-900);
-    transform: translateY(-2px);
-}
-
-/* NOTE: Duplicate Loading styles removed - using definitions from line 1186+ */
-
-/* NOTE: Duplicate pagination styles removed - using consolidated version from line 1266+ */
-
-/* ==========================================================================
-   Sidebar
-   ========================================================================== */
-.sidebar-widget {
-    background: var(--gov-white);
-    border: 1px solid var(--gov-gray-200);
-    border-radius: var(--gov-radius-lg);
-    box-shadow: var(--gov-shadow-sm);
-    overflow: hidden;
-}
-
-.widget-title {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 16px 20px;
-    background: var(--gov-navy-50);
-    border-bottom: 2px solid var(--gov-navy-800);
-    font-family: var(--gov-font-serif);
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--gov-navy-900);
-    margin: 0;
-}
-
-.widget-title svg {
-    color: var(--gov-navy-600);
-    flex-shrink: 0;
-}
-
-.widget-content {
-    padding: 20px;
-}
-
-/* NOTE: Duplicate Sidebar Ad Space removed - using definitions from line 1381 */
-
-/* Ranking */
-.ranking-list {
-    list-style: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
-}
-
-.ranking-item {
-    border-bottom: 1px solid var(--gov-gray-100);
-}
-
-.ranking-item:last-child {
-    border-bottom: none;
-}
-
-.ranking-link {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 14px 0;
-    text-decoration: none;
-    color: inherit;
-    transition: background var(--gov-transition);
-}
-
-.ranking-link:hover {
-    background: var(--gov-navy-50);
-    margin: 0 -20px;
-    padding: 14px 20px;
-}
-
-.ranking-number {
-    flex-shrink: 0;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--gov-font-mono);
-    font-size: 13px;
-    font-weight: 900;
-    color: var(--gov-gray-500);
-    background: var(--gov-gray-100);
-    border-radius: 50%;
-}
-
-.rank-1 .ranking-number {
-    background: linear-gradient(135deg, var(--gov-gold) 0%, var(--gov-gold-light) 100%);
-    color: var(--gov-navy-900);
-}
-
-.rank-2 .ranking-number {
-    background: var(--gov-navy-300);
-    color: var(--gov-navy-900);
-}
-
-.rank-3 .ranking-number {
-    background: var(--gov-navy-400);
-    color: var(--gov-white);
-}
-
-.ranking-content {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    gap: 10px;
-}
-
-.ranking-thumb {
-    width: 50px;
-    height: 40px;
-    flex-shrink: 0;
-    border-radius: var(--gov-radius);
-    overflow: hidden;
-    background: var(--gov-gray-100);
-}
-
-.ranking-thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.ranking-text {
-    flex: 1;
-    min-width: 0;
-}
-
-.ranking-title {
-    display: block;
-    font-size: 13px;
-    font-weight: 600;
-    line-height: 1.5;
-    color: var(--gov-navy-900);
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-.ranking-link:hover .ranking-title {
-    color: var(--gov-blue);
-}
-
-.ranking-meta {
-    display: flex;
-    gap: 8px;
-    font-size: 11px;
-    color: var(--gov-gray-500);
-    margin-top: 4px;
-}
-
-.ranking-views {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-/* Topics */
-.topics-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-.topics-item {
-    border-bottom: 1px solid var(--gov-gray-100);
-    padding-bottom: 14px;
-    margin-bottom: 14px;
-}
-
-.topics-item:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-    margin-bottom: 0;
-}
-
-.topics-link {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    text-decoration: none;
-}
-
-.topics-link:hover .topics-title {
-    color: var(--gov-blue);
-}
-
-.topics-date {
-    font-size: 11px;
-    font-family: var(--gov-font-mono);
-    color: var(--gov-gray-500);
-}
-
-.topics-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--gov-navy-900);
-    line-height: 1.5;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    transition: color var(--gov-transition);
-}
-
-/* Tags */
-.tags-cloud {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.tag-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    background: var(--gov-gray-50);
-    border: 1px solid var(--gov-gray-200);
-    border-radius: var(--gov-radius);
-    text-decoration: none;
-    transition: all var(--gov-transition);
-}
-
-.tag-item:hover {
-    background: var(--gov-gray-100);
-    border-color: var(--gov-navy-400);
-    transform: translateX(4px);
-}
-
-.tag-rank {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 20px;
-    height: 20px;
-    font-size: 11px;
-    font-weight: 800;
-    color: var(--gov-white);
-    background: var(--gov-gray-400);
-    border-radius: 10px;
-}
-
-.tag-item:nth-child(-n+3) .tag-rank {
-    background: var(--gov-navy-800);
-}
-
-.tag-name {
-    flex: 1;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--gov-navy-900);
-}
-
-.tag-count {
-    font-size: 11px;
-    color: var(--gov-gray-500);
-}
-
-/* Categories */
-.categories-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-.categories-item {
-    border-bottom: 1px solid var(--gov-gray-100);
-}
-
-.categories-item:last-child {
-    border-bottom: none;
-}
-
-.categories-link {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 0;
-    text-decoration: none;
-    color: var(--gov-navy-800);
-    font-size: 14px;
-    font-weight: 500;
-    transition: all var(--gov-transition);
-}
-
-.categories-link:hover {
-    color: var(--gov-blue);
-    padding-left: 8px;
-}
-
-.categories-link .category-icon {
-    display: inline-flex;
-    color: var(--gov-navy-600);
-}
-
-.categories-link .category-icon svg {
-    width: 16px;
-    height: 16px;
-}
-
-.category-name {
-    flex: 1;
-}
-
-.categories-count {
-    font-size: 12px;
-    font-family: var(--gov-font-mono);
-    color: var(--gov-gray-500);
-    background: var(--gov-gray-100);
-    padding: 2px 8px;
-    border-radius: 12px;
-}
-
-/* CTA */
-.sidebar-cta {
-    background: linear-gradient(135deg, var(--gov-navy-800) 0%, var(--gov-navy-900) 100%) !important;
-    color: var(--gov-white);
-    padding: 24px 20px;
-    text-align: center;
-    border: none !important;
-}
-
-.cta-title {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    font-family: var(--gov-font-serif);
-    font-size: 18px;
-    font-weight: 700;
-    margin: 0 0 12px;
-    color: var(--gov-white);
-    background: none !important;
-    padding: 0 !important;
-    border: none !important;
-}
-
-.cta-title svg {
-    color: var(--gov-gold);
-}
-
-.cta-desc {
-    font-size: 13px;
-    opacity: 0.9;
-    margin: 0 0 20px;
-    line-height: 1.7;
-}
-
-.cta-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    width: 100%;
-    padding: 14px 24px;
-    background: var(--gov-white);
-    color: var(--gov-navy-900);
-    font-size: 15px;
-    font-weight: 700;
-    text-decoration: none;
-    border-radius: var(--gov-radius);
-    transition: all var(--gov-transition);
-}
-
-.cta-btn:hover {
-    background: var(--gov-gray-100);
-    transform: translateY(-2px);
-}
-
-/* ==========================================================================
-   Mobile Filter
-   ========================================================================== */
-.mobile-filter-toggle {
-    display: none;
-    position: fixed;
-    bottom: 80px;
-    left: 16px;
-    z-index: 1000;
-    padding: 14px 24px;
-    background: linear-gradient(135deg, var(--gov-navy-800) 0%, var(--gov-navy-900) 100%);
-    color: var(--gov-white);
-    border: none;
-    border-radius: 28px;
-    box-shadow: var(--gov-shadow-lg);
-    cursor: pointer;
-    font-family: var(--gov-font-sans);
-    font-size: 14px;
-    font-weight: 700;
-    align-items: center;
-    gap: 8px;
-}
-
-.mobile-filter-toggle svg {
-    color: var(--gov-gold);
-}
-
-.mobile-filter-close {
-    display: none;
-    background: none;
-    border: none;
-    font-size: 28px;
-    color: var(--gov-gray-600);
-    cursor: pointer;
-    padding: 8px;
-    margin-left: auto;
-}
-
-.filter-panel-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 997;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.filter-panel-overlay.active {
-    display: block;
-    opacity: 1;
-}
-
-.mobile-filter-apply-section {
-    display: none;
-    position: sticky;
-    bottom: 0;
-    padding: 16px 24px;
-    background: var(--gov-white);
-    border-top: 2px solid var(--gov-gray-200);
-    z-index: 20;
-}
-
-.mobile-apply-filters-btn {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 16px 24px;
-    background: linear-gradient(135deg, var(--gov-navy-800) 0%, var(--gov-navy-900) 100%);
-    color: var(--gov-white);
-    border: none;
-    border-radius: var(--gov-radius);
-    font-family: var(--gov-font-sans);
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: var(--gov-shadow);
-}
-
-/* ==========================================================================
-   Responsive
-   ========================================================================== */
-@media (max-width: 1024px) {
-    .yahoo-two-column-layout {
-        grid-template-columns: 1fr;
-        gap: 24px;
-    }
-    
-    .yahoo-sidebar {
-        display: none;
-    }
-    
-    .columns-container-yahoo {
-        grid-template-columns: 1fr;
-    }
-    
-    .columns-container-yahoo[data-view="list"] .column-card {
-        flex-direction: column;
-    }
-    
-    .columns-container-yahoo[data-view="list"] .column-card-thumb {
-        width: 100%;
-        aspect-ratio: 16 / 9;
-        height: auto;
-    }
-    
-    .yahoo-filters-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 768px) {
-    .yahoo-container {
-        padding: 0 16px;
-    }
-    
-    .yahoo-two-column-layout {
-        padding: 24px 16px 80px;
-    }
-    
-    .mobile-filter-toggle {
-        display: flex !important;
-    }
-    
-    .mobile-filter-close {
-        display: block !important;
-    }
-    
-    .mobile-filter-apply-section {
-        display: block !important;
-    }
-    
-    .yahoo-filter-section {
-        position: fixed !important;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: var(--gov-white);
-        z-index: 998;
-        margin: 0;
-        border-radius: 0;
-        overflow-y: auto !important;
-        transform: translateX(100%);
-        box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
-        transition: transform 0.3s ease;
-    }
-    
-    .yahoo-filter-section.active {
-        transform: translateX(0) !important;
-    }
-    
-    .filter-header {
-        position: sticky;
-        top: 0;
-        background: var(--gov-white);
-        z-index: 10;
-    }
-    
-    .yahoo-filters-grid {
-        padding-bottom: 100px;
-    }
-    
-    .yahoo-hero-section {
-        padding: 32px 0;
-    }
-    
-    .yahoo-main-title {
-        font-size: 24px;
-    }
-    
-    .yahoo-meta-info {
-        gap: 16px;
-    }
-    
-    .meta-item strong {
-        font-size: 22px;
-    }
-    
-    .search-bar-wrapper {
-        padding: 16px;
-    }
-    
-    .search-input-container {
-        flex-wrap: wrap;
-    }
-    
-    .search-execute-btn {
-        width: 100%;
-        margin-top: 12px;
-        justify-content: center;
-    }
-    
-    .yahoo-category-tabs {
-        margin: 0 -16px 24px -16px;
-        padding: 0 16px;
-    }
-    
-    .results-header {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 16px 20px;
-    }
-    
-    .view-controls {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    .columns-container-yahoo {
-        padding: 16px;
-    }
-}
-
-/* ==========================================================================
-   Accessibility
-   ========================================================================== */
-.visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-}
-
-.column-archive-yahoo-style a:focus-visible,
-.column-archive-yahoo-style button:focus-visible,
-.column-archive-yahoo-style input:focus-visible {
-    outline: 3px solid var(--gov-gold);
-    outline-offset: 2px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    * {
-        animation-duration: 0.01ms !important;
-        transition-duration: 0.01ms !important;
-    }
-}
-
-/* ==========================================================================
-   Print
-   ========================================================================== */
-@media print {
-    .yahoo-search-section,
-    .yahoo-filter-section,
-    .yahoo-category-tabs,
-    .view-controls,
-    .pagination-wrapper,
-    .yahoo-sidebar,
-    .mobile-filter-toggle {
-        display: none !important;
-    }
-    
-    .yahoo-two-column-layout {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* ==========================================================================
-   Force Display
-   ========================================================================== */
-.column-archive-yahoo-style,
-.yahoo-container,
-.yahoo-two-column-layout,
-.yahoo-main-content,
-.yahoo-results-section,
-.columns-container-yahoo {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-}
-
-.yahoo-two-column-layout {
-    display: grid !important;
-}
-
-.columns-container-yahoo {
-    display: grid !important;
-}
-
-/* ==========================================================================
-   Toast Notification - トースト通知
-   FIX: alert() replaced with user-friendly toast notifications
-   ========================================================================== */
-.toast-container {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 10000;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    pointer-events: none;
-}
-
-.toast {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 16px 20px;
-    border-radius: var(--gov-radius-md);
-    background: var(--gov-white);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    max-width: 400px;
-    pointer-events: auto;
-    transform: translateX(120%);
-    opacity: 0;
-    transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-.toast.show {
-    transform: translateX(0);
-    opacity: 1;
-}
-
-.toast.toast-error {
-    border-left: 4px solid var(--gov-red-500);
-}
-
-.toast.toast-success {
-    border-left: 4px solid var(--gov-green-500);
-}
-
-.toast.toast-warning {
-    border-left: 4px solid var(--gov-gold-500);
-}
-
-.toast.toast-info {
-    border-left: 4px solid var(--gov-blue-500);
-}
-
-.toast-icon {
-    flex-shrink: 0;
-    width: 24px;
-    height: 24px;
-}
-
-.toast-error .toast-icon {
-    color: var(--gov-red-500);
-}
-
-.toast-success .toast-icon {
-    color: var(--gov-green-500);
-}
-
-.toast-warning .toast-icon {
-    color: var(--gov-gold-500);
-}
-
-.toast-info .toast-icon {
-    color: var(--gov-blue-500);
-}
-
-.toast-content {
-    flex: 1;
-}
-
-.toast-title {
-    font-family: var(--gov-font-sans);
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--gov-gray-900);
-    margin: 0 0 4px 0;
-}
-
-.toast-message {
-    font-family: var(--gov-font-sans);
-    font-size: 13px;
-    color: var(--gov-gray-600);
-    margin: 0;
-    line-height: 1.5;
-}
-
-.toast-close {
-    flex-shrink: 0;
-    width: 20px;
-    height: 20px;
-    border: none;
-    background: transparent;
-    color: var(--gov-gray-400);
-    cursor: pointer;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: color 0.2s ease;
-}
-
-.toast-close:hover {
-    color: var(--gov-gray-600);
-}
-
-@media (max-width: 480px) {
-    .toast-container {
-        top: auto;
-        bottom: 20px;
-        left: 16px;
-        right: 16px;
-    }
-    
-    .toast {
-        max-width: 100%;
-    }
-}
-
-/* ==========================================================================
-   📚 補助金図鑑 - 本・辞典スタイル要素（アーカイブページ用）
-   ========================================================================== */
-
-/* ページの本風フレーム装飾（アーカイブ用） */
-.grant-archive-yahoo-style::after,
-.grant-category-archive::after,
-.grant-prefecture-archive::after {
-    content: '';
-    position: fixed;
-    top: 4px;
-    bottom: 0;
-    left: 0;
-    width: 5px;
-    background: linear-gradient(
-        180deg,
-        var(--gov-gold) 0%,
-        var(--gov-gold-light) 20%,
-        var(--gov-navy-300) 40%,
-        var(--gov-navy-200) 60%,
-        var(--gov-navy-300) 80%,
-        var(--gov-gold-light) 100%
-    );
-    z-index: 10;
-    box-shadow: 2px 0 8px rgba(0,0,0,0.08);
-    pointer-events: none;
-}
-
-@media (max-width: 768px) {
-    .grant-archive-yahoo-style::after,
-    .grant-category-archive::after,
-    .grant-prefecture-archive::after {
-        display: none;
-    }
-}
-
-/* 図鑑ヘッダー装飾（アーカイブ用） */
-.gov-zukan-header {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 12px 16px;
-    background: linear-gradient(135deg, var(--gov-navy-800) 0%, var(--gov-navy-900) 100%);
-    border-radius: var(--gov-radius-lg);
-    margin-bottom: 16px;
-    border-bottom: 3px solid var(--gov-gold);
-}
-
-.gov-zukan-header-icon {
-    width: 40px;
-    height: 40px;
-    flex-shrink: 0;
-}
-
-.gov-zukan-header-icon svg {
-    width: 100%;
-    height: 100%;
-}
-
-.gov-zukan-header-content {
-    flex: 1;
-}
-
-.gov-zukan-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 3px 10px;
-    background: var(--gov-gold);
-    color: var(--gov-navy-900);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    border-radius: 2px;
-    margin-bottom: 6px;
-}
-
-.gov-zukan-label svg {
-    width: 11px;
-    height: 11px;
-}
-
-.gov-zukan-entry {
-    font-family: var(--gov-font-mono);
-    font-size: 11px;
-    color: var(--gov-gold-light);
-    letter-spacing: 0.1em;
-}
-
-/* 図鑑風カードスタイル（アーカイブ用） */
-.gov-card-zukan-style {
-    position: relative;
-    border-left: 4px solid var(--gov-navy-300);
-    box-shadow: 
-        var(--gov-shadow-sm),
-        -3px 0 0 var(--gov-navy-200),
-        -6px 0 0 var(--gov-navy-100);
-    transition: all var(--gov-transition);
-}
-
-.gov-card-zukan-style:hover {
-    border-left-color: var(--gov-gold);
-}
-
-.gov-card-zukan-style::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: -4px;
-    width: 4px;
-    background: linear-gradient(
-        180deg,
-        var(--gov-gold) 0%,
-        var(--gov-gold-light) 50%,
-        var(--gov-gold) 100%
-    );
-    opacity: 0;
-    transition: opacity var(--gov-transition);
-}
-
-.gov-card-zukan-style:hover::before {
-    opacity: 1;
-}
-
-/* 図鑑エントリーバッジ（アーカイブ用） */
-.gov-entry-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 4px 10px;
-    background: linear-gradient(135deg, var(--gov-navy-800) 0%, var(--gov-navy-900) 100%);
-    color: var(--gov-gold);
-    font-family: var(--gov-font-mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    border-radius: 2px;
-}
-
-.gov-entry-badge svg {
-    width: 12px;
-    height: 12px;
-}
-
-/* しおり風リボン（アーカイブ用） */
-.gov-bookmark-ribbon {
-    position: absolute;
-    top: 0;
-    right: 16px;
-    width: 24px;
-    height: 56px;
-    background: linear-gradient(180deg, var(--gov-gold) 0%, #b8941f 100%);
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 85%, 0 100%);
-    box-shadow: 1px 2px 6px rgba(0,0,0,0.15);
-    z-index: 5;
-}
-
-/* 図鑑風セクション区切り */
-.gov-encyclopedia-divider {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin: 32px 0;
-    color: var(--gov-navy-400);
-}
-
-.gov-encyclopedia-divider::before,
-.gov-encyclopedia-divider::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(90deg, transparent 0%, var(--gov-navy-200) 50%, transparent 100%);
-}
-
-.gov-encyclopedia-divider svg {
-    width: 20px;
-    height: 20px;
-    color: var(--gov-gold);
 }
