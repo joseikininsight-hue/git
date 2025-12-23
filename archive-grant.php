@@ -321,46 +321,6 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
             }
             ?>
             
-            <!-- 検索バー（非表示：サイドバーに移動） -->
-            <section class="yahoo-search-section">
-                <div class="search-bar-wrapper">
-                    <label for="keyword-search" class="visually-hidden">キーワード検索</label>
-                    <div class="search-input-container">
-                        <svg class="search-icon" 
-                             width="20" 
-                             height="20" 
-                             viewBox="0 0 24 24" 
-                             fill="none" 
-                             stroke="currentColor" 
-                             stroke-width="2" 
-                             aria-hidden="true">
-                            <circle cx="11" cy="11" r="8"/>
-                            <path d="m21 21-4.35-4.35"/>
-                        </svg>
-                        <input type="text" 
-                               id="keyword-search" 
-                               class="search-input" 
-                               placeholder="助成金名、実施機関、対象事業で検索（スペース区切りでAND検索）..."
-                               aria-label="助成金を検索"
-                               autocomplete="off">
-                        <button class="search-clear-btn" 
-                                id="search-clear-btn" 
-                                style="display: none;" 
-                                aria-label="検索をクリア"
-                                type="button">×</button>
-                        <button class="search-execute-btn" 
-                                id="search-btn" 
-                                aria-label="検索を実行"
-                                type="button">検索</button>
-                    </div>
-                    <!-- 検索候補ドロップダウン -->
-                    <div class="search-suggestions" id="search-suggestions" style="display: none;">
-                        <div class="suggestions-header">検索候補</div>
-                        <ul class="suggestions-list" id="suggestions-list"></ul>
-                    </div>
-                </div>
-            </section>
-
             <!-- モバイル用フィルター開閉ボタン -->
             <button class="mobile-filter-toggle" id="mobile-filter-toggle" type="button" aria-label="フィルターを開く">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -1173,6 +1133,175 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
         <!-- サイドバー（PC only） - 図鑑スタイル -->
         <aside class="yahoo-sidebar zukan-sidebar" role="complementary" aria-label="サイドバー">
             
+            <!-- サイドバー検索ウィジェット -->
+            <section class="sidebar-widget sidebar-search-widget">
+                <h3 class="widget-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="m21 21-4.35-4.35"/>
+                    </svg>
+                    キーワード検索
+                </h3>
+                <div class="widget-content">
+                    <div class="sidebar-search-form">
+                        <input type="text" 
+                               id="sidebar-keyword-search" 
+                               class="sidebar-search-input" 
+                               placeholder="助成金名・キーワードで検索"
+                               aria-label="キーワード検索">
+                        <button type="button" 
+                                id="sidebar-search-btn" 
+                                class="sidebar-search-btn"
+                                aria-label="検索">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"/>
+                                <path d="m21 21-4.35-4.35"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- サイドバー絞り込みウィジェット -->
+            <section class="sidebar-widget sidebar-filter-widget">
+                <h3 class="widget-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+                    </svg>
+                    絞り込み
+                </h3>
+                <div class="widget-content">
+                    
+                    <!-- カテゴリフィルター -->
+                    <div class="sidebar-filter-group" id="sidebar-category-filter">
+                        <button type="button" class="sidebar-filter-toggle" aria-expanded="false">
+                            <span class="filter-group-label">カテゴリ</span>
+                            <span class="filter-selected-count" id="category-selected-count" style="display: none;">0</span>
+                            <svg class="toggle-arrow" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M7 10l5 5 5-5z"/>
+                            </svg>
+                        </button>
+                        <div class="sidebar-filter-options" style="display: none;">
+                            <?php foreach (array_slice($all_categories, 0, 8) as $index => $category): ?>
+                            <label class="sidebar-filter-option">
+                                <input type="checkbox" 
+                                       name="sidebar_category[]" 
+                                       value="<?php echo esc_attr($category->slug); ?>">
+                                <span class="checkbox-custom"></span>
+                                <span class="option-label"><?php echo esc_html($category->name); ?></span>
+                                <span class="option-count"><?php echo $category->count; ?></span>
+                            </label>
+                            <?php endforeach; ?>
+                            <?php if (count($all_categories) > 8): ?>
+                            <button type="button" class="sidebar-filter-more" data-target="category">さらに表示</button>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <!-- 地域フィルター -->
+                    <div class="sidebar-filter-group" id="sidebar-region-filter">
+                        <button type="button" class="sidebar-filter-toggle" aria-expanded="false">
+                            <span class="filter-group-label">地域</span>
+                            <span class="filter-selected-count" id="region-selected-count" style="display: none;">0</span>
+                            <svg class="toggle-arrow" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M7 10l5 5 5-5z"/>
+                            </svg>
+                        </button>
+                        <div class="sidebar-filter-options" style="display: none;">
+                            <?php foreach ($region_groups as $region_slug => $region_name): ?>
+                            <label class="sidebar-filter-option">
+                                <input type="checkbox" 
+                                       name="sidebar_region[]" 
+                                       value="<?php echo esc_attr($region_slug); ?>">
+                                <span class="checkbox-custom"></span>
+                                <span class="option-label"><?php echo esc_html($region_name); ?></span>
+                            </label>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+
+                    <!-- 助成金額フィルター -->
+                    <div class="sidebar-filter-group" id="sidebar-amount-filter">
+                        <button type="button" class="sidebar-filter-toggle" aria-expanded="false">
+                            <span class="filter-group-label">助成金額</span>
+                            <span class="filter-selected-count" id="amount-selected-count" style="display: none;">0</span>
+                            <svg class="toggle-arrow" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M7 10l5 5 5-5z"/>
+                            </svg>
+                        </button>
+                        <div class="sidebar-filter-options" style="display: none;">
+                            <label class="sidebar-filter-option">
+                                <input type="checkbox" name="sidebar_amount[]" value="0-100">
+                                <span class="checkbox-custom"></span>
+                                <span class="option-label">〜100万円</span>
+                            </label>
+                            <label class="sidebar-filter-option">
+                                <input type="checkbox" name="sidebar_amount[]" value="100-500">
+                                <span class="checkbox-custom"></span>
+                                <span class="option-label">100万円〜500万円</span>
+                            </label>
+                            <label class="sidebar-filter-option">
+                                <input type="checkbox" name="sidebar_amount[]" value="500-1000">
+                                <span class="checkbox-custom"></span>
+                                <span class="option-label">500万円〜1000万円</span>
+                            </label>
+                            <label class="sidebar-filter-option">
+                                <input type="checkbox" name="sidebar_amount[]" value="1000-3000">
+                                <span class="checkbox-custom"></span>
+                                <span class="option-label">1000万円〜3000万円</span>
+                            </label>
+                            <label class="sidebar-filter-option">
+                                <input type="checkbox" name="sidebar_amount[]" value="3000+">
+                                <span class="checkbox-custom"></span>
+                                <span class="option-label">3000万円以上</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- 募集状況フィルター -->
+                    <div class="sidebar-filter-group" id="sidebar-status-filter">
+                        <button type="button" class="sidebar-filter-toggle" aria-expanded="false">
+                            <span class="filter-group-label">募集状況</span>
+                            <span class="filter-selected-count" id="status-selected-count" style="display: none;">0</span>
+                            <svg class="toggle-arrow" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M7 10l5 5 5-5z"/>
+                            </svg>
+                        </button>
+                        <div class="sidebar-filter-options" style="display: none;">
+                            <label class="sidebar-filter-option">
+                                <input type="checkbox" name="sidebar_status[]" value="active">
+                                <span class="checkbox-custom"></span>
+                                <span class="option-label">募集中</span>
+                            </label>
+                            <label class="sidebar-filter-option">
+                                <input type="checkbox" name="sidebar_status[]" value="upcoming">
+                                <span class="checkbox-custom"></span>
+                                <span class="option-label">募集予定</span>
+                            </label>
+                            <label class="sidebar-filter-option">
+                                <input type="checkbox" name="sidebar_status[]" value="closed">
+                                <span class="checkbox-custom"></span>
+                                <span class="option-label">募集終了</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- フィルター適用ボタン -->
+                    <div class="sidebar-filter-actions">
+                        <button type="button" id="sidebar-apply-filter" class="sidebar-apply-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            この条件で検索
+                        </button>
+                        <button type="button" id="sidebar-reset-filter" class="sidebar-reset-btn">
+                            リセット
+                        </button>
+                    </div>
+
+                </div>
+            </section>
+
             <?php 
             // アーカイブSEOコンテンツ: サイドバー追加コンテンツ
             if (function_exists('gi_output_archive_sidebar_content')) {
@@ -1371,7 +1500,165 @@ document.addEventListener('DOMContentLoaded', function() {
             fixedTag: ''
         });
     }
+    
+    // サイドバーフィルターの初期化
+    initSidebarFilters();
 });
+
+/**
+ * サイドバーフィルターの初期化
+ */
+function initSidebarFilters() {
+    // フィルターグループのトグル
+    var filterToggles = document.querySelectorAll('.sidebar-filter-toggle');
+    filterToggles.forEach(function(toggle) {
+        toggle.addEventListener('click', function() {
+            var isExpanded = this.getAttribute('aria-expanded') === 'true';
+            var options = this.nextElementSibling;
+            
+            this.setAttribute('aria-expanded', !isExpanded);
+            if (options) {
+                options.style.display = isExpanded ? 'none' : 'block';
+            }
+        });
+    });
+    
+    // チェックボックス変更時のカウント更新
+    var checkboxes = document.querySelectorAll('.sidebar-filter-option input[type="checkbox"]');
+    checkboxes.forEach(function(checkbox) {
+        checkbox.addEventListener('change', function() {
+            updateFilterCounts();
+        });
+    });
+    
+    // サイドバー検索ボタン
+    var sidebarSearchBtn = document.getElementById('sidebar-search-btn');
+    var sidebarSearchInput = document.getElementById('sidebar-keyword-search');
+    
+    if (sidebarSearchBtn && sidebarSearchInput) {
+        sidebarSearchBtn.addEventListener('click', function() {
+            applySidebarFilters();
+        });
+        
+        sidebarSearchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                applySidebarFilters();
+            }
+        });
+    }
+    
+    // フィルター適用ボタン
+    var applyBtn = document.getElementById('sidebar-apply-filter');
+    if (applyBtn) {
+        applyBtn.addEventListener('click', function() {
+            applySidebarFilters();
+        });
+    }
+    
+    // リセットボタン
+    var resetBtn = document.getElementById('sidebar-reset-filter');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', function() {
+            resetSidebarFilters();
+        });
+    }
+}
+
+/**
+ * フィルターカウントを更新
+ */
+function updateFilterCounts() {
+    var filterGroups = document.querySelectorAll('.sidebar-filter-group');
+    filterGroups.forEach(function(group) {
+        var checkedCount = group.querySelectorAll('input[type="checkbox"]:checked').length;
+        var countBadge = group.querySelector('.filter-selected-count');
+        if (countBadge) {
+            if (checkedCount > 0) {
+                countBadge.textContent = checkedCount;
+                countBadge.style.display = 'inline-flex';
+            } else {
+                countBadge.style.display = 'none';
+            }
+        }
+    });
+}
+
+/**
+ * サイドバーフィルターを適用
+ */
+function applySidebarFilters() {
+    if (typeof ArchiveCommon === 'undefined') return;
+    
+    var state = ArchiveCommon.state;
+    
+    // キーワード検索
+    var searchInput = document.getElementById('sidebar-keyword-search');
+    if (searchInput && searchInput.value.trim()) {
+        state.filters.search = searchInput.value.trim();
+        // メインの検索欄にも反映
+        var mainSearch = document.getElementById('keyword-search');
+        if (mainSearch) mainSearch.value = searchInput.value.trim();
+    }
+    
+    // カテゴリ
+    var categoryCheckboxes = document.querySelectorAll('input[name="sidebar_category[]"]:checked');
+    if (categoryCheckboxes.length > 0) {
+        state.filters.category = Array.from(categoryCheckboxes).map(function(cb) { return cb.value; });
+    } else {
+        state.filters.category = [];
+    }
+    
+    // 地域（都道府県フィルタリング用）
+    var regionCheckboxes = document.querySelectorAll('input[name="sidebar_region[]"]:checked');
+    if (regionCheckboxes.length > 0) {
+        state.filters.region = regionCheckboxes[0].value; // 最初の選択のみ使用
+    }
+    
+    // 助成金額
+    var amountCheckboxes = document.querySelectorAll('input[name="sidebar_amount[]"]:checked');
+    if (amountCheckboxes.length > 0) {
+        state.filters.amount = amountCheckboxes[0].value; // 最初の選択のみ使用
+    }
+    
+    // 募集状況
+    var statusCheckboxes = document.querySelectorAll('input[name="sidebar_status[]"]:checked');
+    if (statusCheckboxes.length > 0) {
+        state.filters.status = statusCheckboxes[0].value;
+    }
+    
+    // 検索実行
+    state.currentPage = 1;
+    ArchiveCommon.loadGrants();
+    ArchiveCommon.updateActiveFiltersDisplay();
+    
+    // 結果エリアへスクロール
+    var resultsHeader = document.querySelector('.results-header');
+    if (resultsHeader) {
+        resultsHeader.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+/**
+ * サイドバーフィルターをリセット
+ */
+function resetSidebarFilters() {
+    // 全チェックボックスをリセット
+    var checkboxes = document.querySelectorAll('.sidebar-filter-option input[type="checkbox"]');
+    checkboxes.forEach(function(cb) { cb.checked = false; });
+    
+    // 検索欄をクリア
+    var searchInput = document.getElementById('sidebar-keyword-search');
+    if (searchInput) searchInput.value = '';
+    
+    // カウントバッジをリセット
+    updateFilterCounts();
+    
+    // ArchiveCommonのリセットを呼び出し
+    if (typeof ArchiveCommon !== 'undefined') {
+        ArchiveCommon.resetAllFilters();
+    }
+}
 </script>
 
 <?php 

@@ -316,10 +316,17 @@ body.zukan-theme,
 }
 
 /* ==========================================================================
-   Search Section - 検索バー（メインコンテンツ内）
+   Search Section - 検索バー（メインコンテンツ内）- デスクトップでは非表示
    ========================================================================== */
 .zukan-archive .yahoo-search-section {
     margin-bottom: 24px;
+    display: none; /* サイドバーに移動したため非表示 */
+}
+
+@media (max-width: 1023px) {
+    .zukan-archive .yahoo-search-section {
+        display: block;
+    }
 }
 
 .zukan-archive .search-bar-wrapper {
@@ -1456,6 +1463,288 @@ body.zukan-theme,
 .zukan-archive .categories-count {
     font-size: 11px;
     color: #9ca3af;
+}
+
+/* ==========================================================================
+   Sidebar Search Widget - サイドバー検索
+   ========================================================================== */
+.zukan-archive .sidebar-search-widget {
+    position: relative;
+}
+
+.zukan-archive .sidebar-search-form {
+    display: flex;
+    border: 1px solid #d1d5db;
+    border-radius: 2px;
+    overflow: hidden;
+    background: #f9fafb;
+}
+
+.zukan-archive .sidebar-search-input {
+    flex: 1;
+    border: none;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-family: var(--zukan-font-sans);
+    background: transparent;
+    color: var(--zukan-ink-primary);
+    min-width: 0;
+}
+
+.zukan-archive .sidebar-search-input::placeholder {
+    color: #9ca3af;
+}
+
+.zukan-archive .sidebar-search-input:focus {
+    outline: none;
+}
+
+.zukan-archive .sidebar-search-form:focus-within {
+    border-color: var(--zukan-accent-gold);
+}
+
+.zukan-archive .sidebar-search-btn {
+    flex-shrink: 0;
+    padding: 10px 14px;
+    background: var(--zukan-ink-primary);
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color var(--zukan-transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.zukan-archive .sidebar-search-btn:hover {
+    background: #374151;
+}
+
+/* ==========================================================================
+   Sidebar Filter Widget - サイドバー絞り込み
+   ========================================================================== */
+.zukan-archive .sidebar-filter-widget {
+    position: relative;
+}
+
+.zukan-archive .sidebar-filter-group {
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.zukan-archive .sidebar-filter-group:last-of-type {
+    border-bottom: none;
+}
+
+.zukan-archive .sidebar-filter-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: var(--zukan-font-sans);
+    transition: color var(--zukan-transition);
+}
+
+.zukan-archive .sidebar-filter-toggle:hover {
+    color: var(--zukan-accent-red);
+}
+
+.zukan-archive .filter-group-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--zukan-ink-primary);
+}
+
+.zukan-archive .filter-selected-count {
+    background: var(--zukan-accent-red);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 8px;
+}
+
+.zukan-archive .toggle-arrow {
+    color: #9ca3af;
+    transition: transform var(--zukan-transition);
+}
+
+.zukan-archive .sidebar-filter-toggle[aria-expanded="true"] .toggle-arrow {
+    transform: rotate(180deg);
+}
+
+.zukan-archive .sidebar-filter-options {
+    padding: 0 0 12px;
+    max-height: 240px;
+    overflow-y: auto;
+}
+
+/* Custom Checkbox スタイル */
+.zukan-archive .sidebar-filter-option {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--zukan-ink-light);
+    transition: color var(--zukan-transition);
+}
+
+.zukan-archive .sidebar-filter-option:hover {
+    color: var(--zukan-ink-primary);
+}
+
+.zukan-archive .sidebar-filter-option input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.zukan-archive .checkbox-custom {
+    width: 16px;
+    height: 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 2px;
+    margin-right: 10px;
+    flex-shrink: 0;
+    background: #fff;
+    position: relative;
+    transition: all var(--zukan-transition);
+}
+
+.zukan-archive .sidebar-filter-option input[type="checkbox"]:checked + .checkbox-custom {
+    background: var(--zukan-ink-primary);
+    border-color: var(--zukan-ink-primary);
+}
+
+.zukan-archive .sidebar-filter-option input[type="checkbox"]:checked + .checkbox-custom::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 4px;
+    height: 8px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.zukan-archive .sidebar-filter-option input[type="checkbox"]:focus + .checkbox-custom {
+    box-shadow: 0 0 0 2px rgba(197, 160, 89, 0.3);
+}
+
+.zukan-archive .option-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.zukan-archive .option-count {
+    color: #9ca3af;
+    font-size: 11px;
+    margin-left: 4px;
+}
+
+.zukan-archive .sidebar-filter-more {
+    display: block;
+    width: 100%;
+    padding: 8px;
+    background: transparent;
+    border: 1px dashed #d1d5db;
+    border-radius: 2px;
+    color: #6b7280;
+    font-size: 12px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: all var(--zukan-transition);
+}
+
+.zukan-archive .sidebar-filter-more:hover {
+    background: #f9fafb;
+    border-color: var(--zukan-accent-gold);
+    color: var(--zukan-ink-primary);
+}
+
+/* フィルターアクションボタン */
+.zukan-archive .sidebar-filter-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.zukan-archive .sidebar-apply-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 12px;
+    background: var(--zukan-ink-primary);
+    color: #fff;
+    border: none;
+    border-radius: 2px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: var(--zukan-font-sans);
+    cursor: pointer;
+    transition: all var(--zukan-transition);
+}
+
+.zukan-archive .sidebar-apply-btn:hover {
+    background: #374151;
+}
+
+.zukan-archive .sidebar-reset-btn {
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    color: #6b7280;
+    border: 1px solid #d1d5db;
+    border-radius: 2px;
+    font-size: 12px;
+    font-family: var(--zukan-font-sans);
+    cursor: pointer;
+    transition: all var(--zukan-transition);
+}
+
+.zukan-archive .sidebar-reset-btn:hover {
+    background: #f9fafb;
+    border-color: var(--zukan-accent-red);
+    color: var(--zukan-accent-red);
+}
+
+/* ==========================================================================
+   Main Content Filter (hidden on desktop, visible on mobile)
+   ========================================================================== */
+@media (min-width: 1024px) {
+    .zukan-archive .yahoo-filter-section {
+        display: none;
+    }
+    
+    .zukan-archive .mobile-filter-toggle {
+        display: none;
+    }
+}
+
+@media (max-width: 1023px) {
+    .zukan-archive .sidebar-search-widget,
+    .zukan-archive .sidebar-filter-widget {
+        display: none;
+    }
+    
+    .zukan-archive .yahoo-filter-section {
+        display: block;
+    }
 }
 
 /* Ad Space */
