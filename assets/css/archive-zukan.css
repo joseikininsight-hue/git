@@ -266,11 +266,25 @@ body.zukan-theme,
     color: #6b7280;
 }
 
-.zukan-archive .total-count strong {
+.zukan-archive .total-count strong,
+.zukan-archive #result-count {
     color: var(--zukan-accent-red);
     font-weight: 700;
     font-size: 1.25rem;
     font-family: var(--zukan-font-sans);
+}
+
+.zukan-archive .results-info {
+    flex: 1;
+}
+
+.zukan-archive .yahoo-results-section .results-header {
+    margin-bottom: 24px;
+}
+
+.zukan-archive .yahoo-results-section .results-title {
+    font-size: 1.125rem;
+    margin-bottom: 4px;
 }
 
 /* Sort Control */
@@ -365,14 +379,265 @@ body.zukan-theme,
 }
 
 /* ==========================================================================
-   Filter Section - フィルター（非表示またはサイドバーへ移動）
+   Filter Section - フィルター
    ========================================================================== */
 .zukan-archive .yahoo-filter-section {
+    margin-bottom: 24px;
+    padding: 20px 24px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 2px;
+}
+
+.zukan-archive .filter-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.zukan-archive .filter-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--zukan-ink-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+.zukan-archive .filter-title svg {
+    color: #6b7280;
+}
+
+.zukan-archive .filter-reset-all {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: transparent;
+    border: 1px solid #d1d5db;
+    color: #6b7280;
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all var(--zukan-transition);
+}
+
+.zukan-archive .filter-reset-all:hover {
+    background: #fff;
+    border-color: var(--zukan-accent-red);
+    color: var(--zukan-accent-red);
+}
+
+.zukan-archive .yahoo-filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .yahoo-filters-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+}
+
+/* フィルタードロップダウン */
+.zukan-archive .filter-dropdown-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.zukan-archive .filter-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 6px;
+    font-family: var(--zukan-font-sans);
+}
+
+.zukan-archive .custom-select {
+    position: relative;
+}
+
+.zukan-archive .select-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 2px;
+    font-size: 13px;
+    color: var(--zukan-ink-primary);
+    cursor: pointer;
+    transition: all var(--zukan-transition);
+}
+
+.zukan-archive .select-trigger:hover {
+    border-color: var(--zukan-accent-gold);
+}
+
+.zukan-archive .select-value {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.zukan-archive .select-arrow {
+    flex-shrink: 0;
+    color: #9ca3af;
+}
+
+.zukan-archive .select-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-top: none;
+    border-radius: 0 0 2px 2px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 100;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.zukan-archive .select-option {
+    padding: 8px 12px;
+    font-size: 13px;
+    color: var(--zukan-ink-primary);
+    cursor: pointer;
+    transition: background-color var(--zukan-transition);
+}
+
+.zukan-archive .select-option:hover {
+    background: #f3f4f6;
+}
+
+.zukan-archive .select-option.active {
+    background: var(--zukan-ink-primary);
+    color: #fff;
+}
+
+/* 複数選択バッジ */
+.zukan-archive .multi-select-badge {
+    background: var(--zukan-accent-red);
+    color: #fff;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 4px;
+}
+
+/* 選択中フィルター表示 */
+.zukan-archive .active-filters-display {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.zukan-archive .active-filters-label {
+    font-size: 12px;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.zukan-archive .active-filter-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+/* モバイルフィルタートグル */
+.zukan-archive .mobile-filter-toggle {
     display: none;
 }
 
-.zukan-archive .mobile-filter-toggle {
-    display: none;
+@media (max-width: 767px) {
+    .zukan-archive .mobile-filter-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        padding: 12px;
+        background: #fff;
+        border: 1px solid #d1d5db;
+        border-radius: 2px;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--zukan-ink-primary);
+        cursor: pointer;
+        margin-bottom: 16px;
+    }
+    
+    .zukan-archive .yahoo-filter-section {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1000;
+        background: #fff;
+        overflow-y: auto;
+        padding: 20px;
+        margin-bottom: 0;
+    }
+    
+    .zukan-archive .yahoo-filter-section.is-open {
+        display: block;
+    }
+    
+    .zukan-archive .mobile-filter-close {
+        display: block;
+        background: transparent;
+        border: none;
+        font-size: 24px;
+        color: #6b7280;
+        cursor: pointer;
+    }
+    
+    .zukan-archive .mobile-filter-apply-section {
+        position: sticky;
+        bottom: 0;
+        background: #fff;
+        padding: 16px 0;
+        border-top: 1px solid #e5e7eb;
+        margin-top: 20px;
+    }
+    
+    .zukan-archive .mobile-apply-filters-btn {
+        width: 100%;
+        padding: 14px;
+        background: var(--zukan-ink-primary);
+        color: #fff;
+        border: none;
+        border-radius: 2px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+}
+
+@media (min-width: 768px) {
+    .zukan-archive .mobile-filter-close,
+    .zukan-archive .mobile-filter-apply-section {
+        display: none;
+    }
 }
 
 /* ==========================================================================
@@ -766,12 +1031,17 @@ body.zukan-theme,
     font-size: 14px;
     font-weight: 700;
     margin-bottom: 8px;
+    color: #fff;
 }
 
 .zukan-archive .zukan-article-note-text {
     font-size: 12px;
-    color: #d1d5db;
+    color: #fff;
     line-height: 1.7;
+}
+
+.zukan-archive .zukan-article-note-text br + br {
+    display: none;
 }
 
 /* ==========================================================================

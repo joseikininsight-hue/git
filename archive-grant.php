@@ -817,10 +817,16 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                         <h2 class="results-title">検索結果</h2>
                         <div class="results-meta">
                             <span class="total-count">
-                                <strong id="current-count">0</strong>件
+                                <strong id="result-count"><?php echo isset($initial_grants_query) ? $initial_grants_query->found_posts : $total_grants; ?></strong>件
                             </span>
+                            <?php 
+                            $current_page = max(1, get_query_var('paged'));
+                            $per_page = 12;
+                            $from = ($current_page - 1) * $per_page + 1;
+                            $to = min($current_page * $per_page, isset($initial_grants_query) ? $initial_grants_query->found_posts : $total_grants);
+                            ?>
                             <span class="showing-range">
-                                （<span id="showing-from">1</span>〜<span id="showing-to">12</span>件を表示）
+                                （<span id="showing-from"><?php echo $from; ?></span>〜<span id="showing-to"><?php echo $to; ?></span>件を表示）
                             </span>
                         </div>
                     </div>
