@@ -1464,11 +1464,21 @@ function gi_output_archive_intro_content() {
     $content = gi_get_current_archive_seo_content();
     
     if ($content && !empty($content['intro_content'])) {
-        echo '<div class="gi-archive-seo-intro">';
-        echo '<div class="gi-seo-content-box">';
-        echo wp_kses_post($content['intro_content']);
-        echo '</div>';
-        echo '</div>';
+        ?>
+        <!-- Section 1: Trend Analysis (Essay Style) -->
+        <section id="trend" class="mb-20">
+            <div class="flex items-center mb-8">
+                <span class="text-4xl text-gray-200 font-serif font-bold mr-4 -mt-2">01</span>
+                <h2 class="text-2xl font-serif font-bold text-ink-primary border-b border-accent-gold pb-1 w-full">
+                    傾向と対策
+                </h2>
+            </div>
+            
+            <div class="prose prose-stone font-serif max-w-none text-justify leading-loose">
+                <?php echo wp_kses_post($content['intro_content']); ?>
+            </div>
+        </section>
+        <?php
     }
 }
 
@@ -1477,11 +1487,31 @@ function gi_output_archive_outro_content() {
     $content = gi_get_current_archive_seo_content();
     
     if ($content && !empty($content['outro_content'])) {
-        echo '<div class="gi-archive-seo-outro">';
-        echo '<div class="gi-seo-content-box">';
-        echo wp_kses_post($content['outro_content']);
-        echo '</div>';
-        echo '</div>';
+        ?>
+        <!-- Section 4: Article (Manuscript Style) -->
+        <section id="guide" class="relative pt-12 mt-12 border-t-4 border-double border-gray-300">
+            <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-paper-warm px-4 text-ink-secondary text-2xl">
+                ❦
+            </div>
+
+            <article class="prose prose-stone font-serif max-w-none">
+                <h2 class="text-3xl font-bold text-center mb-10 text-ink-primary">
+                    <span class="block text-sm font-normal text-gray-500 tracking-widest mb-2 uppercase">Special Feature</span>
+                    解説記事
+                </h2>
+                
+                <?php echo wp_kses_post($content['outro_content']); ?>
+                
+                <div class="mt-10 p-6 bg-gray-100 border border-gray-300 rounded-sm text-center">
+                    <p class="font-bold text-sm text-gray-800">※ 注意書き</p>
+                    <p class="text-xs text-gray-600 mt-2 leading-relaxed">
+                        本図鑑の記述は最新の情報に基づく。制度は生き物であり、常に変化する。
+                        最新の公募要領は、必ず公式の布告（公式サイト）にて確認されたし。
+                    </p>
+                </div>
+            </article>
+        </section>
+        <?php
     }
 }
 

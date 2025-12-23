@@ -48,6 +48,10 @@ module.exports = {
           'ink': '#2c3e50',          // インク色
           'spine': '#1e3a5f',        // 背表紙
         },
+        'desk-wood': '#2c241b',
+        'book-cover': '#1a2634',
+        'paper-shadow': '#e3dac9',
+        'ink-secondary': '#595959',
         // 難易度カラー
         'difficulty': {
           'low': '#10b981',          // 緑（易しい）
