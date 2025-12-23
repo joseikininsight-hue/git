@@ -250,21 +250,13 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
       itemscope 
       itemtype="https://schema.org/CollectionPage">
 
-    <!-- 📚 本・図鑑風パンくずリスト -->
+    <!-- シンプルなパンくずリスト -->
     <nav class="breadcrumb-nav book-breadcrumb" 
          aria-label="パンくずリスト" 
          itemscope 
          itemtype="https://schema.org/BreadcrumbList">
-        <div class="book-breadcrumb-spine"></div>
         <div class="yahoo-container">
             <div class="book-breadcrumb-inner">
-                <div class="book-breadcrumb-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-                        <path d="M8 7h8M8 11h5"/>
-                    </svg>
-                </div>
                 <ol class="breadcrumb-list">
                     <?php foreach ($breadcrumbs as $index => $breadcrumb): ?>
                     <li class="breadcrumb-item" 
@@ -276,17 +268,11 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                                itemprop="item"
                                class="book-breadcrumb-link"
                                title="<?php echo esc_attr($breadcrumb['name']); ?>へ移動">
-                                <span class="book-breadcrumb-chapter">第<?php echo $index + 1; ?>章</span>
-                                <span itemprop="name" class="book-breadcrumb-text"><?php echo esc_html($breadcrumb['name']); ?></span>
+                                <span itemprop="name"><?php echo esc_html($breadcrumb['name']); ?></span>
                             </a>
-                            <span class="book-breadcrumb-sep" aria-hidden="true">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
-                            </span>
+                            <span class="book-breadcrumb-sep" aria-hidden="true">&gt;</span>
                         <?php else: ?>
-                            <span class="book-breadcrumb-current">
-                                <span class="book-breadcrumb-chapter">本ページ</span>
-                                <span itemprop="name" class="book-breadcrumb-text"><?php echo esc_html($breadcrumb['name']); ?></span>
-                            </span>
+                            <span class="book-breadcrumb-current" itemprop="name"><?php echo esc_html($breadcrumb['name']); ?></span>
                         <?php endif; ?>
                         <meta itemprop="position" content="<?php echo $index + 1; ?>">
                     </li>
@@ -296,42 +282,32 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
         </div>
     </nav>
 
-    <!-- ヒーローセクション（図鑑式・タイトルページ風） -->
-    <header class="zukan-hero" 
-            itemscope 
-            itemtype="https://schema.org/WPHeader">
-        <span class="zukan-hero-badge">Subsidy Archive <?php echo $current_year; ?></span>
-        <h1 class="zukan-hero-title" itemprop="headline">
-            <?php echo esc_html($archive_title); ?>
-            <span class="zukan-hero-subtitle">令和<?php echo $current_year - 2018; ?>年度版 図鑑</span>
-        </h1>
-        <p class="zukan-hero-description" itemprop="description">
-            <?php echo esc_html($archive_description); ?>
-        </p>
-        <div class="zukan-ornament"><span class="zukan-ornament-symbol">❦</span></div>
-        
-        <!-- 統計情報 -->
-        <div class="zukan-stats-grid">
-            <div class="zukan-stat-item" itemscope itemtype="https://schema.org/QuantitativeValue">
-                <span class="zukan-stat-number" itemprop="value"><?php echo $total_grants_formatted; ?></span>
-                <span class="zukan-stat-label" itemprop="unitText">件の助成金</span>
-            </div>
-            <div class="zukan-stat-item">
-                <span class="zukan-stat-number"><?php echo $current_year; ?></span>
-                <span class="zukan-stat-label">年度版</span>
-            </div>
-            <div class="zukan-stat-item">
-                <span class="zukan-stat-number">47</span>
-                <span class="zukan-stat-label">都道府県対応</span>
-            </div>
-        </div>
-    </header>
+    <!-- ヒーローセクションは非表示（CSSで制御） -->
 
-    <!-- 2カラムレイアウト（図鑑スタイル） -->
+    <!-- 2カラムレイアウト -->
     <div class="yahoo-container yahoo-two-column-layout zukan-two-column">
         
         <!-- メインコンテンツ -->
         <div class="yahoo-main-content zukan-main-content">
+            
+            <!-- ページタイトルエリア -->
+            <div class="results-header" style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #f3f4f6;">
+                <div>
+                    <h1 class="results-title" style="font-size: 1.5rem; font-weight: 700; margin-bottom: 8px;"><?php echo esc_html($archive_title); ?></h1>
+                    <p class="results-meta" style="font-size: 14px; color: #6b7280;">
+                        条件に合致した制度：<strong style="color: #a63737; font-size: 1.25rem; font-weight: 700;" id="current-count"><?php echo $total_grants_formatted; ?></strong> 件
+                    </p>
+                </div>
+                <div class="view-controls" style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 12px; color: #9ca3af;">並び替え:</span>
+                    <select id="sort-select-simple" style="background: #fff; border: 1px solid #d1d5db; font-size: 13px; border-radius: 2px; padding: 6px 10px; color: #6b7280; cursor: pointer;">
+                        <option value="date_desc">新着順</option>
+                        <option value="deadline_asc">締切が近い順</option>
+                        <option value="amount_desc">補助額が高い順</option>
+                        <option value="popular_desc">人気順</option>
+                    </select>
+                </div>
+            </div>
             
             <?php 
             // アーカイブSEOコンテンツ: おすすめ記事
@@ -345,7 +321,7 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
             }
             ?>
             
-            <!-- 検索バー -->
+            <!-- 検索バー（非表示：サイドバーに移動） -->
             <section class="yahoo-search-section">
                 <div class="search-bar-wrapper">
                     <label for="keyword-search" class="visually-hidden">キーワード検索</label>

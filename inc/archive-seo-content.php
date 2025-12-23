@@ -1464,8 +1464,8 @@ function gi_output_archive_intro_content() {
     $content = gi_get_current_archive_seo_content();
     
     if ($content && !empty($content['intro_content'])) {
-        echo '<div class="gi-archive-seo-intro" style="margin-bottom: 30px;">';
-        echo '<div class="gi-seo-content-box" style="background: linear-gradient(135deg, #fdfbf7 0%, #f8f6f0 100%); padding: 25px 30px; border-radius: 12px; border-left: 4px solid #d4af37; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">';
+        echo '<div class="gi-archive-seo-intro">';
+        echo '<div class="gi-seo-content-box">';
         echo wp_kses_post($content['intro_content']);
         echo '</div>';
         echo '</div>';
@@ -1477,8 +1477,8 @@ function gi_output_archive_outro_content() {
     $content = gi_get_current_archive_seo_content();
     
     if ($content && !empty($content['outro_content'])) {
-        echo '<div class="gi-archive-seo-outro" style="margin-top: 30px;">';
-        echo '<div class="gi-seo-content-box" style="background: linear-gradient(135deg, #fdfbf7 0%, #f8f6f0 100%); padding: 25px 30px; border-radius: 12px; border-left: 4px solid #d4af37; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">';
+        echo '<div class="gi-archive-seo-outro">';
+        echo '<div class="gi-seo-content-box">';
         echo wp_kses_post($content['outro_content']);
         echo '</div>';
         echo '</div>';
@@ -1493,38 +1493,32 @@ function gi_output_archive_featured_posts() {
         $posts = gi_get_featured_posts_for_archive($content['featured_posts']);
         
         if (!empty($posts)) {
-            echo '<div class="gi-archive-featured-posts" style="margin-bottom: 30px;">';
-            echo '<h2 style="font-family: \'Noto Serif JP\', serif; font-size: 1.3rem; color: #2c3e50; margin-bottom: 20px; padding-left: 15px; border-left: 4px solid #d4af37;">おすすめの助成金・補助金</h2>';
-            echo '<div class="gi-featured-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">';
+            echo '<div class="gi-archive-featured-posts">';
+            echo '<h2>おすすめの助成金・補助金</h2>';
+            echo '<div class="gi-featured-grid">';
             
             foreach ($posts as $post) {
-                $max_amount = get_field('max_amount', $post->ID) ?: '要確認';
-                $deadline = get_field('deadline', $post->ID) ?: '';
+                $max_amount = get_post_meta($post->ID, 'grant_amount_max', true);
+                $max_amount_display = $max_amount ? number_format($max_amount) . '万円' : '要確認';
+                $deadline = get_post_meta($post->ID, 'deadline_date', true);
+                $deadline_display = $deadline ? date('Y/m/d', strtotime($deadline)) : '';
                 $prefecture_terms = get_the_terms($post->ID, 'grant_prefecture');
                 $prefecture_name = ($prefecture_terms && !is_wp_error($prefecture_terms)) ? $prefecture_terms[0]->name : '全国';
                 
-                echo '<a href="' . get_permalink($post->ID) . '" class="gi-featured-card" style="display: block; background: #fff; border-radius: 10px; padding: 20px; text-decoration: none; color: inherit; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: transform 0.2s, box-shadow 0.2s;">';
-                echo '<div class="gi-featured-card-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">';
-                echo '<span style="background: #2c3e50; color: #fff; font-size: 11px; padding: 3px 8px; border-radius: 3px;">' . esc_html($prefecture_name) . '</span>';
-                if ($deadline) {
-                    echo '<span style="color: #e74c3c; font-size: 12px;">締切: ' . esc_html($deadline) . '</span>';
+                echo '<a href="' . get_permalink($post->ID) . '" class="gi-featured-card">';
+                echo '<div class="gi-featured-card-header">';
+                echo '<span class="gi-featured-prefecture">' . esc_html($prefecture_name) . '</span>';
+                if ($deadline_display) {
+                    echo '<span class="gi-featured-deadline">締切: ' . esc_html($deadline_display) . '</span>';
                 }
                 echo '</div>';
-                echo '<h3 style="font-size: 15px; font-weight: 600; color: #2c3e50; margin: 0 0 10px; line-height: 1.5;">' . esc_html($post->post_title) . '</h3>';
-                echo '<div style="font-size: 18px; font-weight: bold; color: #d4af37;">上限 ' . esc_html($max_amount) . '</div>';
+                echo '<h3>' . esc_html($post->post_title) . '</h3>';
+                echo '<div class="gi-featured-amount">上限 ' . esc_html($max_amount_display) . '</div>';
                 echo '</a>';
             }
             
             echo '</div>';
             echo '</div>';
-            
-            // ホバースタイル
-            echo '<style>
-            .gi-featured-card:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-            }
-            </style>';
         }
     }
 }
