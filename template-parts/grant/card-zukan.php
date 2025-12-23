@@ -1,10 +1,16 @@
 <?php
 /**
- * Template Part: Grant Card - Editor's Pick Style
- * 書籍風デザイン（クリップ留めカードスタイル）
+ * Template Part: Grant Card - Zukan Dictionary Style (Enhanced v6.0)
+ * 補助金図鑑 - 辞書風カードデザイン（リッチ版）
+ * 
+ * Design inspiration from paper-sheet style with:
+ * - Left accent line for visual hierarchy
+ * - Clear meta information layout  
+ * - Enhanced typography and spacing
+ * - Ribbon markers for special items
  * 
  * @package Grant_Insight_Perfect
- * @version 4.1.0
+ * @version 6.0.0
  */
 
 // セキュリティチェック
@@ -30,35 +36,41 @@ $category_label = ($categories && !is_wp_error($categories)) ? $categories[0]->n
 // 締切日計算
 $days_left = null;
 $is_urgent = false;
-$deadline_display = '随時受付'; // デフォルト
+$deadline_display = '随時受付';
 
 if ($deadline) {
     $deadline_date = new DateTime($deadline);
     $now = new DateTime();
     $diff = $now->diff($deadline_date);
     
-    // 過去の日付でない場合
     if ($diff->invert == 0) {
         $days_left = $diff->days;
-        $is_urgent = ($days_left <= 14); // 2週間前なら緊急表示
+        $is_urgent = ($days_left <= 14);
     }
     $deadline_display = date('Y年n月j日', strtotime($deadline));
 }
 
-// 金額フォーマット (例: 3000000 -> 300万円, 100000000 -> 1億円)
+// 金額フォーマット
 $amount_formatted = '金額不明';
+$amount_class = '';
 if ($amount) {
     if ($amount >= 100000000) {
         $amount_formatted = ($amount / 100000000) . '億円';
+        $amount_class = 'amount-large';
+    } elseif ($amount >= 10000000) {
+        $amount_formatted = number_format($amount / 10000) . '万円';
+        $amount_class = 'amount-large';
     } elseif ($amount >= 10000) {
         $amount_formatted = number_format($amount / 10000) . '万円';
+    } else {
+        $amount_formatted = number_format($amount) . '円';
     }
 }
 
 // 抜粋文の生成
 $excerpt = get_the_excerpt();
 if (empty($excerpt)) {
-    $excerpt = wp_trim_words(strip_tags(get_the_content()), 80, '...');
+    $excerpt = wp_trim_words(strip_tags(get_the_content()), 60, '...');
 }
 
 // タグ（最大3つまで）
@@ -70,46 +82,93 @@ if ($tags && !is_wp_error($tags)) {
     }
 }
 
+// ステータスラベル
+$status_labels = array(
+    'open' => '募集中',
+    'upcoming' => '募集予定',
+    'closed' => '募集終了',
+);
+$status_label = isset($status_labels[$status]) ? $status_labels[$status] : '';
+$status_class = $status === 'open' ? 'status-open' : ($status === 'closed' ? 'status-closed' : '');
+
 // ==================================================
-// 2. HTML出力
+// 2. HTML出力 - Paper Sheet Style Card
 // ==================================================
 ?>
 
-<article <?php post_class('group py-6 border-b border-gray-200 border-dashed hover:bg-gray-50 transition-colors px-2'); ?>>
-    <a href="<?php the_permalink(); ?>" class="block">
-        <div class="flex flex-col md:flex-row gap-4 items-start">
-            <div class="md:w-1/4">
-                <span class="font-serif font-bold text-xs bg-book-cover text-white px-2 py-1 mb-2 inline-block">
-                    <?php echo esc_html($category_label); ?>
+<article <?php post_class('zukan-grant-card-v2 group'); ?>>
+    <a href="<?php the_permalink(); ?>" class="card-inner-v2">
+        
+        <!-- 左側アクセントライン -->
+        <div class="card-accent-line"></div>
+        
+        <!-- カテゴリバッジ（左上） -->
+        <div class="card-category-badge">
+            <?php echo esc_html($category_label); ?>
+        </div>
+        
+        <?php if ($is_featured || $is_urgent): ?>
+        <!-- リボンマーク（注目/緊急） -->
+        <div class="card-ribbon <?php echo $is_urgent ? 'ribbon-urgent' : 'ribbon-featured'; ?>"></div>
+        <?php endif; ?>
+        
+        <!-- メインコンテンツエリア -->
+        <div class="card-body-v2">
+            <!-- ヘッダー部分 -->
+            <div class="card-header-v2">
+                <span class="card-organizer"><?php echo $organizer ? esc_html($organizer) : '情報不明'; ?></span>
+                <?php if ($status_label): ?>
+                <span class="card-status <?php echo esc_attr($status_class); ?>"><?php echo esc_html($status_label); ?></span>
+                <?php endif; ?>
+            </div>
+            
+            <!-- タイトル -->
+            <h3 class="card-title-v2"><?php the_title(); ?></h3>
+            
+            <!-- 説明文 -->
+            <p class="card-excerpt-v2"><?php echo esc_html($excerpt); ?></p>
+            
+            <!-- タグ -->
+            <?php if (!empty($tag_list)): ?>
+            <div class="card-tags-v2">
+                <?php foreach ($tag_list as $tag): ?>
+                <span class="card-tag">#<?php echo esc_html($tag); ?></span>
+                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
+        </div>
+        
+        <!-- メタ情報（右側） -->
+        <div class="card-meta-v2">
+            <div class="meta-item meta-amount">
+                <span class="meta-label">MAX AMOUNT</span>
+                <span class="meta-value <?php echo esc_attr($amount_class); ?>"><?php echo esc_html($amount_formatted); ?></span>
+            </div>
+            <div class="meta-item meta-rate">
+                <span class="meta-label">Rate</span>
+                <span class="meta-value"><?php echo $rate ? esc_html($rate) : '要確認'; ?></span>
+            </div>
+            <div class="meta-item meta-deadline">
+                <span class="meta-label">Deadline</span>
+                <span class="meta-value <?php echo $is_urgent ? 'deadline-urgent' : ''; ?>">
+                    <svg class="deadline-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    <?php echo $deadline ? esc_html($deadline_display) : '随時'; ?>
                 </span>
-                <div class="text-[10px] text-gray-500 font-sans mt-1">
-                    <?php echo $organizer ? esc_html($organizer) : '主催機関不明'; ?>
-                </div>
             </div>
-            <div class="md:w-1/2">
-                <h3 class="text-lg font-serif font-bold text-ink-primary mb-2 group-hover:text-accent-red transition-colors">
-                    <?php the_title(); ?>
-                </h3>
-                <p class="text-sm text-gray-600 font-serif leading-relaxed mb-2 line-clamp-2">
-                    <?php echo esc_html($excerpt); ?>
-                </p>
-                <div class="mt-1">
-                    <?php foreach ($tag_list as $tag): ?>
-                        <span class="inline-block bg-gray-200 text-gray-600 text-[10px] px-2 py-0.5 rounded-full mr-1">
-                            <?php echo esc_html($tag); ?>
-                        </span>
-                    <?php endforeach; ?>
-                </div>
+            <?php if ($is_urgent && $days_left !== null): ?>
+            <div class="meta-urgent-badge">
+                あと<?php echo $days_left; ?>日
             </div>
-            <div class="md:w-1/4 flex flex-col items-end justify-center text-right">
-                <div class="text-xs text-gray-500 mb-1">補助上限</div>
-                <div class="font-bold text-ink-primary font-serif text-lg border-b border-accent-gold leading-none pb-1">
-                    <?php echo esc_html($amount_formatted); ?>
-                </div>
-                <div class="text-xs text-gray-400 mt-2">
-                    補助率: <?php echo $rate ? esc_html($rate) : '要確認'; ?>
-                </div>
+            <?php endif; ?>
+            <div class="card-action-v2">
+                <span>View Details</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14m-7-7l7 7-7 7"/>
+                </svg>
             </div>
         </div>
+        
     </a>
 </article>

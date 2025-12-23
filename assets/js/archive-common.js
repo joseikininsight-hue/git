@@ -1909,26 +1909,47 @@
     };
     
     /**
-     * サイドバーフィルターの初期化
+     * サイドバーフィルターの初期化（重複防止版）
      */
+    var archiveCommonSidebarInitialized = false;
+    
     ArchiveCommon.initSidebarFilters = function() {
+        // 重複初期化を防止
+        if (archiveCommonSidebarInitialized) {
+            console.log('📋 ArchiveCommon sidebar filters already initialized, skipping...');
+            return;
+        }
+        archiveCommonSidebarInitialized = true;
+        
         var self = this;
-        console.log('📋 Initializing sidebar filters...');
+        console.log('📋 Initializing ArchiveCommon sidebar filters...');
         
         // フィルターグループのトグル
         var filterToggles = document.querySelectorAll('.sidebar-filter-toggle');
         console.log('  Found', filterToggles.length, 'filter toggles');
         
         filterToggles.forEach(function(toggle, index) {
-            var options = toggle.nextElementSibling;
+            // 既にイベントリスナーが登録されていればスキップ
+            if (toggle.dataset.acInitialized === 'true') {
+                return;
+            }
+            toggle.dataset.acInitialized = 'true';
+            
+            var parentGroup = toggle.closest('.sidebar-filter-group');
+            var options = parentGroup ? parentGroup.querySelector('.sidebar-filter-options') : null;
+            
             if (index === 0 && options) {
                 toggle.setAttribute('aria-expanded', 'true');
                 options.style.display = 'block';
             }
             
-            toggle.addEventListener('click', function() {
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
                 var isExpanded = this.getAttribute('aria-expanded') === 'true';
-                var opts = this.nextElementSibling;
+                var group = this.closest('.sidebar-filter-group');
+                var opts = group ? group.querySelector('.sidebar-filter-options') : null;
                 
                 this.setAttribute('aria-expanded', !isExpanded);
                 if (opts) {
@@ -2295,9 +2316,18 @@
     }
 
     /**
-     * サイドバーフィルターの初期化
+     * サイドバーフィルターの初期化（重複防止版）
      */
+    var sidebarFiltersInitialized = false;
+    
     function initSidebarFilters() {
+        // 重複初期化を防止
+        if (sidebarFiltersInitialized) {
+            console.log('📋 Sidebar filters already initialized, skipping...');
+            return;
+        }
+        sidebarFiltersInitialized = true;
+        
         console.log('📋 Initializing sidebar filters...');
         
         // フィルターグループのトグル
@@ -2305,16 +2335,28 @@
         console.log('  Found', filterToggles.length, 'filter toggles');
         
         filterToggles.forEach(function(toggle, index) {
+            // 既にイベントリスナーが登録されていれば スキップ
+            if (toggle.dataset.initialized === 'true') {
+                return;
+            }
+            toggle.dataset.initialized = 'true';
+            
             // 最初のカテゴリフィルターのみデフォルトで開く
-            var options = toggle.nextElementSibling;
+            var parentGroup = toggle.closest('.sidebar-filter-group');
+            var options = parentGroup ? parentGroup.querySelector('.sidebar-filter-options') : null;
+            
             if (index === 0 && options) {
                 toggle.setAttribute('aria-expanded', 'true');
                 options.style.display = 'block';
             }
             
-            toggle.addEventListener('click', function() {
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
                 var isExpanded = this.getAttribute('aria-expanded') === 'true';
-                var opts = this.nextElementSibling;
+                var group = this.closest('.sidebar-filter-group');
+                var opts = group ? group.querySelector('.sidebar-filter-options') : null;
                 
                 this.setAttribute('aria-expanded', !isExpanded);
                 if (opts) {
