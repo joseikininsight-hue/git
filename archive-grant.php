@@ -29,7 +29,7 @@ $js_file = $template_dir . '/assets/js/archive-common.js';
 <?php endif; ?>
 <?php
 
-// URLパラメータの取得と処理
+// URLパラメータの取得と処理 - v40.0 Archive Integration
 $url_params = array(
     'application_status' => isset($_GET['application_status']) ? sanitize_text_field($_GET['application_status']) : '',
     'orderby' => isset($_GET['orderby']) ? sanitize_text_field($_GET['orderby']) : '',
@@ -38,6 +38,8 @@ $url_params = array(
     'search' => isset($_GET['search']) ? sanitize_text_field($_GET['search']) : '',
     'category' => isset($_GET['category']) ? sanitize_text_field($_GET['category']) : '',
     'prefecture' => isset($_GET['prefecture']) ? sanitize_text_field($_GET['prefecture']) : '',
+    'municipality' => isset($_GET['municipality']) ? sanitize_text_field($_GET['municipality']) : '',
+    'tag' => isset($_GET['tag']) ? sanitize_text_field($_GET['tag']) : '',
 );
 
 // 各種データ取得
@@ -88,6 +90,26 @@ if (!empty($url_params['application_status']) && $url_params['application_status
 } elseif ($is_tag_archive) {
     $archive_title = $current_category->name . 'の助成金・補助金';
     $archive_description = $current_category->name . 'に関連する助成金・補助金の一覧。最新の募集情報を毎日更新。';
+} elseif (!empty($url_params['tag'])) {
+    // URLパラメータのタグでフィルタリング
+    $tag_term = get_term_by('slug', $url_params['tag'], 'grant_tag');
+    if ($tag_term && !is_wp_error($tag_term)) {
+        $archive_title = $tag_term->name . 'の助成金・補助金';
+        $archive_description = $tag_term->name . 'に関連する助成金・補助金の一覧。最新の募集情報を毎日更新。';
+    } else {
+        $archive_title = '助成金・補助金総合検索';
+        $archive_description = '全国の助成金・補助金情報を網羅的に検索。都道府県・市町村・業種・金額で詳細に絞り込み可能。専門家による申請サポート完備。毎日更新。';
+    }
+} elseif (!empty($url_params['municipality'])) {
+    // URLパラメータの市町村でフィルタリング
+    $municipality_term = get_term_by('slug', $url_params['municipality'], 'grant_municipality');
+    if ($municipality_term && !is_wp_error($municipality_term)) {
+        $archive_title = $municipality_term->name . 'の助成金・補助金';
+        $archive_description = $municipality_term->name . 'の地域密着型助成金・補助金情報。市町村独自の支援制度から国の制度まで幅広く掲載。';
+    } else {
+        $archive_title = '助成金・補助金総合検索';
+        $archive_description = '全国の助成金・補助金情報を網羅的に検索。都道府県・市町村・業種・金額で詳細に絞り込み可能。専門家による申請サポート完備。毎日更新。';
+    }
 } else {
     $archive_title = '助成金・補助金総合検索';
     $archive_description = '全国の助成金・補助金情報を網羅的に検索。都道府県・市町村・業種・金額で詳細に絞り込み可能。専門家による申請サポート完備。毎日更新。';
@@ -455,6 +477,24 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                             'taxonomy' => 'grant_prefecture',
                             'field' => 'slug',
                             'terms' => $url_params['prefecture']
+                        );
+                    }
+                    
+                    // 市町村フィルタ（URLパラメータ）- v40.0追加
+                    if (!empty($url_params['municipality'])) {
+                        $tax_query[] = array(
+                            'taxonomy' => 'grant_municipality',
+                            'field' => 'slug',
+                            'terms' => $url_params['municipality']
+                        );
+                    }
+                    
+                    // タグフィルタ（URLパラメータ）- v40.0追加
+                    if (!empty($url_params['tag'])) {
+                        $tax_query[] = array(
+                            'taxonomy' => 'grant_tag',
+                            'field' => 'slug',
+                            'terms' => $url_params['tag']
                         );
                     }
                     

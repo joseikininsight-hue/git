@@ -1,21 +1,30 @@
 <?php
 /**
- * Template Part: Front Page Search Section
- * フロントページ検索セクション - 官公庁デザイン版
- *
+ * Template Part: Grant Search Section
+ * 補助金・助成金検索セクション v40.1
+ * 
  * @package Grant_Insight_Perfect
- * @version 54.0.0 - Government Style
+ * @version 40.1.0 - Taxonomy Archive URL Structure
+ * 
+ * Design Concept:
+ * - 官公庁風のシンプルで信頼感あるデザイン
+ * - 白背景ベース + 濃紺×金のアクセント
+ * - 折りたたみ式のフィルターグループ
+ * 
+ * v40.1 Changes:
+ * - 都道府県: /prefecture/{slug}/ 形式に修正
+ * - 市町村: /grant_municipality/{slug}/ 形式に修正
+ * - タグ: /grant-tag/{slug}/ 形式に修正
+ * - タクソノミーアーカイブへの正しいURL構造
  */
 
-if (!defined('ABSPATH')) {
-    exit('Direct access forbidden.');
-}
+if (!defined('ABSPATH')) exit;
 
 // ==========================================================================
-// データ取得（パフォーマンス最適化）
+// データ取得
 // ==========================================================================
 
-$cache_key = 'search_section_data_v54';
+$cache_key = 'search_section_data_v40';
 $cached_data = get_transient($cache_key);
 
 if ($cached_data === false) {
@@ -37,7 +46,7 @@ if ($cached_data === false) {
         ? gi_get_all_prefectures() 
         : [];
     
-    // タグ取得
+    // タグ取得（人気キーワード）
     $all_tags = get_terms([
         'taxonomy'   => 'grant_tag',
         'hide_empty' => true,
@@ -68,647 +77,366 @@ $prefectures    = $cached_data['prefectures'];
 $all_tags       = $cached_data['tags'];
 $total_grants   = $cached_data['total_grants'];
 
-// 人気カテゴリー（上位10件）
-$popular_categories = is_array($all_categories) ? array_slice($all_categories, 0, 10) : [];
-
 // 人気タグ（上位10件）
 $popular_tags = is_array($all_tags) ? array_slice($all_tags, 0, 10) : [];
 
-// カテゴリーグループ定義
-$category_groups = [
-    [
-        'id'         => 'types',
-        'name'       => '補助金の種類',
-        'name_en'    => 'TYPES',
-        'icon'       => 'briefcase',
-        'categories' => is_array($all_categories) ? array_slice($all_categories, 0, 8) : [],
-    ],
-    [
-        'id'         => 'fields',
-        'name'       => '対象分野',
-        'name_en'    => 'FIELDS',
-        'icon'       => 'layers',
-        'categories' => is_array($all_categories) ? array_slice($all_categories, 8, 8) : [],
-    ],
-    [
-        'id'         => 'supports',
-        'name'       => '支援内容',
-        'name_en'    => 'SUPPORTS',
-        'icon'       => 'heart',
-        'categories' => is_array($all_categories) ? array_slice($all_categories, 16, 8) : [],
-    ],
-];
-
-// 地域グループ定義
-$region_groups = [
-    [
-        'id'          => 'hokkaido-tohoku',
-        'name'        => '北海道・東北',
-        'name_en'     => 'HOKKAIDO / TOHOKU',
-        'prefectures' => ['北海道', '青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県'],
-    ],
-    [
-        'id'          => 'kanto',
-        'name'        => '関東',
-        'name_en'     => 'KANTO',
-        'prefectures' => ['東京都', '神奈川県', '埼玉県', '千葉県', '茨城県', '栃木県', '群馬県'],
-    ],
-    [
-        'id'          => 'hokuriku-koshinetsu',
-        'name'        => '北陸・甲信越',
-        'name_en'     => 'HOKURIKU / KOSHINETSU',
-        'prefectures' => ['新潟県', '富山県', '石川県', '福井県', '山梨県', '長野県'],
-    ],
-    [
-        'id'          => 'tokai',
-        'name'        => '東海',
-        'name_en'     => 'TOKAI',
-        'prefectures' => ['愛知県', '岐阜県', '三重県', '静岡県'],
-    ],
-    [
-        'id'          => 'kinki',
-        'name'        => '関西',
-        'name_en'     => 'KANSAI',
-        'prefectures' => ['大阪府', '京都府', '兵庫県', '奈良県', '滋賀県', '和歌山県'],
-    ],
-    [
-        'id'          => 'chugoku',
-        'name'        => '中国',
-        'name_en'     => 'CHUGOKU',
-        'prefectures' => ['鳥取県', '島根県', '岡山県', '広島県', '山口県'],
-    ],
-    [
-        'id'          => 'shikoku',
-        'name'        => '四国',
-        'name_en'     => 'SHIKOKU',
-        'prefectures' => ['徳島県', '香川県', '愛媛県', '高知県'],
-    ],
-    [
-        'id'          => 'kyushu-okinawa',
-        'name'        => '九州・沖縄',
-        'name_en'     => 'KYUSHU / OKINAWA',
-        'prefectures' => ['福岡県', '佐賀県', '長崎県', '熊本県', '大分県', '宮崎県', '鹿児島県', '沖縄県'],
-    ],
-];
-
-// 対象者カード定義
-$target_cards = [
-    [
-        'id'          => 'individual',
-        'title'       => '個人事業主・フリーランス',
-        'description' => '個人でも申請可能な補助金・給付金',
-        'icon'        => 'user',
-        'url'         => home_url('/grants/?grant_tag=個人向け'),
-        'featured'    => true,
-    ],
-    [
-        'id'          => 'small-business',
-        'title'       => '中小企業',
-        'description' => 'ものづくり・IT導入・事業再構築など',
-        'icon'        => 'building',
-        'url'         => home_url('/grants/?grant_tag=中小企業'),
-        'featured'    => false,
-    ],
-    [
-        'id'          => 'startup',
-        'title'       => '創業・スタートアップ',
-        'description' => '起業資金・創業融資・オフィス支援',
-        'icon'        => 'rocket',
-        'url'         => home_url('/grants/?grant_tag=創業'),
-        'featured'    => false,
-    ],
-];
-
-// AJAX用ノンス
-$ajax_nonce = wp_create_nonce('gi_ajax_nonce');
-
-/**
- * アイコンSVGを取得
- */
-function search_get_svg_icon($name) {
-    $icons = [
-        'user'      => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>',
-        'building'  => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2"/></svg>',
-        'rocket'    => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2c4 4 6 8 6 14H6c0-6 2-10 6-14z"/><circle cx="12" cy="11" r="2"/><path d="M6 16l-3 5h6M18 16l3 5h-6"/></svg>',
-        'briefcase' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2M3 12h18"/></svg>',
-        'layers'    => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>',
-        'heart'     => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>',
-        'map'       => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4zM8 2v16M16 6v16"/></svg>',
-        'folder'    => '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4a1 1 0 011-1h3l2 2h5a1 1 0 011 1v6a1 1 0 01-1 1H3a1 1 0 01-1-1V4z"/></svg>',
-        'hash'      => '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h10M3 10h10M6 3v10M10 3v10"/></svg>',
-    ];
-    
-    return $icons[$name] ?? '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/></svg>';
-}
+// 都道府県リスト（gi_get_all_prefecturesから取得）
+// スラッグと名前のマッピングを使用してアーカイブページと連携
+$pref_list = $prefectures; // gi_get_all_prefectures() の結果をそのまま使用
 ?>
 
-<section 
-    class="search" 
-    id="search-section" 
-    role="search" 
-    aria-labelledby="search-heading">
-    
+<!-- ==========================================================================
+     補助金・助成金検索セクション v39.0
+     ========================================================================== -->
+<section class="gs-search" id="grant-search-section">
+    <div class="gs-search__container">
 
-    
-    <!-- ========================================
-         メイン検索フォーム
-         ======================================== -->
-    <div class="search__main">
-        <div class="search__container">
-            
-            <header class="search__header">
-                <p class="search__header-sub">SEARCH GRANTS</p>
-                <h2 class="search__header-title" id="search-heading">補助金・助成金を検索</h2>
-            </header>
-            
-            <form 
-                id="grant-search-form" 
-                class="search__form" 
-                action="<?php echo esc_url(home_url('/grants/')); ?>" 
-                method="get"
-                role="search">
+        <!-- Section Header -->
+        <div class="gs-search__header">
+            <span class="gs-search__badge">SEARCH GRANTS</span>
+            <h2 class="gs-search__title">
+                <span class="gs-search__title-line"></span>
+                補助金・助成金を検索
+                <span class="gs-search__title-line"></span>
+            </h2>
+        </div>
+
+        <!-- Main Search Panel -->
+        <div class="gs-search__panel">
+            <!-- Decorative Corners -->
+            <div class="gs-search__corner gs-search__corner--tl"></div>
+            <div class="gs-search__corner gs-search__corner--br"></div>
+
+            <form action="<?php echo esc_url(home_url('/grants/')); ?>" method="get" class="gs-search__form">
                 
-                <!-- 受付状況 -->
-                <div class="search__form-row">
-                    <span class="search__label">受付状況</span>
-                    <div class="search__radio-group">
-                        <label class="search__radio">
-                            <input type="radio" name="status" value="open" checked class="search__radio-input">
-                            <span class="search__radio-label">募集中のみ</span>
+                <!-- Search Header Controls -->
+                <div class="gs-search__controls">
+                    <div class="gs-search__toggle-group">
+                        <label class="gs-search__toggle">
+                            <input type="checkbox" name="application_status" value="open" checked class="gs-search__toggle-input">
+                            <span class="gs-search__toggle-switch"></span>
+                            <span class="gs-search__toggle-label">受付状況募集中のみ</span>
                         </label>
-                        <label class="search__radio">
-                            <input type="radio" name="status" value="all" class="search__radio-input">
-                            <span class="search__radio-label">すべて表示</span>
-                        </label>
+                        <span class="gs-search__divider">|</span>
+                        <button type="button" class="gs-search__link-btn" id="show-all-btn">すべて表示</button>
+                    </div>
+                    <div class="gs-search__quick-links">
+                        <button type="button" class="gs-search__quick-link" id="clear-conditions">条件クリア</button>
+                        <a href="<?php echo esc_url(home_url('/saved-searches/')); ?>" class="gs-search__quick-link">保存条件</a>
+                        <a href="<?php echo esc_url(home_url('/history/')); ?>" class="gs-search__quick-link">閲覧履歴</a>
                     </div>
                 </div>
-                
-                <!-- 選択フィールド -->
-                <div class="search__form-grid">
+
+                <!-- Filter Groups -->
+                <div class="gs-search__filters">
                     
-                    <!-- カテゴリー -->
-                    <div class="search__field">
-                        <label for="search-category" class="search__label">用途・カテゴリー</label>
-                        <div class="search__select-wrap">
-                            <select id="search-category" name="category" class="search__select">
-                                <option value="">選択してください</option>
+                    <!-- 1. Category Filter -->
+                    <div class="gs-search__group">
+                        <button type="button" class="gs-search__group-header" onclick="toggleGroup('category-content')" aria-expanded="true">
+                            <h3 class="gs-search__group-title">
+                                <span class="gs-search__group-bar"></span>
+                                用途・カテゴリー
+                            </h3>
+                            <div class="gs-search__group-action">
+                                <span class="gs-search__group-hint">選択してください</span>
+                                <span class="gs-search__group-arrow">▼</span>
+                            </div>
+                        </button>
+
+                        <div id="category-content" class="gs-search__group-content gs-search__group-content--open">
+                            <div class="gs-search__index-grid gs-search__scrollable">
                                 <?php foreach ($all_categories as $cat): ?>
-                                <option value="<?php echo esc_attr($cat->slug); ?>">
-                                    <?php echo esc_html($cat->name); ?> (<?php echo esc_html($cat->count); ?>)
-                                </option>
+                                <a href="<?php echo esc_url(get_term_link($cat)); ?>" class="gs-search__category-link" data-slug="<?php echo esc_attr($cat->slug); ?>">
+                                    <?php echo esc_html($cat->name); ?> <span class="gs-search__count">(<?php echo esc_html($cat->count); ?>)</span>
+                                </a>
                                 <?php endforeach; ?>
-                            </select>
+                            </div>
                         </div>
                     </div>
-                    
-                    <!-- 都道府県 -->
-                    <div class="search__field">
-                        <label for="search-prefecture" class="search__label">都道府県</label>
-                        <div class="search__select-wrap">
-                            <select id="search-prefecture" name="prefecture" class="search__select">
-                                <option value="">選択してください</option>
-                                <?php foreach ($prefectures as $pref): ?>
-                                <option value="<?php echo esc_attr($pref['slug']); ?>">
+
+                    <!-- 2. Prefecture Filter -->
+                    <div class="gs-search__group">
+                        <button type="button" class="gs-search__group-header" onclick="toggleGroup('pref-content')" aria-expanded="false">
+                            <h3 class="gs-search__group-title">
+                                <span class="gs-search__group-bar"></span>
+                                都道府県
+                            </h3>
+                            <div class="gs-search__group-action">
+                                <span class="gs-search__group-hint">選択してください</span>
+                                <span class="gs-search__group-arrow">▼</span>
+                            </div>
+                        </button>
+
+                        <div id="pref-content" class="gs-search__group-content">
+                            <div class="gs-search__pref-grid">
+                                <?php foreach ($pref_list as $pref): ?>
+                                <a href="<?php echo esc_url(home_url('/prefecture/' . $pref['slug'] . '/')); ?>" class="gs-search__pref-link" data-slug="<?php echo esc_attr($pref['slug']); ?>">
                                     <?php echo esc_html($pref['name']); ?>
-                                </option>
+                                </a>
                                 <?php endforeach; ?>
-                            </select>
+                            </div>
                         </div>
                     </div>
-                    
-                    <!-- 市区町村（動的） -->
-                    <div class="search__field search__field--municipality" id="municipality-field" style="display: none;">
-                        <label for="search-municipality" class="search__label">市区町村</label>
-                        <div class="search__select-wrap">
-                            <select id="search-municipality" name="municipality" class="search__select">
-                                <option value="">選択してください</option>
-                            </select>
-                            <div class="search__spinner" id="municipality-spinner" style="display: none;"></div>
+
+                    <!-- 3. Municipality Search -->
+                    <div class="gs-search__group">
+                        <button type="button" class="gs-search__group-header" onclick="toggleGroup('city-content')" aria-expanded="false">
+                            <h3 class="gs-search__group-title">
+                                <span class="gs-search__group-bar"></span>
+                                市町村から探す
+                            </h3>
+                            <div class="gs-search__group-action">
+                                <span class="gs-search__group-selected" id="selected-pref">宮城県</span>
+                                <span class="gs-search__group-arrow">▼</span>
+                            </div>
+                        </button>
+
+                        <div id="city-content" class="gs-search__group-content">
+                            <div class="gs-search__municipality">
+                                <div class="gs-search__municipality-select">
+                                    <select id="municipality-pref-select" class="gs-search__select" data-current-slug="miyagi">
+                                        <option value="">都道府県を選択...</option>
+                                        <?php foreach ($pref_list as $pref): ?>
+                                        <option value="<?php echo esc_attr($pref['slug']); ?>" data-name="<?php echo esc_attr($pref['name']); ?>" <?php echo $pref['slug'] === 'miyagi' ? 'selected' : ''; ?>>
+                                            <?php echo esc_html($pref['name']); ?>
+                                        </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div class="gs-search__municipality-list gs-search__scrollable" id="municipality-list">
+                                    <!-- 市町村リストはJavaScriptで動的に生成 -->
+                                    <div class="gs-search__municipality-loading">読み込み中...</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    
-                </div>
-                
-                <!-- フリーワード -->
-                <div class="search__form-row">
-                    <label for="search-keyword" class="search__label">フリーワード</label>
-                    <input 
-                        type="search" 
-                        id="search-keyword" 
-                        name="search" 
-                        class="search__input" 
-                        placeholder="例：IT導入、設備投資、創業支援..."
-                        autocomplete="off">
-                </div>
-                
-                <!-- アクションボタン -->
-                <div class="search__actions">
-                    <button type="button" id="search-reset" class="search__btn search__btn--outline">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                            <path d="M2 8a6 6 0 1011.5 2.5"/>
-                            <path d="M2 4v4h4"/>
-                        </svg>
-                        <span>条件クリア</span>
-                    </button>
-                    <button type="submit" class="search__btn search__btn--solid">
-                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                            <circle cx="8" cy="8" r="5"/>
-                            <path d="M12 12l4 4"/>
-                        </svg>
-                        <span>この条件で検索</span>
-                    </button>
-                </div>
-                
-                <!-- 補助リンク -->
-                <div class="search__sub-links">
-                    <a href="<?php echo esc_url(home_url('/grants/')); ?>" class="search__sub-link">
-                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                            <path d="M2 4h10M2 7h10M2 10h6"/>
-                        </svg>
-                        <span>詳細検索</span>
-                    </a>
-                    <a href="<?php echo esc_url(home_url('/saved-searches/')); ?>" class="search__sub-link">
-                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                            <path d="M2 2h10v12l-5-3-5 3V2z"/>
-                        </svg>
-                        <span>保存条件</span>
-                    </a>
-                    <a href="<?php echo esc_url(home_url('/history/')); ?>" class="search__sub-link">
-                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                            <circle cx="7" cy="7" r="5"/>
-                            <path d="M7 4v3l2 2"/>
-                        </svg>
-                        <span>閲覧履歴</span>
-                    </a>
-                </div>
-                
-            </form>
-            
-        </div>
-    </div>
-    
-    <!-- ========================================
-         対象者から探す
-         ======================================== -->
-    <div class="search__section search__section--alt">
-        <div class="search__container">
-            
-            <header class="search__section-header">
-                <p class="search__section-sub">SEARCH BY TARGET</p>
-                <h3 class="search__section-title">対象者から探す</h3>
-            </header>
-            
-            <div class="search__target-grid">
-                <?php foreach ($target_cards as $card): ?>
-                <a href="<?php echo esc_url($card['url']); ?>" 
-                   class="search__target-card<?php echo $card['featured'] ? ' search__target-card--featured' : ''; ?>">
-                    <div class="search__target-icon">
-                        <?php echo search_get_svg_icon($card['icon']); ?>
-                    </div>
-                    <div class="search__target-content">
-                        <h4 class="search__target-title"><?php echo esc_html($card['title']); ?></h4>
-                        <p class="search__target-desc"><?php echo esc_html($card['description']); ?></p>
-                    </div>
-                    <span class="search__target-arrow">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <path d="M7 4l6 6-6 6"/>
-                        </svg>
-                    </span>
-                </a>
-                <?php endforeach; ?>
-            </div>
-            
-        </div>
-    </div>
-    
-    <!-- ========================================
-         用途・目的から探す（カテゴリーグループ）
-         ======================================== -->
-    <div class="search__section">
-        <div class="search__container">
-            
-            <header class="search__section-header">
-                <p class="search__section-sub">BROWSE BY PURPOSE</p>
-                <h3 class="search__section-title">用途・目的から探す</h3>
-            </header>
-            
-            <div class="search__category-groups">
-                <?php foreach ($category_groups as $group): ?>
-                <?php if (!empty($group['categories'])): ?>
-                <article class="search__category-card">
-                    <header class="search__category-card-header">
-                        <span class="search__category-card-icon">
-                            <?php echo search_get_svg_icon($group['icon']); ?>
-                        </span>
-                        <div class="search__category-card-titles">
-                            <h4 class="search__category-card-name"><?php echo esc_html($group['name']); ?></h4>
-                            <span class="search__category-card-name-en"><?php echo esc_html($group['name_en']); ?></span>
-                        </div>
-                    </header>
-                    <ul class="search__category-list">
-                        <?php foreach ($group['categories'] as $cat): ?>
-                        <li class="search__category-item">
-                            <a href="<?php echo esc_url(get_term_link($cat)); ?>" class="search__category-link">
-                                <span class="search__category-name"><?php echo esc_html($cat->name); ?></span>
-                                <span class="search__category-count"><?php echo esc_html($cat->count); ?></span>
-                            </a>
-                        </li>
-                        <?php endforeach; ?>
-                    </ul>
-                </article>
-                <?php endif; ?>
-                <?php endforeach; ?>
-            </div>
-            
-        </div>
-    </div>
-    
-    <!-- ========================================
-         人気カテゴリから探す
-         ======================================== -->
-    <div class="search__section search__section--alt">
-        <div class="search__container">
-            
-            <header class="search__section-header">
-                <p class="search__section-sub">POPULAR CATEGORIES</p>
-                <h3 class="search__section-title">人気カテゴリから探す</h3>
-            </header>
-            
-            <!-- フィルター入力 -->
-            <div class="search__filter-box">
-                <input 
-                    type="text" 
-                    id="category-filter-input" 
-                    class="search__filter-input" 
-                    placeholder="カテゴリをキーワードで絞り込む..."
-                    aria-label="カテゴリを絞り込む">
-            </div>
-            
-            <!-- 人気カテゴリ（常に表示） -->
-            <div class="search__pill-grid" id="popular-categories-grid">
-                <?php foreach ($popular_categories as $cat): ?>
-                <a href="<?php echo esc_url(get_term_link($cat)); ?>" 
-                   class="search__pill" 
-                   data-name="<?php echo esc_attr($cat->name); ?>">
-                    <?php echo search_get_svg_icon('folder'); ?>
-                    <span class="search__pill-text"><?php echo esc_html($cat->name); ?></span>
-                    <span class="search__pill-count"><?php echo esc_html($cat->count); ?></span>
-                </a>
-                <?php endforeach; ?>
-            </div>
-            
-            <!-- すべてのカテゴリ（折りたたみ） -->
-            <?php if (count($all_categories) > 10): ?>
-            <div class="search__collapse">
-                <button type="button" id="all-categories-toggle" class="search__collapse-btn" aria-expanded="false">
-                    <span>すべてのカテゴリを見る</span>
-                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <path d="M3 4.5l3 3 3-3"/>
-                    </svg>
-                </button>
-                <div id="all-categories-content" class="search__collapse-content" hidden>
-                    <div class="search__pill-grid" id="all-categories-grid">
-                        <?php foreach ($all_categories as $cat): ?>
-                        <a href="<?php echo esc_url(get_term_link($cat)); ?>" 
-                           class="search__pill" 
-                           data-name="<?php echo esc_attr($cat->name); ?>">
-                            <span class="search__pill-text"><?php echo esc_html($cat->name); ?></span>
-                            <span class="search__pill-count"><?php echo esc_html($cat->count); ?></span>
-                        </a>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-                <p id="no-categories-msg" class="search__no-result" style="display: none;">
-                    一致するカテゴリがありません
-                </p>
-            </div>
-            <?php endif; ?>
-            
-        </div>
-    </div>
-    
-    <!-- ========================================
-         都道府県から探す
-         ======================================== -->
-    <div class="search__section">
-        <div class="search__container">
-            
-            <header class="search__section-header">
-                <p class="search__section-sub">BROWSE BY REGION</p>
-                <h3 class="search__section-title">都道府県から探す</h3>
-            </header>
-            
-            <div class="search__region-grid">
-                <?php foreach ($region_groups as $region): ?>
-                <article class="search__region-card">
-                    <header class="search__region-header">
-                        <h4 class="search__region-name"><?php echo esc_html($region['name']); ?></h4>
-                        <span class="search__region-name-en"><?php echo esc_html($region['name_en']); ?></span>
-                    </header>
-                    <div class="search__region-prefs">
-                        <?php foreach ($region['prefectures'] as $pref_name): ?>
-                            <?php 
-                            $pref_slug = '';
-                            foreach ($prefectures as $p) {
-                                if ($p['name'] === $pref_name) {
-                                    $pref_slug = $p['slug'];
-                                    break;
-                                }
-                            }
-                            if ($pref_slug):
-                            ?>
-                        <a href="<?php echo esc_url(get_term_link($pref_slug, 'grant_prefecture')); ?>" 
-                           class="search__region-pref">
-                            <?php echo esc_html($pref_name); ?>
-                        </a>
-                            <?php endif; ?>
-                        <?php endforeach; ?>
-                    </div>
-                </article>
-                <?php endforeach; ?>
-            </div>
-            
-        </div>
-    </div>
-    
-    <!-- ========================================
-         市町村から探す
-         ======================================== -->
-    <div class="search__section search__section--alt">
-        <div class="search__container">
-            
-            <header class="search__section-header">
-                <p class="search__section-sub">MUNICIPALITY SEARCH</p>
-                <h3 class="search__section-title">市町村から探す</h3>
-            </header>
-            
-            <div class="search__municipality-interface">
-                
-                <div class="search__municipality-control">
-                    <label for="municipality-prefecture-filter" class="search__label search__label--center">
-                        都道府県を選択してください
-                    </label>
-                    <div class="search__select-wrap search__select-wrap--lg">
-                        <select id="municipality-prefecture-filter" class="search__select search__select--lg">
-                            <option value="">都道府県を選択...</option>
-                            <?php foreach ($prefectures as $pref): ?>
-                            <option value="<?php echo esc_attr($pref['slug']); ?>">
-                                <?php echo esc_html($pref['name']); ?>
-                            </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                </div>
-                
-                <!-- ローディング -->
-                <div id="municipality-loading" class="search__municipality-loading" style="display: none;">
-                    <div class="search__spinner search__spinner--lg"></div>
-                    <span>読み込み中...</span>
-                </div>
-                
-                <!-- 市町村リスト -->
-                <div id="municipality-list" class="search__municipality-grid">
-                    <div class="search__municipality-placeholder">
-                        <div class="search__placeholder-icon">
-                            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <circle cx="24" cy="24" r="18" stroke-dasharray="4 4"/>
-                                <path d="M24 16v8M24 28v2"/>
+
+                    <!-- 4. Free Word -->
+                    <div class="gs-search__group gs-search__group--freeword">
+                        <h3 class="gs-search__group-title gs-search__group-title--inline">
+                            <span class="gs-search__group-bar"></span>
+                            フリーワード
+                        </h3>
+                        <div class="gs-search__freeword">
+                            <svg class="gs-search__freeword-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="7"/>
+                                <path d="M21 21l-6-6"/>
                             </svg>
+                            <input type="text" name="search" placeholder="キーワードを入力..." class="gs-search__freeword-input" autocomplete="off">
                         </div>
-                        <p class="search__placeholder-text">
-                            都道府県を選択すると、<br>ここに市町村一覧が表示されます
-                        </p>
                     </div>
+
                 </div>
-                
-            </div>
-            
+
+                <!-- Search Button -->
+                <div class="gs-search__submit">
+                    <button type="submit" class="gs-search__submit-btn">
+                        <span>この条件で検索</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                        </svg>
+                    </button>
+                    <a href="<?php echo esc_url(home_url('/grants/advanced-search/')); ?>" class="gs-search__advanced-link">詳細検索はこちら</a>
+                </div>
+
+            </form>
         </div>
-    </div>
-    
-    <!-- ========================================
-         人気キーワードから探す
-         ======================================== -->
-    <?php if (!empty($popular_tags)): ?>
-    <div class="search__section">
-        <div class="search__container">
-            
-            <header class="search__section-header">
-                <p class="search__section-sub">POPULAR KEYWORDS</p>
-                <h3 class="search__section-title">人気キーワードから探す</h3>
-            </header>
-            
-            <!-- フィルター入力 -->
-            <div class="search__filter-box">
-                <input 
-                    type="text" 
-                    id="tag-filter-input" 
-                    class="search__filter-input" 
-                    placeholder="タグをキーワードで絞り込む..."
-                    aria-label="タグを絞り込む">
-            </div>
-            
-            <!-- 人気タグ（常に表示） -->
-            <div class="search__pill-grid" id="popular-tags-grid">
-                <?php foreach ($popular_tags as $tag): ?>
-                <a href="<?php echo esc_url(home_url('/grants/?grant_tag=' . $tag->slug)); ?>" 
-                   class="search__pill search__pill--tag" 
-                   data-name="<?php echo esc_attr($tag->name); ?>">
-                    <?php echo search_get_svg_icon('hash'); ?>
-                    <span class="search__pill-text"><?php echo esc_html($tag->name); ?></span>
-                </a>
-                <?php endforeach; ?>
-            </div>
-            
-            <!-- すべてのタグ（折りたたみ） -->
-            <?php if (count($all_tags) > 10): ?>
-            <div class="search__collapse">
-                <button type="button" id="all-tags-toggle" class="search__collapse-btn" aria-expanded="false">
-                    <span>すべてのタグを見る</span>
-                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <path d="M3 4.5l3 3 3-3"/>
+
+        <!-- Popular Keywords Section -->
+        <div class="gs-search__keywords">
+            <div class="gs-search__keywords-header">
+                <h3 class="gs-search__keywords-title">
+                    <span class="gs-search__keywords-badge">INDEX</span>
+                    人気キーワードから探す
+                </h3>
+                <button type="button" id="keywords-toggle" class="gs-search__keywords-toggle">
+                    <span id="keywords-toggle-text">すべて表示</span>
+                    <svg id="keywords-toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 9l-7 7-7-7"/>
                     </svg>
                 </button>
-                <div id="all-tags-content" class="search__collapse-content" hidden>
-                    <div class="search__pill-grid" id="all-tags-grid">
-                        <?php foreach ($all_tags as $tag): ?>
-                        <a href="<?php echo esc_url(home_url('/grants/?grant_tag=' . $tag->slug)); ?>" 
-                           class="search__pill search__pill--tag" 
-                           data-name="<?php echo esc_attr($tag->name); ?>">
-                            <span class="search__pill-text"><?php echo esc_html($tag->name); ?></span>
-                        </a>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-                <p id="no-tags-msg" class="search__no-result" style="display: none;">
-                    一致するタグがありません
-                </p>
             </div>
-            <?php endif; ?>
+
+            <div id="keywords-container" class="gs-search__keywords-container">
+                <div class="gs-search__keywords-list">
+                    <!-- Top Keywords (Bold) -->
+                    <?php foreach ($popular_tags as $tag): ?>
+                    <a href="<?php echo esc_url(home_url('/grant-tag/' . $tag->slug . '/')); ?>" class="gs-search__keyword gs-search__keyword--popular">
+                        <?php echo esc_html($tag->name); ?>
+                    </a>
+                    <?php endforeach; ?>
+                    
+                    <span class="gs-search__keyword-divider"></span>
+                    
+                    <!-- All Keywords -->
+                    <?php $remaining_tags = array_slice($all_tags, 10); ?>
+                    <?php foreach ($remaining_tags as $tag): ?>
+                    <a href="<?php echo esc_url(home_url('/grant-tag/' . $tag->slug . '/')); ?>" class="gs-search__keyword">
+                        <?php echo esc_html($tag->name); ?>
+                    </a>
+                    <?php endforeach; ?>
+                </div>
+                
+                <!-- Gradient Overlay -->
+                <div id="keywords-gradient" class="gs-search__keywords-gradient"></div>
+            </div>
             
-        </div>
-    </div>
-    <?php endif; ?>
-    
-    <!-- ========================================
-         信頼性バー（E-E-A-T）
-         ======================================== -->
-    <div class="search__trust-bar">
-        <div class="search__container">
-            <p class="search__trust-text">
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                    <path d="M9 1l2.5 5 5.5.5-4 4 1 5.5-5-3-5 3 1-5.5-4-4 5.5-.5L9 1z"/>
-                </svg>
-                <span>当サイトの情報は各省庁・自治体の公表データに基づき、専門家監修のもと更新されています。</span>
+            <p class="gs-search__keywords-note">
+                当サイトの情報は各省庁・自治体の公表データに基づき、専門家監修のもと更新されています。
             </p>
         </div>
+
     </div>
-    
-    <!-- ========================================
-         CTA セクション（条件付き表示）
-         ======================================== -->
-    <?php if (!get_query_var('exclude_cta')): ?>
-    <div class="search__cta">
-        <div class="search__container">
-            <div class="search__cta-card">
-                <div class="search__cta-icon">
-                    <svg width="56" height="56" viewBox="0 0 56 56" fill="none" aria-hidden="true">
-                        <rect x="10" y="8" width="36" height="40" rx="2" stroke="currentColor" stroke-width="2"/>
-                        <path d="M18 22h20M18 30h16M18 38h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        <circle cx="42" cy="42" r="12" fill="currentColor"/>
-                        <path d="M38 42l3 3 6-6" stroke="#1b263b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </div>
-                <h3 class="search__cta-title">あなたに最適な補助金を無料診断</h3>
-                <p class="search__cta-desc">
-                    簡単な質問に答えるだけで、あなたの事業に最適な補助金・助成金を診断します。<br class="search__cta-br">
-                    診断は完全無料、所要時間はわずか3分です。
-                </p>
-                <div class="search__cta-btns">
-                    <a href="<?php echo esc_url(home_url('/grants/')); ?>" class="search__cta-btn search__cta-btn--secondary">
-                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                            <circle cx="8" cy="8" r="5"/>
-                            <path d="M12 12l4 4"/>
-                        </svg>
-                        <span>補助金を探す</span>
-                    </a>
-                    <a href="https://joseikin-insight.com/subsidy-diagnosis/" class="search__cta-btn search__cta-btn--primary">
-                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                            <path d="M4 9h10M10 5l4 4-4 4"/>
-                        </svg>
-                        <span>今すぐ無料診断を始める</span>
-                    </a>
-                </div>
-                <p class="search__cta-note">
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                        <circle cx="7" cy="7" r="5"/>
-                        <path d="M7 5v2M7 9v.5"/>
-                    </svg>
-                    <span>会員登録不要・メールアドレス不要</span>
-                </p>
-            </div>
-        </div>
-    </div>
-    <?php endif; ?>
-    
 </section>
+
+<!-- JavaScript -->
+<script>
+(function() {
+    'use strict';
+
+    // Base URL for municipality archives
+    const municipalityBaseUrl = '<?php echo esc_url(home_url('/grant_municipality/')); ?>';
+
+    // Group Toggle
+    window.toggleGroup = function(contentId) {
+        const content = document.getElementById(contentId);
+        const header = content.previousElementSibling;
+        const arrow = header.querySelector('.gs-search__group-arrow');
+        const isOpen = content.classList.contains('gs-search__group-content--open');
+        
+        if (isOpen) {
+            content.classList.remove('gs-search__group-content--open');
+            header.setAttribute('aria-expanded', 'false');
+            if (arrow) arrow.style.transform = 'rotate(0deg)';
+        } else {
+            content.classList.add('gs-search__group-content--open');
+            header.setAttribute('aria-expanded', 'true');
+            if (arrow) arrow.style.transform = 'rotate(180deg)';
+        }
+    };
+
+    // Keywords Toggle
+    const keywordsToggle = document.getElementById('keywords-toggle');
+    const keywordsContainer = document.getElementById('keywords-container');
+    const keywordsToggleText = document.getElementById('keywords-toggle-text');
+    const keywordsToggleIcon = document.getElementById('keywords-toggle-icon');
+    const keywordsGradient = document.getElementById('keywords-gradient');
+    
+    let keywordsExpanded = false;
+
+    if (keywordsToggle) {
+        keywordsToggle.addEventListener('click', function() {
+            keywordsExpanded = !keywordsExpanded;
+            
+            if (keywordsExpanded) {
+                keywordsContainer.classList.add('gs-search__keywords-container--expanded');
+                keywordsToggleText.textContent = '閉じる';
+                keywordsToggleIcon.style.transform = 'rotate(180deg)';
+                if (keywordsGradient) keywordsGradient.style.opacity = '0';
+            } else {
+                keywordsContainer.classList.remove('gs-search__keywords-container--expanded');
+                keywordsToggleText.textContent = 'すべて表示';
+                keywordsToggleIcon.style.transform = 'rotate(0deg)';
+                if (keywordsGradient) keywordsGradient.style.opacity = '1';
+            }
+        });
+    }
+
+    // Clear Conditions
+    const clearBtn = document.getElementById('clear-conditions');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function() {
+            const form = document.querySelector('.gs-search__form');
+            if (form) {
+                form.reset();
+                // Re-check the status toggle
+                const statusToggle = form.querySelector('input[name="application_status"]');
+                if (statusToggle) statusToggle.checked = true;
+                // Clear free word input
+                const freewordInput = form.querySelector('input[name="search"]');
+                if (freewordInput) freewordInput.value = '';
+            }
+        });
+    }
+
+    // Show All Button
+    const showAllBtn = document.getElementById('show-all-btn');
+    if (showAllBtn) {
+        showAllBtn.addEventListener('click', function() {
+            const statusToggle = document.querySelector('input[name="application_status"]');
+            if (statusToggle) statusToggle.checked = false;
+        });
+    }
+
+    // Municipality Prefecture Select - Dynamic Loading
+    const prefSelect = document.getElementById('municipality-pref-select');
+    const selectedPref = document.getElementById('selected-pref');
+    const municipalityList = document.getElementById('municipality-list');
+
+    // Function to load municipalities for a prefecture
+    function loadMunicipalities(prefSlug) {
+        if (!municipalityList) return;
+        
+        // AJAX request to get municipalities
+        municipalityList.innerHTML = '<div class="gs-search__municipality-loading">読み込み中...</div>';
+        
+        // POSTリクエストでAJAX送信
+        const formData = new FormData();
+        formData.append('action', 'gi_get_municipalities_for_prefecture');
+        formData.append('prefecture_slug', prefSlug);
+        formData.append('nonce', '<?php echo wp_create_nonce('gi_ajax_nonce'); ?>');
+        
+        fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Municipality AJAX response:', data); // デバッグ用
+                
+                // wp_send_json_success は { success: true, data: { municipalities: [...] } } を返す
+                const municipalities = data.data?.municipalities || [];
+                
+                if (data.success && municipalities.length > 0) {
+                    let html = '';
+                    municipalities.forEach(function(city) {
+                        const citySlug = city.slug || city.name.toLowerCase().replace(/\s+/g, '-');
+                        html += '<a href="' + municipalityBaseUrl + citySlug + '/" class="gs-search__city-link">' + city.name + '</a>';
+                    });
+                    municipalityList.innerHTML = html;
+                } else if (data.success && municipalities.length === 0) {
+                    municipalityList.innerHTML = '<div class="gs-search__municipality-empty">この都道府県の市町村データはまだ登録されていません</div>';
+                } else {
+                    console.error('Municipality AJAX error:', data);
+                    municipalityList.innerHTML = '<div class="gs-search__municipality-empty">市町村データがありません</div>';
+                }
+            })
+            .catch(function(error) {
+                console.error('Municipality load error:', error);
+                municipalityList.innerHTML = '<div class="gs-search__municipality-error">読み込みエラー</div>';
+            });
+    }
+
+    if (prefSelect) {
+        // Load initial municipalities (宮城県)
+        const initialSlug = prefSelect.getAttribute('data-current-slug') || 'miyagi';
+        loadMunicipalities(initialSlug);
+
+        prefSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const prefName = selectedOption.getAttribute('data-name') || this.value;
+            const prefSlug = this.value;
+            
+            if (selectedPref) {
+                selectedPref.textContent = prefName || '選択してください';
+            }
+            
+            if (prefSlug) {
+                loadMunicipalities(prefSlug);
+            }
+        });
+    }
+
+    console.log('✅ Grant Search Section v40.0 Initialized (Archive Integration Complete)');
+})();
+</script>

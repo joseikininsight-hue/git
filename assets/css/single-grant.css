@@ -85,6 +85,10 @@
     --gi-sidebar: 320px;
     --gi-gap: 40px;
     
+    /* スティッキーCTA（下部バナー）高さ - global-sticky-cta.php と同期 */
+    --gi-sticky-cta-height: 70px;
+    --gi-mobile-banner: 70px;
+    
     /* ボーダー */
     --gi-radius: 2px;
     --gi-radius-lg: 4px;
@@ -165,6 +169,12 @@ ul, ol {
 }
 
 @media (max-width: 768px) {
+    :root {
+        /* モバイルでのスティッキーCTA高さ調整 */
+        --gi-sticky-cta-height: 60px;
+        --gi-mobile-banner: 60px;
+    }
+    
     .gi-container {
         padding: 0 6px;
     }
@@ -187,7 +197,7 @@ ul, ol {
     right: 0;
     height: 4px;
     background: linear-gradient(90deg, var(--gi-gov-navy-800) 0%, var(--gi-gov-gold) 50%, var(--gi-gov-navy-800) 100%);
-    z-index: 9999;
+    z-index: 9998; /* スティッキーCTA（9999）より下 */
 }
 
 .gi-layout {
@@ -226,7 +236,8 @@ ul, ol {
 
 @media (max-width: 768px) {
     .gi-layout {
-        padding: 16px 0 5px;
+        /* スティッキーCTA（60-70px）+ 余白のため、80px以上を確保 */
+        padding: 16px 0 80px;
     }
 }
 
@@ -2804,6 +2815,258 @@ ul, ol {
 }
 
 /* ==========================================================================
+   📰 関連補助金セクション v2 - 編集部選定・推奨制度スタイル
+   ========================================================================== */
+
+.gi-related-v2 {
+    padding: 48px 0 64px;
+    background: var(--gi-white);
+    border-top: 1px solid var(--gi-gray-200);
+}
+
+/* セクションヘッダー - Section番号付き */
+.gi-related-v2-header {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin-bottom: 32px;
+    border-bottom: 2px solid var(--gi-gov-navy-800);
+}
+
+.gi-related-v2-number-box {
+    width: 72px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, #f8f6f1 0%, #f0ede6 100%);
+    border-right: 1px solid var(--gi-gray-200);
+    padding: 16px 0;
+}
+
+.gi-related-v2-number-label {
+    font-family: var(--gi-font-mono);
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: var(--gi-gray-500);
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+
+.gi-related-v2-number-value {
+    font-family: var(--gi-font-serif);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--gi-gray-300);
+    line-height: 1;
+}
+
+.gi-related-v2-title-area {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+}
+
+.gi-related-v2-title {
+    font-family: var(--gi-font-serif);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--gi-gov-navy-900);
+    margin: 0;
+    line-height: 1.3;
+}
+
+.gi-related-v2-sub {
+    font-family: var(--gi-font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--gi-gray-400);
+    text-transform: uppercase;
+    margin: 0;
+}
+
+/* カードグリッド - 横並び */
+.gi-related-v2-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+}
+
+@media (max-width: 768px) {
+    .gi-related-v2-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+}
+
+/* カード本体 */
+.gi-related-v2-card {
+    background: var(--gi-white);
+    border: 1px solid var(--gi-gray-200);
+    border-radius: var(--gi-radius-lg);
+    overflow: hidden;
+    transition: all var(--gi-transition);
+}
+
+.gi-related-v2-card:hover {
+    border-color: var(--gi-gov-gold);
+    box-shadow: var(--gi-shadow-md);
+}
+
+.gi-related-v2-card-link {
+    display: block;
+    padding: 20px 24px;
+    text-decoration: none;
+    color: inherit;
+}
+
+.gi-related-v2-card-link:hover {
+    text-decoration: none;
+}
+
+/* PICK UP ラベル */
+.gi-related-v2-pickup {
+    margin-bottom: 12px;
+}
+
+.gi-related-v2-pickup-label {
+    font-family: var(--gi-font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--gi-gov-gold-dark, #a88c3f);
+}
+
+/* カードタイトル */
+.gi-related-v2-card-title {
+    font-family: var(--gi-font-serif);
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.5;
+    color: var(--gi-gov-navy-900);
+    margin: 0 0 8px;
+    transition: color var(--gi-transition);
+}
+
+.gi-related-v2-card:hover .gi-related-v2-card-title {
+    color: var(--gi-accent-red, #a63737);
+}
+
+.gi-related-v2-card-pref {
+    color: var(--gi-gov-navy-700);
+}
+
+/* 難易度 */
+.gi-related-v2-card-difficulty {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 12px;
+    font-size: 12px;
+}
+
+.gi-related-v2-card-difficulty-label {
+    color: var(--gi-gray-500);
+}
+
+.gi-related-v2-card-difficulty-value {
+    color: var(--gi-accent-red, #a63737);
+    font-weight: 600;
+}
+
+/* 金額バッジ */
+.gi-related-v2-card-amount {
+    margin-bottom: 14px;
+}
+
+.gi-related-v2-card-amount-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    background: var(--gi-gov-navy-800);
+    color: var(--gi-white);
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 4px;
+}
+
+/* 説明文 */
+.gi-related-v2-card-desc {
+    font-family: var(--gi-font-serif);
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--gi-gray-700);
+    margin: 0 0 14px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* 対象者 */
+.gi-related-v2-card-target {
+    padding-top: 12px;
+    border-top: 1px dashed var(--gi-gray-200);
+    font-size: 12px;
+    color: var(--gi-gray-600);
+}
+
+.gi-related-v2-card-target-label {
+    color: var(--gi-gray-500);
+}
+
+.gi-related-v2-card-target-value {
+    color: var(--gi-gray-700);
+}
+
+/* レスポンシブ */
+@media (max-width: 640px) {
+    .gi-related-v2 {
+        padding: 32px 0 48px;
+    }
+    
+    .gi-related-v2-header {
+        flex-direction: column;
+    }
+    
+    .gi-related-v2-number-box {
+        width: 100%;
+        flex-direction: row;
+        justify-content: flex-start;
+        padding: 10px 16px;
+        gap: 8px;
+    }
+    
+    .gi-related-v2-number-label {
+        margin-bottom: 0;
+    }
+    
+    .gi-related-v2-number-value {
+        font-size: 22px;
+    }
+    
+    .gi-related-v2-title-area {
+        padding: 12px 16px;
+    }
+    
+    .gi-related-v2-title {
+        font-size: 16px;
+    }
+    
+    .gi-related-v2-card-link {
+        padding: 16px;
+    }
+    
+    .gi-related-v2-card-title {
+        font-size: 15px;
+    }
+}
+
+/* ==========================================================================
    📚 本風・関連補助金セクション
    ========================================================================== */
 .gi-book-related {
@@ -2942,7 +3205,7 @@ ul, ol {
 .gi-mobile-fab {
     display: none;
     position: fixed;
-    bottom: calc(var(--gi-mobile-banner, 60px) + 20px);
+    bottom: calc(var(--gi-sticky-cta-height, 70px) + 20px);
     right: 20px;
     z-index: 100;
 }
@@ -3013,11 +3276,11 @@ ul, ol {
 .gi-mobile-panel {
     display: none;
     position: fixed;
-    bottom: var(--gi-mobile-banner, 60px);
+    bottom: var(--gi-sticky-cta-height, 70px);
     left: 0;
     right: 0;
     background: var(--gi-white);
-    max-height: calc(80vh - var(--gi-mobile-banner, 60px));
+    max-height: calc(80vh - var(--gi-sticky-cta-height, 70px));
     z-index: 999;
     transform: translateY(100%);
     visibility: hidden;
@@ -4239,5 +4502,1777 @@ ul, ol {
     .gi-article-ad-section {
         padding: 16px;
         margin: 16px 0;
+    }
+}
+
+/* ==========================================================================
+   📚 統合補助金詳細セクション - 図鑑風デザイン v2
+   写真参考: 補助金図鑑 ENTRY No.XXXXX + 詳細テーブル統合スタイル
+   ========================================================================== */
+
+/* 統合セクション全体 */
+.gi-integrated-section {
+    background: var(--gi-white);
+    border: 1px solid var(--gi-gray-200);
+    border-radius: var(--gi-radius-lg);
+    margin-bottom: 48px;
+    overflow: hidden;
+    box-shadow: var(--gi-shadow-sm);
+}
+
+/* 統合ヘッダー（図鑑エントリー風） */
+.gi-integrated-header {
+    display: flex;
+    background: var(--gi-white);
+    border-bottom: 2px solid var(--gi-gov-navy-800);
+}
+
+/* 左側：セクション番号 */
+.gi-integrated-number {
+    width: 80px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, #f8f6f1 0%, #f0ede6 100%);
+    border-right: 1px solid var(--gi-gray-200);
+}
+
+.gi-integrated-number-inner {
+    text-align: center;
+}
+
+.gi-integrated-number-label {
+    display: block;
+    font-family: var(--gi-font-mono);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: var(--gi-gray-500);
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+
+.gi-integrated-number-value {
+    display: block;
+    font-family: var(--gi-font-serif);
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--gi-gray-300);
+    line-height: 1;
+}
+
+/* 右側：タイトルエリア */
+.gi-integrated-title-area {
+    flex: 1;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+}
+
+.gi-integrated-book-icon {
+    width: 56px;
+    height: 56px;
+    flex-shrink: 0;
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .gi-integrated-book-icon {
+        display: block;
+    }
+}
+
+.gi-integrated-title-content {
+    flex: 1;
+}
+
+.gi-integrated-entry-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--gi-font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gi-gov-gold);
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+}
+
+.gi-integrated-entry-label svg {
+    width: 14px;
+    height: 14px;
+}
+
+.gi-integrated-main-title {
+    font-family: var(--gi-font-serif);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--gi-gov-navy-900);
+    margin: 0 0 4px;
+    line-height: 1.3;
+}
+
+.gi-integrated-sub-title {
+    font-size: 13px;
+    color: var(--gi-gray-600);
+    margin: 0;
+}
+
+.gi-integrated-en-title {
+    font-family: var(--gi-font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: var(--gi-gray-400);
+    text-transform: uppercase;
+    margin-top: 4px;
+}
+
+.gi-integrated-ribbon {
+    position: absolute;
+    top: 0;
+    right: 24px;
+    width: 28px;
+    height: 48px;
+    background: linear-gradient(180deg, var(--gi-gov-gold) 0%, #b8941f 100%);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%);
+    box-shadow: 0 2px 4px rgba(181, 152, 92, 0.3);
+}
+
+/* 統合セクション本体 */
+.gi-integrated-body {
+    padding: 0;
+}
+
+/* 統合テーブル - 写真1枚目参考 */
+.gi-integrated-table {
+    width: 100%;
+}
+
+.gi-integrated-table-section {
+    border-bottom: 1px solid var(--gi-gray-200);
+}
+
+.gi-integrated-table-section:last-child {
+    border-bottom: none;
+}
+
+.gi-integrated-table-header {
+    display: flex;
+    align-items: center;
+    padding: 14px 24px;
+    background: #faf8f3;
+    border-bottom: 1px solid var(--gi-gray-200);
+}
+
+.gi-integrated-table-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--gi-gov-gold-dark, #a88c3f);
+    font-size: 14px;
+    font-weight: 700;
+    font-family: var(--gi-font-serif);
+}
+
+.gi-integrated-table-header-left svg {
+    width: 18px;
+    height: 18px;
+}
+
+.gi-integrated-table-header-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.gi-integrated-table-rows {
+    background: var(--gi-white);
+}
+
+.gi-integrated-table-row {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    border-bottom: 1px solid var(--gi-gray-100);
+}
+
+.gi-integrated-table-row:last-child {
+    border-bottom: none;
+}
+
+.gi-integrated-table-key {
+    padding: 14px 16px 14px 24px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gi-gray-600);
+    background: #fdfcf9;
+    border-right: 1px solid var(--gi-gray-100);
+}
+
+.gi-integrated-table-value {
+    padding: 14px 24px 14px 16px;
+    font-size: 14px;
+    color: var(--gi-gray-900);
+    line-height: 1.7;
+}
+
+.gi-integrated-table-value-large {
+    font-size: 22px;
+    font-weight: 700;
+    font-family: var(--gi-font-serif);
+    color: var(--gi-gov-navy-900);
+}
+
+.gi-integrated-table-value-highlight {
+    color: var(--gi-accent-red);
+    font-weight: 700;
+}
+
+.gi-integrated-table-value-sub {
+    font-size: 12px;
+    color: var(--gi-gray-500);
+    margin-left: 8px;
+}
+
+/* 採択率統計情報ボックス */
+.gi-integrated-stats-box {
+    background: #faf8f3;
+    border: 1px solid var(--gi-gray-200);
+    padding: 20px;
+    margin: 0 24px 24px;
+    border-radius: var(--gi-radius);
+}
+
+.gi-integrated-stats-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed var(--gi-gray-300);
+}
+
+.gi-integrated-stats-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gi-gray-900);
+}
+
+.gi-integrated-stats-content {
+    text-align: center;
+    padding: 16px 0;
+}
+
+.gi-integrated-stats-label {
+    font-size: 11px;
+    color: var(--gi-gray-500);
+    margin-bottom: 4px;
+}
+
+.gi-integrated-stats-value {
+    font-size: 32px;
+    font-weight: 700;
+    font-family: var(--gi-font-serif);
+    color: var(--gi-gov-navy-900);
+}
+
+.gi-integrated-stats-note {
+    font-size: 11px;
+    color: var(--gi-gray-500);
+    margin-top: 4px;
+}
+
+.gi-integrated-stats-disclaimer {
+    font-size: 11px;
+    color: var(--gi-gray-500);
+    line-height: 1.6;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--gi-gray-300);
+}
+
+/* お問い合わせ統合セクション */
+.gi-integrated-contact {
+    background: var(--gi-white);
+    border-top: 2px solid var(--gi-gray-200);
+    padding: 32px 24px;
+    text-align: center;
+}
+
+.gi-integrated-contact-title {
+    font-family: var(--gi-font-serif);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--gi-gov-navy-900);
+    margin: 0 0 8px;
+}
+
+.gi-integrated-contact-sub {
+    font-family: var(--gi-font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: var(--gi-gray-400);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+
+.gi-integrated-contact-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 32px;
+    background: var(--gi-gov-gold);
+    color: var(--gi-white);
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: var(--gi-radius);
+    text-decoration: none;
+    transition: all var(--gi-transition);
+    margin-bottom: 24px;
+}
+
+.gi-integrated-contact-btn:hover {
+    background: var(--gi-gov-gold-light);
+    transform: translateY(-2px);
+    text-decoration: none;
+    color: var(--gi-white);
+}
+
+.gi-integrated-contact-info {
+    background: #faf8f3;
+    border: 1px solid var(--gi-gray-200);
+    border-radius: var(--gi-radius);
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    text-align: left;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.gi-integrated-contact-info-row {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 8px;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--gi-gray-200);
+    font-size: 13px;
+}
+
+.gi-integrated-contact-info-row:last-child {
+    border-bottom: none;
+}
+
+.gi-integrated-contact-info-key {
+    font-weight: 700;
+    color: var(--gi-gray-600);
+}
+
+.gi-integrated-contact-info-value {
+    color: var(--gi-gray-900);
+}
+
+/* 監修セクション統合 */
+.gi-integrated-supervisor {
+    border-top: 1px solid var(--gi-gray-200);
+    padding: 24px;
+    text-align: center;
+}
+
+.gi-integrated-supervisor-label {
+    font-family: var(--gi-font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--gi-gray-500);
+    margin-bottom: 16px;
+}
+
+.gi-integrated-supervisor-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+}
+
+.gi-integrated-supervisor-avatar {
+    width: 56px;
+    height: 56px;
+    background: var(--gi-gov-navy-800);
+    color: var(--gi-gov-gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-family: var(--gi-font-serif);
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.gi-integrated-supervisor-info {
+    text-align: left;
+}
+
+.gi-integrated-supervisor-name {
+    font-family: var(--gi-font-serif);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--gi-gov-navy-900);
+}
+
+.gi-integrated-supervisor-title {
+    font-size: 12px;
+    color: var(--gi-gray-600);
+    margin-top: 2px;
+}
+
+.gi-integrated-supervisor-desc {
+    font-size: 12px;
+    color: var(--gi-gray-600);
+    margin-top: 12px;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+}
+
+/* ==========================================================================
+   📄 フッターセクション - お問い合わせ・情報ソース・監修 新デザイン
+   ========================================================================== */
+
+.gi-footer-section {
+    border-top: 2px solid var(--gi-gray-200);
+    background: var(--gi-white);
+}
+
+/* 上部：お問い合わせ + 補助金ID・情報ソース */
+.gi-footer-top {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 0;
+    border-bottom: 1px solid var(--gi-gray-200);
+}
+
+/* 左側：お問い合わせ */
+.gi-footer-contact {
+    padding: 24px;
+    border-right: 1px solid var(--gi-gray-200);
+}
+
+.gi-footer-contact-title {
+    font-family: var(--gi-font-serif);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--gi-gov-navy-900);
+    margin: 0 0 4px;
+}
+
+.gi-footer-contact-sub {
+    font-family: var(--gi-font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--gi-gray-400);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+}
+
+.gi-footer-contact-item {
+    margin-bottom: 8px;
+}
+
+.gi-footer-contact-label {
+    font-size: 11px;
+    color: var(--gi-gray-500);
+    margin-bottom: 4px;
+}
+
+.gi-footer-contact-link {
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gi-gov-gold-dark, #a88c3f);
+    text-decoration: none;
+    transition: color var(--gi-transition);
+}
+
+.gi-footer-contact-link:hover {
+    color: var(--gi-gov-gold);
+    text-decoration: underline;
+}
+
+.gi-footer-contact-na {
+    font-size: 14px;
+    color: var(--gi-gray-400);
+}
+
+/* 右側：補助金ID・情報ソース */
+.gi-footer-meta {
+    padding: 24px;
+    background: #faf8f3;
+}
+
+.gi-footer-meta-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--gi-gray-200);
+}
+
+.gi-footer-meta-id {
+    font-family: var(--gi-font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gi-gov-navy-900);
+}
+
+.gi-footer-meta-year {
+    font-size: 12px;
+    color: var(--gi-gray-500);
+    background: var(--gi-white);
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--gi-gray-200);
+}
+
+.gi-footer-meta-source {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.gi-footer-meta-label {
+    font-size: 11px;
+    color: var(--gi-gray-500);
+    flex-shrink: 0;
+}
+
+.gi-footer-meta-value {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gi-gov-navy-900);
+}
+
+.gi-footer-meta-verified {
+    font-size: 12px;
+    color: var(--gi-gray-600);
+    margin-bottom: 12px;
+}
+
+.gi-footer-meta-disclaimer {
+    font-size: 11px;
+    color: var(--gi-gray-500);
+    line-height: 1.6;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 4px;
+    border-left: 3px solid var(--gi-gray-300);
+}
+
+/* 下部：監修・編集 */
+.gi-footer-supervisor {
+    padding: 24px;
+    border-top: 1px solid var(--gi-gray-200);
+}
+
+.gi-footer-supervisor-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gi-gray-500);
+    letter-spacing: 0.05em;
+    margin-bottom: 16px;
+}
+
+.gi-footer-supervisor-main {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.gi-footer-supervisor-avatar {
+    width: 48px;
+    height: 48px;
+    background: var(--gi-gov-navy-800);
+    color: var(--gi-gov-gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-family: var(--gi-font-serif);
+    font-size: 18px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.gi-footer-supervisor-info {
+    flex: 1;
+}
+
+.gi-footer-supervisor-name {
+    font-family: var(--gi-font-serif);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--gi-gov-navy-900);
+}
+
+.gi-footer-supervisor-title {
+    font-size: 12px;
+    color: var(--gi-gray-600);
+    margin-top: 2px;
+}
+
+.gi-footer-supervisor-desc {
+    font-size: 13px;
+    color: var(--gi-gray-600);
+    line-height: 1.7;
+    margin-bottom: 16px;
+}
+
+.gi-footer-supervisor-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.gi-footer-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: var(--gi-white);
+    border: 1px solid var(--gi-gray-200);
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gi-gov-navy-700);
+}
+
+/* フッターセクション モバイル対応 */
+@media (max-width: 768px) {
+    .gi-footer-top {
+        grid-template-columns: 1fr;
+    }
+    
+    .gi-footer-contact {
+        border-right: none;
+        border-bottom: 1px solid var(--gi-gray-200);
+    }
+}
+
+@media (max-width: 640px) {
+    .gi-footer-contact,
+    .gi-footer-meta,
+    .gi-footer-supervisor {
+        padding: 16px;
+    }
+    
+    .gi-footer-meta-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .gi-footer-supervisor-badges {
+        gap: 6px;
+    }
+    
+    .gi-footer-badge {
+        padding: 3px 10px;
+        font-size: 10px;
+    }
+}
+
+/* ==========================================================================
+   📞 お問い合わせセクション v2 - 写真2枚目参考デザイン
+   ========================================================================== */
+
+/* お問い合わせセクション */
+.gi-contact-section-v2 {
+    background: var(--gi-white);
+    border: 1px solid var(--gi-gray-200);
+    border-radius: var(--gi-radius-lg);
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.gi-contact-v2-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--gi-gray-200);
+}
+
+.gi-contact-v2-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gi-gov-navy-700);
+}
+
+.gi-contact-v2-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.gi-contact-v2-title {
+    font-family: var(--gi-font-serif);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--gi-gov-navy-900);
+    margin: 0;
+}
+
+.gi-contact-v2-sub {
+    font-family: var(--gi-font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--gi-gray-400);
+    text-transform: uppercase;
+    margin-left: auto;
+}
+
+.gi-contact-v2-body {
+    padding: 24px;
+}
+
+.gi-contact-v2-row {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.gi-contact-v2-official {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-shrink: 0;
+}
+
+.gi-contact-v2-official-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gi-gov-navy-50, #f0f4f8);
+    border-radius: 50%;
+    color: var(--gi-gov-navy-700);
+}
+
+.gi-contact-v2-official-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.gi-contact-v2-official-label {
+    font-size: 12px;
+    color: var(--gi-gray-500);
+    margin-bottom: 4px;
+}
+
+.gi-contact-v2-official-link {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--gi-gov-navy-700);
+    text-decoration: none;
+    transition: color var(--gi-transition);
+}
+
+.gi-contact-v2-official-link:hover {
+    color: var(--gi-gov-gold);
+    text-decoration: underline;
+}
+
+.gi-contact-v2-official-na {
+    font-size: 15px;
+    color: var(--gi-gray-400);
+}
+
+.gi-contact-v2-ad {
+    flex: 1;
+    min-width: 0;
+}
+
+/* 補助金ID・情報ソースセクション */
+.gi-meta-section-v2 {
+    background: var(--gi-white);
+    border: 1px solid var(--gi-gray-200);
+    border-radius: var(--gi-radius-lg);
+    margin-bottom: 24px;
+    padding: 16px 24px;
+}
+
+.gi-meta-v2-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.gi-meta-v2-id {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--gi-font-mono);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gi-gov-navy-900);
+}
+
+.gi-meta-v2-id svg {
+    width: 20px;
+    height: 20px;
+    color: var(--gi-gov-navy-600);
+}
+
+.gi-meta-v2-year {
+    display: inline-block;
+    padding: 4px 12px;
+    background: var(--gi-gov-navy-50, #f0f4f8);
+    border: 1px solid var(--gi-gov-navy-100, #dbe4ef);
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gi-gov-navy-700);
+}
+
+/* 情報ソースセクション */
+.gi-source-section-v2 {
+    background: var(--gi-white);
+    border: 1px solid var(--gi-gray-200);
+    border-radius: var(--gi-radius-lg);
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.gi-source-v2-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 24px;
+    background: var(--gi-gray-50);
+    border-bottom: 1px solid var(--gi-gray-200);
+}
+
+.gi-source-v2-header svg {
+    width: 18px;
+    height: 18px;
+    color: var(--gi-gray-500);
+}
+
+.gi-source-v2-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gi-gray-600);
+}
+
+.gi-source-v2-body {
+    padding: 20px 24px;
+}
+
+.gi-source-v2-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--gi-gov-navy-900);
+    margin-bottom: 8px;
+}
+
+.gi-source-v2-verified {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--gi-success, #2e7d32);
+}
+
+.gi-source-v2-verified svg {
+    width: 16px;
+    height: 16px;
+}
+
+.gi-source-v2-footer {
+    padding: 12px 24px;
+    background: var(--gi-gray-50);
+    border-top: 1px solid var(--gi-gray-200);
+    font-size: 12px;
+    color: var(--gi-gray-500);
+    line-height: 1.5;
+}
+
+/* 監修・編集セクション */
+.gi-supervisor-section-v2 {
+    background: var(--gi-white);
+    border: 1px solid var(--gi-gray-200);
+    border-radius: var(--gi-radius-lg);
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.gi-supervisor-v2-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 24px;
+    background: var(--gi-gray-50);
+    border-bottom: 1px solid var(--gi-gray-200);
+}
+
+.gi-supervisor-v2-header svg {
+    width: 18px;
+    height: 18px;
+    color: var(--gi-gray-500);
+}
+
+.gi-supervisor-v2-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gi-gray-600);
+}
+
+.gi-supervisor-v2-body {
+    padding: 24px;
+}
+
+.gi-supervisor-v2-main {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.gi-supervisor-v2-avatar {
+    width: 56px;
+    height: 56px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--gi-gov-navy-800);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gi-supervisor-v2-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.gi-supervisor-v2-avatar-text {
+    font-family: var(--gi-font-serif);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--gi-gov-gold);
+}
+
+.gi-supervisor-v2-info {
+    flex: 1;
+}
+
+.gi-supervisor-v2-name {
+    font-family: var(--gi-font-serif);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--gi-gov-navy-900);
+}
+
+.gi-supervisor-v2-title {
+    font-size: 12px;
+    color: var(--gi-gray-600);
+    margin-top: 2px;
+}
+
+.gi-supervisor-v2-bio {
+    font-size: 13px;
+    color: var(--gi-gray-600);
+    line-height: 1.7;
+    margin: 0 0 16px;
+}
+
+.gi-supervisor-v2-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.gi-supervisor-v2-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    background: var(--gi-white);
+    border: 1px solid var(--gi-gray-200);
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gi-gov-navy-700);
+}
+
+/* v2セクション モバイル対応 */
+@media (max-width: 768px) {
+    .gi-contact-v2-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .gi-contact-v2-ad {
+        width: 100%;
+        margin-top: 16px;
+    }
+}
+
+@media (max-width: 640px) {
+    .gi-contact-v2-header,
+    .gi-contact-v2-body,
+    .gi-meta-section-v2,
+    .gi-source-v2-body,
+    .gi-supervisor-v2-body {
+        padding: 16px;
+    }
+    
+    .gi-contact-v2-title {
+        font-size: 16px;
+    }
+    
+    .gi-supervisor-v2-badges {
+        gap: 6px;
+    }
+    
+    .gi-supervisor-v2-badge {
+        padding: 4px 10px;
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 640px) {
+    .gi-integrated-header {
+        flex-direction: column;
+    }
+    
+    .gi-integrated-number {
+        width: 100%;
+        padding: 12px;
+        border-right: none;
+        border-bottom: 1px solid var(--gi-gray-200);
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 8px;
+    }
+    
+    .gi-integrated-number-inner {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .gi-integrated-number-label {
+        margin-bottom: 0;
+    }
+    
+    .gi-integrated-number-value {
+        font-size: 24px;
+    }
+    
+    .gi-integrated-title-area {
+        padding: 16px;
+    }
+    
+    .gi-integrated-ribbon {
+        width: 20px;
+        height: 36px;
+        right: 16px;
+    }
+    
+    .gi-integrated-table-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .gi-integrated-table-key {
+        padding: 12px 16px;
+        border-right: none;
+        border-bottom: 1px solid var(--gi-gray-100);
+    }
+    
+    .gi-integrated-table-value {
+        padding: 12px 16px;
+    }
+    
+    .gi-integrated-contact-info {
+        padding: 16px;
+    }
+    
+    .gi-integrated-contact-info-row {
+        grid-template-columns: 1fr;
+        gap: 4px;
+    }
+}
+
+/* ==========================================================================
+   📋 チェックリスト - 写真2枚目参考デザイン（クリーム背景・穴あき装飾）
+   ========================================================================== */
+
+/* チェックリストセクション - 写真風 */
+.gi-checklist-v2 {
+    background: #faf8f3;
+    border: 1px solid var(--gi-gray-200);
+    border-radius: var(--gi-radius-lg);
+    padding: 32px;
+    position: relative;
+    box-shadow: var(--gi-shadow-sm);
+}
+
+/* 左端の穴あき装飾 */
+.gi-checklist-v2::before {
+    content: '';
+    position: absolute;
+    left: 16px;
+    top: 24px;
+    bottom: 24px;
+    width: 1px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.gi-checklist-v2-holes {
+    position: absolute;
+    left: 12px;
+    top: 32px;
+    bottom: 32px;
+    width: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.gi-checklist-v2-hole {
+    width: 12px;
+    height: 12px;
+    background: var(--gi-gray-300);
+    border-radius: 50%;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+/* チェックリストヘッダー */
+.gi-checklist-v2-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    margin-left: 24px;
+}
+
+.gi-checklist-v2-progress {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+}
+
+.gi-checklist-v2-count {
+    font-family: var(--gi-font-mono);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--gi-gov-navy-900);
+}
+
+.gi-checklist-v2-percent {
+    font-family: var(--gi-font-mono);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--gi-gov-gold);
+}
+
+.gi-checklist-v2-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.gi-checklist-v2-action {
+    font-size: 12px;
+    color: var(--gi-gray-500);
+    text-decoration: underline;
+    cursor: pointer;
+    transition: color var(--gi-transition);
+}
+
+.gi-checklist-v2-action:hover {
+    color: var(--gi-gov-navy-700);
+}
+
+/* チェックリストカテゴリ */
+.gi-checklist-v2-category {
+    margin-bottom: 24px;
+    margin-left: 24px;
+}
+
+.gi-checklist-v2-category:last-child {
+    margin-bottom: 0;
+}
+
+.gi-checklist-v2-category-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gi-gray-600);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--gi-gray-200);
+}
+
+/* チェックリストアイテム */
+.gi-checklist-v2-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.gi-checklist-v2-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: var(--gi-radius);
+    transition: background var(--gi-transition);
+}
+
+.gi-checklist-v2-item:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.gi-checklist-v2-item.checked {
+    background: rgba(46, 125, 50, 0.08);
+}
+
+.gi-checklist-v2-checkbox {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    border: 2px solid var(--gi-gray-300);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gi-white);
+    transition: all var(--gi-transition);
+}
+
+.gi-checklist-v2-item.checked .gi-checklist-v2-checkbox {
+    background: var(--gi-gov-navy-900);
+    border-color: var(--gi-gov-navy-900);
+}
+
+.gi-checklist-v2-checkbox svg {
+    width: 14px;
+    height: 14px;
+    color: var(--gi-white);
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all var(--gi-transition);
+}
+
+.gi-checklist-v2-item.checked .gi-checklist-v2-checkbox svg {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.gi-checklist-v2-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.gi-checklist-v2-label-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.gi-checklist-v2-required {
+    display: inline-block;
+    padding: 2px 6px;
+    background: var(--gi-accent-red);
+    color: var(--gi-white);
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 2px;
+}
+
+.gi-checklist-v2-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gi-gov-navy-900);
+    line-height: 1.4;
+}
+
+.gi-checklist-v2-item.checked .gi-checklist-v2-label {
+    color: var(--gi-success);
+}
+
+.gi-checklist-v2-desc {
+    font-size: 12px;
+    color: var(--gi-gray-500);
+    margin-top: 4px;
+    line-height: 1.5;
+}
+
+/* チェックリスト結果メッセージ */
+.gi-checklist-v2-result {
+    margin-top: 24px;
+    margin-left: 24px;
+    padding-top: 24px;
+    border-top: 2px solid var(--gi-gray-300);
+    text-align: center;
+}
+
+.gi-checklist-v2-result-title {
+    font-family: var(--gi-font-serif);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--gi-gov-navy-900);
+    margin-bottom: 8px;
+}
+
+.gi-checklist-v2-result-sub {
+    font-size: 13px;
+    color: var(--gi-gray-500);
+}
+
+.gi-checklist-v2-result.complete .gi-checklist-v2-result-title {
+    color: var(--gi-success);
+}
+
+.gi-checklist-v2-cta {
+    display: none;
+    margin-top: 16px;
+}
+
+.gi-checklist-v2-result.complete .gi-checklist-v2-cta {
+    display: block;
+}
+
+/* チェックリストCTAボタン */
+.gi-checklist-cta-btn {
+    margin-top: 16px;
+}
+
+/* チェックリストヘッダーアクション */
+.gi-checklist-header-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 12px;
+}
+
+.gi-checklist-action-btn {
+    font-size: 12px;
+    color: #6b7280;
+    text-decoration: underline;
+    cursor: pointer;
+    background: none;
+    border: none;
+    transition: color var(--gi-transition);
+}
+
+.gi-checklist-action-btn:hover {
+    color: var(--gi-gov-navy-700);
+}
+
+/* セクションボディ - パディングなし */
+.gi-section-body--no-padding {
+    padding: 0;
+}
+
+@media (max-width: 640px) {
+    .gi-checklist-v2 {
+        padding: 24px 16px;
+    }
+    
+    .gi-checklist-v2-holes {
+        display: none;
+    }
+    
+    .gi-checklist-v2-header,
+    .gi-checklist-v2-category,
+    .gi-checklist-v2-result {
+        margin-left: 0;
+    }
+    
+    .gi-checklist-v2-progress {
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .gi-checklist-v2-percent {
+        font-size: 24px;
+    }
+}
+
+/* ==========================================================================
+   セクション番号付きヘッダー - 02, 03... 用
+   ========================================================================== */
+.gi-section-numbered-header {
+    display: flex;
+    align-items: stretch;
+    border-bottom: 2px solid var(--gi-gov-navy-800);
+    margin-bottom: 24px;
+}
+
+.gi-section-number-box {
+    width: 72px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, #f8f6f1 0%, #f0ede6 100%);
+    border-right: 1px solid var(--gi-gray-200);
+    padding: 16px 0;
+}
+
+.gi-section-number-inner {
+    text-align: center;
+}
+
+.gi-section-number-label {
+    display: block;
+    font-family: var(--gi-font-mono);
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: var(--gi-gray-500);
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+
+.gi-section-number-value {
+    display: block;
+    font-family: var(--gi-font-serif);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--gi-gray-300);
+    line-height: 1;
+}
+
+.gi-section-title-box {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+}
+
+.gi-section-body {
+    padding: 0 32px 32px;
+}
+
+@media (max-width: 640px) {
+    .gi-section-numbered-header {
+        flex-direction: column;
+    }
+    
+    .gi-section-number-box {
+        width: 100%;
+        flex-direction: row;
+        justify-content: flex-start;
+        padding: 10px 16px;
+        gap: 8px;
+    }
+    
+    .gi-section-number-inner {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .gi-section-number-label {
+        margin-bottom: 0;
+    }
+    
+    .gi-section-number-value {
+        font-size: 22px;
+    }
+    
+    .gi-section-title-box {
+        padding: 12px 16px;
+    }
+    
+    .gi-section-body {
+        padding: 0 16px 24px;
+    }
+}
+
+/* ==========================================================================
+   📊 統合詳細セクション - グリッドレイアウト（インラインスタイル置換）
+   ========================================================================== */
+
+/* 金額・スケジュール + 採択率の2カラムグリッド */
+.gi-details-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border-bottom: 1px solid var(--gi-gray-200);
+}
+
+/* 左カラム：金額・スケジュール */
+.gi-details-left-col {
+    padding: 24px;
+    border-right: 1px solid var(--gi-gray-200);
+}
+
+/* 右カラム：採択率・統計情報 */
+.gi-details-right-col {
+    padding: 24px;
+    background: #faf8f3;
+}
+
+/* セクションヘッダー（金色タイトル） */
+.gi-details-section-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #a88c3f;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 8px;
+}
+
+.gi-details-section-title--no-border {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+/* 採択率ヘッダー（AI推定バッジ付き） */
+.gi-details-stats-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 8px;
+}
+
+/* 詳細フィールドグループ */
+.gi-details-field {
+    margin-bottom: 16px;
+}
+
+.gi-details-field:last-child {
+    margin-bottom: 0;
+}
+
+/* ラベル（小さいグレー文字） */
+.gi-details-label {
+    font-size: 11px;
+    color: #6b7280;
+    margin-bottom: 2px;
+}
+
+/* 金額値（大きい数字） */
+.gi-details-value-large {
+    font-size: 24px;
+    font-weight: 700;
+    font-family: var(--gi-font-serif);
+    color: #1a1a1a;
+}
+
+/* 締切値 */
+.gi-details-value-deadline {
+    font-size: 18px;
+    font-weight: 700;
+    font-family: var(--gi-font-serif);
+    color: #1a1a1a;
+}
+
+.gi-details-value-deadline--urgent {
+    color: #a63737;
+}
+
+/* 残り日数 */
+.gi-details-remaining {
+    font-size: 12px;
+    color: #a63737;
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+/* 採択率表示ボックス */
+.gi-details-rate-box {
+    text-align: center;
+    padding: 16px 0;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 12px;
+}
+
+.gi-details-rate-value {
+    font-size: 32px;
+    font-weight: 700;
+    font-family: var(--gi-font-serif);
+    color: #1a1a1a;
+}
+
+.gi-details-rate-note {
+    font-size: 11px;
+    color: #6b7280;
+    margin-top: 4px;
+}
+
+/* 注意書き */
+.gi-details-disclaimer {
+    font-size: 10px;
+    color: #6b7280;
+    line-height: 1.6;
+}
+
+/* 対象要件・申請要件の2カラム（1:2比率） */
+.gi-details-requirements-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 0;
+}
+
+/* 対象要件カラム（左） */
+.gi-details-requirements-left {
+    padding: 24px;
+    border-right: 1px solid var(--gi-gray-200);
+}
+
+/* 申請要件カラム（右） */
+.gi-details-requirements-right {
+    padding: 24px;
+}
+
+/* フィールドアイテム */
+.gi-details-item {
+    margin-bottom: 12px;
+}
+
+.gi-details-item:last-child {
+    margin-bottom: 0;
+}
+
+/* フィールド値（通常テキスト） */
+.gi-details-value {
+    font-size: 13px;
+    color: #1a1a1a;
+    line-height: 1.6;
+}
+
+.gi-details-value--bold {
+    font-weight: 500;
+}
+
+/* 必要書類ボックス */
+.gi-details-docs-box {
+    font-size: 13px;
+    color: #1a1a1a;
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #e5e7eb;
+    line-height: 1.6;
+}
+
+/* モバイル対応 */
+@media (max-width: 768px) {
+    .gi-details-two-col {
+        grid-template-columns: 1fr;
+    }
+    
+    .gi-details-left-col {
+        border-right: none;
+        border-bottom: 1px solid var(--gi-gray-200);
+    }
+    
+    .gi-details-requirements-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .gi-details-requirements-left {
+        border-right: none;
+        border-bottom: 1px solid var(--gi-gray-200);
+    }
+}
+
+@media (max-width: 640px) {
+    .gi-details-left-col,
+    .gi-details-right-col,
+    .gi-details-requirements-left,
+    .gi-details-requirements-right {
+        padding: 16px;
+    }
+    
+    .gi-details-value-large {
+        font-size: 20px;
+    }
+    
+    .gi-details-value-deadline {
+        font-size: 16px;
+    }
+    
+    .gi-details-rate-value {
+        font-size: 28px;
+    }
+}
+
+
+/* ==========================================================================
+   スティッキーCTA対応 - 下部バナーとの競合回避
+   ========================================================================== */
+
+/* body に下部パディングを確保（global-sticky-cta.php との互換性強化） */
+body.single-grant {
+    padding-bottom: var(--gi-sticky-cta-height, 70px) !important;
+}
+
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+    body.single-grant {
+        padding-bottom: calc(var(--gi-sticky-cta-height, 70px) + env(safe-area-inset-bottom)) !important;
+    }
+}
+
+/* .gi-page のコンテンツがCTAに隠れないように余白確保 */
+.gi-page {
+    padding-bottom: var(--gi-sticky-cta-height, 70px);
+}
+
+/* モバイルでの調整 */
+@media (max-width: 768px) {
+    body.single-grant {
+        padding-bottom: var(--gi-sticky-cta-height, 60px) !important;
+    }
+    
+    .gi-page {
+        padding-bottom: var(--gi-sticky-cta-height, 60px);
+    }
+}
+
+/* モバイルパネル・FABがCTAと重ならないように位置調整 */
+.gi-mobile-fab {
+    bottom: calc(var(--gi-sticky-cta-height, 70px) + 20px);
+}
+
+.gi-mobile-panel {
+    bottom: var(--gi-sticky-cta-height, 70px);
+    max-height: calc(80vh - var(--gi-sticky-cta-height, 70px));
+}
+
+@media (max-width: 768px) {
+    .gi-mobile-fab {
+        bottom: calc(var(--gi-sticky-cta-height, 60px) + 16px);
+    }
+    
+    .gi-mobile-panel {
+        bottom: var(--gi-sticky-cta-height, 60px);
+        max-height: calc(80vh - var(--gi-sticky-cta-height, 60px));
     }
 }
