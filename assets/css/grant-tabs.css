@@ -1,1100 +1,927 @@
 /* ==========================================================================
-   Ultimate UI Grant & Column Section - Government Official Design v54.0
-   官公庁風デザイン - 濃紺×金カラースキーム
+   Grant & Column Information Hub - Clean Government Style v38.0
+   官公庁風シンプルデザイン - 白背景ベース + 濃紺×金アクセント
    ========================================================================== */
 
 /* ==========================================================================
-   Design System - CSS Variables (官公庁統一)
+   Google Fonts Import
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap');
+
+/* ==========================================================================
+   CSS Variables
    ========================================================================== */
 :root {
-    /* 官公庁カラーパレット - メイン */
-    --ui-gov-navy-900: #0d1b2a;
-    --ui-gov-navy-800: #1b263b;
-    --ui-gov-navy-700: #2c3e50;
-    --ui-gov-navy-600: #34495e;
-    --ui-gov-navy-500: #415a77;
-    --ui-gov-navy-400: #778da9;
-    --ui-gov-navy-300: #a3b1c6;
-    --ui-gov-navy-200: #cfd8e3;
-    --ui-gov-navy-100: #e8ecf1;
-    --ui-gov-navy-50: #f4f6f8;
+    /* Colors */
+    --hub-white: #fdfdfd;
+    --hub-bg: #f4f6f8;
+    --hub-navy: #0f2350;
+    --hub-navy-light: #1a3a70;
+    --hub-gold: #c5a059;
+    --hub-gold-light: #e6c885;
+    --hub-red: #a63737;
+    --hub-text: #2b2b2b;
+    --hub-text-light: #6b7280;
+    --hub-border: #dce3ea;
+    --hub-border-light: #e5e7eb;
     
-    /* アクセントカラー - 金 */
-    --ui-gov-gold: #c9a227;
-    --ui-gov-gold-light: #d4b77a;
-    --ui-gov-gold-pale: #f0e6c8;
-    
-    /* セマンティックカラー */
-    --ui-gov-green: #2e7d32;
-    --ui-gov-green-light: #e8f5e9;
-    --ui-gov-red: #c62828;
-    --ui-gov-red-light: #ffebee;
-    
-    /* ニュートラル */
-    --ui-white: #ffffff;
-    --ui-black: #1a1a1a;
-    --ui-gray-900: #212529;
-    --ui-gray-800: #343a40;
-    --ui-gray-700: #495057;
-    --ui-gray-600: #6c757d;
-    --ui-gray-500: #adb5bd;
-    --ui-gray-400: #ced4da;
-    --ui-gray-300: #dee2e6;
-    --ui-gray-200: #e9ecef;
-    --ui-gray-100: #f8f9fa;
-    
-    /* タイポグラフィ */
-    --ui-font-serif: "Shippori Mincho", "Yu Mincho", "YuMincho", "Hiragino Mincho ProN", serif;
-    --ui-font-sans: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --ui-font-mono: 'SF Mono', 'Monaco', 'Cascadia Code', 'Courier New', monospace;
-    
-    /* Font Sizes */
-    --ui-text-xs: 11px;
-    --ui-text-sm: 12px;
-    --ui-text-base: 14px;
-    --ui-text-md: 15px;
-    --ui-text-lg: 16px;
-    --ui-text-xl: 18px;
-    --ui-text-2xl: 20px;
-    --ui-text-3xl: 24px;
-    --ui-text-4xl: 32px;
+    /* Typography */
+    --hub-font-serif: "Shippori Mincho", "Yu Mincho", serif;
+    --hub-font-sans: "Noto Sans JP", -apple-system, sans-serif;
     
     /* Spacing */
-    --ui-space-1: 4px;
-    --ui-space-2: 8px;
-    --ui-space-3: 12px;
-    --ui-space-4: 16px;
-    --ui-space-5: 20px;
-    --ui-space-6: 24px;
-    --ui-space-8: 32px;
-    --ui-space-10: 40px;
-    --ui-space-12: 48px;
-    --ui-space-15: 60px;
-    --ui-space-20: 80px;
-    --ui-space-25: 100px;
+    --hub-space-xs: 4px;
+    --hub-space-sm: 8px;
+    --hub-space-md: 16px;
+    --hub-space-lg: 24px;
+    --hub-space-xl: 32px;
+    --hub-space-2xl: 48px;
     
-    /* Layout */
-    --ui-container-max: 1200px;
-    --ui-radius: 4px;
-    --ui-radius-lg: 8px;
-    
-    /* Shadows */
-    --ui-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
-    --ui-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    --ui-shadow-md: 0 6px 16px rgba(0, 0, 0, 0.12);
-    --ui-shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
-    
-    /* Transitions */
-    --ui-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    --ui-transition-slow: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    /* Effects */
+    --hub-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1);
+    --hub-shadow-lg: 0 10px 30px -5px rgba(15, 35, 80, 0.15);
+    --hub-radius: 4px;
+    --hub-transition: 0.25s ease;
 }
 
 /* ==========================================================================
-   Base Styles
+   Main Section
    ========================================================================== */
-.ui-section {
-    background: linear-gradient(180deg, var(--ui-gov-navy-50) 0%, var(--ui-white) 100%);
-    color: var(--ui-gray-900);
-    font-family: var(--ui-font-sans);
-    padding: var(--ui-space-25) 0;
+.info-hub {
+    background-color: rgba(244, 246, 248, 0.3);
+    padding: 64px 0;
+    font-family: var(--hub-font-sans);
+    color: var(--hub-text);
     line-height: 1.7;
-    font-size: var(--ui-text-base);
-    position: relative;
-    border-bottom: 1px solid var(--ui-gray-200);
 }
 
-/* 上部アクセントライン（官公庁風） */
-.ui-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--ui-gov-navy-800) 0%, var(--ui-gov-gold) 50%, var(--ui-gov-navy-800) 100%);
-    z-index: 10;
-}
-
-.ui-container {
-    max-width: var(--ui-container-max);
+.info-hub__container {
+    max-width: 1152px;
     margin: 0 auto;
-    padding: 0 var(--ui-space-6);
+    padding: 0 16px;
 }
 
-/* Reset */
-a {
+@media (min-width: 768px) {
+    .info-hub__container {
+        padding: 0 32px;
+    }
+}
+
+/* ==========================================================================
+   Section Header
+   ========================================================================== */
+.info-hub__header {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding-bottom: 24px;
+    margin-bottom: 48px;
+    border-bottom: 1px solid var(--hub-border);
+}
+
+@media (min-width: 768px) {
+    .info-hub__header {
+        flex-direction: row;
+        align-items: flex-end;
+        justify-content: space-between;
+    }
+}
+
+.info-hub__title {
+    font-family: var(--hub-font-serif);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--hub-navy);
+    margin: 0 0 8px 0;
+    letter-spacing: 0.02em;
+}
+
+@media (min-width: 768px) {
+    .info-hub__title {
+        font-size: 30px;
+    }
+}
+
+.info-hub__description {
+    font-size: 14px;
+    color: var(--hub-text-light);
+    margin: 0;
+}
+
+.info-hub__count {
+    font-weight: 700;
+    color: var(--hub-navy);
+    margin: 0 4px;
+}
+
+/* Stats Bar */
+.info-hub__stats {
+    display: flex;
+    gap: 16px;
+}
+
+.info-hub__stat {
+    background: var(--hub-white);
+    border: 1px solid var(--hub-border);
+    padding: 8px 16px;
+    border-radius: var(--hub-radius);
+    text-align: center;
+    min-width: 100px;
+    box-shadow: var(--hub-shadow);
+}
+
+.info-hub__stat--muted {
+    opacity: 0.6;
+}
+
+.info-hub__stat-label {
+    display: block;
+    font-size: 10px;
+    color: var(--hub-text-light);
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+}
+
+.info-hub__stat-number {
+    display: block;
+    font-family: var(--hub-font-serif);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--hub-navy);
+}
+
+.info-hub__stat--muted .info-hub__stat-number {
+    color: var(--hub-text-light);
+}
+
+/* ==========================================================================
+   Columns Grid
+   ========================================================================== */
+.info-hub__columns-grid {
+    display: grid;
+    gap: 48px;
+    margin-bottom: 80px;
+}
+
+@media (min-width: 1024px) {
+    .info-hub__columns-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* Section Header */
+.info-hub__section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.info-hub__section-title {
+    font-family: var(--hub-font-serif);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--hub-navy);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+}
+
+.info-hub__section-bar {
+    width: 4px;
+    height: 24px;
+    background: var(--hub-gold);
+    flex-shrink: 0;
+}
+
+.info-hub__section-sub {
+    font-size: 12px;
+    font-family: var(--hub-font-sans);
+    font-weight: 400;
+    color: var(--hub-text-light);
+    margin-left: 8px;
+}
+
+.info-hub__link {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--hub-gold);
+    text-decoration: none;
+    border-bottom: 1px solid var(--hub-gold);
+    padding-bottom: 2px;
+    transition: var(--hub-transition);
+    white-space: nowrap;
+}
+
+.info-hub__link:hover {
+    color: var(--hub-navy);
+    border-color: var(--hub-navy);
+}
+
+/* ==========================================================================
+   Article Cards (New Columns)
+   ========================================================================== */
+.info-hub__articles {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.article-card {
+    background: var(--hub-white);
+    border: 1px solid var(--hub-border);
+    border-radius: var(--hub-radius);
+    box-shadow: var(--hub-shadow);
+    transition: var(--hub-transition);
+}
+
+.article-card:hover {
+    border-color: var(--hub-gold);
+}
+
+.article-card__link {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
     text-decoration: none;
     color: inherit;
 }
 
-ul, ol {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-h2, h3, h4, p, dl, dt, dd {
-    margin: 0;
-}
-
-figure {
-    margin: 0;
-}
-
-/* ==========================================================================
-   Header
-   ========================================================================== */
-.ui-header {
-    text-align: center;
-    margin-bottom: var(--ui-space-15);
-}
-
-.ui-title {
-    font-family: var(--ui-font-mono);
-    font-size: var(--ui-text-xs);
-    letter-spacing: 0.15em;
-    font-weight: 700;
-    color: var(--ui-gov-navy-500);
-    margin-bottom: var(--ui-space-3);
-    text-transform: uppercase;
-}
-
-.ui-subtitle {
-    font-family: var(--ui-font-serif);
-    font-size: clamp(24px, 5vw, var(--ui-text-4xl));
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    color: var(--ui-gov-navy-900);
-    margin-bottom: var(--ui-space-4);
-    position: relative;
-    display: inline-block;
-}
-
-.ui-subtitle::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80px;
-    height: 4px;
-    background: linear-gradient(90deg, var(--ui-gov-gold) 0%, var(--ui-gov-gold-light) 100%);
-    border-radius: 2px;
-}
-
-.ui-description {
-    font-size: var(--ui-text-md);
-    color: var(--ui-gray-700);
-    line-height: 1.9;
-    margin-top: var(--ui-space-6);
-}
-
-.ui-count-emphasis {
-    color: var(--ui-gov-navy-900);
-    font-weight: 700;
-}
-
-.ui-sp-only {
-    display: none;
-}
-
-/* ==========================================================================
-   Tabs Navigation
-   ========================================================================== */
-.ui-tabs-wrapper {
-    border-bottom: 2px solid var(--ui-gov-navy-800);
-    margin-bottom: var(--ui-space-10);
-    background: var(--ui-white);
-}
-
-.ui-tabs-nav {
-    display: flex;
-    justify-content: center;
-    gap: 0;
-}
-
-.ui-tab-btn {
-    background: transparent;
-    border: none;
-    padding: var(--ui-space-5) var(--ui-space-10);
-    cursor: pointer;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: var(--ui-gray-600);
-    transition: all var(--ui-transition);
-    font-family: inherit;
-    border-bottom: 3px solid transparent;
-    margin-bottom: -2px;
-}
-
-.ui-tab-btn:hover {
-    color: var(--ui-gov-navy-800);
-    background: var(--ui-gov-navy-50);
-}
-
-.ui-tab-btn:focus-visible {
-    outline: 3px solid var(--ui-gov-gold);
-    outline-offset: -3px;
-}
-
-.ui-tab-btn.active {
-    color: var(--ui-gov-navy-900);
-    background: var(--ui-gov-navy-50);
-    border-bottom-color: var(--ui-gov-gold);
-}
-
-.ui-tab-en {
-    font-family: var(--ui-font-mono);
-    font-weight: 700;
-    font-size: var(--ui-text-xs);
-    letter-spacing: 0.1em;
-    margin-bottom: var(--ui-space-1);
-}
-
-.ui-tab-ja {
-    font-family: var(--ui-font-serif);
-    font-size: var(--ui-text-md);
-    font-weight: 700;
-}
-
-.ui-tab-count {
-    position: absolute;
-    top: var(--ui-space-2);
-    right: var(--ui-space-5);
-    font-size: var(--ui-text-xs);
-    color: var(--ui-gov-navy-400);
-    font-family: var(--ui-font-mono);
-    background: var(--ui-gov-navy-100);
-    padding: 2px 6px;
-    border-radius: 10px;
-}
-
-.ui-tab-btn.active .ui-tab-count {
-    background: var(--ui-gov-gold);
-    color: var(--ui-gov-navy-900);
-}
-
-/* ==========================================================================
-   Panels
-   ========================================================================== */
-.ui-panels-container {
-    margin-bottom: var(--ui-space-20);
-}
-
-.ui-panel {
-    display: none;
-}
-
-.ui-panel.active {
-    display: block;
-    animation: fadeIn 0.5s var(--ui-transition-slow);
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(var(--ui-space-2));
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
+@media (min-width: 480px) {
+    .article-card__link {
+        flex-direction: row;
     }
 }
 
-/* ==========================================================================
-   Sub Sections
-   ========================================================================== */
-.ui-sub-section {
-    margin-bottom: var(--ui-space-15);
-    background: var(--ui-white);
-    border: 1px solid var(--ui-gray-200);
-    border-radius: var(--ui-radius-lg);
-    padding: var(--ui-space-8);
-    box-shadow: var(--ui-shadow-sm);
-}
-
-.ui-sub-header {
-    margin-bottom: var(--ui-space-6);
-    padding-bottom: var(--ui-space-4);
-    border-bottom: 2px solid var(--ui-gov-navy-800);
-}
-
-.ui-sub-title {
-    font-family: var(--ui-font-serif);
-    font-size: var(--ui-text-xl);
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: var(--ui-space-3);
-    color: var(--ui-gov-navy-900);
-    margin-bottom: var(--ui-space-2);
-}
-
-.ui-sub-description {
-    font-size: var(--ui-text-sm);
-    color: var(--ui-gray-600);
-    padding-left: calc(10px + var(--ui-space-3));
-}
-
-.ui-icon-dot {
-    width: 10px;
-    height: 10px;
-    background: linear-gradient(135deg, var(--ui-gov-gold) 0%, var(--ui-gov-gold-light) 100%);
-    border-radius: 2px;
+.article-card__image {
+    width: 100%;
+    height: 80px;
+    background: var(--hub-bg);
     flex-shrink: 0;
-}
-
-/* ==========================================================================
-   Layout Helpers
-   ========================================================================== */
-.ui-dual-columns {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--ui-space-8);
-}
-
-.ui-dual-columns .ui-sub-section {
-    margin-bottom: 0;
-}
-
-.ui-grid-featured {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--ui-space-6);
-}
-
-.ui-grid-columns {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--ui-space-6);
-}
-
-/* ==========================================================================
-   Cards
-   ========================================================================== */
-.ui-card {
-    background: var(--ui-white);
-    border: 1px solid var(--ui-gray-200);
-    border-radius: var(--ui-radius-lg);
-    transition: all var(--ui-transition);
+    position: relative;
     overflow: hidden;
+    border-radius: var(--hub-radius);
 }
 
-.ui-card:hover {
-    border-color: var(--ui-gov-navy-400);
-    transform: translateY(-4px);
-    box-shadow: var(--ui-shadow-lg);
+@media (min-width: 480px) {
+    .article-card__image {
+        width: 128px;
+    }
 }
 
-.ui-card-link {
-    display: block;
-    height: 100%;
-}
-
-.ui-card-link:focus-visible {
-    outline: 3px solid var(--ui-gov-gold);
-    outline-offset: 2px;
-}
-
-.ui-card-body {
-    padding: var(--ui-space-6);
-}
-
-/* Featured Card */
-.ui-card-featured {
-    border-left: 4px solid var(--ui-gov-gold);
-}
-
-.ui-card-featured .ui-card-labels {
-    display: flex;
-    gap: var(--ui-space-2);
-    margin-bottom: var(--ui-space-4);
-}
-
-.ui-label {
-    font-size: var(--ui-text-xs);
-    font-weight: 700;
-    padding: var(--ui-space-1) var(--ui-space-3);
-    border-radius: var(--ui-radius);
-}
-
-.ui-label-featured {
-    background: linear-gradient(135deg, var(--ui-gov-navy-800) 0%, var(--ui-gov-navy-900) 100%);
-    color: var(--ui-white);
-}
-
-.ui-label-urgent {
-    background: var(--ui-gov-red-light);
-    border: 1px solid var(--ui-gov-red);
-    color: var(--ui-gov-red);
-}
-
-.ui-card-title {
-    font-family: var(--ui-font-serif);
-    font-size: var(--ui-text-lg);
-    font-weight: 700;
-    line-height: 1.5;
-    margin-bottom: var(--ui-space-4);
-    color: var(--ui-gov-navy-900);
-    min-height: calc(var(--ui-text-lg) * 1.5 * 2);
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-.ui-card-meta {
-    display: flex;
-    flex-direction: column;
-    gap: var(--ui-space-2);
-}
-
-.ui-card-meta-item {
-    display: flex;
-    justify-content: space-between;
-    font-size: var(--ui-text-sm);
-    padding-bottom: var(--ui-space-2);
-    border-bottom: 1px dashed var(--ui-gray-300);
-}
-
-.ui-card-meta-item:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-}
-
-.ui-card-meta-item dt {
-    color: var(--ui-gray-600);
-}
-
-.ui-card-meta-item dd {
-    font-weight: 700;
-    font-family: var(--ui-font-mono);
-    color: var(--ui-gov-navy-900);
-}
-
-/* Column Card */
-.ui-card-column .ui-card-image {
-    aspect-ratio: 16/9;
-    background: var(--ui-gov-navy-50);
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-bottom: 1px solid var(--ui-gray-200);
-}
-
-.ui-card-thumb {
+.article-card__thumb {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform var(--ui-transition-slow);
 }
 
-.ui-card:hover .ui-card-thumb {
-    transform: scale(1.05);
+.article-card__no-image {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--hub-bg) 0%, var(--hub-border) 100%);
 }
 
-.ui-card-no-image {
-    background: var(--ui-gov-navy-100);
+.article-card__badge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: var(--hub-navy);
+    color: white;
+    font-size: 10px;
+    padding: 2px 8px;
+    font-family: var(--hub-font-sans);
 }
 
-.ui-no-image-text {
-    color: var(--ui-gov-navy-300);
-    font-size: var(--ui-text-sm);
-    font-weight: 700;
-    font-family: var(--ui-font-mono);
-}
-
-.ui-card-column .ui-card-body {
-    padding: var(--ui-space-5);
-}
-
-.ui-card-column .ui-card-title {
-    font-size: var(--ui-text-md);
-    min-height: calc(var(--ui-text-md) * 1.5 * 2);
-}
-
-.ui-card-date {
-    font-size: var(--ui-text-sm);
-    color: var(--ui-gray-600);
-    display: block;
-    margin-bottom: var(--ui-space-2);
-    font-family: var(--ui-font-mono);
-}
-
-/* ==========================================================================
-   List Items
-   ========================================================================== */
-.ui-list-group {
-    border-top: 2px solid var(--ui-gov-navy-200);
-}
-
-.ui-list-item {
-    border-bottom: 1px solid var(--ui-gray-200);
-    transition: background var(--ui-transition);
-}
-
-.ui-list-item:hover {
-    background: var(--ui-gov-navy-50);
-}
-
-.ui-list-link {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: var(--ui-space-5) var(--ui-space-4);
-    gap: var(--ui-space-5);
-}
-
-.ui-list-link:focus-visible {
-    outline: 3px solid var(--ui-gov-gold);
-    outline-offset: -3px;
-}
-
-.ui-list-content {
+.article-card__body {
     flex: 1;
-    min-width: 0;
 }
 
-.ui-list-title {
-    font-family: var(--ui-font-serif);
-    font-size: var(--ui-text-md);
-    font-weight: 600;
-    margin-bottom: var(--ui-space-2);
-    line-height: 1.5;
-    color: var(--ui-gov-navy-900);
+.article-card__date {
+    display: block;
+    font-size: 10px;
+    color: var(--hub-text-light);
+    margin-bottom: 4px;
 }
 
-.ui-list-date {
-    font-size: var(--ui-text-sm);
-    color: var(--ui-gray-600);
-    font-family: var(--ui-font-mono);
-}
-
-.ui-list-date-urgent {
-    color: var(--ui-gov-red);
+.article-card__title {
+    font-size: 14px;
     font-weight: 700;
-    background: var(--ui-gov-red-light);
-    padding: var(--ui-space-1) var(--ui-space-2);
-    border-radius: var(--ui-radius);
-    display: inline-block;
+    color: var(--hub-text);
+    line-height: 1.6;
+    margin: 0;
+    transition: var(--hub-transition);
 }
 
-.ui-list-date-urgent strong {
-    font-size: var(--ui-text-lg);
-}
-
-.ui-list-meta {
-    display: flex;
-    align-items: center;
-    gap: var(--ui-space-3);
-    font-size: var(--ui-text-sm);
-}
-
-.ui-list-views {
-    color: var(--ui-gov-navy-600);
-    font-weight: 600;
-    font-family: var(--ui-font-mono);
-    background: var(--ui-gov-navy-100);
-    padding: var(--ui-space-1) var(--ui-space-2);
-    border-radius: var(--ui-radius);
-}
-
-.ui-list-header {
-    display: flex;
-    align-items: center;
-    gap: var(--ui-space-3);
-    margin-bottom: var(--ui-space-2);
-}
-
-.ui-list-category {
-    background: var(--ui-gov-navy-800);
-    color: var(--ui-white);
-    font-size: var(--ui-text-xs);
-    padding: var(--ui-space-1) var(--ui-space-3);
-    font-weight: 700;
-    border-radius: var(--ui-radius);
-}
-
-.ui-list-arrow {
-    font-family: var(--ui-font-sans);
-    font-weight: 300;
-    flex-shrink: 0;
-    transition: all var(--ui-transition);
-    font-size: var(--ui-text-xl);
-    color: var(--ui-gov-navy-400);
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: var(--ui-gov-navy-50);
-}
-
-.ui-list-link:hover .ui-list-arrow {
-    transform: translateX(var(--ui-space-1));
-    background: var(--ui-gov-navy-800);
-    color: var(--ui-white);
+.article-card:hover .article-card__title {
+    color: var(--hub-navy-light);
+    text-decoration: underline;
+    text-underline-offset: 4px;
 }
 
 /* ==========================================================================
-   More Button
+   Ranking List
    ========================================================================== */
-.ui-more-container {
-    margin-top: var(--ui-space-6);
-    text-align: right;
-    padding-top: var(--ui-space-4);
-    border-top: 1px solid var(--ui-gray-200);
-}
-
-.ui-btn-more {
-    font-family: var(--ui-font-mono);
-    font-size: var(--ui-text-sm);
-    font-weight: 700;
-    color: var(--ui-gov-navy-800);
-    border-bottom: 2px solid var(--ui-gov-gold);
-    padding-bottom: 4px;
-    transition: all var(--ui-transition);
-    display: inline-flex;
-    align-items: center;
-    gap: var(--ui-space-2);
-    letter-spacing: 0.05em;
-}
-
-.ui-btn-more::after {
-    content: '→';
-    transition: transform var(--ui-transition);
-}
-
-.ui-btn-more:hover {
-    color: var(--ui-gov-navy-600);
-    border-color: var(--ui-gov-navy-600);
-}
-
-.ui-btn-more:hover::after {
-    transform: translateX(4px);
-}
-
-.ui-btn-more:focus-visible {
-    outline: 3px solid var(--ui-gov-gold);
-    outline-offset: 4px;
-}
-
-/* ==========================================================================
-   Ranking Section
-   ========================================================================== */
-.ui-ranking-section {
-    margin-top: var(--ui-space-20);
-    padding: var(--ui-space-15) 0;
-    background: linear-gradient(135deg, var(--ui-gov-navy-800) 0%, var(--ui-gov-navy-900) 100%);
-    margin-left: calc(-50vw + 50%);
-    margin-right: calc(-50vw + 50%);
-    padding-left: calc(50vw - 50%);
-    padding-right: calc(50vw - 50%);
+.ranking-list {
+    background: var(--hub-white);
+    border: 2px solid var(--hub-border);
+    border-radius: var(--hub-radius);
+    padding: 24px;
+    box-shadow: var(--hub-shadow-lg);
     position: relative;
 }
 
-.ui-ranking-section::before {
-    content: '';
+.ranking-list__binding {
+    position: absolute;
+    left: 16px;
+    top: 0;
+    bottom: 0;
+    border-left: 2px dotted var(--hub-border-light);
+}
+
+.ranking-list__items {
+    list-style: none;
+    padding: 0 0 0 24px;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.ranking-item {
+    position: relative;
+}
+
+.ranking-item--rest {
+    opacity: 0.8;
+}
+
+.ranking-item__rank {
+    position: absolute;
+    left: -40px;
+    top: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--hub-font-serif);
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: var(--hub-radius);
+    box-shadow: var(--hub-shadow);
+}
+
+.ranking-item__rank--gold {
+    background: var(--hub-gold);
+    color: white;
+}
+
+.ranking-item__rank--silver {
+    background: #9ca3af;
+    color: white;
+}
+
+.ranking-item:not(.ranking-item--top) .ranking-item__rank {
+    background: #e5e7eb;
+    color: var(--hub-text-light);
+}
+
+.ranking-item__link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.ranking-item__title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--hub-text);
+    line-height: 1.6;
+    margin: 0 0 4px 0;
+    transition: var(--hub-transition);
+}
+
+.ranking-item__link:hover .ranking-item__title {
+    color: var(--hub-gold);
+}
+
+.ranking-item__meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--hub-text-light);
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--hub-border-light);
+}
+
+.ranking-item__pv {
+    background: var(--hub-bg);
+    padding: 2px 6px;
+    border-radius: var(--hub-radius);
+    font-weight: 700;
+    color: var(--hub-navy);
+}
+
+/* ==========================================================================
+   Grant Tabs Section
+   ========================================================================== */
+.grant-tabs {
+    background: var(--hub-white);
+    border: 1px solid var(--hub-border);
+    border-radius: var(--hub-radius);
+    box-shadow: var(--hub-shadow-lg);
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+}
+
+@media (min-width: 768px) {
+    .grant-tabs {
+        padding: 40px;
+    }
+}
+
+.grant-tabs__decoration {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 128px;
+    height: 128px;
+    background: rgba(15, 35, 80, 0.05);
+    border-bottom-left-radius: 100%;
+    pointer-events: none;
+}
+
+/* Tabs Navigation */
+.grant-tabs__nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    border-bottom: 1px solid var(--hub-border);
+    margin-bottom: 32px;
+    padding-bottom: 1px;
+}
+
+.grant-tabs__btn {
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: var(--hub-font-sans);
+    color: var(--hub-text-light);
+    background: transparent;
+    border: none;
+    border-top: 2px solid transparent;
+    border-left: 1px solid transparent;
+    border-right: 1px solid transparent;
+    border-radius: var(--hub-radius) var(--hub-radius) 0 0;
+    cursor: pointer;
+    transition: var(--hub-transition);
+    position: relative;
+    top: 1px;
+}
+
+.grant-tabs__btn:hover {
+    color: var(--hub-navy);
+}
+
+.grant-tabs__btn.active {
+    background: var(--hub-navy);
+    color: white;
+    border-color: var(--hub-navy);
+}
+
+.grant-tabs__badge {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 9999px;
+    margin-left: 4px;
+    vertical-align: middle;
+}
+
+.grant-tabs__badge--red {
+    background: var(--hub-red);
+    color: white;
+}
+
+.grant-tabs__badge--gold {
+    background: var(--hub-gold);
+    color: white;
+}
+
+/* Tab Panels */
+.grant-tabs__panel {
+    animation: fadeIn 0.4s ease-out;
+}
+
+.grant-tabs__panel[hidden] {
+    display: none;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.grant-tabs__panel-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.grant-tabs__panel-desc {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--hub-navy);
+    margin: 0 0 24px 0;
+}
+
+.grant-tabs__panel-desc--red {
+    color: var(--hub-red);
+}
+
+/* ==========================================================================
+   Grant Cards (Featured)
+   ========================================================================== */
+.grant-cards {
+    display: grid;
+    gap: 24px;
+}
+
+@media (min-width: 768px) {
+    .grant-cards {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.grant-card {
+    border: 1px solid var(--hub-border);
+    border-radius: var(--hub-radius);
+    padding: 20px;
+    background: var(--hub-white);
+    transition: var(--hub-transition);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.grant-card:hover {
+    box-shadow: var(--hub-shadow-lg);
+}
+
+.grant-card__top-line {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, var(--ui-gov-gold) 0%, var(--ui-gov-gold-light) 50%, var(--ui-gov-gold) 100%);
+    background: var(--hub-gold);
+    border-radius: var(--hub-radius) var(--hub-radius) 0 0;
 }
 
-.ui-ranking-main-header {
-    text-align: center;
-    margin-bottom: var(--ui-space-12);
-    color: var(--ui-white);
-}
-
-.ui-ranking-main-title {
-    font-family: var(--ui-font-mono);
-    font-size: var(--ui-text-3xl);
-    font-weight: 900;
-    letter-spacing: 0.1em;
-    margin-bottom: var(--ui-space-2);
-    color: var(--ui-white);
-}
-
-.ui-ranking-main-description {
-    font-size: var(--ui-text-base);
-    color: var(--ui-gov-navy-300);
-}
-
-.ui-ranking-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--ui-space-10);
-    max-width: var(--ui-container-max);
-    margin: 0 auto;
-}
-
-.ui-ranking-col {
-    background: var(--ui-white);
-    border-radius: var(--ui-radius-lg);
-    padding: var(--ui-space-8);
-    box-shadow: var(--ui-shadow-lg);
-}
-
-.ui-ranking-header {
-    margin-bottom: var(--ui-space-6);
-    padding-bottom: var(--ui-space-4);
-    border-bottom: 2px solid var(--ui-gov-gold);
-}
-
-.ui-ranking-title {
-    font-family: var(--ui-font-mono);
-    font-size: var(--ui-text-lg);
-    font-weight: 900;
-    letter-spacing: 0.08em;
-    margin-bottom: var(--ui-space-1);
-    color: var(--ui-gov-navy-900);
-}
-
-.ui-ranking-subtitle {
-    font-size: var(--ui-text-sm);
-    color: var(--ui-gray-600);
-}
-
-.ui-ranking-list {
+.grant-card__badges {
     display: flex;
-    flex-direction: column;
-    gap: var(--ui-space-3);
-    counter-reset: ranking;
+    gap: 8px;
+    margin-bottom: 12px;
 }
 
-.ui-ranking-item {
-    padding-bottom: var(--ui-space-3);
-    border-bottom: 1px solid var(--ui-gray-200);
+.grant-card__badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: var(--hub-radius);
 }
 
-.ui-ranking-item:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
+.grant-card__badge--gold {
+    background: var(--hub-gold);
+    color: white;
 }
 
-.ui-ranking-link {
-    display: flex;
-    align-items: center;
-    gap: var(--ui-space-4);
-    transition: all var(--ui-transition);
-    padding: var(--ui-space-2);
-    margin: calc(var(--ui-space-2) * -1);
-    border-radius: var(--ui-radius);
+.grant-card__badge--red {
+    background: var(--hub-red);
+    color: white;
 }
 
-.ui-ranking-link:hover {
-    background: var(--ui-gov-navy-50);
+.grant-card__title {
+    font-family: var(--hub-font-serif);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--hub-navy);
+    line-height: 1.4;
+    margin: 0 0 12px 0;
 }
 
-.ui-ranking-link:focus-visible {
-    outline: 3px solid var(--ui-gov-gold);
-    outline-offset: 2px;
+.grant-card__title a {
+    color: inherit;
+    text-decoration: none;
+    transition: var(--hub-transition);
 }
 
-.ui-ranking-number {
-    flex-shrink: 0;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--ui-font-mono);
-    font-size: var(--ui-text-lg);
-    font-weight: 900;
-    color: var(--ui-gov-navy-300);
-    background: var(--ui-gray-100);
-    border-radius: 50%;
-    transition: all var(--ui-transition);
+.grant-card:hover .grant-card__title a {
+    color: var(--hub-gold);
 }
 
-.ui-ranking-link:hover .ui-ranking-number {
-    color: var(--ui-gov-navy-800);
-    background: var(--ui-gov-navy-200);
-}
-
-.rank-1 .ui-ranking-number {
-    background: linear-gradient(135deg, var(--ui-gov-gold) 0%, var(--ui-gov-gold-light) 100%);
-    color: var(--ui-gov-navy-900);
-}
-
-.rank-2 .ui-ranking-number {
-    background: var(--ui-gov-navy-300);
-    color: var(--ui-gov-navy-900);
-}
-
-.rank-3 .ui-ranking-number {
-    background: var(--ui-gov-navy-400);
-    color: var(--ui-white);
-}
-
-.ui-ranking-text {
-    flex: 1;
-    font-family: var(--ui-font-serif);
-    font-size: var(--ui-text-base);
-    font-weight: 600;
-    line-height: 1.5;
-    color: var(--ui-gov-navy-900);
-    overflow: hidden;
-    text-overflow: ellipsis;
+.grant-card__excerpt {
+    font-size: 12px;
+    color: var(--hub-text-light);
+    line-height: 1.6;
+    margin: 0 0 16px 0;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.grant-card__footer {
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px dashed var(--hub-border-light);
+}
+
+.grant-card__deadline {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.grant-card__deadline-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--hub-text-light);
+}
+
+.grant-card__deadline-date {
+    font-size: 14px;
+    font-weight: 700;
+    font-family: var(--hub-font-sans);
+    color: var(--hub-text);
+}
+
+.grant-card__deadline-date--urgent {
+    color: var(--hub-red);
+}
+
+.grant-card__cta {
+    display: block;
+    width: 100%;
+    text-align: center;
+    background: var(--hub-navy);
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 8px;
+    border-radius: var(--hub-radius);
+    text-decoration: none;
+    transition: var(--hub-transition);
+}
+
+.grant-card__cta:hover {
+    background: var(--hub-gold);
+}
+
+/* ==========================================================================
+   Deadline List
+   ========================================================================== */
+.deadline-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.deadline-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+    background: rgba(244, 246, 248, 0.3);
+    border: 1px solid var(--hub-border);
+    border-radius: var(--hub-radius);
+    text-decoration: none;
+    color: inherit;
+    transition: var(--hub-transition);
+}
+
+@media (min-width: 768px) {
+    .deadline-item {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+.deadline-item:hover {
+    background: var(--hub-white);
+    border-color: var(--hub-red);
+}
+
+.deadline-item__content {
+    flex: 1;
+}
+
+.deadline-item__title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--hub-text);
+    margin: 0;
+    transition: var(--hub-transition);
+}
+
+.deadline-item:hover .deadline-item__title {
+    color: var(--hub-red);
+}
+
+.deadline-item__date {
+    font-size: 10px;
+    color: var(--hub-text-light);
+}
+
+.deadline-item__info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.deadline-item__label {
+    font-size: 10px;
+    background: var(--hub-white);
+    border: 1px solid var(--hub-border-light);
+    padding: 4px 8px;
+    border-radius: var(--hub-radius);
+}
+
+.deadline-item__days {
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    background: var(--hub-red);
+    padding: 4px 12px;
+    border-radius: var(--hub-radius);
+    box-shadow: var(--hub-shadow);
+}
+
+/* ==========================================================================
+   New Grants List
+   ========================================================================== */
+.new-grants-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.new-grant-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+    border-bottom: 1px dashed var(--hub-border-light);
+    text-decoration: none;
+    color: inherit;
+    transition: var(--hub-transition);
+}
+
+@media (min-width: 768px) {
+    .new-grant-item {
+        flex-direction: row;
+        align-items: baseline;
+    }
+}
+
+.new-grant-item:hover {
+    background: rgba(244, 246, 248, 0.3);
+}
+
+.new-grant-item__date {
+    font-size: 10px;
+    color: var(--hub-text-light);
+    flex-shrink: 0;
+}
+
+.new-grant-item__title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--hub-navy);
+    margin: 0;
+    transition: var(--hub-transition);
+}
+
+.new-grant-item:hover .new-grant-item__title {
+    color: var(--hub-gold);
 }
 
 /* ==========================================================================
    Empty State
    ========================================================================== */
-.ui-empty-state {
+.info-hub__empty {
     text-align: center;
-    padding: var(--ui-space-12) var(--ui-space-6);
-    color: var(--ui-gray-600);
-    font-size: var(--ui-text-base);
-    background: var(--ui-gov-navy-50);
-    border: 2px dashed var(--ui-gov-navy-200);
-    border-radius: var(--ui-radius-lg);
-}
-
-.ui-empty-state-sm {
-    text-align: center;
-    padding: var(--ui-space-8) var(--ui-space-5);
-    color: var(--ui-gray-600);
-    font-size: var(--ui-text-sm);
-    background: var(--ui-gov-navy-50);
-    border: 2px dashed var(--ui-gov-navy-200);
-    border-radius: var(--ui-radius);
+    padding: 40px 24px;
+    color: var(--hub-text-light);
+    background: var(--hub-bg);
+    border: 2px dashed var(--hub-border);
+    border-radius: var(--hub-radius);
 }
 
 /* ==========================================================================
-   Responsive Design
+   Responsive
    ========================================================================== */
-
-/* Tablet (768px以下) */
-@media (max-width: 768px) {
-    .ui-section {
-        padding: var(--ui-space-15) 0;
+@media (max-width: 767px) {
+    .info-hub {
+        padding: 40px 0;
     }
     
-    .ui-container {
-        padding: 0 var(--ui-space-4);
+    .info-hub__header {
+        text-align: center;
     }
     
-    .ui-sp-only {
-        display: inline;
+    .info-hub__stats {
+        justify-content: center;
     }
     
-    .ui-subtitle {
-        font-size: var(--ui-text-3xl);
+    .info-hub__section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
     }
     
-    .ui-description {
-        font-size: var(--ui-text-base);
+    .info-hub__section-title {
+        font-size: 18px;
+        flex-wrap: wrap;
     }
     
-    /* Tabs - Horizontal Scroll */
-    .ui-tabs-wrapper {
-        margin: 0 calc(var(--ui-space-4) * -1) var(--ui-space-8);
-        padding: 0 var(--ui-space-4);
+    .info-hub__section-sub {
+        width: 100%;
+        margin-left: 16px;
     }
     
-    .ui-tabs-nav {
-        justify-content: flex-start;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
+    .ranking-list {
+        padding: 16px;
     }
     
-    .ui-tabs-nav::-webkit-scrollbar {
-        display: none;
+    .ranking-list__binding {
+        left: 12px;
     }
     
-    .ui-tab-btn {
-        padding: var(--ui-space-4) var(--ui-space-5);
-        flex-shrink: 0;
+    .ranking-list__items {
+        padding-left: 20px;
     }
     
-    /* Stack Columns */
-    .ui-dual-columns {
-        grid-template-columns: 1fr;
-        gap: var(--ui-space-6);
+    .ranking-item__rank {
+        left: -32px;
+        width: 20px;
+        height: 20px;
+        font-size: 10px;
     }
     
-    .ui-ranking-grid {
-        grid-template-columns: 1fr;
-        gap: var(--ui-space-6);
-    }
-    
-    /* Sub Section */
-    .ui-sub-section {
-        padding: var(--ui-space-6);
-        margin-bottom: var(--ui-space-6);
-    }
-    
-    /* Horizontal Scroll for Cards */
-    .ui-grid-featured,
-    .ui-grid-columns {
-        display: flex;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        gap: var(--ui-space-4);
-        padding-bottom: var(--ui-space-4);
-        margin-right: calc(var(--ui-space-4) * -1);
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-    }
-    
-    .ui-grid-featured::-webkit-scrollbar,
-    .ui-grid-columns::-webkit-scrollbar {
-        display: none;
-    }
-    
-    .ui-grid-featured .ui-card,
-    .ui-grid-columns .ui-card {
-        min-width: 280px;
-        scroll-snap-align: start;
-    }
-    
-    .ui-ranking-section {
-        margin-top: var(--ui-space-10);
-        padding: var(--ui-space-10) var(--ui-space-4);
-    }
-    
-    .ui-ranking-col {
-        padding: var(--ui-space-6);
-    }
-    
-    .ui-list-title {
-        font-size: var(--ui-text-base);
-    }
-    
-    .ui-list-link {
-        padding: var(--ui-space-4) var(--ui-space-2);
-    }
-}
-
-/* Small Mobile (480px以下) */
-@media (max-width: 480px) {
-    .ui-subtitle {
-        font-size: var(--ui-text-2xl);
-    }
-    
-    .ui-subtitle::after {
-        width: 60px;
-        height: 3px;
-    }
-    
-    .ui-grid-featured .ui-card,
-    .ui-grid-columns .ui-card {
-        min-width: 260px;
-    }
-    
-    .ui-card-title {
-        font-size: var(--ui-text-md);
-    }
-    
-    .ui-ranking-main-title {
-        font-size: var(--ui-text-xl);
-    }
-    
-    .ui-ranking-number {
-        width: 32px;
-        height: 32px;
-        font-size: var(--ui-text-base);
-    }
-}
-
-/* ==========================================================================
-   Print Styles
-   ========================================================================== */
-@media print {
-    .ui-section::before,
-    .ui-tabs-wrapper,
-    .ui-ranking-section,
-    .ui-btn-more {
-        display: none;
-    }
-    
-    .ui-section {
-        background: white;
-        padding: 24px 0;
-    }
-    
-    .ui-panel {
-        display: block;
-    }
-    
-    .ui-card,
-    .ui-list-item {
-        page-break-inside: avoid;
-        border: 1px solid #000;
-    }
-    
-    .ui-sub-section {
-        box-shadow: none;
-        border: 1px solid #000;
+    .grant-tabs__btn {
+        padding: 8px 16px;
+        font-size: 13px;
     }
 }
 
 /* ==========================================================================
    Accessibility
    ========================================================================== */
-
-/* Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
+    .grant-tabs__panel {
+        animation: none;
+    }
+    
+    * {
         transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
     }
 }
 
-/* High Contrast Mode */
-@media (prefers-contrast: high) {
-    .ui-card,
-    .ui-list-item,
-    .ui-sub-section {
-        border-width: 2px;
-    }
-    
-    .ui-label-featured {
-        border: 2px solid var(--ui-white);
-    }
-    
-    .ui-tab-btn.active {
-        border-bottom-width: 4px;
-    }
-}
-
-/* Focus Visible for all interactive elements */
-.ui-section a:focus-visible,
-.ui-section button:focus-visible {
-    outline: 3px solid var(--ui-gov-gold);
+.info-hub a:focus-visible,
+.info-hub button:focus-visible {
+    outline: 3px solid var(--hub-gold);
     outline-offset: 2px;
 }
 
 /* ==========================================================================
-   強制表示
+   Print
    ========================================================================== */
-.ultimate-section,
-.tabs-container,
-.tab-content,
-.ui-section,
-.ui-container,
-.ui-panels-container {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-}
-
-.ui-panel.active {
-    display: block !important;
+@media print {
+    .info-hub {
+        background: white;
+        padding: 24px 0;
+    }
+    
+    .grant-tabs__nav {
+        display: none;
+    }
+    
+    .grant-tabs__panel[hidden] {
+        display: block !important;
+    }
+    
+    .grant-card,
+    .article-card,
+    .ranking-list {
+        box-shadow: none;
+        border: 1px solid #000;
+    }
 }

@@ -493,6 +493,11 @@ document.addEventListener('DOMContentLoaded', function() {
             fixedPurpose: '',
             fixedTag: ''
         });
+        
+        // モバイルフィルターの初期化
+        if (typeof ArchiveCommon.initMobileFilter === 'function') {
+            ArchiveCommon.initMobileFilter();
+        }
     }
 });
 </script>

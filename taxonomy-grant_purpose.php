@@ -504,6 +504,11 @@ document.addEventListener('DOMContentLoaded', function() {
             fixedPurpose: '<?php echo esc_js($purpose_slug); ?>',
             fixedTag: ''
         });
+        
+        // モバイルフィルターの初期化
+        if (typeof ArchiveCommon.initMobileFilter === 'function') {
+            ArchiveCommon.initMobileFilter();
+        }
     }
 });
 </script>

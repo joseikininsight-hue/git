@@ -146,9 +146,10 @@
             
             el.mobileFilterToggle = document.getElementById('mobile-filter-toggle');
             el.mobileFilterClose = document.getElementById('mobile-filter-close');
-            el.filterPanel = document.getElementById('filter-panel');
+            // Support both old 'filter-panel' and new 'mobile-filter-panel' IDs
+            el.filterPanel = document.getElementById('mobile-filter-panel') || document.getElementById('filter-panel');
             el.mobileFilterCount = document.getElementById('mobile-filter-count');
-            el.filterPanelOverlay = document.getElementById('filter-panel-overlay');
+            el.filterPanelOverlay = document.getElementById('mobile-filter-overlay') || document.getElementById('filter-panel-overlay');
         },
 
         /**

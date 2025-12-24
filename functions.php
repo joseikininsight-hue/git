@@ -1031,6 +1031,12 @@ if (file_exists($archive_seo_content_file)) {
     require_once $archive_seo_content_file;
 }
 
+// AdSense 最適化モジュール - LiteSpeed Cache連携 & 手動広告挿入
+$adsense_optimization_file = get_template_directory() . '/inc/adsense-optimization.php';
+if (file_exists($adsense_optimization_file)) {
+    require_once $adsense_optimization_file;
+}
+
 /**
  * ============================================================================
  * PHASE 4: SEO 100点達成のための追加最適化

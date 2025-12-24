@@ -2,48 +2,38 @@
     'use strict';
     
     const init = () => {
-        setupImageLoading();
-        setupScrollIndicator();
+        setupBackgroundImageLoading();
         setupCTATracking();
         setupKeyboardNavigation();
     };
     
-    const setupImageLoading = () => {
-        const heroImage = document.querySelector('.hero__image');
-        if (!heroImage) return;
+    /**
+     * 背景画像の読み込み処理
+     */
+    const setupBackgroundImageLoading = () => {
+        const bgImage = document.querySelector('.hero__bg-image');
+        if (!bgImage) return;
         
-        if (heroImage.complete) {
-            heroImage.classList.add('is-loaded');
+        const handleLoad = () => {
+            bgImage.classList.add('is-loaded');
+            bgImage.style.opacity = '1';
+        };
+        
+        if (bgImage.complete) {
+            handleLoad();
         } else {
-            heroImage.addEventListener('load', () => {
-                heroImage.classList.add('is-loaded');
-            }, { once: true });
+            bgImage.style.opacity = '0';
+            bgImage.style.transition = 'opacity 0.5s ease';
+            bgImage.addEventListener('load', handleLoad, { once: true });
         }
     };
     
-    const setupScrollIndicator = () => {
-        const scrollIndicator = document.querySelector('.hero__scroll');
-        if (!scrollIndicator) return;
-        
-        let hasScrolled = false;
-        
-        const handleScroll = () => {
-            if (hasScrolled) return;
-            
-            if (window.scrollY > 100) {
-                hasScrolled = true;
-                scrollIndicator.style.opacity = '0';
-                scrollIndicator.style.transform = 'translateX(-50%) translateY(20px)';
-                window.removeEventListener('scroll', handleScroll);
-            }
-        };
-        
-        window.addEventListener('scroll', handleScroll, { passive: true });
-    };
-    
+    /**
+     * CTAクリックトラッキング
+     */
     const setupCTATracking = () => {
         const primaryCTA = document.querySelector('.hero__btn--primary');
-        const secondaryCTA = document.querySelector('.hero__sub-cta-link');
+        const secondaryCTA = document.querySelector('.hero__btn--secondary');
         
         const trackClick = (label, destination) => {
             if (typeof gtag !== 'undefined') {
@@ -77,6 +67,9 @@
         }
     };
     
+    /**
+     * キーボードナビゲーション
+     */
     const setupKeyboardNavigation = () => {
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Tab') {
@@ -89,6 +82,7 @@
         });
     };
     
+    // DOMContentLoaded時に初期化
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {
