@@ -1740,9 +1740,9 @@ function gi_archive_seo_merge_page() {
                 "SELECT * FROM {$table_name} WHERE archive_type = %s AND archive_key = %s",
                 $page['type'], $page['key']
             ));
-            $page['is_noindex'] = $saved && !empty($saved['is_noindex']);
-            $page['is_merged'] = $saved && !empty($saved['merge_target']);
-            $page['merge_target'] = $saved ? $saved['merge_target'] : '';
+            $page['is_noindex'] = $saved && !empty($saved->is_noindex);
+            $page['is_merged'] = $saved && !empty($saved->merge_target);
+            $page['merge_target'] = $saved ? $saved->merge_target : '';
             
             $merge_candidates[] = $page;
         }
