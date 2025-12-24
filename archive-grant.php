@@ -247,6 +247,9 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
       itemscope 
       itemtype="https://schema.org/CollectionPage">
 
+    <!-- モバイル用フィルター -->
+    <?php include(get_template_directory() . '/template-parts/archive/mobile-filter.php'); ?>
+
     <!-- シンプルなパンくずリスト -->
     <nav class="breadcrumb-nav book-breadcrumb" 
          aria-label="パンくずリスト" 
@@ -320,7 +323,7 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
             ?>
             
             <!-- 統合された検索結果ヘッダー -->
-            <section class="editors-pick-section" id="list">
+            <section class="editors-pick-section results-header" id="list">
                 <div class="editors-pick-header">
                     <div class="flex items-center">
                         <span class="editors-pick-number">03</span>
@@ -398,7 +401,7 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                 <?php else: ?>
             
                 <!-- List Container: Dictionary Layout -->
-                <div id="subsidy-list" class="grid gap-0 border-t border-gray-200 mb-20">
+                <div id="grants-container" class="grid gap-0 border-t border-gray-200 mb-20">
                     <?php
                     // WP_Queryの引数を構築
                     $query_args = array(
@@ -511,7 +514,6 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                     
                     if ($initial_grants_query->have_posts()) :
                         $grant_count = 0; // インフィード広告用カウンター
-                        echo '<div class="zukan-list-container">';
                         while ($initial_grants_query->have_posts()) : 
                             $initial_grants_query->the_post();
                             // 図鑑スタイルのカードを使用
@@ -528,7 +530,6 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                             <?php endif;
                             
                         endwhile;
-                        echo '</div>'; // End .zukan-list-container
                         wp_reset_postdata();
                     else :
                         // 結果なしの場合（図鑑スタイル）
@@ -748,6 +749,38 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                             <?php if (count($all_categories) > 8): ?>
                             <button type="button" class="sidebar-filter-more" data-target="category">さらに表示</button>
                             <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <!-- 都道府県フィルター -->
+                    <div class="sidebar-filter-group" id="sidebar-prefecture-filter">
+                        <button type="button" class="sidebar-filter-toggle" aria-expanded="false">
+                            <span class="filter-group-label">都道府県</span>
+                            <span class="filter-selected-count" id="prefecture-selected-count" style="display: none;">0</span>
+                            <svg class="toggle-arrow" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M7 10l5 5 5-5z"/>
+                            </svg>
+                        </button>
+                        <div class="sidebar-filter-options" style="display: none;">
+                            <?php 
+                            $sidebar_prefectures = get_terms(array(
+                                'taxonomy' => 'grant_prefecture',
+                                'hide_empty' => true,
+                                'orderby' => 'count',
+                                'order' => 'DESC',
+                                'number' => 15
+                            ));
+                            if ($sidebar_prefectures && !is_wp_error($sidebar_prefectures)):
+                                foreach ($sidebar_prefectures as $pref): ?>
+                            <label class="sidebar-filter-option">
+                                <input type="checkbox" 
+                                       name="sidebar_prefecture[]" 
+                                       value="<?php echo esc_attr($pref->slug); ?>">
+                                <span class="checkbox-custom"></span>
+                                <span class="option-label"><?php echo esc_html($pref->name); ?></span>
+                                <span class="option-count"><?php echo $pref->count; ?></span>
+                            </label>
+                            <?php endforeach; endif; ?>
                         </div>
                     </div>
 

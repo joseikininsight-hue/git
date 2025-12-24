@@ -1,10 +1,10 @@
 <?php
 /**
- * Grant Single Page - Ultimate Edition v304
- * 補助金図鑑 - 本・辞典スタイル + 採択率AI判断注意書き
+ * Grant Single Page - Ultimate Edition v500
+ * 補助金図鑑 - 本・辞典スタイル + 統合セクションデザイン
  * 
  * @package Grant_Insight_Ultimate
- * @version 304.0.0
+ * @version 500.0.0
  */
 
 if (!defined('ABSPATH')) exit;
@@ -72,7 +72,6 @@ function gisg_get_grant_card($pid) {
     if (!$rate) {
         $rate = gisg_get_field('subsidy_rate', $pid);
     }
-    // If both are empty, try to construct from max/min
     if (!$rate) {
         $max = floatval(gisg_get_field('subsidy_rate_max', $pid, 0));
         $min = floatval(gisg_get_field('subsidy_rate_min', $pid, 0));
@@ -80,8 +79,6 @@ function gisg_get_grant_card($pid) {
             $rate = ($min > 0 && $min != $max) ? $min . '%〜' . $max . '%' : $max . '%';
         }
     }
-    
-    // Fallback for cases where max is not set but text might be available in other fields
     if (!$rate) {
         $rate = gisg_get_field('subsidy_rate_limit', $pid);
     }
@@ -343,18 +340,17 @@ $status_map = array(
 );
 $status = isset($status_map[$grant['application_status']]) ? $status_map[$grant['application_status']] : $status_map['open'];
 
-// 閲覧数更新 (Cookie セキュリティ強化版)
+// 閲覧数更新
 $view_cookie = 'gi_viewed_' . $post_id;
 if (!isset($_COOKIE[$view_cookie])) {
     update_post_meta($post_id, 'views_count', $grant['views_count'] + 1);
     $grant['views_count']++;
-    // セキュリティフラグ追加: SameSite=Lax (CSRF対策), Secure (HTTPS時のみ送信), HttpOnly (JS経由でのアクセス防止)
     $cookie_options = array(
         'expires' => time() + 86400,
         'path' => '/',
-        'secure' => is_ssl(), // HTTPSの場合のみSecure属性を有効化
-        'httponly' => true,   // JavaScriptからのアクセスを防止
-        'samesite' => 'Lax'   // クロスサイトリクエストでは送信しない（CSRF対策）
+        'secure' => is_ssl(),
+        'httponly' => true,
+        'samesite' => 'Lax'
     );
     setcookie($view_cookie, '1', $cookie_options);
 }
@@ -538,7 +534,7 @@ if (count($faq_items) < 6) {
 // 目次
 $toc_items = array();
 if (!empty($grant['ai_summary'])) $toc_items[] = array('id' => 'summary', 'title' => 'AI要約');
-$toc_items[] = array('id' => 'details', 'title' => '詳細情報');
+$toc_items[] = array('id' => 'details', 'title' => '補助金詳細');
 $toc_items[] = array('id' => 'content', 'title' => '補助金概要');
 $toc_items[] = array('id' => 'checklist', 'title' => '申請チェックリスト');
 if (!empty($grant['application_flow']) || !empty($grant['application_flow_steps'])) $toc_items[] = array('id' => 'flow', 'title' => '申請の流れ');
@@ -546,7 +542,6 @@ if (!empty($grant['application_tips'])) $toc_items[] = array('id' => 'tips', 'ti
 if (!empty($grant['success_cases'])) $toc_items[] = array('id' => 'cases', 'title' => '採択事例');
 if (!empty($similar_grants)) $toc_items[] = array('id' => 'compare', 'title' => '類似補助金比較');
 if (!empty($faq_items)) $toc_items[] = array('id' => 'faq', 'title' => 'よくある質問');
-// Match the actual display condition (phone, email, OR official URL)
 if (!empty($grant['contact_phone']) || !empty($grant['contact_email']) || !empty($grant['official_url'])) {
     $toc_items[] = array('id' => 'contact', 'title' => 'お問い合わせ');
 }
@@ -564,14 +559,10 @@ if ($grant['ai_summary']) {
 
 <?php
 /**
- * 構造化データ出力 (SEO最適化版: Article型 + 監修者情報)
- * 
- * ⚠️ SEOプラグイン（Rank Math等）が有効な場合は出力をスキップ
- * プラグインが独自にスキーマを生成するため、重複を防止
+ * 構造化データ出力 (SEO最適化版)
  */
 if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
 ?>
-<!-- 構造化データ (Theme Generated - No SEO Plugin) -->
 <script type="application/ld+json">
 {
     "@context": "https://schema.org",
@@ -637,425 +628,11 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
     ]
 }
 </script>
-<?php endif; // End SEO plugin check ?>
+<?php endif; ?>
 
-<!-- 採択率AI推定に関するスタイル -->
-<style>
-.gi-ai-estimate-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 10px;
-    font-weight: 600;
-    color: #6366f1;
-    background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
-    padding: 2px 8px;
-    border-radius: 10px;
-    margin-left: 6px;
-    border: 1px solid #c7d2fe;
-}
-.gi-ai-estimate-badge svg {
-    width: 12px;
-    height: 12px;
-}
-.gi-metric-ai-note {
-    font-size: 11px;
-    color: var(--gi-gray-500, #6b7280);
-    margin-top: 4px;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-.gi-metric-ai-note svg {
-    width: 12px;
-    height: 12px;
-    flex-shrink: 0;
-}
-.gi-compare-ai-note {
-    display: block;
-    font-size: 10px;
-    color: #6366f1;
-    margin-top: 2px;
-}
-.gi-ai-disclaimer {
-    background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
-    border: 1px solid #fde047;
-    border-radius: 8px;
-    padding: 12px 16px;
-    margin: 16px 0;
-    font-size: 13px;
-    color: #854d0e;
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-}
-.gi-ai-disclaimer svg {
-    width: 18px;
-    height: 18px;
-    flex-shrink: 0;
-    margin-top: 1px;
-}
-.gi-ai-disclaimer-text {
-    line-height: 1.6;
-}
-.gi-ai-disclaimer-text strong {
-    color: #92400e;
-}
-.gi-tooltip-trigger {
-    display: inline-flex;
-    align-items: center;
-    cursor: help;
-    position: relative;
-}
-.gi-tooltip-trigger:hover .gi-tooltip {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
-.gi-tooltip {
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%) translateY(8px);
-    background: #1f2937;
-    color: #fff;
-    font-size: 12px;
-    font-weight: 400;
-    padding: 8px 12px;
-    border-radius: 6px;
-    white-space: nowrap;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.2s ease;
-    z-index: 100;
-    margin-bottom: 8px;
-    max-width: 280px;
-    white-space: normal;
-    text-align: left;
-    line-height: 1.5;
-}
-.gi-tooltip::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border: 6px solid transparent;
-    border-top-color: #1f2937;
-}
-
-/* ==========================================================================
-   広告枠スタイル - Affiliate Ad Slots
-   ========================================================================== */
-.gi-ad-section {
-    background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
-    border: 1px dashed #e0e0e0;
-}
-
-.gi-ad-section .gi-sidebar-header {
-    padding: 8px 16px;
-    border-bottom: 1px dashed #e0e0e0;
-    background: transparent;
-}
-
-.gi-pr-label {
-    font-size: 10px;
-    font-weight: 600;
-    color: #9e9e9e;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-}
-
-.gi-ad-slot {
-    min-height: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px;
-}
-
-.gi-ad-slot:empty::before {
-    content: '広告枠';
-    color: #bdbdbd;
-    font-size: 12px;
-}
-
-/* 広告位置別スタイル */
-.gi-ad-top {
-    border-radius: var(--gi-radius-lg, 12px);
-    margin-bottom: 16px;
-}
-
-.gi-ad-upper {
-    border-radius: var(--gi-radius-lg, 12px);
-    margin: 16px 0;
-}
-
-.gi-ad-middle {
-    border-radius: var(--gi-radius-lg, 12px);
-    margin: 16px 0;
-}
-
-.gi-ad-lower {
-    border-radius: var(--gi-radius-lg, 12px);
-    margin: 16px 0;
-}
-
-.gi-ad-sticky {
-    border-radius: var(--gi-radius-lg, 12px);
-    margin: 16px 0;
-    position: sticky;
-    top: 100px;
-    z-index: 10;
-}
-
-.gi-ad-bottom {
-    border-radius: var(--gi-radius-lg, 12px);
-    margin: 16px 0;
-}
-
-/* 広告コンテンツ内のスタイル調整 */
-.gi-ad-slot img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-}
-
-.gi-ad-slot a {
-    display: block;
-    transition: opacity 0.2s ease;
-}
-
-.gi-ad-slot a:hover {
-    opacity: 0.9;
-}
-
-/* アフィリエイト広告共通 */
-.ji-affiliate-ad {
-    width: 100%;
-}
-
-.ji-affiliate-ad img {
-    max-width: 100%;
-    height: auto;
-}
-
-/* ==========================================================================
-   記事型広告スタイル - Article Ad Style
-   ========================================================================== */
-.ji-article-ad {
-    position: relative;
-    background: #fff;
-    border: 1px solid var(--gi-gray-200, #e5e7eb);
-    border-radius: var(--gi-radius-lg, 12px);
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
-}
-
-.ji-article-ad:hover {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
-}
-
-.ji-article-ad-badge {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    background: rgba(0, 0, 0, 0.6);
-    color: #fff;
-    font-size: 10px;
-    font-weight: 600;
-    padding: 4px 8px;
-    border-radius: 4px;
-    letter-spacing: 0.5px;
-    z-index: 2;
-}
-
-.ji-article-ad-image-link {
-    display: block;
-    overflow: hidden;
-}
-
-.ji-article-ad-image {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-}
-
-.ji-article-ad:hover .ji-article-ad-image {
-    transform: scale(1.03);
-}
-
-.ji-article-ad-content {
-    padding: 16px 20px 20px;
-}
-
-.ji-article-ad-title {
-    font-size: 16px;
-    font-weight: 700;
-    line-height: 1.4;
-    margin: 0 0 10px;
-    color: var(--gi-gray-900, #111827);
-}
-
-.ji-article-ad-title a {
-    color: inherit;
-    text-decoration: none;
-}
-
-.ji-article-ad-title a:hover {
-    color: var(--gi-primary, #2563eb);
-}
-
-.ji-article-ad-desc {
-    font-size: 13px;
-    line-height: 1.6;
-    color: var(--gi-gray-600, #6b7280);
-    margin: 0 0 12px;
-}
-
-.ji-article-ad-features {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 12px;
-}
-
-.ji-article-ad-features li {
-    font-size: 12px;
-    color: var(--gi-gray-700, #374151);
-    padding: 4px 0 4px 20px;
-    position: relative;
-}
-
-.ji-article-ad-features li::before {
-    content: '✓';
-    position: absolute;
-    left: 0;
-    color: var(--gi-success, #10b981);
-    font-weight: 700;
-}
-
-.ji-article-ad-price {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--gi-error, #ef4444);
-    margin-bottom: 12px;
-}
-
-.ji-article-ad-cta {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: linear-gradient(135deg, var(--gi-primary, #2563eb) 0%, #1d4ed8 100%);
-    color: #fff;
-    font-size: 14px;
-    font-weight: 600;
-    padding: 10px 20px;
-    border-radius: 8px;
-    text-decoration: none;
-    transition: all 0.2s ease;
-}
-
-.ji-article-ad-cta:hover {
-    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
-    transform: translateY(-1px);
-    color: #fff;
-}
-
-.ji-article-ad-cta svg {
-    transition: transform 0.2s ease;
-}
-
-.ji-article-ad-cta:hover svg {
-    transform: translateX(3px);
-}
-
-/* コンテンツ内記事型広告 */
-.gi-article-ad-section {
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    border: 1px solid var(--gi-gray-200, #e5e7eb);
-    border-radius: var(--gi-radius-lg, 12px);
-    padding: 20px;
-    margin: 24px 0;
-}
-
-.gi-article-ad-section-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 16px;
-    padding-bottom: 12px;
-    border-bottom: 1px dashed var(--gi-gray-300, #d1d5db);
-}
-
-.gi-article-ad-section-badge {
-    background: var(--gi-primary, #2563eb);
-    color: #fff;
-    font-size: 10px;
-    font-weight: 600;
-    padding: 3px 8px;
-    border-radius: 4px;
-    letter-spacing: 0.5px;
-}
-
-.gi-article-ad-section-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--gi-gray-600, #6b7280);
-    margin: 0;
-}
-
-/* モバイル対応 */
-@media (max-width: 768px) {
-    .gi-ad-section {
-        display: none; /* モバイルでは非表示（オプション） */
-    }
-    
-    /* モバイルで表示する場合はこちらを使用 */
-    .gi-ad-section.show-mobile {
-        display: block;
-    }
-    
-    .gi-ad-sticky {
-        position: static;
-    }
-    
-    /* 記事型広告モバイル */
-    .ji-article-ad-content {
-        padding: 12px 16px 16px;
-    }
-    
-    .ji-article-ad-title {
-        font-size: 15px;
-    }
-    
-    .ji-article-ad-cta {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    .gi-article-ad-section {
-        padding: 16px;
-        margin: 16px 0;
-    }
-}
-</style>
-
-<!-- 📚 図鑑インデックスタブ（左端）- モバイル・PC共通でサイドバー目次に統一のため削除 -->
-
-<!-- 📚 本・図鑑風パンくずリスト -->
-<nav class="gi-breadcrumb gi-book-breadcrumb" aria-label="パンくずリスト">
-    <div class="gi-breadcrumb-book-spine"></div>
+<!-- パンくずリスト -->
+<nav class="gi-breadcrumb" aria-label="パンくずリスト">
     <div class="gi-breadcrumb-inner">
-        <div class="gi-breadcrumb-book-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-                <path d="M8 7h8M8 11h5"/>
-            </svg>
-        </div>
         <ol class="gi-breadcrumb-list">
             <?php foreach ($breadcrumbs as $i => $crumb): ?>
             <li class="gi-breadcrumb-item">
@@ -1080,31 +657,6 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
 <div class="gi-page gi-grant-page">
     <div class="gi-container">
         
-        <!-- 📚 図鑑風ヘッダー（補助金図鑑らしさを演出） -->
-        <div class="gi-zukan-header">
-            <div class="gi-zukan-book-icon">
-                <!-- 本のSVGアイコン -->
-                <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="8" y="6" width="44" height="52" rx="2" fill="#1b263b" stroke="#c9a227" stroke-width="2"/>
-                    <rect x="12" y="6" width="40" height="52" rx="2" fill="#0d1b2a"/>
-                    <path d="M16 12h28M16 18h28M16 24h20" stroke="#c9a227" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
-                    <rect x="52" y="6" width="4" height="52" fill="#c9a227"/>
-                    <path d="M54 10v44" stroke="#b8941f" stroke-width="1"/>
-                    <circle cx="32" cy="40" r="8" fill="#c9a227" opacity="0.2"/>
-                    <path d="M28 40l3 3 5-6" stroke="#c9a227" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </div>
-            <div class="gi-zukan-header-content">
-                <div class="gi-zukan-category-label">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-                    補助金図鑑
-                </div>
-                <div class="gi-zukan-entry-number">ENTRY No.<?php echo str_pad($post_id, 5, '0', STR_PAD_LEFT); ?></div>
-                <p class="gi-zukan-title"><?php echo esc_html($grant['organization'] ? $grant['organization'] : '補助金'); ?>の詳細情報</p>
-            </div>
-            <div class="gi-bookmark-ribbon"></div>
-        </div>
-
         <!-- ヒーロー -->
         <header class="gi-hero">
             <div class="gi-hero-badges">
@@ -1132,14 +684,8 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
             </div>
         </header>
 
-        <!-- 📚 図鑑エントリーバッジ -->
-        <div class="gi-entry-badge">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-            補助金図鑑 #<?php echo str_pad($post_id, 5, '0', STR_PAD_LEFT); ?>
-        </div>
-
         <!-- メトリクス -->
-        <section class="gi-metrics gi-card-style" aria-label="重要情報">
+        <section class="gi-metrics" aria-label="重要情報">
             <div class="gi-metric">
                 <div class="gi-metric-label">補助金額</div>
                 <div class="gi-metric-value highlight"><?php echo $amount_display ? esc_html($amount_display) : '要確認'; ?></div>
@@ -1198,231 +744,289 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                 </section>
                 <?php endif; ?>
 
-                <!-- 詳細情報 -->
-                <section class="gi-section gi-book-style" id="details" aria-labelledby="details-title">
-                    <span class="gi-page-number">01</span>
-                    <header class="gi-section-header gi-zukan-style">
-                        <svg class="gi-section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
-                        <h2 class="gi-section-title" id="details-title">補助金詳細</h2>
-                        <span class="gi-section-en">Details</span>
+                <!-- ===================================
+                     01 補助金詳細 - 統合セクション
+                     =================================== -->
+                <section class="gi-integrated-section" id="details" aria-labelledby="details-title">
+                    <!-- 統合ヘッダー -->
+                    <header class="gi-integrated-header">
+                        <!-- 左側：セクション番号 -->
+                        <div class="gi-integrated-number">
+                            <div class="gi-integrated-number-inner">
+                                <span class="gi-integrated-number-label">Section</span>
+                                <span class="gi-integrated-number-value">01</span>
+                            </div>
+                        </div>
+                        <!-- 右側：タイトルエリア -->
+                        <div class="gi-integrated-title-area">
+                            <div class="gi-integrated-book-icon">
+                                <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="8" y="6" width="44" height="52" rx="2" fill="#1b263b" stroke="#c9a227" stroke-width="2"/>
+                                    <rect x="12" y="6" width="40" height="52" rx="2" fill="#0d1b2a"/>
+                                    <path d="M16 12h28M16 18h28M16 24h20" stroke="#c9a227" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+                                    <rect x="52" y="6" width="4" height="52" fill="#c9a227"/>
+                                    <path d="M54 10v44" stroke="#b8941f" stroke-width="1"/>
+                                    <circle cx="32" cy="40" r="8" fill="#c9a227" opacity="0.2"/>
+                                    <path d="M28 40l3 3 5-6" stroke="#c9a227" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <div class="gi-integrated-title-content">
+                                <div class="gi-integrated-entry-label">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                                    ENTRY No.<?php echo str_pad($post_id, 5, '0', STR_PAD_LEFT); ?>
+                                </div>
+                                <h2 class="gi-integrated-main-title" id="details-title">補助金詳細</h2>
+                                <p class="gi-integrated-sub-title"><?php echo esc_html($grant['organization'] ? $grant['organization'] : '補助金'); ?>の詳細情報</p>
+                                <div class="gi-integrated-en-title">Details</div>
+                            </div>
+                            <div class="gi-integrated-ribbon"></div>
+                        </div>
                     </header>
                     
-                    <!-- 金額・補助率 -->
-                    <div class="gi-details-group">
-                        <div class="gi-details-group-header"><span class="gi-details-group-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>金額・補助率</div>
-                        <div class="gi-table">
-                            <?php if ($amount_display): ?>
-                            <div class="gi-table-row">
-                                <div class="gi-table-key">補助金額</div>
-                                <div class="gi-table-value"><span class="gi-value-large gi-value-highlight"><?php echo esc_html($amount_display); ?></span></div>
+                    <!-- 統合セクション本体 -->
+                    <div class="gi-integrated-body">
+                        <!-- 金額・補助率 -->
+                        <div class="gi-details-group">
+                            <div class="gi-details-group-header">
+                                <span class="gi-details-group-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                </span>
+                                金額・補助率
                             </div>
-                            <?php endif; ?>
-                            <?php if ($subsidy_rate_display): ?>
-                            <div class="gi-table-row">
-                                <div class="gi-table-key">補助率</div>
-                                <div class="gi-table-value"><strong><?php echo esc_html($subsidy_rate_display); ?></strong></div>
-                            </div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                    
-                    <!-- スケジュール -->
-                    <div class="gi-details-group">
-                        <div class="gi-details-group-header"><span class="gi-details-group-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>スケジュール</div>
-                        <div class="gi-table">
-                            <?php if ($deadline_info): ?>
-                            <div class="gi-table-row">
-                                <div class="gi-table-key">申請締切</div>
-                                <div class="gi-table-value">
-                                    <strong style="<?php echo ($deadline_status === 'critical' || $deadline_status === 'urgent') ? 'color: var(--gi-error);' : ''; ?>"><?php echo esc_html($deadline_info); ?></strong>
-                                    <?php if ($days_remaining > 0): ?><span style="color: var(--gi-gray-600); margin-left: 8px;">（残り<?php echo $days_remaining; ?>日）</span><?php endif; ?>
+                            <div class="gi-table">
+                                <?php if ($amount_display): ?>
+                                <div class="gi-table-row">
+                                    <div class="gi-table-key">補助金額</div>
+                                    <div class="gi-table-value"><span class="gi-value-large gi-value-highlight"><?php echo esc_html($amount_display); ?></span></div>
                                 </div>
-                            </div>
-                            <?php endif; ?>
-                            <?php if ($grant['application_period']): ?>
-                            <div class="gi-table-row">
-                                <div class="gi-table-key">申請期間</div>
-                                <div class="gi-table-value"><?php echo esc_html($grant['application_period']); ?></div>
-                            </div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                    
-                    <!-- 対象要件 -->
-                    <div class="gi-details-group">
-                        <div class="gi-details-group-header"><span class="gi-details-group-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span>対象要件</div>
-                        <div class="gi-table">
-                            <?php if ($grant['organization']): ?>
-                            <div class="gi-table-row">
-                                <div class="gi-table-key">主催機関</div>
-                                <div class="gi-table-value"><strong><?php echo esc_html($grant['organization']); ?></strong></div>
-                            </div>
-                            <?php endif; ?>
-                            <div class="gi-table-row">
-                                <div class="gi-table-key">対象地域</div>
-                                <div class="gi-table-value">
-                                    <?php if ($is_nationwide): ?>
-                                    <span class="gi-value-highlight">全国</span>
-                                    <?php elseif (!empty($taxonomies['prefectures'])): ?>
-                                    <div class="gi-tags">
-                                        <?php foreach (array_slice($taxonomies['prefectures'], 0, 5) as $pref): 
-                                            $pref_link = get_term_link($pref);
-                                            if (!is_wp_error($pref_link)):
-                                        ?>
-                                        <a href="<?php echo esc_url($pref_link); ?>" class="gi-tag"><?php echo esc_html($pref->name); ?></a>
-                                        <?php endif; endforeach; ?>
-                                        <?php if (count($taxonomies['prefectures']) > 5): ?><span class="gi-tag">他<?php echo count($taxonomies['prefectures']) - 5; ?>件</span><?php endif; ?>
-                                    </div>
-                                    <?php else: ?>要確認<?php endif; ?>
+                                <?php endif; ?>
+                                <?php if ($subsidy_rate_display): ?>
+                                <div class="gi-table-row">
+                                    <div class="gi-table-key">補助率</div>
+                                    <div class="gi-table-value"><strong><?php echo esc_html($subsidy_rate_display); ?></strong></div>
                                 </div>
-                            </div>
-                            <?php if ($grant['grant_target']): ?>
-                            <div class="gi-table-row">
-                                <div class="gi-table-key">対象者</div>
-                                <div class="gi-table-value"><?php echo wp_kses_post($grant['grant_target']); ?></div>
-                            </div>
-                            <?php endif; ?>
-                            <?php if (!empty($taxonomies['industries'])): ?>
-                            <div class="gi-table-row">
-                                <div class="gi-table-key">対象業種</div>
-                                <div class="gi-table-value">
-                                    <div class="gi-tags">
-                                        <?php foreach (array_slice($taxonomies['industries'], 0, 5) as $ind): 
-                                            $ind_link = get_term_link($ind);
-                                            if (!is_wp_error($ind_link)):
-                                        ?>
-                                        <a href="<?php echo esc_url($ind_link); ?>" class="gi-tag"><?php echo esc_html($ind->name); ?></a>
-                                        <?php endif; endforeach; ?>
-                                    </div>
-                                </div>
-                            </div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                    
-                    <!-- 採択率・統計情報（AI推定注意書き付き） -->
-                    <?php if ($grant['adoption_rate'] > 0 || $grant['adoption_count'] > 0 || $grant['application_count'] > 0): ?>
-                    <div class="gi-details-group">
-                        <div class="gi-details-group-header">
-                            <span class="gi-details-group-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
-                            </span>
-                            採択率・統計情報
-                            <span class="gi-ai-estimate-badge" style="margin-left: 8px;">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-                                AI推定値
-                            </span>
-                        </div>
-                        
-                        <!-- AI推定に関する注意書き -->
-                        <div class="gi-ai-disclaimer">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                                <line x1="12" y1="8" x2="12" y2="12"/>
-                                <line x1="12" y1="16" x2="12.01" y2="16"/>
-                            </svg>
-                            <div class="gi-ai-disclaimer-text">
-                                <strong>ご注意：</strong>以下の採択率・統計情報は、AIが過去の公開データや類似補助金の傾向を分析して推定した<strong>参考値</strong>です。公式機関が発表した数値ではありません。実際の採択率は募集回や申請内容によって大きく異なる場合があります。正確な情報は公式サイトでご確認ください。
+                                <?php endif; ?>
                             </div>
                         </div>
                         
-                        <div class="gi-table">
-                            <?php if ($grant['adoption_rate'] > 0): ?>
-                            <div class="gi-table-row">
-                                <div class="gi-table-key">
-                                    推定採択率
-                                    <span class="gi-ai-estimate-badge">AI推定</span>
-                                </div>
-                                <div class="gi-table-value">
-                                    <strong style="font-size: 1.2em; color: var(--gi-success-text, #059669);"><?php echo number_format($grant['adoption_rate'], 1); ?>%</strong>
-                                    <span style="font-size: 12px; color: var(--gi-gray-500); margin-left: 8px;">（参考値）</span>
-                                </div>
+                        <!-- スケジュール -->
+                        <div class="gi-details-group">
+                            <div class="gi-details-group-header">
+                                <span class="gi-details-group-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                </span>
+                                スケジュール
                             </div>
-                            <?php endif; ?>
-                            <?php if ($grant['adoption_count'] > 0): ?>
-                            <div class="gi-table-row">
-                                <div class="gi-table-key">
-                                    推定採択件数
-                                    <span class="gi-ai-estimate-badge">AI推定</span>
-                                </div>
-                                <div class="gi-table-value"><?php echo number_format($grant['adoption_count']); ?>件（参考値）</div>
-                            </div>
-                            <?php endif; ?>
-                            <?php if ($grant['application_count'] > 0): ?>
-                            <div class="gi-table-row">
-                                <div class="gi-table-key">
-                                    推定申請件数
-                                    <span class="gi-ai-estimate-badge">AI推定</span>
-                                </div>
-                                <div class="gi-table-value"><?php echo number_format($grant['application_count']); ?>件（参考値）</div>
-                            </div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                    <?php endif; ?>
-                    
-                    <!-- 更新履歴 -->
-                    <?php if (!empty($grant['update_history'])): ?>
-                    <div class="gi-details-group">
-                        <div class="gi-details-group-header"><span class="gi-details-group-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>更新履歴</div>
-                        <div class="gi-table">
-                            <?php foreach ($grant['update_history'] as $hist): 
-                                $hist_date = isset($hist['date']) ? $hist['date'] : (isset($hist['update_date']) ? $hist['update_date'] : '');
-                                $hist_content = isset($hist['content']) ? $hist['content'] : (isset($hist['text']) ? $hist['text'] : '');
-                                if (empty($hist_date) || empty($hist_content)) continue;
-                            ?>
-                            <div class="gi-table-row">
-                                <div class="gi-table-key"><?php echo esc_html($hist_date); ?></div>
-                                <div class="gi-table-value"><?php echo esc_html($hist_content); ?></div>
-                            </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-                    <?php endif; ?>
-                    
-                    <!-- 申請要件 -->
-                    <div class="gi-details-group">
-                        <div class="gi-details-group-header"><span class="gi-details-group-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>申請要件</div>
-                        <div class="gi-table">
-                            <?php if ($docs): ?>
-                            <div class="gi-table-row">
-                                <div class="gi-table-key">必要書類</div>
-                                <div class="gi-table-value"><?php echo wp_kses_post($docs); ?></div>
-                            </div>
-                            <?php endif; ?>
-                            <?php if ($expenses): ?>
-                            <div class="gi-table-row">
-                                <div class="gi-table-key">対象経費</div>
-                                <div class="gi-table-value"><?php echo wp_kses_post($expenses); ?></div>
-                            </div>
-                            <?php endif; ?>
-                            <?php if ($grant['ineligible_expenses']): ?>
-                            <div class="gi-table-row">
-                                <div class="gi-table-key">対象外経費</div>
-                                <div class="gi-table-value" style="color: var(--gi-error);"><?php echo wp_kses_post($grant['ineligible_expenses']); ?></div>
-                            </div>
-                            <?php endif; ?>
-                            <?php if ($grant['online_application'] || $grant['jgrants_available']): ?>
-                            <div class="gi-table-row">
-                                <div class="gi-table-key">申請方法</div>
-                                <div class="gi-table-value">
-                                    <div class="gi-tags">
-                                        <?php if ($grant['online_application']): ?><span class="gi-tag gi-tag-success">オンライン申請可</span><?php endif; ?>
-                                        <?php if ($grant['jgrants_available']): ?><span class="gi-tag gi-tag-info">jGrants対応</span><?php endif; ?>
+                            <div class="gi-table">
+                                <?php if ($deadline_info): ?>
+                                <div class="gi-table-row">
+                                    <div class="gi-table-key">申請締切</div>
+                                    <div class="gi-table-value">
+                                        <strong style="<?php echo ($deadline_status === 'critical' || $deadline_status === 'urgent') ? 'color: var(--zukan-error);' : ''; ?>"><?php echo esc_html($deadline_info); ?></strong>
+                                        <?php if ($days_remaining > 0): ?><span style="color: var(--zukan-ink-light); margin-left: 8px;">（残り<?php echo $days_remaining; ?>日）</span><?php endif; ?>
                                     </div>
                                 </div>
+                                <?php endif; ?>
+                                <?php if ($grant['application_period']): ?>
+                                <div class="gi-table-row">
+                                    <div class="gi-table-key">申請期間</div>
+                                    <div class="gi-table-value"><?php echo esc_html($grant['application_period']); ?></div>
+                                </div>
+                                <?php endif; ?>
                             </div>
-                            <?php endif; ?>
+                        </div>
+                        
+                        <!-- 対象要件 -->
+                        <div class="gi-details-group">
+                            <div class="gi-details-group-header">
+                                <span class="gi-details-group-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                                </span>
+                                対象要件
+                            </div>
+                            <div class="gi-table">
+                                <?php if ($grant['organization']): ?>
+                                <div class="gi-table-row">
+                                    <div class="gi-table-key">主催機関</div>
+                                    <div class="gi-table-value"><strong><?php echo esc_html($grant['organization']); ?></strong></div>
+                                </div>
+                                <?php endif; ?>
+                                <div class="gi-table-row">
+                                    <div class="gi-table-key">対象地域</div>
+                                    <div class="gi-table-value">
+                                        <?php if ($is_nationwide): ?>
+                                        <span class="gi-value-highlight">全国</span>
+                                        <?php elseif (!empty($taxonomies['prefectures'])): ?>
+                                        <div class="gi-tags">
+                                            <?php foreach (array_slice($taxonomies['prefectures'], 0, 5) as $pref): 
+                                                $pref_link = get_term_link($pref);
+                                                if (!is_wp_error($pref_link)):
+                                            ?>
+                                            <a href="<?php echo esc_url($pref_link); ?>" class="gi-tag"><?php echo esc_html($pref->name); ?></a>
+                                            <?php endif; endforeach; ?>
+                                            <?php if (count($taxonomies['prefectures']) > 5): ?><span class="gi-tag">他<?php echo count($taxonomies['prefectures']) - 5; ?>件</span><?php endif; ?>
+                                        </div>
+                                        <?php else: ?>要確認<?php endif; ?>
+                                    </div>
+                                </div>
+                                <?php if ($grant['grant_target']): ?>
+                                <div class="gi-table-row">
+                                    <div class="gi-table-key">対象者</div>
+                                    <div class="gi-table-value"><?php echo wp_kses_post($grant['grant_target']); ?></div>
+                                </div>
+                                <?php endif; ?>
+                                <?php if (!empty($taxonomies['industries'])): ?>
+                                <div class="gi-table-row">
+                                    <div class="gi-table-key">対象業種</div>
+                                    <div class="gi-table-value">
+                                        <div class="gi-tags">
+                                            <?php foreach (array_slice($taxonomies['industries'], 0, 5) as $ind): 
+                                                $ind_link = get_term_link($ind);
+                                                if (!is_wp_error($ind_link)):
+                                            ?>
+                                            <a href="<?php echo esc_url($ind_link); ?>" class="gi-tag"><?php echo esc_html($ind->name); ?></a>
+                                            <?php endif; endforeach; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        
+                        <!-- 採択率・統計情報 -->
+                        <?php if ($grant['adoption_rate'] > 0 || $grant['adoption_count'] > 0 || $grant['application_count'] > 0): ?>
+                        <div class="gi-details-group">
+                            <div class="gi-details-group-header">
+                                <span class="gi-details-group-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+                                </span>
+                                採択率・統計情報
+                                <span class="gi-ai-estimate-badge" style="margin-left: 8px;">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                                    AI推定値
+                                </span>
+                            </div>
+                            
+                            <div class="gi-ai-disclaimer">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="12" y1="8" x2="12" y2="12"/>
+                                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                                </svg>
+                                <div class="gi-ai-disclaimer-text">
+                                    <strong>ご注意：</strong>以下の採択率・統計情報は、AIが過去の公開データや類似補助金の傾向を分析して推定した<strong>参考値</strong>です。公式機関が発表した数値ではありません。実際の採択率は募集回や申請内容によって大きく異なる場合があります。正確な情報は公式サイトでご確認ください。
+                                </div>
+                            </div>
+                            
+                            <div class="gi-table">
+                                <?php if ($grant['adoption_rate'] > 0): ?>
+                                <div class="gi-table-row">
+                                    <div class="gi-table-key">
+                                        推定採択率
+                                        <span class="gi-ai-estimate-badge">AI推定</span>
+                                    </div>
+                                    <div class="gi-table-value">
+                                        <strong style="font-size: 1.2em; color: var(--zukan-success);"><?php echo number_format($grant['adoption_rate'], 1); ?>%</strong>
+                                        <span style="font-size: 12px; color: var(--zukan-ink-light); margin-left: 8px;">（参考値）</span>
+                                    </div>
+                                </div>
+                                <?php endif; ?>
+                                <?php if ($grant['adoption_count'] > 0): ?>
+                                <div class="gi-table-row">
+                                    <div class="gi-table-key">
+                                        推定採択件数
+                                        <span class="gi-ai-estimate-badge">AI推定</span>
+                                    </div>
+                                    <div class="gi-table-value"><?php echo number_format($grant['adoption_count']); ?>件（参考値）</div>
+                                </div>
+                                <?php endif; ?>
+                                <?php if ($grant['application_count'] > 0): ?>
+                                <div class="gi-table-row">
+                                    <div class="gi-table-key">
+                                        推定申請件数
+                                        <span class="gi-ai-estimate-badge">AI推定</span>
+                                    </div>
+                                    <div class="gi-table-value"><?php echo number_format($grant['application_count']); ?>件（参考値）</div>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+                        
+                        <!-- 更新履歴 -->
+                        <?php if (!empty($grant['update_history'])): ?>
+                        <div class="gi-details-group">
+                            <div class="gi-details-group-header">
+                                <span class="gi-details-group-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                </span>
+                                更新履歴
+                            </div>
+                            <div class="gi-table">
+                                <?php foreach ($grant['update_history'] as $hist): 
+                                    $hist_date = isset($hist['date']) ? $hist['date'] : (isset($hist['update_date']) ? $hist['update_date'] : '');
+                                    $hist_content = isset($hist['content']) ? $hist['content'] : (isset($hist['text']) ? $hist['text'] : '');
+                                    if (empty($hist_date) || empty($hist_content)) continue;
+                                ?>
+                                <div class="gi-table-row">
+                                    <div class="gi-table-key"><?php echo esc_html($hist_date); ?></div>
+                                    <div class="gi-table-value"><?php echo esc_html($hist_content); ?></div>
+                                </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+                        
+                        <!-- 申請要件 -->
+                        <div class="gi-details-group">
+                            <div class="gi-details-group-header">
+                                <span class="gi-details-group-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                </span>
+                                申請要件
+                            </div>
+                            <div class="gi-table">
+                                <?php if ($docs): ?>
+                                <div class="gi-table-row">
+                                    <div class="gi-table-key">必要書類</div>
+                                    <div class="gi-table-value"><?php echo wp_kses_post($docs); ?></div>
+                                </div>
+                                <?php endif; ?>
+                                <?php if ($expenses): ?>
+                                <div class="gi-table-row">
+                                    <div class="gi-table-key">対象経費</div>
+                                    <div class="gi-table-value"><?php echo wp_kses_post($expenses); ?></div>
+                                </div>
+                                <?php endif; ?>
+                                <?php if ($grant['ineligible_expenses']): ?>
+                                <div class="gi-table-row">
+                                    <div class="gi-table-key">対象外経費</div>
+                                    <div class="gi-table-value" style="color: var(--zukan-error);"><?php echo wp_kses_post($grant['ineligible_expenses']); ?></div>
+                                </div>
+                                <?php endif; ?>
+                                <?php if ($grant['online_application'] || $grant['jgrants_available']): ?>
+                                <div class="gi-table-row">
+                                    <div class="gi-table-key">申請方法</div>
+                                    <div class="gi-table-value">
+                                        <div class="gi-tags">
+                                            <?php if ($grant['online_application']): ?><span class="gi-tag gi-tag-success">オンライン申請可</span><?php endif; ?>
+                                            <?php if ($grant['jgrants_available']): ?><span class="gi-tag gi-tag-info">jGrants対応</span><?php endif; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
                 </section>
 
                 <!-- アフィリエイト記事欄（補助金詳細後） -->
                 <?php 
-                // 出力バッファリング開始
                 ob_start();
-                ji_display_ad('single_grant_article_after_details');
-                $ad_after_details = ob_get_clean(); // 内容を変数に取得
+                if (function_exists('ji_display_ad')) {
+                    ji_display_ad('single_grant_article_after_details');
+                }
+                $ad_after_details = ob_get_clean();
 
                 if (!empty($ad_after_details)): 
                 ?>
@@ -1435,34 +1039,44 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                 </aside>
                 <?php endif; ?>
 
-                <!-- 本文（補助金概要） -->
-                <section class="gi-section gi-book-style" id="content" aria-labelledby="content-title">
-                    <span class="gi-page-number">02</span>
-                    <header class="gi-section-header gi-zukan-style">
-                        <svg class="gi-section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-                        <h2 class="gi-section-title" id="content-title">補助金概要</h2>
-                        <span class="gi-section-en">Overview</span>
+                <!-- ===================================
+                     02 補助金概要
+                     =================================== -->
+                <section class="gi-section" id="content" aria-labelledby="content-title">
+                    <header class="gi-section-numbered-header">
+                        <div class="gi-section-number-box">
+                            <div class="gi-section-number-inner">
+                                <span class="gi-section-number-label">Section</span>
+                                <span class="gi-section-number-value">02</span>
+                            </div>
+                        </div>
+                        <div class="gi-section-title-box">
+                            <svg class="gi-section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                            <h2 class="gi-section-title" id="content-title">補助金概要</h2>
+                            <span class="gi-section-en">Overview</span>
+                        </div>
                     </header>
                     
-                    <!-- 📚 図鑑風注釈 -->
-                    <div class="gi-dict-note">
-                        <span class="gi-dict-note-text">この補助金に関する詳細な説明と申請に必要な情報を掲載しています。最新情報は公式サイトで必ずご確認ください。</span>
-                    </div>
-                    
-                    <div class="gi-content"><?php echo apply_filters('the_content', $content); ?></div>
-                    
-                    <!-- 📚 セクション区切り -->
-                    <div class="gi-encyclopedia-divider">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    <div class="gi-section-body">
+                        <div class="gi-dict-note">
+                            <span class="gi-dict-note-text">この補助金に関する詳細な説明と申請に必要な情報を掲載しています。最新情報は公式サイトで必ずご確認ください。</span>
+                        </div>
+                        
+                        <div class="gi-content"><?php echo apply_filters('the_content', $content); ?></div>
+                        
+                        <div class="gi-encyclopedia-divider">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                        </div>
                     </div>
                 </section>
 
                 <!-- アフィリエイト記事欄（チェックリスト前） -->
                 <?php 
-                // 出力バッファリング開始
                 ob_start();
-                ji_display_ad('single_grant_article_before_checklist');
-                $ad_before_checklist = ob_get_clean(); // 内容を変数に取得
+                if (function_exists('ji_display_ad')) {
+                    ji_display_ad('single_grant_article_before_checklist');
+                }
+                $ad_before_checklist = ob_get_clean();
 
                 if (!empty($ad_before_checklist)): 
                 ?>
@@ -1475,74 +1089,91 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                 </aside>
                 <?php endif; ?>
 
-                <!-- チェックリスト（補助金概要の後に配置） -->
-                <section class="gi-section gi-book-style" id="checklist" aria-labelledby="checklist-title">
-                    <span class="gi-page-number">03</span>
-                    <div class="gi-checklist">
-                        <header class="gi-checklist-header">
-                            <h2 class="gi-checklist-title" id="checklist-title">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-                                申請前チェックリスト
-                            </h2>
-                            <div class="gi-checklist-actions">
-                                <button class="gi-checklist-action" id="checklistReset" type="button">リセット</button>
-                                <button class="gi-checklist-action" id="checklistPrint" type="button">印刷</button>
-                            </div>
-                        </header>
-                        <div class="gi-checklist-progress">
-                            <div class="gi-checklist-progress-bar"><div class="gi-checklist-progress-fill" id="checklistFill"></div></div>
-                            <div class="gi-checklist-progress-text">
-                                <span id="checklistCount">0 / <?php echo count($checklist_items); ?> 完了</span>
-                                <span class="gi-checklist-progress-percent" id="checklistPercent">0%</span>
+                <!-- ===================================
+                     03 申請前チェックリスト
+                     =================================== -->
+                <section class="gi-section" id="checklist" aria-labelledby="checklist-title">
+                    <header class="gi-section-numbered-header">
+                        <div class="gi-section-number-box">
+                            <div class="gi-section-number-inner">
+                                <span class="gi-section-number-label">Section</span>
+                                <span class="gi-section-number-value">03</span>
                             </div>
                         </div>
-                        <?php 
-                        $grouped_items = array();
-                        foreach ($checklist_items as $item) {
-                            $cat = $item['category'];
-                            if (!isset($grouped_items[$cat])) $grouped_items[$cat] = array();
-                            $grouped_items[$cat][] = $item;
-                        }
-                        foreach ($grouped_items as $cat_key => $items):
-                            $cat_info = isset($checklist_categories[$cat_key]) ? $checklist_categories[$cat_key] : array('label' => $cat_key);
-                        ?>
-                        <div class="gi-checklist-category">
-                            <div class="gi-checklist-category-header"><?php echo esc_html($cat_info['label']); ?></div>
-                            <div class="gi-checklist-items">
-                                <?php foreach ($items as $item): ?>
-                                <div class="gi-checklist-item" data-id="<?php echo esc_attr($item['id']); ?>" data-required="<?php echo $item['required'] ? 'true' : 'false'; ?>">
-                                    <div class="gi-checklist-checkbox" role="checkbox" aria-checked="false" tabindex="0">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                                    </div>
-                                    <div class="gi-checklist-content">
-                                        <div class="gi-checklist-label">
-                                            <?php echo esc_html($item['label']); ?>
-                                            <?php if ($item['required']): ?><span class="gi-checklist-required">必須</span><?php else: ?><span class="gi-checklist-optional">任意</span><?php endif; ?>
+                        <div class="gi-section-title-box">
+                            <svg class="gi-section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                            <h2 class="gi-section-title" id="checklist-title">申請前チェックリスト</h2>
+                            <span class="gi-section-en">Checklist</span>
+                        </div>
+                    </header>
+                    
+                    <div class="gi-section-body" style="padding: 0;">
+                        <div class="gi-checklist">
+                            <header class="gi-checklist-header">
+                                <h3 class="gi-checklist-title">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                                    申請可否チェック
+                                </h3>
+                                <div class="gi-checklist-actions">
+                                    <button class="gi-checklist-action" id="checklistReset" type="button">リセット</button>
+                                    <button class="gi-checklist-action" id="checklistPrint" type="button">印刷</button>
+                                </div>
+                            </header>
+                            <div class="gi-checklist-progress">
+                                <div class="gi-checklist-progress-bar"><div class="gi-checklist-progress-fill" id="checklistFill"></div></div>
+                                <div class="gi-checklist-progress-text">
+                                    <span id="checklistCount">0 / <?php echo count($checklist_items); ?> 完了</span>
+                                    <span class="gi-checklist-progress-percent" id="checklistPercent">0%</span>
+                                </div>
+                            </div>
+                            <?php 
+                            $grouped_items = array();
+                            foreach ($checklist_items as $item) {
+                                $cat = $item['category'];
+                                if (!isset($grouped_items[$cat])) $grouped_items[$cat] = array();
+                                $grouped_items[$cat][] = $item;
+                            }
+                            foreach ($grouped_items as $cat_key => $items):
+                                $cat_info = isset($checklist_categories[$cat_key]) ? $checklist_categories[$cat_key] : array('label' => $cat_key);
+                            ?>
+                            <div class="gi-checklist-category">
+                                <div class="gi-checklist-category-header"><?php echo esc_html($cat_info['label']); ?></div>
+                                <div class="gi-checklist-items">
+                                    <?php foreach ($items as $item): ?>
+                                    <div class="gi-checklist-item" data-id="<?php echo esc_attr($item['id']); ?>" data-required="<?php echo $item['required'] ? 'true' : 'false'; ?>">
+                                        <div class="gi-checklist-checkbox" role="checkbox" aria-checked="false" tabindex="0">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
                                         </div>
-                                        <?php if (!empty($item['description'])): ?><div class="gi-checklist-desc"><?php echo esc_html($item['description']); ?></div><?php endif; ?>
-                                        <?php if (!empty($item['help'])): ?><div class="gi-checklist-help"><?php echo esc_html($item['help']); ?></div><?php endif; ?>
+                                        <div class="gi-checklist-content">
+                                            <div class="gi-checklist-label">
+                                                <?php echo esc_html($item['label']); ?>
+                                                <?php if ($item['required']): ?><span class="gi-checklist-required">必須</span><?php else: ?><span class="gi-checklist-optional">任意</span><?php endif; ?>
+                                            </div>
+                                            <?php if (!empty($item['description'])): ?><div class="gi-checklist-desc"><?php echo esc_html($item['description']); ?></div><?php endif; ?>
+                                            <?php if (!empty($item['help'])): ?><div class="gi-checklist-help"><?php echo esc_html($item['help']); ?></div><?php endif; ?>
+                                        </div>
+                                        <?php if (!empty($item['help'])): ?>
+                                        <button class="gi-checklist-help-btn" type="button" aria-label="ヘルプを表示">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                        </button>
+                                        <?php endif; ?>
                                     </div>
-                                    <?php if (!empty($item['help'])): ?>
-                                    <button class="gi-checklist-help-btn" type="button" aria-label="ヘルプを表示">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                                    </button>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
+                            <div class="gi-checklist-result" id="checklistResult">
+                                <div class="gi-checklist-result-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+                                <div class="gi-checklist-result-text" id="checklistResultText">チェックを入れて申請可否を確認しましょう</div>
+                                <div class="gi-checklist-result-sub" id="checklistResultSub">必須項目をすべてクリアすると申請可能です</div>
+                                <div class="gi-checklist-cta">
+                                    <?php if ($grant['official_url']): ?>
+                                    <a href="<?php echo esc_url($grant['official_url']); ?>" class="gi-btn gi-btn-accent gi-btn-full" target="_blank" rel="noopener">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                        公式サイトで申請する
+                                    </a>
                                     <?php endif; ?>
                                 </div>
-                                <?php endforeach; ?>
-                            </div>
-                        </div>
-                        <?php endforeach; ?>
-                        <div class="gi-checklist-result" id="checklistResult">
-                            <div class="gi-checklist-result-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
-                            <div class="gi-checklist-result-text" id="checklistResultText">チェックを入れて申請可否を確認しましょう</div>
-                            <div class="gi-checklist-result-sub" id="checklistResultSub">必須項目をすべてクリアすると申請可能です</div>
-                            <div class="gi-checklist-cta">
-                                <?php if ($grant['official_url']): ?>
-                                <a href="<?php echo esc_url($grant['official_url']); ?>" class="gi-btn gi-btn-accent gi-btn-full" target="_blank" rel="noopener">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                                    公式サイトで申請する
-                                </a>
-                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -1550,10 +1181,11 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
 
                 <!-- アフィリエイト記事欄（チェックリスト後） -->
                 <?php 
-                // 出力バッファリング開始
                 ob_start();
-                ji_display_ad('single_grant_article_after_checklist');
-                $ad_after_checklist = ob_get_clean(); // 内容を変数に取得
+                if (function_exists('ji_display_ad')) {
+                    ji_display_ad('single_grant_article_after_checklist');
+                }
+                $ad_after_checklist = ob_get_clean();
 
                 if (!empty($ad_after_checklist)): 
                 ?>
@@ -1569,47 +1201,58 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                 <!-- 申請フロー -->
                 <?php if (!empty($grant['application_flow_steps']) || !empty($grant['application_flow'])): ?>
                 <section class="gi-section" id="flow" aria-labelledby="flow-title">
-                    <header class="gi-section-header">
-                        <svg class="gi-section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
-                        <h2 class="gi-section-title" id="flow-title">申請の流れ</h2>
-                        <span class="gi-section-en">Flow</span>
-                    </header>
-                    <div class="gi-flow">
-                        <?php 
-                        $steps = array();
-                        if (!empty($grant['application_flow_steps'])) {
-                            foreach ($grant['application_flow_steps'] as $step) {
-                                if (is_array($step) && !empty($step['title'])) {
-                                    $steps[] = array('title' => $step['title'], 'desc' => isset($step['description']) ? $step['description'] : '');
-                                }
-                            }
-                        } elseif (!empty($grant['application_flow'])) {
-                            $flow_lines = array_filter(explode("\n", $grant['application_flow']));
-                            foreach ($flow_lines as $line) {
-                                $parts = preg_split('/[:：]/', trim($line), 2);
-                                $steps[] = array('title' => trim($parts[0]), 'desc' => isset($parts[1]) ? trim($parts[1]) : '');
-                            }
-                        }
-                        foreach ($steps as $i => $step):
-                        ?>
-                        <div class="gi-flow-step">
-                            <div class="gi-flow-num"><?php echo $i + 1; ?></div>
-                            <div class="gi-flow-content">
-                                <h3 class="gi-flow-title"><?php echo esc_html($step['title']); ?></h3>
-                                <?php if (!empty($step['desc'])): ?><p class="gi-flow-desc"><?php echo esc_html($step['desc']); ?></p><?php endif; ?>
+                    <header class="gi-section-numbered-header">
+                        <div class="gi-section-number-box">
+                            <div class="gi-section-number-inner">
+                                <span class="gi-section-number-label">Section</span>
+                                <span class="gi-section-number-value">04</span>
                             </div>
                         </div>
-                        <?php endforeach; ?>
+                        <div class="gi-section-title-box">
+                            <svg class="gi-section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
+                            <h2 class="gi-section-title" id="flow-title">申請の流れ</h2>
+                            <span class="gi-section-en">Flow</span>
+                        </div>
+                    </header>
+                    <div class="gi-section-body">
+                        <div class="gi-flow">
+                            <?php 
+                            $steps = array();
+                            if (!empty($grant['application_flow_steps'])) {
+                                foreach ($grant['application_flow_steps'] as $step) {
+                                    if (is_array($step) && !empty($step['title'])) {
+                                        $steps[] = array('title' => $step['title'], 'desc' => isset($step['description']) ? $step['description'] : '');
+                                    }
+                                }
+                            } elseif (!empty($grant['application_flow'])) {
+                                $flow_lines = array_filter(explode("\n", $grant['application_flow']));
+                                foreach ($flow_lines as $line) {
+                                    $parts = preg_split('/[:：]/', trim($line), 2);
+                                    $steps[] = array('title' => trim($parts[0]), 'desc' => isset($parts[1]) ? trim($parts[1]) : '');
+                                }
+                            }
+                            foreach ($steps as $i => $step):
+                            ?>
+                            <div class="gi-flow-step">
+                                <div class="gi-flow-num"><?php echo $i + 1; ?></div>
+                                <div class="gi-flow-content">
+                                    <h3 class="gi-flow-title"><?php echo esc_html($step['title']); ?></h3>
+                                    <?php if (!empty($step['desc'])): ?><p class="gi-flow-desc"><?php echo esc_html($step['desc']); ?></p><?php endif; ?>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
                     </div>
                 </section>
                 <?php endif; ?>
 
                 <!-- アフィリエイト記事欄（申請フロー後） -->
                 <?php 
-                // 出力バッファリング開始
                 ob_start();
-                ji_display_ad('single_grant_article_after_flow');
-                $ad_after_flow = ob_get_clean(); // 内容を変数に取得
+                if (function_exists('ji_display_ad')) {
+                    ji_display_ad('single_grant_article_after_flow');
+                }
+                $ad_after_flow = ob_get_clean();
 
                 if (!empty($ad_after_flow)): 
                 ?>
@@ -1630,7 +1273,9 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                         <h2 class="gi-section-title" id="tips-title">申請のコツ・ポイント</h2>
                         <span class="gi-section-en">Tips</span>
                     </header>
-                    <div class="gi-content"><?php echo wp_kses_post($grant['application_tips']); ?></div>
+                    <div class="gi-section-body">
+                        <div class="gi-content"><?php echo wp_kses_post($grant['application_tips']); ?></div>
+                    </div>
                 </section>
                 <?php endif; ?>
 
@@ -1642,7 +1287,9 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                         <h2 class="gi-section-title" id="mistakes-title">よくある失敗・注意点</h2>
                         <span class="gi-section-en">Caution</span>
                     </header>
-                    <div class="gi-content" style="background: var(--gi-error-light); padding: 20px; border-left: 4px solid var(--gi-error);"><?php echo wp_kses_post($grant['common_mistakes']); ?></div>
+                    <div class="gi-section-body">
+                        <div class="gi-content" style="background: var(--zukan-error-light); padding: 20px; border-left: 4px solid var(--zukan-error);"><?php echo wp_kses_post($grant['common_mistakes']); ?></div>
+                    </div>
                 </section>
                 <?php endif; ?>
 
@@ -1654,21 +1301,23 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                         <h2 class="gi-section-title" id="cases-title">採択事例</h2>
                         <span class="gi-section-en">Cases</span>
                     </header>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
-                        <?php foreach ($grant['success_cases'] as $case): if (!is_array($case)) continue; ?>
-                        <div style="background: var(--gi-gray-50); border: 1px solid var(--gi-gray-200); padding: 20px;">
-                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                                <div style="width: 48px; height: 48px; background: var(--gi-success-light); display: flex; align-items: center; justify-content: center; border-radius: 50%;">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--gi-success)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    <div class="gi-section-body">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
+                            <?php foreach ($grant['success_cases'] as $case): if (!is_array($case)) continue; ?>
+                            <div style="background: var(--zukan-border-light); border: 1px solid var(--zukan-border-color); padding: 20px;">
+                                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                                    <div style="width: 48px; height: 48px; background: var(--zukan-success-light); display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--zukan-success)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                    </div>
+                                    <div>
+                                        <?php if (!empty($case['industry'])): ?><div style="font-size: 14px; color: var(--zukan-ink-light);"><?php echo esc_html($case['industry']); ?></div><?php endif; ?>
+                                        <?php if (!empty($case['amount'])): ?><div style="font-size: 18px; font-weight: 900; color: var(--zukan-success);"><?php echo esc_html($case['amount']); ?></div><?php endif; ?>
+                                    </div>
                                 </div>
-                                <div>
-                                    <?php if (!empty($case['industry'])): ?><div style="font-size: 14px; color: var(--gi-gray-600);"><?php echo esc_html($case['industry']); ?></div><?php endif; ?>
-                                    <?php if (!empty($case['amount'])): ?><div style="font-size: 18px; font-weight: 900; color: var(--gi-success-text);"><?php echo esc_html($case['amount']); ?></div><?php endif; ?>
-                                </div>
+                                <?php if (!empty($case['purpose'])): ?><p style="font-size: 14px; color: var(--zukan-ink-secondary); line-height: 1.6;"><?php echo esc_html($case['purpose']); ?></p><?php endif; ?>
                             </div>
-                            <?php if (!empty($case['purpose'])): ?><p style="font-size: 14px; color: var(--gi-gray-700); line-height: 1.6;"><?php echo esc_html($case['purpose']); ?></p><?php endif; ?>
+                            <?php endforeach; ?>
                         </div>
-                        <?php endforeach; ?>
                     </div>
                 </section>
                 <?php endif; ?>
@@ -1681,145 +1330,155 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                         <h2 class="gi-section-title" id="compare-title">類似補助金との比較</h2>
                         <span class="gi-section-en">Comparison</span>
                     </header>
-                    
-                    <!-- 比較表のAI推定注意書き -->
-                    <div class="gi-ai-disclaimer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <line x1="12" y1="8" x2="12" y2="12"/>
-                            <line x1="12" y1="16" x2="12.01" y2="16"/>
-                        </svg>
-                        <div class="gi-ai-disclaimer-text">
-                            <strong>採択率について：</strong>比較表内の採択率はAIによる推定値であり、公式発表の数値ではありません。補助金選びの参考としてご活用ください。
+                    <div class="gi-section-body">
+                        <div class="gi-ai-disclaimer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="8" x2="12" y2="12"/>
+                                <line x1="12" y1="16" x2="12.01" y2="16"/>
+                            </svg>
+                            <div class="gi-ai-disclaimer-text">
+                                <strong>採択率について：</strong>比較表内の採択率はAIによる推定値であり、公式発表の数値ではありません。補助金選びの参考としてご活用ください。
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="gi-compare">
-                        <table class="gi-compare-table">
-                            <thead>
-                                <tr>
-                                    <th>比較項目</th>
-                                    <th class="gi-compare-current-header">
-                                        <div class="gi-compare-grant-header">
-                                            <span class="gi-compare-grant-name">この補助金</span>
-                                            <?php if ($grant['organization']): ?><span class="gi-compare-grant-org"><?php echo esc_html($grant['organization']); ?></span><?php endif; ?>
-                                        </div>
-                                    </th>
-                                    <?php foreach ($similar_grants as $sg): ?>
-                                    <th>
-                                        <div class="gi-compare-grant-header">
-                                            <span class="gi-compare-grant-name" title="<?php echo esc_attr($sg['title']); ?>">
-                                                <?php echo esc_html(mb_substr($sg['title'], 0, 25, 'UTF-8')); ?><?php if (mb_strlen($sg['title'], 'UTF-8') > 25): ?>...<?php endif; ?>
+                        
+                        <div class="gi-compare">
+                            <table class="gi-compare-table">
+                                <thead>
+                                    <tr>
+                                        <th>比較項目</th>
+                                        <th class="gi-compare-current-header">
+                                            <div class="gi-compare-grant-header">
+                                                <span class="gi-compare-grant-name">この補助金</span>
+                                                <?php if ($grant['organization']): ?><span class="gi-compare-grant-org"><?php echo esc_html($grant['organization']); ?></span><?php endif; ?>
+                                            </div>
+                                        </th>
+                                        <?php foreach ($similar_grants as $sg): ?>
+                                        <th>
+                                            <div class="gi-compare-grant-header">
+                                                <span class="gi-compare-grant-name" title="<?php echo esc_attr($sg['title']); ?>">
+                                                    <?php echo esc_html(mb_substr($sg['title'], 0, 25, 'UTF-8')); ?><?php if (mb_strlen($sg['title'], 'UTF-8') > 25): ?>...<?php endif; ?>
+                                                </span>
+                                                <?php if ($sg['organization']): ?><span class="gi-compare-grant-org"><?php echo esc_html($sg['organization']); ?></span><?php endif; ?>
+                                            </div>
+                                        </th>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th>補助金額</th>
+                                        <td class="gi-compare-current"><span class="gi-compare-value highlight"><?php echo $amount_display ? esc_html($amount_display) : '要確認'; ?></span></td>
+                                        <?php foreach ($similar_grants as $sg): ?><td><span class="gi-compare-value"><?php echo $sg['max_amount'] ? esc_html($sg['max_amount']) : '要確認'; ?></span></td><?php endforeach; ?>
+                                    </tr>
+                                    <tr>
+                                        <th>補助率</th>
+                                        <td class="gi-compare-current"><span class="gi-compare-value"><?php echo $subsidy_rate_display ? esc_html($subsidy_rate_display) : '—'; ?></span></td>
+                                        <?php foreach ($similar_grants as $sg): ?><td><span class="gi-compare-value"><?php echo $sg['subsidy_rate'] ? esc_html($sg['subsidy_rate']) : '—'; ?></span></td><?php endforeach; ?>
+                                    </tr>
+                                    <tr>
+                                        <th>申請締切</th>
+                                        <td class="gi-compare-current"><span class="gi-compare-value"><?php echo $deadline_info ? esc_html($deadline_info) : '随時'; ?></span></td>
+                                        <?php foreach ($similar_grants as $sg): ?><td><span class="gi-compare-value"><?php echo $sg['deadline'] ? esc_html($sg['deadline']) : '随時'; ?></span></td><?php endforeach; ?>
+                                    </tr>
+                                    <tr>
+                                        <th>難易度</th>
+                                        <td class="gi-compare-current">
+                                            <div class="gi-compare-stars">
+                                                <?php for ($i = 1; $i <= 5; $i++): ?><svg class="gi-compare-star <?php echo $i <= $difficulty['level'] ? 'active' : ''; ?>" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><?php endfor; ?>
+                                            </div>
+                                        </td>
+                                        <?php foreach ($similar_grants as $sg): 
+                                            $sg_diff = isset($difficulty_map[$sg['grant_difficulty']]) ? $difficulty_map[$sg['grant_difficulty']] : $difficulty_map['normal'];
+                                        ?>
+                                        <td>
+                                            <div class="gi-compare-stars">
+                                                <?php for ($i = 1; $i <= 5; $i++): ?><svg class="gi-compare-star <?php echo $i <= $sg_diff['level'] ? 'active' : ''; ?>" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><?php endfor; ?>
+                                            </div>
+                                        </td>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            採択率
+                                            <span class="gi-ai-estimate-badge" style="display: block; margin-top: 4px;">AI推定</span>
+                                        </th>
+                                        <td class="gi-compare-current">
+                                            <span class="gi-compare-value <?php echo $grant['adoption_rate'] >= 50 ? 'highlight' : ''; ?>">
+                                                <?php echo $grant['adoption_rate'] > 0 ? number_format($grant['adoption_rate'], 1) . '%' : '—'; ?>
                                             </span>
-                                            <?php if ($sg['organization']): ?><span class="gi-compare-grant-org"><?php echo esc_html($sg['organization']); ?></span><?php endif; ?>
-                                        </div>
-                                    </th>
-                                    <?php endforeach; ?>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <th>補助金額</th>
-                                    <td class="gi-compare-current"><span class="gi-compare-value highlight"><?php echo $amount_display ? esc_html($amount_display) : '要確認'; ?></span></td>
-                                    <?php foreach ($similar_grants as $sg): ?><td><span class="gi-compare-value"><?php echo $sg['max_amount'] ? esc_html($sg['max_amount']) : '要確認'; ?></span></td><?php endforeach; ?>
-                                </tr>
-                                <tr>
-                                    <th>補助率</th>
-                                    <td class="gi-compare-current"><span class="gi-compare-value"><?php echo $subsidy_rate_display ? esc_html($subsidy_rate_display) : '—'; ?></span></td>
-                                    <?php foreach ($similar_grants as $sg): ?><td><span class="gi-compare-value"><?php echo $sg['subsidy_rate'] ? esc_html($sg['subsidy_rate']) : '—'; ?></span></td><?php endforeach; ?>
-                                </tr>
-                                <tr>
-                                    <th>申請締切</th>
-                                    <td class="gi-compare-current"><span class="gi-compare-value"><?php echo $deadline_info ? esc_html($deadline_info) : '随時'; ?></span></td>
-                                    <?php foreach ($similar_grants as $sg): ?><td><span class="gi-compare-value"><?php echo $sg['deadline'] ? esc_html($sg['deadline']) : '随時'; ?></span></td><?php endforeach; ?>
-                                </tr>
-                                <tr>
-                                    <th>難易度</th>
-                                    <td class="gi-compare-current">
-                                        <div class="gi-compare-stars">
-                                            <?php for ($i = 1; $i <= 5; $i++): ?><svg class="gi-compare-star <?php echo $i <= $difficulty['level'] ? 'active' : ''; ?>" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><?php endfor; ?>
-                                        </div>
-                                    </td>
-                                    <?php foreach ($similar_grants as $sg): 
-                                        $sg_diff = isset($difficulty_map[$sg['grant_difficulty']]) ? $difficulty_map[$sg['grant_difficulty']] : $difficulty_map['normal'];
-                                    ?>
-                                    <td>
-                                        <div class="gi-compare-stars">
-                                            <?php for ($i = 1; $i <= 5; $i++): ?><svg class="gi-compare-star <?php echo $i <= $sg_diff['level'] ? 'active' : ''; ?>" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><?php endfor; ?>
-                                        </div>
-                                    </td>
-                                    <?php endforeach; ?>
-                                </tr>
-                                <tr>
-                                    <th>
-                                        採択率
-                                        <span class="gi-ai-estimate-badge" style="display: block; margin-top: 4px;">AI推定</span>
-                                    </th>
-                                    <td class="gi-compare-current">
-                                        <span class="gi-compare-value <?php echo $grant['adoption_rate'] >= 50 ? 'highlight' : ''; ?>">
-                                            <?php echo $grant['adoption_rate'] > 0 ? number_format($grant['adoption_rate'], 1) . '%' : '—'; ?>
-                                        </span>
-                                        <?php if ($grant['adoption_rate'] > 0): ?>
-                                        <span class="gi-compare-ai-note">※参考値</span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <?php foreach ($similar_grants as $sg): ?>
-                                    <td>
-                                        <span class="gi-compare-value <?php echo $sg['adoption_rate'] >= 50 ? 'highlight' : ''; ?>">
-                                            <?php echo $sg['adoption_rate'] > 0 ? number_format($sg['adoption_rate'], 1) . '%' : '—'; ?>
-                                        </span>
-                                        <?php if ($sg['adoption_rate'] > 0): ?>
-                                        <span class="gi-compare-ai-note">※参考値</span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <?php endforeach; ?>
-                                </tr>
-                                <tr>
-                                    <th>準備目安</th>
-                                    <td class="gi-compare-current"><span class="gi-compare-value">約<?php echo $grant['preparation_days']; ?>日</span></td>
-                                    <?php foreach ($similar_grants as $sg): ?><td><span class="gi-compare-value">約<?php echo $sg['preparation_days'] ? $sg['preparation_days'] : 14; ?>日</span></td><?php endforeach; ?>
-                                </tr>
-                                <tr>
-                                    <th>詳細</th>
-                                    <td class="gi-compare-current">—</td>
-                                    <?php foreach ($similar_grants as $sg): ?><td><a href="<?php echo esc_url($sg['permalink']); ?>" class="gi-compare-link">詳細を見る →</a></td><?php endforeach; ?>
-                                </tr>
-                            </tbody>
-                        </table>
+                                            <?php if ($grant['adoption_rate'] > 0): ?>
+                                            <span class="gi-compare-ai-note">※参考値</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <?php foreach ($similar_grants as $sg): ?>
+                                        <td>
+                                            <span class="gi-compare-value <?php echo $sg['adoption_rate'] >= 50 ? 'highlight' : ''; ?>">
+                                                <?php echo $sg['adoption_rate'] > 0 ? number_format($sg['adoption_rate'], 1) . '%' : '—'; ?>
+                                            </span>
+                                            <?php if ($sg['adoption_rate'] > 0): ?>
+                                            <span class="gi-compare-ai-note">※参考値</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                    <tr>
+                                        <th>準備目安</th>
+                                        <td class="gi-compare-current"><span class="gi-compare-value">約<?php echo $grant['preparation_days']; ?>日</span></td>
+                                        <?php foreach ($similar_grants as $sg): ?><td><span class="gi-compare-value">約<?php echo $sg['preparation_days'] ? $sg['preparation_days'] : 14; ?>日</span></td><?php endforeach; ?>
+                                    </tr>
+                                    <tr>
+                                        <th>詳細</th>
+                                        <td class="gi-compare-current">—</td>
+                                        <?php foreach ($similar_grants as $sg): ?><td><a href="<?php echo esc_url($sg['permalink']); ?>" class="gi-compare-link">詳細を見る →</a></td><?php endforeach; ?>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </section>
                 <?php endif; ?>
 
                 <!-- FAQ -->
                 <?php if (!empty($faq_items)): ?>
-                <section class="gi-section gi-book-style" id="faq" aria-labelledby="faq-title">
-                    <span class="gi-page-number">04</span>
-                    <header class="gi-section-header gi-zukan-style">
-                        <svg class="gi-section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                        <h2 class="gi-section-title" id="faq-title">よくある質問</h2>
-                        <span class="gi-section-en">FAQ</span>
+                <section class="gi-section" id="faq" aria-labelledby="faq-title">
+                    <header class="gi-section-numbered-header">
+                        <div class="gi-section-number-box">
+                            <div class="gi-section-number-inner">
+                                <span class="gi-section-number-label">Section</span>
+                                <span class="gi-section-number-value">05</span>
+                            </div>
+                        </div>
+                        <div class="gi-section-title-box">
+                            <svg class="gi-section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            <h2 class="gi-section-title" id="faq-title">よくある質問</h2>
+                            <span class="gi-section-en">FAQ</span>
+                        </div>
                     </header>
-                    <div class="gi-faq-list">
-                        <?php foreach ($faq_items as $faq): ?>
-                        <details class="gi-faq-item">
-                            <summary class="gi-faq-question">
-                                <span class="gi-faq-q-mark">Q</span>
-                                <span class="gi-faq-question-text"><?php echo esc_html($faq['question']); ?></span>
-                                <svg class="gi-faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                            </summary>
-                            <div class="gi-faq-answer"><?php echo nl2br(esc_html($faq['answer'])); ?></div>
-                        </details>
-                        <?php endforeach; ?>
+                    <div class="gi-section-body">
+                        <div class="gi-faq-list">
+                            <?php foreach ($faq_items as $faq): ?>
+                            <details class="gi-faq-item">
+                                <summary class="gi-faq-question">
+                                    <span class="gi-faq-q-mark">Q</span>
+                                    <span class="gi-faq-question-text"><?php echo esc_html($faq['question']); ?></span>
+                                    <svg class="gi-faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                </summary>
+                                <div class="gi-faq-answer"><?php echo nl2br(esc_html($faq['answer'])); ?></div>
+                            </details>
+                            <?php endforeach; ?>
+                        </div>
                     </div>
                 </section>
                 <?php endif; ?>
 
                 <!-- アフィリエイト記事欄（お問い合わせ前） -->
                 <?php 
-                // 出力バッファリング開始
                 ob_start();
-                ji_display_ad('single_grant_article_before_contact');
-                $ad_before_contact = ob_get_clean(); // 内容を変数に取得
+                if (function_exists('ji_display_ad')) {
+                    ji_display_ad('single_grant_article_before_contact');
+                }
+                $ad_before_contact = ob_get_clean();
 
                 if (!empty($ad_before_contact)): 
                 ?>
@@ -1840,29 +1499,32 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                         <h2 class="gi-section-title" id="contact-title">お問い合わせ</h2>
                         <span class="gi-section-en">Contact</span>
                     </header>
-                    <div class="gi-contact-grid">
-                        <?php if ($grant['contact_phone']): ?>
-                        <a href="tel:<?php echo esc_attr(preg_replace('/[^0-9]/', '', $grant['contact_phone'])); ?>" class="gi-contact-item">
-                            <div class="gi-contact-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
-                            <div><div class="gi-contact-label">電話番号</div><div class="gi-contact-value"><?php echo esc_html($grant['contact_phone']); ?></div></div>
-                        </a>
-                        <?php endif; ?>
-                        <?php if ($grant['contact_email']): ?>
-                        <a href="mailto:<?php echo esc_attr($grant['contact_email']); ?>" class="gi-contact-item">
-                            <div class="gi-contact-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
-                            <div><div class="gi-contact-label">メール</div><div class="gi-contact-value"><?php echo esc_html($grant['contact_email']); ?></div></div>
-                        </a>
-                        <?php endif; ?>
-                        <?php if ($grant['official_url']): ?>
-                        <a href="<?php echo esc_url($grant['official_url']); ?>" class="gi-contact-item" target="_blank" rel="noopener">
-                            <div class="gi-contact-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
-                            <div><div class="gi-contact-label">公式サイト</div><div class="gi-contact-value">公式サイトを見る →</div></div>
-                        </a>
-                        <?php endif; ?>
+                    <div class="gi-section-body">
+                        <div class="gi-contact-grid">
+                            <?php if ($grant['contact_phone']): ?>
+                            <a href="tel:<?php echo esc_attr(preg_replace('/[^0-9]/', '', $grant['contact_phone'])); ?>" class="gi-contact-item">
+                                <div class="gi-contact-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+                                <div><div class="gi-contact-label">電話番号</div><div class="gi-contact-value"><?php echo esc_html($grant['contact_phone']); ?></div></div>
+                            </a>
+                            <?php endif; ?>
+                            <?php if ($grant['contact_email']): ?>
+                            <a href="mailto:<?php echo esc_attr($grant['contact_email']); ?>" class="gi-contact-item">
+                                <div class="gi-contact-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+                                <div><div class="gi-contact-label">メール</div><div class="gi-contact-value"><?php echo esc_html($grant['contact_email']); ?></div></div>
+                            </a>
+                            <?php endif; ?>
+                            <?php if ($grant['official_url']): ?>
+                            <a href="<?php echo esc_url($grant['official_url']); ?>" class="gi-contact-item" target="_blank" rel="noopener">
+                                <div class="gi-contact-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+                                <div><div class="gi-contact-label">公式サイト</div><div class="gi-contact-value">公式サイトを見る →</div></div>
+                            </a>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </section>
                 <?php endif; ?>
-<!-- 📚 図鑑風フッター -->
+
+                <!-- 図鑑風フッター -->
                 <div class="gi-zukan-footer">
                     <div class="gi-zukan-footer-page">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
@@ -1874,29 +1536,29 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                     </div>
                 </div>
 
-<!-- 情報ソース -->
-<div class="gi-source-card">
-    <div class="gi-source-header">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        <span class="gi-source-label">情報ソース</span>
-    </div>
-    <div class="gi-source-body">
-        <div class="gi-source-info">
-            <div class="gi-source-name"><?php echo esc_html($grant['source_name'] ? $grant['source_name'] : ($grant['organization'] ? $grant['organization'] : '公式情報')); ?></div>
-            <div class="gi-source-verified">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                <?php echo esc_html($last_verified_display); ?> 確認済み
-            </div>
-        </div>
-        <?php if ($grant['source_url']): ?>
-        <a href="<?php echo esc_url($grant['source_url']); ?>" class="gi-source-link" target="_blank" rel="noopener">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-            公式ページを確認
-        </a>
-        <?php endif; ?>
-    </div>
-    <div class="gi-source-footer">※最新情報は必ず公式サイトでご確認ください。本ページの情報は参考情報です。</div>
-</div>
+                <!-- 情報ソース -->
+                <div class="gi-source-card">
+                    <div class="gi-source-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        <span class="gi-source-label">情報ソース</span>
+                    </div>
+                    <div class="gi-source-body">
+                        <div class="gi-source-info">
+                            <div class="gi-source-name"><?php echo esc_html($grant['source_name'] ? $grant['source_name'] : ($grant['organization'] ? $grant['organization'] : '公式情報')); ?></div>
+                            <div class="gi-source-verified">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                <?php echo esc_html($last_verified_display); ?> 確認済み
+                            </div>
+                        </div>
+                        <?php if ($grant['source_url']): ?>
+                        <a href="<?php echo esc_url($grant['source_url']); ?>" class="gi-source-link" target="_blank" rel="noopener">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                            公式ページを確認
+                        </a>
+                        <?php endif; ?>
+                    </div>
+                    <div class="gi-source-footer">※最新情報は必ず公式サイトでご確認ください。本ページの情報は参考情報です。</div>
+                </div>
 
                 <!-- 監修者 -->
                 <aside class="gi-supervisor">
@@ -2178,9 +1840,9 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
         </div>
     </div>
 
-    <!-- 📚 本風・関連補助金セクション -->
+    <!-- 関連補助金セクション -->
     <?php if (!empty($similar_grants)): ?>
-    <section class="gi-related gi-book-related" aria-labelledby="related-title">
+    <section class="gi-related" aria-labelledby="related-title">
         <div class="gi-container">
             <header class="gi-related-header">
                 <p class="gi-related-en">Related Grants</p>
@@ -2214,7 +1876,6 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
         <span>AI相談</span>
     </button>
 </div>
-
 <!-- モバイルパネル -->
 <div class="gi-mobile-overlay" id="mobileOverlay"></div>
 <div class="gi-mobile-panel" id="mobilePanel">
@@ -2263,9 +1924,30 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
         </div>
         <div class="gi-panel-content-tab" id="tabAction">
             <div class="gi-cta-buttons">
-                <?php if ($grant['official_url']): ?><a href="<?php echo esc_url($grant['official_url']); ?>" class="gi-btn gi-btn-primary gi-btn-full" target="_blank" rel="noopener">公式サイトで申請</a><?php endif; ?>
-                <button class="gi-btn gi-btn-secondary gi-btn-full" id="mobileBookmarkBtn"><span>保存する</span></button>
-                <button class="gi-btn gi-btn-secondary gi-btn-full" id="mobileShareBtn">シェアする</button>
+                <?php if ($grant['official_url']): ?>
+                <a href="<?php echo esc_url($grant['official_url']); ?>" class="gi-btn gi-btn-primary gi-btn-full" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    公式サイトで申請
+                </a>
+                <?php endif; ?>
+                <?php if ($grant['application_url']): ?>
+                <a href="<?php echo esc_url($grant['application_url']); ?>" class="gi-btn gi-btn-accent gi-btn-full" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    申請フォームへ
+                </a>
+                <?php endif; ?>
+                <button class="gi-btn gi-btn-secondary gi-btn-full" id="mobileBookmarkBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                    <span>保存する</span>
+                </button>
+                <button class="gi-btn gi-btn-secondary gi-btn-full" id="mobileShareBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                    シェアする
+                </button>
+                <button class="gi-btn gi-btn-secondary gi-btn-full" id="mobilePrintBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                    印刷する
+                </button>
             </div>
         </div>
     </div>
@@ -2274,9 +1956,8 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
 <!-- トースト通知 -->
 <div class="gi-toast" id="giToast"></div>
 
-<!-- JavaScript設定 -->
+<!-- JavaScript設定 - CONFIG のみ (ロジックは assets/js/single-grant.js に外部化済み) -->
 <script>
-// CONFIG をグローバルスコープで定義
 var CONFIG = {
     postId: <?php echo $post_id; ?>,
     ajaxUrl: '<?php echo admin_url("admin-ajax.php"); ?>',
@@ -2297,560 +1978,11 @@ var CONFIG = {
         adoptionRate: <?php echo $grant['adoption_rate']; ?>,
         onlineApplication: <?php echo $grant['online_application'] ? 'true' : 'false'; ?>,
         jgrantsAvailable: <?php echo $grant['jgrants_available'] ? 'true' : 'false'; ?>,
-        officialUrl: <?php echo json_encode($grant['official_url'], JSON_UNESCAPED_UNICODE); ?>
+        officialUrl: <?php echo json_encode($grant['official_url'], JSON_UNESCAPED_UNICODE); ?>,
+        preparationDays: <?php echo $grant['preparation_days']; ?>,
+        reviewPeriod: <?php echo json_encode($grant['review_period'], JSON_UNESCAPED_UNICODE); ?>
     }
 };
-
-document.addEventListener('DOMContentLoaded', function() {
-    // ========================================
-    // チェックリスト機能
-    // ========================================
-    const checklistItems = document.querySelectorAll('.gi-checklist-item');
-    const checklistFill = document.getElementById('checklistFill');
-    const checklistCount = document.getElementById('checklistCount');
-    const checklistPercent = document.getElementById('checklistPercent');
-    const checklistResult = document.getElementById('checklistResult');
-    const checklistResultText = document.getElementById('checklistResultText');
-    const checklistResultSub = document.getElementById('checklistResultSub');
-    const checklistReset = document.getElementById('checklistReset');
-    const checklistPrint = document.getElementById('checklistPrint');
-    
-    // ローカルストレージからチェック状態を復元
-    const storageKey = 'gi_checklist_' + CONFIG.postId;
-    let checkedItems = JSON.parse(localStorage.getItem(storageKey) || '[]');
-    
-    function updateChecklistUI() {
-        let checked = 0;
-        let requiredChecked = 0;
-        let requiredTotal = 0;
-        
-        checklistItems.forEach(function(item) {
-            const id = item.dataset.id;
-            const isRequired = item.dataset.required === 'true';
-            const checkbox = item.querySelector('.gi-checklist-checkbox');
-            
-            if (isRequired) requiredTotal++;
-            
-            if (checkedItems.includes(id)) {
-                item.classList.add('checked');
-                checkbox.setAttribute('aria-checked', 'true');
-                checked++;
-                if (isRequired) requiredChecked++;
-            } else {
-                item.classList.remove('checked');
-                checkbox.setAttribute('aria-checked', 'false');
-            }
-        });
-        
-        const total = CONFIG.totalChecklist;
-        const percent = Math.round((checked / total) * 100);
-        
-        if (checklistFill) checklistFill.style.width = percent + '%';
-        if (checklistCount) checklistCount.textContent = checked + ' / ' + total + ' 完了';
-        if (checklistPercent) checklistPercent.textContent = percent + '%';
-        
-        // 結果表示
-        if (checklistResult) {
-            if (requiredChecked === requiredTotal && requiredTotal > 0) {
-                checklistResult.classList.add('success');
-                checklistResult.classList.remove('warning');
-                if (checklistResultText) checklistResultText.textContent = '申請可能です！';
-                if (checklistResultSub) checklistResultSub.textContent = '必須項目をすべてクリアしました。公式サイトから申請を進めましょう。';
-            } else if (checked > 0) {
-                checklistResult.classList.add('warning');
-                checklistResult.classList.remove('success');
-                if (checklistResultText) checklistResultText.textContent = 'あと' + (requiredTotal - requiredChecked) + '項目';
-                if (checklistResultSub) checklistResultSub.textContent = '必須項目をすべてクリアすると申請可能です。';
-            } else {
-                checklistResult.classList.remove('success', 'warning');
-                if (checklistResultText) checklistResultText.textContent = 'チェックを入れて申請可否を確認しましょう';
-                if (checklistResultSub) checklistResultSub.textContent = '必須項目をすべてクリアすると申請可能です';
-            }
-        }
-    }
-    
-    // チェックリストアイテムのクリックイベント
-    checklistItems.forEach(function(item) {
-        const checkbox = item.querySelector('.gi-checklist-checkbox');
-        
-        function toggleCheck() {
-            const id = item.dataset.id;
-            const index = checkedItems.indexOf(id);
-            
-            if (index > -1) {
-                checkedItems.splice(index, 1);
-            } else {
-                checkedItems.push(id);
-            }
-            
-            localStorage.setItem(storageKey, JSON.stringify(checkedItems));
-            updateChecklistUI();
-        }
-        
-        if (checkbox) {
-            checkbox.addEventListener('click', toggleCheck);
-            checkbox.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    toggleCheck();
-                }
-            });
-        }
-        
-        // ヘルプボタン
-        const helpBtn = item.querySelector('.gi-checklist-help-btn');
-        if (helpBtn) {
-            helpBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                item.classList.toggle('show-help');
-            });
-        }
-    });
-    
-    // リセットボタン
-    if (checklistReset) {
-        checklistReset.addEventListener('click', function() {
-            if (confirm('チェックリストをリセットしますか？')) {
-                checkedItems = [];
-                localStorage.removeItem(storageKey);
-                updateChecklistUI();
-                showToast('チェックリストをリセットしました');
-            }
-        });
-    }
-    
-    // 印刷ボタン
-    if (checklistPrint) {
-        checklistPrint.addEventListener('click', function() {
-            window.print();
-        });
-    }
-    
-    // 初期表示
-    updateChecklistUI();
-    
-    // ========================================
-    // ブックマーク機能
-    // ========================================
-    const bookmarkBtn = document.getElementById('bookmarkBtn');
-    const mobileBookmarkBtn = document.getElementById('mobileBookmarkBtn');
-    const bookmarkStorageKey = 'gi_bookmarks';
-    
-    function getBookmarks() {
-        return JSON.parse(localStorage.getItem(bookmarkStorageKey) || '[]');
-    }
-    
-    function isBookmarked() {
-        return getBookmarks().some(function(b) { return b.id === CONFIG.postId; });
-    }
-    
-    function updateBookmarkUI() {
-        const bookmarked = isBookmarked();
-        [bookmarkBtn, mobileBookmarkBtn].forEach(function(btn) {
-            if (btn) {
-                const span = btn.querySelector('span');
-                if (bookmarked) {
-                    btn.classList.add('bookmarked');
-                    if (span) span.textContent = '保存済み';
-                } else {
-                    btn.classList.remove('bookmarked');
-                    if (span) span.textContent = '保存する';
-                }
-            }
-        });
-    }
-    
-    function toggleBookmark() {
-        let bookmarks = getBookmarks();
-        const bookmarked = isBookmarked();
-        
-        if (bookmarked) {
-            bookmarks = bookmarks.filter(function(b) { return b.id !== CONFIG.postId; });
-            showToast('ブックマークを解除しました');
-        } else {
-            bookmarks.push({
-                id: CONFIG.postId,
-                title: CONFIG.title,
-                url: CONFIG.url,
-                date: new Date().toISOString()
-            });
-            showToast('ブックマークに保存しました');
-        }
-        
-        localStorage.setItem(bookmarkStorageKey, JSON.stringify(bookmarks));
-        updateBookmarkUI();
-    }
-    
-    if (bookmarkBtn) bookmarkBtn.addEventListener('click', toggleBookmark);
-    if (mobileBookmarkBtn) mobileBookmarkBtn.addEventListener('click', toggleBookmark);
-    updateBookmarkUI();
-    
-    // ========================================
-    // シェア機能
-    // ========================================
-    const shareBtn = document.getElementById('shareBtn');
-    const mobileShareBtn = document.getElementById('mobileShareBtn');
-    
-    function shareContent() {
-        if (navigator.share) {
-            navigator.share({
-                title: CONFIG.title,
-                url: CONFIG.url
-            }).catch(function() {});
-        } else {
-            // フォールバック: URLをコピー
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(CONFIG.url).then(function() {
-                    showToast('URLをコピーしました');
-                });
-            } else {
-                // 古いブラウザ用フォールバック
-                const textarea = document.createElement('textarea');
-                textarea.value = CONFIG.url;
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-                showToast('URLをコピーしました');
-            }
-        }
-    }
-    
-    if (shareBtn) shareBtn.addEventListener('click', shareContent);
-    if (mobileShareBtn) mobileShareBtn.addEventListener('click', shareContent);
-    
-    // ========================================
-    // モバイルパネル機能
-    // ========================================
-    const mobileAiBtn = document.getElementById('mobileAiBtn');
-    const mobileOverlay = document.getElementById('mobileOverlay');
-    const mobilePanel = document.getElementById('mobilePanel');
-    const panelClose = document.getElementById('panelClose');
-    const panelTabs = document.querySelectorAll('.gi-panel-tab');
-    const panelContents = document.querySelectorAll('.gi-panel-content-tab');
-    const mobileTocLinks = document.querySelectorAll('.mobile-toc-link');
-    
-    function openPanel() {
-        if (mobileOverlay) mobileOverlay.classList.add('active');
-        if (mobilePanel) mobilePanel.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-    
-    function closePanel() {
-        if (mobileOverlay) mobileOverlay.classList.remove('active');
-        if (mobilePanel) mobilePanel.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-    
-    if (mobileAiBtn) mobileAiBtn.addEventListener('click', openPanel);
-    if (mobileOverlay) mobileOverlay.addEventListener('click', closePanel);
-    if (panelClose) panelClose.addEventListener('click', closePanel);
-    
-    // タブ切り替え
-    panelTabs.forEach(function(tab) {
-        tab.addEventListener('click', function() {
-            const targetTab = this.dataset.tab;
-            
-            panelTabs.forEach(function(t) { t.classList.remove('active'); });
-            panelContents.forEach(function(c) { c.classList.remove('active'); });
-            
-            this.classList.add('active');
-            const targetContent = document.getElementById('tab' + targetTab.charAt(0).toUpperCase() + targetTab.slice(1));
-            if (targetContent) targetContent.classList.add('active');
-        });
-    });
-    
-    // モバイル目次リンククリック時にパネルを閉じる
-    mobileTocLinks.forEach(function(link) {
-        link.addEventListener('click', function() {
-            closePanel();
-        });
-    });
-    
-    // ========================================
-    // AIアシスタント機能
-    // ========================================
-    const aiInput = document.getElementById('aiInput');
-    const aiSend = document.getElementById('aiSend');
-    const aiMessages = document.getElementById('aiMessages');
-    const mobileAiInput = document.getElementById('mobileAiInput');
-    const mobileAiSend = document.getElementById('mobileAiSend');
-    const mobileAiMessages = document.getElementById('mobileAiMessages');
-    const aiChips = document.querySelectorAll('.gi-ai-chip, .gi-mobile-ai-chip');
-    
-    // AI応答データ（ローカル処理用）
-    const aiResponses = {
-        '対象者': CONFIG.grantData.target || 'この補助金の対象者については、詳細情報セクションをご確認ください。',
-        '金額': CONFIG.grantData.maxAmount ? '補助金額は' + CONFIG.grantData.maxAmount + 'です。' + (CONFIG.grantData.subsidyRate ? '補助率は' + CONFIG.grantData.subsidyRate + 'となっています。' : '') : '補助金額については公式サイトでご確認ください。',
-        '書類': CONFIG.grantData.documents || '必要書類については、詳細情報セクションをご確認ください。',
-        '申請': (CONFIG.grantData.onlineApplication === 'true' ? 'オンライン申請に対応しています。' : '') + (CONFIG.grantData.jgrantsAvailable === 'true' ? 'jGrantsでの申請が可能です。' : '') + (CONFIG.grantData.officialUrl ? '詳細は公式サイトをご確認ください。' : ''),
-        '締切': CONFIG.grantData.deadline ? '申請締切は' + CONFIG.grantData.deadline + 'です。' + (CONFIG.grantData.daysRemaining > 0 ? '残り' + CONFIG.grantData.daysRemaining + '日です。' : '') : '申請締切については公式サイトでご確認ください。',
-        '経費': CONFIG.grantData.expenses || '対象経費については、詳細情報セクションをご確認ください。',
-        '難易度': '申請難易度は「' + CONFIG.grantData.difficulty + '」です。' + (CONFIG.grantData.adoptionRate > 0 ? '推定採択率は約' + CONFIG.grantData.adoptionRate + '%です（※AI推定値であり、公式発表ではありません）。' : '')
-    };
-    
-    function addAiMessage(message, isUser, container) {
-        const msgDiv = document.createElement('div');
-        msgDiv.className = 'gi-ai-msg' + (isUser ? ' user' : '');
-        
-        if (isUser) {
-            msgDiv.innerHTML = '<div class="gi-ai-bubble">' + escapeHtml(message) + '</div>';
-        } else {
-            msgDiv.innerHTML = '<div class="gi-ai-avatar">AI</div><div class="gi-ai-bubble">' + message + '</div>';
-        }
-        
-        container.appendChild(msgDiv);
-        container.scrollTop = container.scrollHeight;
-    }
-    
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-    
-    function processAiQuery(query, container) {
-        // ユーザーメッセージを追加
-        addAiMessage(query, true, container);
-        
-        // ローディング表示
-        const loadingDiv = document.createElement('div');
-        loadingDiv.className = 'gi-ai-msg loading';
-        loadingDiv.innerHTML = '<div class="gi-ai-avatar">AI</div><div class="gi-ai-bubble"><span class="gi-ai-typing">考え中...</span></div>';
-        container.appendChild(loadingDiv);
-        container.scrollTop = container.scrollHeight;
-        
-        // 応答を生成（簡易マッチング）
-        setTimeout(function() {
-            container.removeChild(loadingDiv);
-            
-            let response = '';
-            const queryLower = query.toLowerCase();
-            
-            if (queryLower.includes('対象') || queryLower.includes('誰')) {
-                response = aiResponses['対象者'];
-            } else if (queryLower.includes('金額') || queryLower.includes('いくら') || queryLower.includes('補助率')) {
-                response = aiResponses['金額'];
-            } else if (queryLower.includes('書類') || queryLower.includes('必要')) {
-                response = aiResponses['書類'];
-            } else if (queryLower.includes('申請') || queryLower.includes('方法') || queryLower.includes('オンライン')) {
-                response = aiResponses['申請'];
-            } else if (queryLower.includes('締切') || queryLower.includes('期限') || queryLower.includes('いつ')) {
-                response = aiResponses['締切'];
-            } else if (queryLower.includes('経費') || queryLower.includes('費用') || queryLower.includes('使える')) {
-                response = aiResponses['経費'];
-            } else if (queryLower.includes('難易度') || queryLower.includes('採択率') || queryLower.includes('難しい')) {
-                response = aiResponses['難易度'];
-            } else {
-                response = 'ご質問ありがとうございます。この補助金の詳細については、上記の「補助金詳細」セクションや公式サイトをご確認ください。具体的なご質問があれば、「対象者」「金額」「書類」「申請方法」「締切」などのキーワードでお聞きください。';
-            }
-            
-            addAiMessage(response, false, container);
-        }, 800);
-    }
-    
-    function handleDiagnosis(container) {
-        addAiMessage('資格診断をお願いします', true, container);
-        
-        setTimeout(function() {
-            let diagnosisHtml = '<strong>申請資格診断</strong><br><br>';
-            diagnosisHtml += '以下の項目をご確認ください：<br><br>';
-            diagnosisHtml += '✅ <strong>対象者要件</strong><br>' + (CONFIG.grantData.target || '詳細は公式サイトをご確認ください') + '<br><br>';
-            diagnosisHtml += '✅ <strong>補助金額</strong><br>' + (CONFIG.grantData.maxAmount || '要確認') + '<br><br>';
-            diagnosisHtml += '✅ <strong>申請締切</strong><br>' + (CONFIG.grantData.deadline || '要確認');
-            if (CONFIG.grantData.daysRemaining > 0) {
-                diagnosisHtml += '（残り' + CONFIG.grantData.daysRemaining + '日）';
-            }
-            diagnosisHtml += '<br><br>';
-            diagnosisHtml += '📋 詳しくは上部の「申請前チェックリスト」で確認できます。';
-            
-            addAiMessage(diagnosisHtml, false, container);
-        }, 600);
-    }
-    
-    function handleRoadmap(container) {
-        addAiMessage('申請ロードマップを教えてください', true, container);
-        
-        setTimeout(function() {
-            let roadmapHtml = '<strong>申請ロードマップ</strong><br><br>';
-            roadmapHtml += '📍 <strong>STEP 1</strong>: 申請要件の確認<br>';
-            roadmapHtml += '└ 対象者・対象経費を確認<br><br>';
-            roadmapHtml += '📍 <strong>STEP 2</strong>: 必要書類の準備<br>';
-            roadmapHtml += '└ ' + (CONFIG.grantData.documents ? CONFIG.grantData.documents.substring(0, 50) + '...' : '事業計画書、決算書など') + '<br><br>';
-            roadmapHtml += '📍 <strong>STEP 3</strong>: 申請書作成<br>';
-            if (CONFIG.grantData.jgrantsAvailable === 'true') {
-                roadmapHtml += '└ jGrantsでの電子申請<br><br>';
-            } else if (CONFIG.grantData.onlineApplication === 'true') {
-                roadmapHtml += '└ オンライン申請<br><br>';
-            } else {
-                roadmapHtml += '└ 申請書類の作成・提出<br><br>';
-            }
-            roadmapHtml += '📍 <strong>STEP 4</strong>: 審査・採択<br>';
-            roadmapHtml += '└ 審査期間を経て採択決定<br><br>';
-            roadmapHtml += '⏰ 締切: ' + (CONFIG.grantData.deadline || '要確認');
-            
-            addAiMessage(roadmapHtml, false, container);
-        }, 600);
-    }
-    
-    // AIチップのクリックイベント
-    aiChips.forEach(function(chip) {
-        chip.addEventListener('click', function() {
-            const action = this.dataset.action;
-            const query = this.dataset.q;
-            const isMobile = this.classList.contains('gi-mobile-ai-chip');
-            const container = isMobile ? mobileAiMessages : aiMessages;
-            
-            if (action === 'diagnosis') {
-                handleDiagnosis(container);
-            } else if (action === 'roadmap') {
-                handleRoadmap(container);
-            } else if (query) {
-                processAiQuery(query, container);
-            }
-        });
-    });
-    
-    // AI送信機能
-    function sendAiMessage(input, container) {
-        const query = input.value.trim();
-        if (!query) return;
-        
-        processAiQuery(query, container);
-        input.value = '';
-        input.style.height = 'auto';
-    }
-    
-    if (aiSend && aiInput && aiMessages) {
-        aiSend.addEventListener('click', function() {
-            sendAiMessage(aiInput, aiMessages);
-        });
-        
-        aiInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendAiMessage(aiInput, aiMessages);
-            }
-        });
-        
-        // テキストエリア自動リサイズ
-        aiInput.addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
-        });
-    }
-    
-    if (mobileAiSend && mobileAiInput && mobileAiMessages) {
-        mobileAiSend.addEventListener('click', function() {
-            sendAiMessage(mobileAiInput, mobileAiMessages);
-        });
-        
-        mobileAiInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendAiMessage(mobileAiInput, mobileAiMessages);
-            }
-        });
-        
-        mobileAiInput.addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = Math.min(this.scrollHeight, 100) + 'px';
-        });
-    }
-    
-    // ========================================
-    // スムーズスクロール
-    // ========================================
-    document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
-        anchor.addEventListener('click', function(e) {
-            const href = this.getAttribute('href');
-            if (href === '#') return;
-            
-            const target = document.querySelector(href);
-            if (target) {
-                e.preventDefault();
-                const headerOffset = 80;
-                const elementPosition = target.getBoundingClientRect().top;
-                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-                
-                window.scrollTo({
-                    top: offsetPosition,
-                    behavior: 'smooth'
-                });
-            }
-        });
-    });
-    
-    // ========================================
-    // トースト通知
-    // ========================================
-    window.showToast = function(message, duration) {
-        duration = duration || 3000;
-        const toast = document.getElementById('giToast');
-        if (!toast) return;
-        
-        toast.textContent = message;
-        toast.classList.add('show');
-        
-        setTimeout(function() {
-            toast.classList.remove('show');
-        }, duration);
-    };
-    
-    // ========================================
-    // FAQ アコーディオン アニメーション
-    // ========================================
-    document.querySelectorAll('.gi-faq-item').forEach(function(item) {
-        item.addEventListener('toggle', function() {
-            const icon = this.querySelector('.gi-faq-icon');
-            if (icon) {
-                if (this.open) {
-                    icon.style.transform = 'rotate(45deg)';
-                } else {
-                    icon.style.transform = 'rotate(0deg)';
-                }
-            }
-        });
-    });
-    
-    // ========================================
-    // サイドバー目次ハイライト
-    // ========================================
-    const tocLinks = document.querySelectorAll('.gi-sidebar-list-link[href^="#"]');
-    const sections = [];
-    
-    tocLinks.forEach(function(link) {
-        const href = link.getAttribute('href');
-        const section = document.querySelector(href);
-        if (section) {
-            sections.push({ link: link, section: section });
-        }
-    });
-    
-    function updateTocHighlight() {
-        const scrollPos = window.scrollY + 100;
-        
-        let currentSection = null;
-        sections.forEach(function(item) {
-            if (item.section.offsetTop <= scrollPos) {
-                currentSection = item;
-            }
-        });
-        
-        tocLinks.forEach(function(link) {
-            link.classList.remove('active');
-        });
-        
-        if (currentSection) {
-            currentSection.link.classList.add('active');
-        }
-    }
-    
-    // Add passive listener to improve scroll performance (INP optimization)
-    window.addEventListener('scroll', updateTocHighlight, { passive: true });
-    updateTocHighlight();
-    
-}); // DOMContentLoaded end
 </script>
 
 <?php get_footer(); ?>

@@ -1,11 +1,11 @@
 /**
  * Single Grant Page JavaScript
- * Version: 302.0.0
+ * Version: 303.0.0 - CSS/JS Externalization Update
  * 補助金詳細ページ専用スクリプト
+ * 
+ * CONFIG は PHP側 (single-grant.php) で設定される:
+ * var CONFIG = { postId, ajaxUrl, nonce, url, title, totalChecklist, grantData }
  */
-
-// CONFIG は PHP側で設定される
-// var CONFIG = { postId, ajaxUrl, nonce, url, title, totalChecklist };
 
 document.addEventListener('DOMContentLoaded', function() {
     'use strict';
@@ -427,7 +427,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    console.log('Grant Single v302 Initialized');
+    console.log('Grant Single v303 Initialized (CSS/JS Externalized)');
     
     // トースト通知
     function showToast(msg) {
