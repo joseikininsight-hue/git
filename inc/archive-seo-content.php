@@ -1156,6 +1156,39 @@ function gi_archive_seo_edit_page() {
                         </div>
                     </div>
                     
+                    <!-- AIコンテンツ生成プロンプト -->
+                    <div class="postbox" style="margin-bottom: 20px; border-color: #9b59b6;">
+                        <div class="postbox-header" style="background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);">
+                            <h2 style="padding: 10px 15px; margin: 0; color: #fff;">
+                                <span class="dashicons dashicons-admin-customizer" style="color: #fff;"></span>
+                                AIコンテンツ生成プロンプト
+                            </h2>
+                        </div>
+                        <div class="inside">
+                            <p class="description" style="margin-bottom: 10px;">このアーカイブページ用のSEOコンテンツを生成するためのプロンプトです。クリックでコピーできます。</p>
+                            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
+                                <button type="button" class="button button-primary ai-prompt-copy" data-prompt-type="intro">
+                                    <span class="dashicons dashicons-editor-paste-text" style="vertical-align: middle;"></span>
+                                    イントロ用プロンプト
+                                </button>
+                                <button type="button" class="button button-primary ai-prompt-copy" data-prompt-type="outro">
+                                    <span class="dashicons dashicons-editor-paste-text" style="vertical-align: middle;"></span>
+                                    アウトロ用プロンプト
+                                </button>
+                                <button type="button" class="button ai-prompt-copy" data-prompt-type="meta">
+                                    <span class="dashicons dashicons-editor-paste-text" style="vertical-align: middle;"></span>
+                                    メタディスクリプション用
+                                </button>
+                            </div>
+                            <div id="ai-prompt-preview" style="background: #f9f9f9; border: 1px solid #ddd; border-radius: 4px; padding: 15px; font-size: 13px; line-height: 1.6; max-height: 300px; overflow-y: auto; display: none;">
+                                <pre style="white-space: pre-wrap; word-wrap: break-word; margin: 0; font-family: inherit;"></pre>
+                            </div>
+                            <p id="ai-prompt-copy-status" style="color: #46b450; font-weight: bold; margin-top: 10px; display: none;">
+                                <span class="dashicons dashicons-yes-alt"></span> コピーしました！
+                            </p>
+                        </div>
+                    </div>
+                    
                     <!-- 統合候補（100件以下の場合） -->
                     <?php if ($auto_noindex_recommend && $type !== 'post_type_archive'): ?>
                     <div class="postbox" style="margin-bottom: 20px; border-color: #d63638;">
@@ -1268,6 +1301,116 @@ function gi_archive_seo_edit_page() {
                 }
             });
         });
+        
+        // AIプロンプト生成・コピー機能
+        var archiveTitle = '<?php echo esc_js($title); ?>';
+        var archiveTypeName = '<?php echo esc_js(gi_get_archive_type_label($type)); ?>';
+        var postCount = <?php echo intval($post_count); ?>;
+        var siteName = '<?php echo esc_js(get_bloginfo('name')); ?>';
+        
+        function generateAIPrompt(promptType) {
+            var currentYear = new Date().getFullYear();
+            var prompt = '';
+            
+            if (promptType === 'intro') {
+                prompt = `以下の条件でSEO記事のイントロコンテンツ（傾向と対策セクション）を作成してください。
+
+【対象アーカイブページ】
+- タイトル: ${archiveTitle}
+- カテゴリ種別: ${archiveTypeName}
+- 掲載補助金数: ${postCount}件
+
+【作成要件】
+1. 「01 傾向と対策」というセクション番号付きの見出しで開始
+2. このカテゴリ/地域の補助金の特徴・傾向を解説（300〜500字）
+3. 申請のポイントや採択率を上げるコツを記載
+4. ${currentYear}年の最新動向を含める
+5. 読者（中小企業経営者・個人事業主）に役立つ実践的な情報
+
+【HTML形式】
+- 見出しは<h2>タグを使用（セクション番号含む）
+- 段落は<p>タグ
+- 箇条書きは<ul><li>タグ
+- 重要ポイントは<strong>タグ
+
+【トーン】
+専門的だが親しみやすい。図鑑・事典のような知的で信頼性のある文体。`;
+
+            } else if (promptType === 'outro') {
+                prompt = `以下の条件でSEO記事のアウトロコンテンツ（まとめ・追加情報セクション）を作成してください。
+
+【対象アーカイブページ】
+- タイトル: ${archiveTitle}
+- カテゴリ種別: ${archiveTypeName}
+- 掲載補助金数: ${postCount}件
+
+【作成要件】
+1. 「04 申請のまとめ」または「04 関連情報」というセクション番号付きの見出しで開始
+2. このカテゴリ/地域の補助金申請における重要ポイントのまとめ（200〜400字）
+3. よくある質問と回答（Q&A形式で2〜3個）
+4. 関連する他のカテゴリ・地域への誘導文
+5. 専門家への相談を促すCTA文
+
+【HTML形式】
+- 見出しは<h2>タグを使用（セクション番号含む）
+- Q&Aは<h3>と<p>タグで構成
+- 段落は<p>タグ
+- 重要ポイントは<strong>タグ
+
+【トーン】
+専門的だが親しみやすい。読者の次のアクションを促す。`;
+
+            } else if (promptType === 'meta') {
+                prompt = `以下のアーカイブページ用のメタディスクリプション（SEO用説明文）を作成してください。
+
+【対象アーカイブページ】
+- タイトル: ${archiveTitle}
+- カテゴリ種別: ${archiveTypeName}
+- 掲載補助金数: ${postCount}件
+- サイト名: ${siteName}
+
+【作成要件】
+1. 120〜160文字以内
+2. キーワード「${archiveTitle}」「助成金」「補助金」を自然に含める
+3. 検索ユーザーがクリックしたくなる魅力的な文章
+4. 具体的な数字（${postCount}件以上掲載）を含める
+5. ${currentYear}年の最新情報であることを示唆
+6. アクションを促す文言（「今すぐチェック」等）を末尾に
+
+【出力形式】
+メタディスクリプションのテキストのみを出力（HTMLタグ不要）`;
+            }
+            
+            return prompt;
+        }
+        
+        // プロンプトボタンクリックイベント
+        $('.ai-prompt-copy').on('click', function() {
+            var promptType = $(this).data('prompt-type');
+            var prompt = generateAIPrompt(promptType);
+            
+            // プレビュー表示
+            $('#ai-prompt-preview').show().find('pre').text(prompt);
+            
+            // クリップボードにコピー
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(prompt).then(function() {
+                    $('#ai-prompt-copy-status').fadeIn().delay(2000).fadeOut();
+                });
+            } else {
+                // フォールバック: 古いブラウザ用
+                var $temp = $('<textarea>');
+                $('body').append($temp);
+                $temp.val(prompt).select();
+                document.execCommand('copy');
+                $temp.remove();
+                $('#ai-prompt-copy-status').fadeIn().delay(2000).fadeOut();
+            }
+            
+            // ボタンのアクティブ状態を更新
+            $('.ai-prompt-copy').removeClass('button-primary');
+            $(this).addClass('button-primary');
+        });
     });
     </script>
     <?php
@@ -1316,6 +1459,7 @@ function gi_ajax_get_posts_preview() {
 /**
  * =============================================================================
  * 11. AJAX: おすすめ記事自動選出（PV順）
+ * ※ 都道府県・カテゴリ内の記事のみでPV順にソート
  * =============================================================================
  */
 
@@ -1331,33 +1475,112 @@ function gi_ajax_auto_select_featured() {
         return;
     }
     
-    $args = array(
-        'post_type' => 'grant',
-        'post_status' => 'publish',
-        'posts_per_page' => $count,
-        'meta_key' => '_gi_pv_total',
-        'orderby' => 'meta_value_num',
-        'order' => 'DESC',
-    );
+    global $wpdb;
     
-    // タクソノミーの場合
+    // タクソノミー内の記事をPV順で取得
     if ($type !== 'post_type_archive') {
-        $args['tax_query'] = array(
-            array(
-                'taxonomy' => $type,
-                'field' => 'slug',
-                'terms' => $key,
+        // 都道府県・カテゴリ等のタクソノミーの場合
+        // そのタクソノミーに属する記事のPV数でソート
+        $term = get_term_by('slug', $key, $type);
+        
+        if (!$term) {
+            wp_send_json_error('タームが見つかりません');
+            return;
+        }
+        
+        // アクセストラッキングテーブルから該当タクソノミー内の記事のPVを取得
+        $daily_table = $wpdb->prefix . 'ji_access_daily';
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$daily_table}'");
+        
+        if ($table_exists) {
+            // アクセストラッキングテーブルがある場合、そこからPVを取得
+            $query = $wpdb->prepare("
+                SELECT p.ID, p.post_title, COALESCE(SUM(ad.view_count), 0) as total_pv
+                FROM {$wpdb->posts} p
+                INNER JOIN {$wpdb->term_relationships} tr ON p.ID = tr.object_id
+                INNER JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+                LEFT JOIN {$daily_table} ad ON p.ID = ad.post_id
+                WHERE p.post_type = 'grant'
+                AND p.post_status = 'publish'
+                AND tt.taxonomy = %s
+                AND tt.term_id = %d
+                GROUP BY p.ID
+                ORDER BY total_pv DESC, p.post_date DESC
+                LIMIT %d
+            ", $type, $term->term_id, $count);
+            
+            $results = $wpdb->get_results($query);
+            
+            if (!empty($results)) {
+                $ids = wp_list_pluck($results, 'ID');
+                
+                wp_send_json_success(array(
+                    'ids' => $ids,
+                    'posts' => array_map(function($r) {
+                        return array(
+                            'id' => $r->ID,
+                            'title' => $r->post_title,
+                            'pv' => (int)$r->total_pv
+                        );
+                    }, $results),
+                    'source' => 'access_tracking'
+                ));
+                return;
+            }
+        }
+        
+        // フォールバック: view_count メタを使用
+        $args = array(
+            'post_type' => 'grant',
+            'post_status' => 'publish',
+            'posts_per_page' => $count,
+            'tax_query' => array(
+                array(
+                    'taxonomy' => $type,
+                    'field' => 'slug',
+                    'terms' => $key,
+                ),
             ),
         );
-    }
-    
-    $posts = get_posts($args);
-    
-    if (empty($posts)) {
-        // PVがない場合は最新順
-        unset($args['meta_key']);
-        $args['orderby'] = 'date';
+        
+        // まずview_countで試す
+        $args['meta_key'] = 'view_count';
+        $args['orderby'] = 'meta_value_num';
+        $args['order'] = 'DESC';
+        
         $posts = get_posts($args);
+        
+        if (empty($posts)) {
+            // view_countがない場合は_gi_pv_totalで試す
+            $args['meta_key'] = '_gi_pv_total';
+            $posts = get_posts($args);
+        }
+        
+        if (empty($posts)) {
+            // それでもない場合は日付順
+            unset($args['meta_key']);
+            $args['orderby'] = 'date';
+            $posts = get_posts($args);
+        }
+        
+    } else {
+        // 全体アーカイブの場合
+        $args = array(
+            'post_type' => 'grant',
+            'post_status' => 'publish',
+            'posts_per_page' => $count,
+            'meta_key' => 'view_count',
+            'orderby' => 'meta_value_num',
+            'order' => 'DESC',
+        );
+        
+        $posts = get_posts($args);
+        
+        if (empty($posts)) {
+            unset($args['meta_key']);
+            $args['orderby'] = 'date';
+            $posts = get_posts($args);
+        }
     }
     
     $ids = wp_list_pluck($posts, 'ID');
@@ -1365,13 +1588,33 @@ function gi_ajax_auto_select_featured() {
     wp_send_json_success(array(
         'ids' => $ids,
         'posts' => array_map(function($p) {
+            $pv = (int)get_post_meta($p->ID, 'view_count', true);
+            if (!$pv) {
+                $pv = (int)get_post_meta($p->ID, '_gi_pv_total', true);
+            }
             return array(
                 'id' => $p->ID,
                 'title' => $p->post_title,
-                'pv' => (int)get_post_meta($p->ID, '_gi_pv_total', true)
+                'pv' => $pv
             );
-        }, $posts)
+        }, $posts),
+        'source' => 'meta_fallback'
     ));
+}
+
+/**
+ * アーカイブタイプのラベルを取得
+ */
+function gi_get_archive_type_label($type) {
+    $labels = array(
+        'post_type_archive' => '全助成金',
+        'grant_category' => 'カテゴリ',
+        'grant_prefecture' => '都道府県',
+        'grant_municipality' => '市町村',
+        'grant_tag' => 'タグ',
+        'grant_purpose' => '目的',
+    );
+    return isset($labels[$type]) ? $labels[$type] : $type;
 }
 
 
@@ -2355,10 +2598,16 @@ function gi_output_archive_featured_posts() {
     <?php
 }
 
-// おすすめ記事自動選出
+/**
+ * おすすめ記事自動選出（フロントエンド用）
+ * タクソノミー（都道府県・カテゴリ等）内の記事のPV順で選出
+ */
 function gi_auto_get_featured_posts() {
+    global $wpdb;
+    
     $type = '';
     $key = '';
+    $term = null;
     
     if (is_post_type_archive('grant')) {
         $type = 'post_type_archive';
@@ -2375,13 +2624,41 @@ function gi_auto_get_featured_posts() {
         return '';
     }
     
+    // タクソノミーの場合、そのタクソノミー内の記事のPV順で取得
+    if ($type !== 'post_type_archive' && $term) {
+        // アクセストラッキングテーブルから該当タクソノミー内の記事のPVを取得
+        $daily_table = $wpdb->prefix . 'ji_access_daily';
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$daily_table}'");
+        
+        if ($table_exists) {
+            $query = $wpdb->prepare("
+                SELECT p.ID
+                FROM {$wpdb->posts} p
+                INNER JOIN {$wpdb->term_relationships} tr ON p.ID = tr.object_id
+                INNER JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+                LEFT JOIN {$daily_table} ad ON p.ID = ad.post_id
+                WHERE p.post_type = 'grant'
+                AND p.post_status = 'publish'
+                AND tt.taxonomy = %s
+                AND tt.term_id = %d
+                GROUP BY p.ID
+                ORDER BY COALESCE(SUM(ad.view_count), 0) DESC, p.post_date DESC
+                LIMIT 3
+            ", $type, $term->term_id);
+            
+            $results = $wpdb->get_col($query);
+            
+            if (!empty($results)) {
+                return implode(',', $results);
+            }
+        }
+    }
+    
+    // フォールバック: WP_Queryを使用
     $args = array(
         'post_type' => 'grant',
         'post_status' => 'publish',
         'posts_per_page' => 3,
-        'meta_key' => '_gi_pv_total',
-        'orderby' => 'meta_value_num',
-        'order' => 'DESC',
     );
     
     if ($type !== 'post_type_archive') {
@@ -2394,7 +2671,18 @@ function gi_auto_get_featured_posts() {
         );
     }
     
+    // view_countでソートを試す
+    $args['meta_key'] = 'view_count';
+    $args['orderby'] = 'meta_value_num';
+    $args['order'] = 'DESC';
+    
     $posts = get_posts($args);
+    
+    if (empty($posts)) {
+        // view_countがない場合は_gi_pv_total
+        $args['meta_key'] = '_gi_pv_total';
+        $posts = get_posts($args);
+    }
     
     if (empty($posts)) {
         // PVがない場合は最新順
