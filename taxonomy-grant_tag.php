@@ -495,6 +495,7 @@ $js_uri = get_template_directory_uri() . '/assets/js/archive-common.js';
 document.addEventListener('DOMContentLoaded', function() {
     if (typeof ArchiveCommon !== 'undefined') {
         ArchiveCommon.init({
+            ajaxUrl
             ajaxUrl: '<?php echo admin_url("admin-ajax.php"); ?>',
             nonce: '<?php echo wp_create_nonce("gi_ajax_nonce"); ?>',
             postType: 'grant',
@@ -504,8 +505,18 @@ document.addEventListener('DOMContentLoaded', function() {
             fixedPurpose: '',
             fixedTag: '<?php echo esc_js($tag_slug); ?>'
         });
+        
+        // モバイルフィルターの初期化
+        if (typeof ArchiveCommon.initMobileFilter === 'function') {
+            ArchiveCommon.initMobileFilter();
+        }
     }
 });
+        
+        // モバイルフィルターの初期化
+        if (typeof ArchiveCommon.initMobileFilter === 'function') {
+            ArchiveCommon.initMobileFilter();
+        }
 </script>
 
 <?php get_footer(); ?>

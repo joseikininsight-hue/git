@@ -445,4 +445,28 @@ $js_uri = get_template_directory_uri() . '/assets/js/archive-common.js';
 <script src="<?php echo esc_url($js_uri . '?ver=' . filemtime($js_file)); ?>"></script>
 <?php endif; ?>
 
+<!-- 初期化スクリプト -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ArchiveCommon の初期化（都道府県固定）
+    if (typeof ArchiveCommon !== 'undefined') {
+        ArchiveCommon.init({
+            ajaxUrl: '<?php echo admin_url("admin-ajax.php"); ?>',
+            nonce: '<?php echo wp_create_nonce("gi_ajax_nonce"); ?>',
+            postType: 'grant',
+            fixedCategory: '',
+            fixedPrefecture: '<?php echo esc_js($prefecture_slug); ?>',
+            fixedMunicipality: '',
+            fixedPurpose: '',
+            fixedTag: ''
+        });
+        
+        // モバイルフィルターの初期化
+        if (typeof ArchiveCommon.initMobileFilter === 'function') {
+            ArchiveCommon.initMobileFilter();
+        }
+    }
+});
+</script>
+
 <?php get_footer(); ?>

@@ -1305,7 +1305,7 @@ function gi_archive_seo_edit_page() {
         // AIプロンプト生成・コピー機能
         var archiveTitle = '<?php echo esc_js($title); ?>';
         var archiveTypeName = '<?php echo esc_js(gi_get_archive_type_label($type)); ?>';
-        var postCount = <?php echo intval($post_count); ?>;
+        var postCount = <?php echo intval($page_info['post_count'] ?? 0); ?>;
         var siteName = '<?php echo esc_js(get_bloginfo('name')); ?>';
         
         function generateAIPrompt(promptType) {
