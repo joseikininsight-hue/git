@@ -2182,7 +2182,7 @@ function gi_output_archive_outro_content() {
     }
 }
 
-// おすすめ記事出力
+// おすすめ記事出力 - Editor's Pick デザイン
 function gi_output_archive_featured_posts() {
     $content = gi_get_current_archive_seo_content();
     
@@ -2206,28 +2206,148 @@ function gi_output_archive_featured_posts() {
     }
     
     ?>
-    <section class="gi-archive-seo-featured mb-8">
-        <h2 class="text-xl font-bold mb-4 pb-2 border-b-2 border-gray-800">
-            <span class="dashicons dashicons-star-filled" style="color: #f59e0b;"></span>
-            おすすめの助成金・補助金
-        </h2>
-        <div class="grid gap-4 md:grid-cols-3">
-            <?php foreach ($posts as $post): 
-                $pv = (int)get_post_meta($post->ID, '_gi_pv_total', true);
+    <!-- Section 2: おすすめの助成金・補助金 (Cards with Paper clip effect) -->
+    <section id="pickup" class="gi-archive-seo-featured editors-pick-section mb-20">
+        <div class="editors-pick-header">
+            <div class="flex items-center">
+                <span class="editors-pick-number">02</span>
+                <div class="editors-pick-title-wrap">
+                    <h2>おすすめの助成金・補助金</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-12">
+            <?php 
+            $counter = 0;
+            foreach ($posts as $post): 
+                $counter++;
+                $is_even = ($counter % 2 === 0);
+                $rotate_class = $is_even ? '-rotate-1' : 'rotate-1';
+                
+                // Meta data
                 $max_amount = get_post_meta($post->ID, 'max_amount', true);
+                if (!$max_amount) $max_amount = get_post_meta($post->ID, 'grant_amount_max', true);
+                
+                $max_amount_numeric = get_post_meta($post->ID, 'max_amount_numeric', true);
+                
+                // Format amount
+                $amount_display = '要確認';
+                $badge_class = 'bg-highlight-blue';
+                
+                if ($max_amount_numeric) {
+                     if ($max_amount_numeric >= 100000000) {
+                         $amount_display = '最大' . number_format($max_amount_numeric / 100000000, 1) . '億円';
+                         $badge_class = 'bg-accent-red'; // 1億円以上は赤
+                     } elseif ($max_amount_numeric >= 10000) {
+                         $amount_display = '最大' . number_format($max_amount_numeric / 10000) . '万円';
+                         if ($max_amount_numeric >= 30000000) {
+                             $badge_class = 'bg-accent-red'; // 3000万円以上は赤
+                         }
+                     } else {
+                         $amount_display = '最大' . number_format($max_amount_numeric) . '円';
+                     }
+                } elseif ($max_amount) {
+                    $amount_display = '最大' . $max_amount;
+                    // 文字列で億が含まれていれば赤にする簡易判定
+                    if (strpos($max_amount, '億') !== false) {
+                        $badge_class = 'bg-accent-red';
+                    }
+                }
+
+                // Difficulty
+                $difficulty = get_post_meta($post->ID, 'grant_difficulty', true);
+                if (!$difficulty) $difficulty = 'high'; // Default
+                
+                $difficulty_stars = '★ 難易度：高';
+                
+                switch ($difficulty) {
+                    case 'low':
+                        $difficulty_stars = '★ 難易度：低';
+                        break;
+                    case 'medium':
+                        $difficulty_stars = '★ 難易度：中';
+                        break;
+                    case 'high':
+                    default:
+                        $difficulty_stars = '★ 難易度：高';
+                        break;
+                }
+                
+                // Description
+                $excerpt = get_the_excerpt($post->ID);
+                if (!$excerpt) {
+                    $excerpt = wp_trim_words($post->post_content, 120, '...');
+                }
+                
+                // Fields
+                $target_business = get_post_meta($post->ID, 'target_business', true);
+                if (!$target_business) $target_business = get_post_meta($post->ID, 'grant_target', true);
+                
+                $eligible_expenses = get_post_meta($post->ID, 'eligible_expenses', true);
+                $requirements = get_post_meta($post->ID, 'requirements', true);
+                
+                // List items builder
+                $list_items = [];
+                
+                // Item 1 (Target) is always shown if available
+                if ($target_business) {
+                    $list_items[] = ['label' => '対象', 'value' => wp_trim_words($target_business, 30, '...')];
+                }
+                
+                // Item 2 (Usage or Conditions)
+                if ($eligible_expenses) {
+                    $list_items[] = ['label' => '用途', 'value' => wp_trim_words($eligible_expenses, 30, '...')];
+                } elseif ($requirements) {
+                    $list_items[] = ['label' => '条件', 'value' => wp_trim_words($requirements, 30, '...')];
+                }
+                
+                if (count($list_items) < 2 && $requirements) {
+                     $list_items[] = ['label' => '条件', 'value' => wp_trim_words($requirements, 30, '...')];
+                }
+                
+                // Fallback
+                if (empty($list_items)) {
+                    $list_items[] = ['label' => '詳細', 'value' => '詳細ページをご確認ください'];
+                }
             ?>
-            <div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-shadow">
-                <a href="<?php echo get_permalink($post->ID); ?>" class="block">
-                    <h3 class="font-bold text-sm mb-2 line-clamp-2 hover:text-blue-600">
-                        <?php echo esc_html($post->post_title); ?>
-                    </h3>
-                    <div class="text-xs text-gray-500 flex justify-between">
-                        <span>PV: <?php echo number_format($pv); ?></span>
-                        <?php if ($max_amount): ?>
-                        <span class="text-green-600 font-bold"><?php echo esc_html($max_amount); ?></span>
-                        <?php endif; ?>
+            <div class="featured-grant-card relative bg-white shadow-book-depth <?php echo $rotate_class; ?> hover:rotate-0 transition-transform duration-300 border border-gray-200 group">
+                <!-- Clip effect -->
+                <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 w-32 h-6 bg-gray-200 rounded-sm opacity-50 shadow-inner z-10"></div>
+                
+                <a href="<?php echo get_permalink($post->ID); ?>" class="absolute inset-0 z-0" aria-label="<?php echo esc_attr($post->post_title); ?>"></a>
+
+                <div class="flex flex-col md:flex-row relative z-10 pointer-events-none">
+                    <!-- 左側: 番号とメタ情報 -->
+                    <div class="featured-grant-left md:w-1/4 flex flex-col items-center justify-center text-center bg-gradient-to-br from-gray-50 to-white border-r border-gray-100 p-6">
+                        <span class="featured-grant-number text-5xl font-serif font-bold text-gray-200 leading-none mb-3"><?php echo sprintf('%02d', $counter); ?></span>
+                        <span class="inline-block <?php echo $badge_class; ?> text-white text-xs px-4 py-2 rounded font-bold shadow-sm tracking-wide mb-2">
+                            <?php echo esc_html($amount_display); ?>
+                        </span>
+                        <div class="text-accent-gold text-xs font-bold"><?php echo esc_html($difficulty_stars); ?></div>
                     </div>
-                </a>
+                    <!-- 右側: コンテンツ -->
+                    <div class="featured-grant-right md:w-3/4 p-6">
+                        <h3 class="text-lg font-serif font-bold text-ink-primary mb-3 pointer-events-auto leading-snug">
+                            <a href="<?php echo get_permalink($post->ID); ?>" class="hover:text-accent-gold transition-colors">
+                                <?php echo esc_html($post->post_title); ?>
+                            </a>
+                        </h3>
+                        <p class="text-sm leading-7 font-serif text-gray-700 mb-4 text-justify">
+                            <?php echo esc_html($excerpt); ?>
+                        </p>
+                        <div class="bg-paper-warm p-4 rounded border border-gray-100">
+                            <ul class="text-xs text-gray-600 space-y-2 font-sans">
+                                <?php foreach ($list_items as $item): ?>
+                                <li class="flex items-start">
+                                    <span class="font-bold w-12 shrink-0 text-gray-500"><?php echo esc_html($item['label']); ?>：</span>
+                                    <span><?php echo esc_html($item['value']); ?></span>
+                                </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
             <?php endforeach; ?>
         </div>
@@ -2396,6 +2516,90 @@ function gi_output_archive_custom_css() {
     
     .gi-seo-content-box a:hover {
         color: #135e96;
+    }
+    
+    /* Featured Grant Cards - おすすめの助成金・補助金 01 02 04 デザイン */
+    .gi-archive-seo-featured.editors-pick-section {
+        margin-bottom: 3rem;
+    }
+    
+    .gi-archive-seo-featured .editors-pick-header {
+        margin-bottom: 2rem;
+        border-bottom: 2px solid #c9a96c;
+        padding-bottom: 0.5rem;
+    }
+    
+    .gi-archive-seo-featured .editors-pick-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #e5e5e5;
+        font-family: Georgia, serif;
+        margin-right: 1rem;
+        line-height: 1;
+    }
+    
+    .gi-archive-seo-featured .editors-pick-title-wrap h2 {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #333;
+        font-family: Georgia, "游明朝", serif;
+        margin: 0;
+        padding: 0;
+        border: none;
+    }
+    
+    .featured-grant-card {
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+        border-radius: 4px;
+    }
+    
+    .featured-grant-left {
+        min-height: 140px;
+    }
+    
+    .featured-grant-number {
+        font-family: Georgia, serif;
+        letter-spacing: -0.05em;
+    }
+    
+    .featured-grant-right h3 {
+        font-family: Georgia, "游明朝", serif;
+    }
+    
+    /* 背景色のバッジスタイル */
+    .bg-highlight-blue {
+        background-color: #3b82f6;
+    }
+    
+    .bg-accent-red {
+        background-color: #ef4444;
+    }
+    
+    .bg-paper-warm {
+        background-color: #faf8f5;
+    }
+    
+    /* モバイル対応 */
+    @media (max-width: 768px) {
+        .featured-grant-card .flex-col {
+            flex-direction: column;
+        }
+        
+        .featured-grant-left {
+            border-right: none;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 1rem;
+            min-height: auto;
+        }
+        
+        .featured-grant-number {
+            font-size: 3rem;
+        }
+        
+        .gi-archive-seo-featured .editors-pick-number {
+            font-size: 2rem;
+        }
     }
     </style>
     <?php
