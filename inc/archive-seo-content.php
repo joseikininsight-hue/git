@@ -871,23 +871,58 @@ function gi_get_available_archive_pages() {
 
 function gi_get_archive_pv_count($type, $key) {
     global $wpdb;
-    $table_name = $wpdb->prefix . 'gi_access_log';
     
-    if ($wpdb->get_var("SHOW TABLES LIKE '{$table_name}'") !== $table_name) {
+    // access-tracking.phpで使用されている正しいテーブル名を使用
+    $daily_table = $wpdb->prefix . 'ji_post_views_daily';
+    
+    if ($wpdb->get_var("SHOW TABLES LIKE '{$daily_table}'") !== $daily_table) {
         return 0;
     }
     
-    $url_pattern = '';
+    // アーカイブページのURLパターンからPV数を集計
     if ($type === 'post_type_archive') {
-        $url_pattern = '%/grant/%';
+        // 投稿タイプアーカイブ全体のPV数
+        $count = $wpdb->get_var($wpdb->prepare(
+            "SELECT COALESCE(SUM(view_count), 0) 
+            FROM {$daily_table} 
+            WHERE post_type = %s",
+            'grant'
+        ));
     } else {
-        $url_pattern = '%/' . $wpdb->esc_like($key) . '/%';
+        // タクソノミーアーカイブのPV数
+        // 該当タームに属する投稿のPV数を合計
+        $term = get_term_by('slug', $key, $type);
+        if (!$term || is_wp_error($term)) {
+            return 0;
+        }
+        
+        // タームに属する投稿IDを取得
+        $posts = get_posts(array(
+            'post_type' => 'grant',
+            'tax_query' => array(
+                array(
+                    'taxonomy' => $type,
+                    'field' => 'slug',
+                    'terms' => $key,
+                ),
+            ),
+            'posts_per_page' => -1,
+            'fields' => 'ids',
+            'post_status' => 'publish',
+        ));
+        
+        if (empty($posts)) {
+            return 0;
+        }
+        
+        $post_ids = implode(',', array_map('intval', $posts));
+        
+        $count = $wpdb->get_var(
+            "SELECT COALESCE(SUM(view_count), 0) 
+            FROM {$daily_table} 
+            WHERE post_id IN ({$post_ids})"
+        );
     }
-    
-    $count = $wpdb->get_var($wpdb->prepare(
-        "SELECT COUNT(*) FROM {$table_name} WHERE url LIKE %s",
-        $url_pattern
-    ));
     
     return intval($count);
 }
@@ -1161,31 +1196,44 @@ function gi_archive_seo_edit_page() {
                         <div class="postbox-header" style="background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);">
                             <h2 style="padding: 10px 15px; margin: 0; color: #fff;">
                                 <span class="dashicons dashicons-admin-customizer" style="color: #fff;"></span>
-                                AIコンテンツ生成プロンプト
+                                統合AIコンテンツ生成プロンプト
                             </h2>
                         </div>
                         <div class="inside">
-                            <p class="description" style="margin-bottom: 10px;">このアーカイブページ用のSEOコンテンツを生成するためのプロンプトです。クリックでコピーできます。</p>
+                            <p class="description" style="margin-bottom: 15px;">
+                                <strong>新機能：</strong> イントロ・アウトロ・メタディスクリプションを一括生成する統合プロンプトです。<br>
+                                都道府県なら予算規模・独自制度、カテゴリなら業界トレンド・補助金額相場など、独創的な情報をAIに生成させます。
+                            </p>
                             <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
                                 <button type="button" class="button button-primary ai-prompt-copy" data-prompt-type="intro">
                                     <span class="dashicons dashicons-editor-paste-text" style="vertical-align: middle;"></span>
-                                    イントロ用プロンプト
+                                    イントロ用（統合版）
                                 </button>
                                 <button type="button" class="button button-primary ai-prompt-copy" data-prompt-type="outro">
                                     <span class="dashicons dashicons-editor-paste-text" style="vertical-align: middle;"></span>
-                                    アウトロ用プロンプト
+                                    アウトロ用（統合版）
                                 </button>
                                 <button type="button" class="button ai-prompt-copy" data-prompt-type="meta">
                                     <span class="dashicons dashicons-editor-paste-text" style="vertical-align: middle;"></span>
                                     メタディスクリプション用
                                 </button>
                             </div>
-                            <div id="ai-prompt-preview" style="background: #f9f9f9; border: 1px solid #ddd; border-radius: 4px; padding: 15px; font-size: 13px; line-height: 1.6; max-height: 300px; overflow-y: auto; display: none;">
+                            <div id="ai-prompt-preview" style="background: #f9f9f9; border: 1px solid #ddd; border-radius: 4px; padding: 15px; font-size: 13px; line-height: 1.6; max-height: 400px; overflow-y: auto; display: none;">
                                 <pre style="white-space: pre-wrap; word-wrap: break-word; margin: 0; font-family: inherit;"></pre>
                             </div>
                             <p id="ai-prompt-copy-status" style="color: #46b450; font-weight: bold; margin-top: 10px; display: none;">
-                                <span class="dashicons dashicons-yes-alt"></span> コピーしました！
+                                <span class="dashicons dashicons-yes-alt"></span> クリップボードにコピーしました！ChatGPTなどのAIに貼り付けてください。
                             </p>
+                            <div style="margin-top: 15px; padding: 15px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px;">
+                                <strong>💡 使い方：</strong>
+                                <ol style="margin: 10px 0 0; padding-left: 20px; font-size: 13px; line-height: 1.8;">
+                                    <li>上のボタンをクリックしてプロンプトをコピー</li>
+                                    <li>ChatGPT、Claude、Geminiなどのチャット画面に貼り付け</li>
+                                    <li>生成されたHTML形式のコンテンツをコピー</li>
+                                    <li>上の「イントロコンテンツ」または「アウトロコンテンツ」エディタに貼り付け</li>
+                                    <li>必要に応じて微調整して保存</li>
+                                </ol>
+                            </div>
                         </div>
                     </div>
                     
@@ -1303,7 +1351,7 @@ function gi_archive_seo_edit_page() {
         });
         
         // AIプロンプト生成・コピー機能
-        var archiveTitle = '<?php echo esc_js($title); ?>';
+        var archiveTitle = '<?php echo esc_js($page_info['name']); ?>';
         var archiveTypeName = '<?php echo esc_js(gi_get_archive_type_label($type)); ?>';
         var postCount = <?php echo intval($page_info['post_count'] ?? 0); ?>;
         var siteName = '<?php echo esc_js(get_bloginfo('name')); ?>';
@@ -1312,73 +1360,153 @@ function gi_archive_seo_edit_page() {
             var currentYear = new Date().getFullYear();
             var prompt = '';
             
-            if (promptType === 'intro') {
-                prompt = `以下の条件でSEO記事のイントロコンテンツ（傾向と対策セクション）を作成してください。
+            // 都道府県別の追加情報を準備
+            var prefectureInfo = '';
+            if (archiveTypeName === '都道府県') {
+                prefectureInfo = `
 
-【対象アーカイブページ】
-- タイトル: ${archiveTitle}
+【都道府県別 独創的情報の要求】
+この都道府県に関して、以下の独創的な情報を必ず含めてください：
+1. **予算規模**: この都道府県の補助金・助成金の年間予算規模の概算
+2. **特色**: この地域特有の産業・課題に対応した補助金の特徴
+3. **採択傾向**: 過去の採択実績から見える優先分野や重点施策
+4. **独自制度**: 国の制度にはない、この都道府県独自の補助金制度
+5. **地域課題**: 人口減少、産業衰退、環境問題など地域特有の課題と対応施策
+6. **成功事例**: この都道府県での補助金活用による具体的な成功事例（匿名化）`;
+            }
+            
+            // カテゴリ別の追加情報を準備
+            var categoryInfo = '';
+            if (archiveTypeName === 'カテゴリ') {
+                categoryInfo = `
+
+【カテゴリ別 独創的情報の要求】
+このカテゴリに関して、以下の独創的な情報を必ず含めてください：
+1. **業界トレンド**: このカテゴリに関連する最新の業界トレンドと補助金の関係
+2. **補助金額相場**: このカテゴリの補助金の一般的な支給額の範囲
+3. **採択率データ**: このカテゴリの一般的な採択率と採択を高めるポイント
+4. **併用可能性**: 他のカテゴリの補助金との併用可能性
+5. **申請難易度**: 書類準備の難易度と必要な専門知識のレベル`;
+            }
+            
+            // 統合プロンプトを生成
+            if (promptType === 'intro') {
+                prompt = `あなたは補助金・助成金の専門家です。以下の条件で、SEO最適化されたイントロコンテンツを作成してください。
+
+【対象アーカイブページ情報】
+- ページタイトル: ${archiveTitle}
 - カテゴリ種別: ${archiveTypeName}
 - 掲載補助金数: ${postCount}件
+- 対象年度: ${currentYear}年${prefectureInfo}${categoryInfo}
 
-【作成要件】
-1. 「01 傾向と対策」というセクション番号付きの見出しで開始
-2. このカテゴリ/地域の補助金の特徴・傾向を解説（300〜500字）
-3. 申請のポイントや採択率を上げるコツを記載
-4. ${currentYear}年の最新動向を含める
-5. 読者（中小企業経営者・個人事業主）に役立つ実践的な情報
+【コンテンツ構成】
+1. **見出し**: 「01 ${archiveTitle}の傾向と対策」（<h2>タグ）
+2. **導入段落**（150〜200字）:
+   - このカテゴリ/地域の補助金の全体像
+   - ${currentYear}年の最新動向
+   - 掲載件数（${postCount}件）の意義
 
-【HTML形式】
-- 見出しは<h2>タグを使用（セクション番号含む）
-- 段落は<p>タグ
-- 箇条書きは<ul><li>タグ
-- 重要ポイントは<strong>タグ
+3. **特徴・傾向セクション**（200〜300字）:
+   - このカテゴリ/地域特有の補助金の特徴
+   - 予算規模や支給額の傾向
+   - 対象となる事業者・事業内容
+   - 重点分野や優先テーマ
 
-【トーン】
-専門的だが親しみやすい。図鑑・事典のような知的で信頼性のある文体。`;
+4. **申請のポイント**（200〜300字）:
+   - 採択率を上げる具体的なコツ（3〜5項目）
+   - 申請書作成の注意点
+   - よくある失敗例と対策
+   - 専門家活用のメリット
+
+5. **最新トレンド**（150〜200字）:
+   - ${currentYear}年の政策動向との関連
+   - 新設・拡充された制度情報
+   - 今後の展望
+
+【必須要件】
+- 合計文字数: 700〜1000字
+- HTML形式で出力（<h2>, <h3>, <p>, <ul>, <li>, <strong>タグ使用）
+- 具体的な数字・データを含める
+- 読みやすい段落構成
+- 専門用語には簡潔な説明を付ける
+- 図鑑・事典のような知的で信頼性のある文体
+- 読者（中小企業経営者・個人事業主）に役立つ実践的な情報`;
 
             } else if (promptType === 'outro') {
-                prompt = `以下の条件でSEO記事のアウトロコンテンツ（まとめ・追加情報セクション）を作成してください。
+                prompt = `あなたは補助金・助成金の専門家です。以下の条件で、SEO最適化されたアウトロコンテンツを作成してください。
 
-【対象アーカイブページ】
-- タイトル: ${archiveTitle}
+【対象アーカイブページ情報】
+- ページタイトル: ${archiveTitle}
 - カテゴリ種別: ${archiveTypeName}
 - 掲載補助金数: ${postCount}件
+- 対象年度: ${currentYear}年${prefectureInfo}${categoryInfo}
 
-【作成要件】
-1. 「04 申請のまとめ」または「04 関連情報」というセクション番号付きの見出しで開始
-2. このカテゴリ/地域の補助金申請における重要ポイントのまとめ（200〜400字）
-3. よくある質問と回答（Q&A形式で2〜3個）
-4. 関連する他のカテゴリ・地域への誘導文
-5. 専門家への相談を促すCTA文
+【コンテンツ構成】
+1. **見出し**: 「04 ${archiveTitle}申請のまとめ」（<h2>タグ）
 
-【HTML形式】
-- 見出しは<h2>タグを使用（セクション番号含む）
-- Q&Aは<h3>と<p>タグで構成
-- 段落は<p>タグ
-- 重要ポイントは<strong>タグ
+2. **重要ポイントのまとめ**（200〜300字）:
+   - このカテゴリ/地域の補助金申請で最も重要な3〜5つのポイント
+   - 申請前に必ず確認すべき事項
+   - 成功のための準備項目
 
-【トーン】
-専門的だが親しみやすい。読者の次のアクションを促す。`;
+3. **よくある質問（Q&A）**:
+   - Q1〜Q3: このカテゴリ/地域の補助金に関する具体的な質問と回答
+   - 各Q&Aは<h3>（質問）と<p>（回答）で構成
+   - 実践的で役立つ内容
+
+4. **関連情報・次のステップ**（150〜200字）:
+   - 関連する他のカテゴリ・地域の補助金への誘導
+   - 併用可能な制度の紹介
+   - より詳しい情報の入手方法
+
+5. **CTA（コールトゥアクション）**（100〜150字）:
+   - 専門家への相談を促す文章
+   - 申請サポートサービスの案内
+   - 次のアクションへの誘導
+
+【必須要件】
+- 合計文字数: 600〜900字
+- HTML形式で出力（<h2>, <h3>, <p>, <ul>, <li>, <strong>タグ使用）
+- Q&Aは実践的で具体的な内容
+- 読者の不安を解消し、行動を促す文章
+- 専門的だが親しみやすいトーン`;
 
             } else if (promptType === 'meta') {
-                prompt = `以下のアーカイブページ用のメタディスクリプション（SEO用説明文）を作成してください。
+                prompt = `あなたはSEOの専門家です。以下の条件で、クリック率を最大化するメタディスクリプションを作成してください。
 
-【対象アーカイブページ】
-- タイトル: ${archiveTitle}
+【対象アーカイブページ情報】
+- ページタイトル: ${archiveTitle}
 - カテゴリ種別: ${archiveTypeName}
 - 掲載補助金数: ${postCount}件
 - サイト名: ${siteName}
+- 対象年度: ${currentYear}年${prefectureInfo}${categoryInfo}
 
-【作成要件】
-1. 120〜160文字以内
-2. キーワード「${archiveTitle}」「助成金」「補助金」を自然に含める
-3. 検索ユーザーがクリックしたくなる魅力的な文章
-4. 具体的な数字（${postCount}件以上掲載）を含める
-5. ${currentYear}年の最新情報であることを示唆
-6. アクションを促す文言（「今すぐチェック」等）を末尾に
+【メタディスクリプション作成要件】
+1. 文字数: 120〜160文字（厳守）
+2. 必須キーワード:
+   - 「${archiveTitle}」を自然に含める
+   - 「補助金」または「助成金」を含める
+   - ${currentYear}年を示唆する言葉
+
+3. 含めるべき要素:
+   - 掲載件数（${postCount}件）
+   - このカテゴリ/地域の特徴・強み
+   - 対象読者（中小企業、個人事業主など）
+   - 行動喚起（「今すぐ確認」「チェック」など）
+
+4. 効果的な表現:
+   - 具体的な数字を使用
+   - ベネフィットを明確に
+   - 緊急性や希少性を示唆
+   - 検索意図に合致した内容
+
+5. NGワード・表現:
+   - 「〜について」「〜に関する」などの冗長表現
+   - 過度な煽り文句
+   - HTMLタグ
 
 【出力形式】
-メタディスクリプションのテキストのみを出力（HTMLタグ不要）`;
+メタディスクリプションのテキストのみを1行で出力してください（HTMLタグ、改行不要）`;
             }
             
             return prompt;
