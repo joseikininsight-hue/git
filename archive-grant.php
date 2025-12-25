@@ -345,15 +345,20 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
             ?>
             
             <!-- 統合された検索結果ヘッダー -->
-            <section class="editors-pick-section results-header" id="list">
-                <div class="editors-pick-header">
-                    <div class="flex items-center">
-                        <span class="editors-pick-number">03</span>
-                        <div class="editors-pick-title-wrap">
-                            <h2>補助金図鑑一覧</h2>
+            <section class="gi-section results-header" id="list">
+                <header class="gi-section-numbered-header">
+                    <div class="gi-section-number-box">
+                        <div class="gi-section-number-inner">
+                            <span class="gi-section-number-label">Section</span>
+                            <span class="gi-section-number-value">03</span>
                         </div>
                     </div>
-                </div>
+                    <div class="gi-section-title-box">
+                        <svg class="gi-section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                        <h2 class="gi-section-title">補助金図鑑一覧</h2>
+                        <span class="gi-section-en">Grant Archive</span>
+                    </div>
+                </header>
                 <?php
                 // ページネーション用の件数計算
                 $current_page = get_query_var('paged') ? get_query_var('paged') : 1;

@@ -3176,16 +3176,165 @@ body.mobile-filter-open {
 }
 
 /* ==========================================================================
-   Archive SEO Content - イントロ・アウトロコンテンツ
+   Section Numbered Header - 図鑑風セクションヘッダー (from single-grant.css)
    ========================================================================== */
+
+.gi-section-numbered-header {
+    display: flex;
+    align-items: stretch;
+    border-bottom: 2px solid var(--gi-gov-navy-800);
+    margin-bottom: 24px;
+}
+
+.gi-section-number-box {
+    width: 72px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, #f8f6f1 0%, #f0ede6 100%);
+    border-right: 1px solid var(--gi-gray-200);
+    padding: 16px 0;
+}
+
+.gi-section-number-inner {
+    text-align: center;
+}
+
+.gi-section-number-label {
+    display: block;
+    font-family: var(--gi-font-mono);
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: var(--gi-gray-500);
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+
+.gi-section-number-value {
+    display: block;
+    font-family: var(--gi-font-serif);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--gi-gray-300);
+    line-height: 1;
+}
+
+.gi-section-title-box {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+}
+
+.gi-section-icon {
+    width: 24px;
+    height: 24px;
+    color: var(--gi-gov-navy-600);
+}
+
+.gi-section-title {
+    font-family: var(--gi-font-serif);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--gi-gov-navy-900);
+}
+
+.gi-section-en {
+    font-family: var(--gi-font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--gi-gov-navy-400);
+    text-transform: uppercase;
+}
+
+.gi-section-body {
+    padding: 0 32px 32px;
+}
+
+@media (max-width: 640px) {
+    .gi-section-numbered-header {
+        flex-direction: column;
+    }
+    
+    .gi-section-number-box {
+        width: 100%;
+        flex-direction: row;
+        justify-content: flex-start;
+        padding: 10px 16px;
+        gap: 8px;
+    }
+    
+    .gi-section-number-inner {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .gi-section-number-label {
+        margin-bottom: 0;
+    }
+    
+    .gi-section-number-value {
+        font-size: 22px;
+    }
+    
+    .gi-section-title-box {
+        padding: 12px 16px;
+    }
+    
+    .gi-section-body {
+        padding: 0 16px 24px;
+    }
+}
+
+/* ==========================================================================
+   Archive SEO Content - イントロ・アウトロコンテンツ
+   既存セクション（02 おすすめ、03 一覧）と調和したデザイン
+   ========================================================================== */
+
+/* イントロ・アウトロ共通ラッパー */
+.gi-archive-seo-intro-wrapper,
+.gi-archive-seo-outro-wrapper {
+    margin-bottom: 48px;
+}
+
+/* セクションヘッダー（番号+タイトル） */
+.gi-archive-seo-section-header {
+    margin-bottom: 32px;
+}
+
+.gi-archive-seo-section-header .flex {
+    display: flex;
+    align-items: center;
+}
+
+.gi-archive-seo-section-number {
+    font-size: 2rem;
+    font-family: var(--zukan-font-serif);
+    font-weight: 700;
+    color: #e5e7eb;
+    margin-right: 16px;
+}
+
+.gi-archive-seo-section-title-wrap h2 {
+    font-size: 1.5rem;
+    font-family: var(--zukan-font-serif);
+    font-weight: 700;
+    color: var(--zukan-ink-primary);
+    border-bottom: 1px solid var(--zukan-accent-gold);
+    padding-bottom: 8px;
+    margin: 0;
+}
 
 /* イントロコンテンツ（記事一覧の上部） */
 .gi-archive-seo-intro {
-    background: var(--zukan-paper-warm);
-    border: 1px solid var(--zukan-border-color);
-    border-radius: 8px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
     padding: 32px;
-    margin-bottom: 32px;
     box-shadow: var(--zukan-shadow-md);
     font-family: var(--zukan-font-serif);
 }
@@ -3201,14 +3350,14 @@ body.mobile-filter-open {
 }
 
 .gi-archive-seo-intro h2 {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     padding-bottom: 12px;
-    border-bottom: 2px solid var(--zukan-accent-gold);
+    border-bottom: 1px solid var(--zukan-accent-gold);
     margin-bottom: 24px;
 }
 
 .gi-archive-seo-intro h3 {
-    font-size: 1.375rem;
+    font-size: 1.25rem;
     color: var(--zukan-accent-red);
     margin-top: 28px;
 }
@@ -3220,7 +3369,7 @@ body.mobile-filter-open {
 
 .gi-archive-seo-intro p {
     font-size: 15px;
-    line-height: 2;
+    line-height: 1.9;
     color: var(--zukan-ink-secondary);
     margin-bottom: 20px;
     text-align: justify;
@@ -3283,12 +3432,9 @@ body.mobile-filter-open {
 
 /* アウトロコンテンツ（記事一覧の下部） */
 .gi-archive-seo-outro {
-    background: var(--zukan-paper-warm);
-    border: 1px solid var(--zukan-border-color);
-    border-radius: 8px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
     padding: 32px;
-    margin-top: 48px;
-    margin-bottom: 32px;
     box-shadow: var(--zukan-shadow-md);
     font-family: var(--zukan-font-serif);
 }
@@ -3304,14 +3450,14 @@ body.mobile-filter-open {
 }
 
 .gi-archive-seo-outro h2 {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     padding-bottom: 12px;
-    border-bottom: 2px solid var(--zukan-accent-gold);
+    border-bottom: 1px solid var(--zukan-accent-gold);
     margin-bottom: 24px;
 }
 
 .gi-archive-seo-outro h3 {
-    font-size: 1.375rem;
+    font-size: 1.25rem;
     color: var(--zukan-accent-red);
     margin-top: 28px;
 }
@@ -3323,7 +3469,7 @@ body.mobile-filter-open {
 
 .gi-archive-seo-outro p {
     font-size: 15px;
-    line-height: 2;
+    line-height: 1.9;
     color: var(--zukan-ink-secondary);
     margin-bottom: 20px;
     text-align: justify;
@@ -3388,7 +3534,7 @@ body.mobile-filter-open {
 .gi-archive-seo-outro .faq-item {
     margin: 24px 0;
     padding: 20px;
-    background: #fff;
+    background: #f9fafb;
     border-left: 4px solid var(--zukan-accent-gold);
     border-radius: 4px;
 }
@@ -3411,7 +3557,7 @@ body.mobile-filter-open {
     background: linear-gradient(135deg, var(--zukan-accent-gold) 0%, #b8935a 100%);
     color: #fff;
     padding: 24px 32px;
-    border-radius: 8px;
+    border-radius: 4px;
     text-align: center;
     margin: 32px 0;
     box-shadow: var(--zukan-shadow-lg);
@@ -3433,6 +3579,7 @@ body.mobile-filter-open {
     font-weight: 700;
     transition: var(--zukan-transition);
     margin-top: 16px;
+    border: none;
 }
 
 .gi-archive-seo-cta a:hover {
@@ -3448,9 +3595,18 @@ body.mobile-filter-open {
         margin-bottom: 24px;
     }
     
+    .gi-archive-seo-section-number {
+        font-size: 1.5rem;
+        margin-right: 12px;
+    }
+    
+    .gi-archive-seo-section-title-wrap h2 {
+        font-size: 1.25rem;
+    }
+    
     .gi-archive-seo-intro h2,
     .gi-archive-seo-outro h2 {
-        font-size: 1.375rem;
+        font-size: 1.25rem;
     }
     
     .gi-archive-seo-intro h3,

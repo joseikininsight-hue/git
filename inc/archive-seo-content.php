@@ -2578,15 +2578,20 @@ function gi_output_archive_featured_posts() {
     
     ?>
     <!-- Section 2: おすすめの助成金・補助金 (Cards with Paper clip effect) -->
-    <section id="pickup" class="gi-archive-seo-featured editors-pick-section mb-20">
-        <div class="editors-pick-header">
-            <div class="flex items-center">
-                <span class="editors-pick-number">02</span>
-                <div class="editors-pick-title-wrap">
-                    <h2>おすすめの助成金・補助金</h2>
+    <section id="pickup" class="gi-archive-seo-featured gi-section mb-20">
+        <header class="gi-section-numbered-header">
+            <div class="gi-section-number-box">
+                <div class="gi-section-number-inner">
+                    <span class="gi-section-number-label">Section</span>
+                    <span class="gi-section-number-value">02</span>
                 </div>
             </div>
-        </div>
+            <div class="gi-section-title-box">
+                <svg class="gi-section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7v10c0 5.5 3.8 7.7 10 10 6.2-2.3 10-4.5 10-10V7l-10-5z"/><path d="m9 12 2 2 4-4"/></svg>
+                <h2 class="gi-section-title">おすすめの助成金・補助金</h2>
+                <span class="gi-section-en">Editor's Pick</span>
+            </div>
+        </header>
 
         <div class="space-y-12">
             <?php 
