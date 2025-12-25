@@ -178,8 +178,6 @@ $schema_data = array(
         <div class="yahoo-main-content zukan-main-content">
             
             <?php 
-            }
-            
             // アーカイブSEOコンテンツ: おすすめ記事（01編集部選定）
             if (function_exists('gi_output_archive_featured_posts')) {
                 gi_output_archive_featured_posts();
@@ -417,9 +415,10 @@ $schema_data = array(
             <?php
             // アーカイブSEOコンテンツ: イントロ（03傾向と対策）
             if (function_exists('gi_output_archive_intro_content')) {
+                gi_output_archive_intro_content();
             }
             
-            //
+
             // アーカイブSEOコンテンツ: アウトロ（04申請のまとめ）
             if (function_exists('gi_output_archive_outro_content')) {
                 gi_output_archive_outro_content();

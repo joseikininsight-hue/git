@@ -426,13 +426,11 @@ if ($parent_prefecture) {
             </section>
             
             <?php 
-            <?php
             // アーカイブSEOコンテンツ: イントロ（03傾向と対策）
             if (function_exists('gi_output_archive_intro_content')) {
                 gi_output_archive_intro_content();
             }
             
-            //
             // アーカイブSEOコンテンツ: アウトロ（04申請のまとめ）
             if (function_exists('gi_output_archive_outro_content')) {
                 gi_output_archive_outro_content();
