@@ -1356,8 +1356,15 @@ function gi_archive_seo_edit_page() {
         var postCount = <?php echo intval($page_info['post_count'] ?? 0); ?>;
         var siteName = '<?php echo esc_js(get_bloginfo('name')); ?>';
         
+        // 全体の補助金件数を動的に取得
+        var totalGrantsCount = <?php 
+            $total_grants = wp_count_posts('grant');
+            echo intval($total_grants->publish ?? 0); 
+        ?>;
+        
         function generateAIPrompt(promptType) {
             var currentYear = new Date().getFullYear();
+            var currentYearJapanese = currentYear - 2018; // 令和年号
             var prompt = '';
             
             // 都道府県別の追加情報を準備
@@ -1396,15 +1403,17 @@ function gi_archive_seo_edit_page() {
 【対象アーカイブページ情報】
 - ページタイトル: ${archiveTitle}
 - カテゴリ種別: ${archiveTypeName}
-- 掲載補助金数: ${postCount}件
-- 対象年度: ${currentYear}年${prefectureInfo}${categoryInfo}
+- このページの掲載補助金数: ${postCount}件
+- サイト全体の補助金総数: ${totalGrantsCount}件
+- 対象年度: ${currentYear}年（令和${currentYearJapanese}年度）${prefectureInfo}${categoryInfo}
 
 【コンテンツ構成】
-1. **見出し**: 「01 ${archiveTitle}の傾向と対策」（<h2>タグ）
+1. **見出し**: 「${archiveTitle}の傾向と対策」（<h2>タグ）
 2. **導入段落**（150〜200字）:
    - このカテゴリ/地域の補助金の全体像
-   - ${currentYear}年の最新動向
-   - 掲載件数（${postCount}件）の意義
+   - ${currentYear}年（令和${currentYearJapanese}年度）の最新動向
+   - 掲載件数（${postCount}件）の意義と選定基準
+   - サイト全体での位置づけ（総数${totalGrantsCount}件中の${postCount}件）
 
 3. **特徴・傾向セクション**（200〜300字）:
    - このカテゴリ/地域特有の補助金の特徴
@@ -1430,7 +1439,8 @@ function gi_archive_seo_edit_page() {
 - 読みやすい段落構成
 - 専門用語には簡潔な説明を付ける
 - 図鑑・事典のような知的で信頼性のある文体
-- 読者（中小企業経営者・個人事業主）に役立つ実践的な情報`;
+- 読者（中小企業経営者・個人事業主）に役立つ実践的な情報
+- SEOキーワードを自然に含める（「${archiveTitle}」「補助金」「助成金」「${currentYear}年」など）`;
 
             } else if (promptType === 'outro') {
                 prompt = `あなたは補助金・助成金の専門家です。以下の条件で、SEO最適化されたアウトロコンテンツを作成してください。
@@ -1438,11 +1448,12 @@ function gi_archive_seo_edit_page() {
 【対象アーカイブページ情報】
 - ページタイトル: ${archiveTitle}
 - カテゴリ種別: ${archiveTypeName}
-- 掲載補助金数: ${postCount}件
-- 対象年度: ${currentYear}年${prefectureInfo}${categoryInfo}
+- このページの掲載補助金数: ${postCount}件
+- サイト全体の補助金総数: ${totalGrantsCount}件
+- 対象年度: ${currentYear}年（令和${currentYearJapanese}年度）${prefectureInfo}${categoryInfo}
 
 【コンテンツ構成】
-1. **見出し**: 「04 ${archiveTitle}申請のまとめ」（<h2>タグ）
+1. **見出し**: 「${archiveTitle}申請のまとめ」（<h2>タグ）
 
 2. **重要ポイントのまとめ**（200〜300字）:
    - このカテゴリ/地域の補助金申請で最も重要な3〜5つのポイント
@@ -1469,7 +1480,8 @@ function gi_archive_seo_edit_page() {
 - HTML形式で出力（<h2>, <h3>, <p>, <ul>, <li>, <strong>タグ使用）
 - Q&Aは実践的で具体的な内容
 - 読者の不安を解消し、行動を促す文章
-- 専門的だが親しみやすいトーン`;
+- 専門的だが親しみやすいトーン
+- SEOキーワードを自然に含める`;
 
             } else if (promptType === 'meta') {
                 prompt = `あなたはSEOの専門家です。以下の条件で、クリック率を最大化するメタディスクリプションを作成してください。
@@ -1477,9 +1489,10 @@ function gi_archive_seo_edit_page() {
 【対象アーカイブページ情報】
 - ページタイトル: ${archiveTitle}
 - カテゴリ種別: ${archiveTypeName}
-- 掲載補助金数: ${postCount}件
+- このページの掲載補助金数: ${postCount}件
+- サイト全体の補助金総数: ${totalGrantsCount}件
 - サイト名: ${siteName}
-- 対象年度: ${currentYear}年${prefectureInfo}${categoryInfo}
+- 対象年度: ${currentYear}年（令和${currentYearJapanese}年度）${prefectureInfo}${categoryInfo}
 
 【メタディスクリプション作成要件】
 1. 文字数: 120〜160文字（厳守）
@@ -1489,7 +1502,7 @@ function gi_archive_seo_edit_page() {
    - ${currentYear}年を示唆する言葉
 
 3. 含めるべき要素:
-   - 掲載件数（${postCount}件）
+   - 掲載件数（${postCount}件）の具体的な数字
    - このカテゴリ/地域の特徴・強み
    - 対象読者（中小企業、個人事業主など）
    - 行動喚起（「今すぐ確認」「チェック」など）
@@ -3129,7 +3142,9 @@ function gi_get_archive_custom_title() {
         return $content['page_title'];
     }
     
-    return null;
+    // SEO最適化されたデフォルトタイトルを生成
+    $default_title = gi_generate_seo_default_title();
+    return $default_title;
 }
 
 function gi_get_archive_custom_meta_description() {
@@ -3139,5 +3154,97 @@ function gi_get_archive_custom_meta_description() {
         return $content['meta_description'];
     }
     
-    return null;
+    // SEO最適化されたデフォルトメタディスクリプションを生成
+    $default_description = gi_generate_seo_default_meta_description();
+    return $default_description;
+}
+
+/**
+ * SEO最適化されたデフォルトタイトルを生成
+ */
+function gi_generate_seo_default_title() {
+    $current_year = date('Y');
+    $japanese_year = $current_year - 2018; // 令和年号
+    
+    if (is_post_type_archive('grant')) {
+        $total_count = wp_count_posts('grant')->publish ?? 0;
+        return "補助金・助成金一覧【{$current_year}年最新版】全{$total_count}件掲載 | 補助金図鑑";
+    }
+    
+    if (is_tax('grant_prefecture')) {
+        $term = get_queried_object();
+        $count = $term->count ?? 0;
+        return "{$term->name}の補助金・助成金【令和{$japanese_year}年度最新】{$count}件掲載 | 申請サポート完備";
+    }
+    
+    if (is_tax('grant_municipality')) {
+        $term = get_queried_object();
+        $count = $term->count ?? 0;
+        return "{$term->name}の補助金・助成金一覧【{$current_year}年版】{$count}制度を完全網羅";
+    }
+    
+    if (is_tax('grant_category')) {
+        $term = get_queried_object();
+        $count = $term->count ?? 0;
+        return "{$term->name}向け補助金・助成金【{$current_year}年最新】{$count}件｜採択率UP申請ガイド";
+    }
+    
+    if (is_tax('grant_purpose')) {
+        $term = get_queried_object();
+        $count = $term->count ?? 0;
+        return "{$term->name}の補助金・助成金【令和{$japanese_year}年度】{$count}制度の詳細解説";
+    }
+    
+    if (is_tax('grant_tag')) {
+        $term = get_queried_object();
+        $count = $term->count ?? 0;
+        return "#{$term->name}の補助金・助成金【{$current_year}年版】{$count}件掲載｜最新情報";
+    }
+    
+    return get_the_archive_title();
+}
+
+/**
+ * SEO最適化されたデフォルトメタディスクリプションを生成
+ */
+function gi_generate_seo_default_meta_description() {
+    $current_year = date('Y');
+    $japanese_year = $current_year - 2018;
+    
+    if (is_post_type_archive('grant')) {
+        $total_count = wp_count_posts('grant')->publish ?? 0;
+        return "{$current_year}年最新の補助金・助成金情報を全{$total_count}件掲載。中小企業向け、個人事業主向けの支援制度を地域別・業種別に検索可能。申請方法、採択率、最新トレンドまで完全ガイド。";
+    }
+    
+    if (is_tax('grant_prefecture')) {
+        $term = get_queried_object();
+        $count = $term->count ?? 0;
+        return "{$term->name}で利用できる補助金・助成金を{$count}件掲載。令和{$japanese_year}年度の最新制度、地域特有の支援策、申請のコツを専門家が徹底解説。中小企業・個人事業主の事業拡大を支援します。";
+    }
+    
+    if (is_tax('grant_municipality')) {
+        $term = get_queried_object();
+        $count = $term->count ?? 0;
+        return "{$term->name}の補助金・助成金{$count}制度を完全網羅。{$current_year}年の地域独自の支援制度、併用可能な制度、申請サポート情報まで。地元企業の成長を応援する最新情報をお届けします。";
+    }
+    
+    if (is_tax('grant_category')) {
+        $term = get_queried_object();
+        $count = $term->count ?? 0;
+        return "{$term->name}向けの補助金・助成金を{$count}件掲載。{$current_year}年の最新制度、採択率を上げる申請ポイント、必要書類、審査基準まで詳しく解説。専門家による申請サポートも完備。";
+    }
+    
+    if (is_tax('grant_purpose')) {
+        $term = get_queried_object();
+        $count = $term->count ?? 0;
+        return "{$term->name}に活用できる補助金・助成金{$count}制度を紹介。令和{$japanese_year}年度の支援内容、支給額、対象者、申請方法を分かりやすく解説。あなたの事業に最適な支援制度が見つかります。";
+    }
+    
+    if (is_tax('grant_tag')) {
+        $term = get_queried_object();
+        $count = $term->count ?? 0;
+        return "#{$term->name}関連の補助金・助成金{$count}件を掲載。{$current_year}年の最新トレンド、注目制度、申請のコツまで。中小企業経営者・個人事業主必見の情報を毎日更新中。";
+    }
+    
+    return get_bloginfo('description');
 }
