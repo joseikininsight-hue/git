@@ -2529,9 +2529,24 @@ function gi_output_archive_intro_content() {
     
     if ($content && !empty($content['intro_content'])) {
         ?>
-        <section class="gi-archive-seo-intro mb-8">
-            <div class="gi-seo-content-box prose prose-stone max-w-none">
-                <?php echo wp_kses_post($content['intro_content']); ?>
+        <section class="gi-archive-seo-intro gi-section mb-8">
+            <header class="gi-section-numbered-header">
+                <div class="gi-section-number-box">
+                    <div class="gi-section-number-inner">
+                        <span class="gi-section-number-label">Section</span>
+                        <span class="gi-section-number-value">01</span>
+                    </div>
+                </div>
+                <div class="gi-section-title-box">
+                    <svg class="gi-section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                    <h2 class="gi-section-title">傾向と対策</h2>
+                    <span class="gi-section-en">Trends & Strategies</span>
+                </div>
+            </header>
+            <div class="gi-section-body">
+                <div class="gi-seo-content-box prose prose-stone max-w-none">
+                    <?php echo wp_kses_post($content['intro_content']); ?>
+                </div>
             </div>
         </section>
         <?php
@@ -2544,9 +2559,24 @@ function gi_output_archive_outro_content() {
     
     if ($content && !empty($content['outro_content'])) {
         ?>
-        <section class="gi-archive-seo-outro mt-12 pt-8 border-t border-gray-200">
-            <div class="gi-seo-content-box prose prose-stone max-w-none">
-                <?php echo wp_kses_post($content['outro_content']); ?>
+        <section class="gi-archive-seo-outro gi-section mt-12">
+            <header class="gi-section-numbered-header">
+                <div class="gi-section-number-box">
+                    <div class="gi-section-number-inner">
+                        <span class="gi-section-number-label">Section</span>
+                        <span class="gi-section-number-value">04</span>
+                    </div>
+                </div>
+                <div class="gi-section-title-box">
+                    <svg class="gi-section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                    <h2 class="gi-section-title">申請のまとめ・関連情報</h2>
+                    <span class="gi-section-en">Summary & Related Info</span>
+                </div>
+            </header>
+            <div class="gi-section-body">
+                <div class="gi-seo-content-box prose prose-stone max-w-none">
+                    <?php echo wp_kses_post($content['outro_content']); ?>
+                </div>
             </div>
         </section>
         <?php
