@@ -2547,7 +2547,7 @@ function gi_output_archive_intro_content() {
                 <div class="gi-section-number-box">
                     <div class="gi-section-number-inner">
                         <span class="gi-section-number-label">Section</span>
-                        <span class="gi-section-number-value">01</span>
+                        <span class="gi-section-number-value">03</span>
                     </div>
                 </div>
                 <div class="gi-section-title-box">
@@ -2626,7 +2626,7 @@ function gi_output_archive_featured_posts() {
             <div class="gi-section-number-box">
                 <div class="gi-section-number-inner">
                     <span class="gi-section-number-label">Section</span>
-                    <span class="gi-section-number-value">02</span>
+                    <span class="gi-section-number-value">01</span>
                 </div>
             </div>
             <div class="gi-section-title-box">

@@ -333,12 +333,7 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
         <div class="yahoo-main-content zukan-main-content">
             
             <?php 
-            // アーカイブSEOコンテンツ: イントロ（01傾向と対策）を先に表示
-            if (function_exists('gi_output_archive_intro_content')) {
-                gi_output_archive_intro_content();
-            }
-            
-            // アーカイブSEOコンテンツ: おすすめ記事（02編集部選定）
+            // アーカイブSEOコンテンツ: おすすめ記事（01編集部選定）
             if (function_exists('gi_output_archive_featured_posts')) {
                 gi_output_archive_featured_posts();
             }
@@ -350,7 +345,7 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                     <div class="gi-section-number-box">
                         <div class="gi-section-number-inner">
                             <span class="gi-section-number-label">Section</span>
-                            <span class="gi-section-number-value">03</span>
+                            <span class="gi-section-number-value">02</span>
                         </div>
                     </div>
                     <div class="gi-section-title-box">
@@ -652,7 +647,12 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
             </section>
             
             <?php 
-            // アーカイブSEOコンテンツ: アウトロ
+            // アーカイブSEOコンテンツ: イントロ（03傾向と対策）
+            if (function_exists('gi_output_archive_intro_content')) {
+                gi_output_archive_intro_content();
+            }
+            
+            // アーカイブSEOコンテンツ: アウトロ（04申請のまとめ）
             if (function_exists('gi_output_archive_outro_content')) {
                 gi_output_archive_outro_content();
             }
