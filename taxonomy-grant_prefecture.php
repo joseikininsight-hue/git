@@ -333,7 +333,7 @@ $schema_data = array(
                                     <span style="font-size: 10px; color: #999; display: block; text-align: left; margin-bottom: 8px;">スポンサーリンク</span>
                                     <?php ji_display_ad('archive_grant_infeed'); ?>
                                 </div>
-                            <?php endif; ?>
+                            <?php endif;
                             
                         endwhile;
                         wp_reset_postdata();
