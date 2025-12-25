@@ -411,14 +411,12 @@ $schema_data = array(
                 </div>
             </section>
             
-            <?php 
             <?php
             // アーカイブSEOコンテンツ: イントロ（03傾向と対策）
             if (function_exists('gi_output_archive_intro_content')) {
                 gi_output_archive_intro_content();
             }
             
-
             // アーカイブSEOコンテンツ: アウトロ（04申請のまとめ）
             if (function_exists('gi_output_archive_outro_content')) {
                 gi_output_archive_outro_content();
@@ -504,7 +502,6 @@ $js_uri = get_template_directory_uri() . '/assets/js/archive-common.js';
 document.addEventListener('DOMContentLoaded', function() {
     if (typeof ArchiveCommon !== 'undefined') {
         ArchiveCommon.init({
-            ajaxUrl
             ajaxUrl: '<?php echo admin_url("admin-ajax.php"); ?>',
             nonce: '<?php echo wp_create_nonce("gi_ajax_nonce"); ?>',
             postType: 'grant',
@@ -521,11 +518,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
-        
-        // モバイルフィルターの初期化
-        if (typeof ArchiveCommon.initMobileFilter === 'function') {
-            ArchiveCommon.initMobileFilter();
-        }
 </script>
 
 <?php get_footer(); ?>
