@@ -344,7 +344,7 @@ body.zukan-theme,
 /* ==========================================================================
    Results Header - 統合検索結果ヘッダー
    ========================================================================== */
-.results-header,
+/* Legacy results header - now handled by .gi-section-numbered-header */
 .zukan-results-header {
     display: flex;
     align-items: center;

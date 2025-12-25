@@ -345,7 +345,7 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
             ?>
             
             <!-- 統合された検索結果ヘッダー -->
-            <section class="gi-section results-header" id="list">
+            <section class="gi-section" id="list">
                 <header class="gi-section-numbered-header">
                     <div class="gi-section-number-box">
                         <div class="gi-section-number-inner">
@@ -359,6 +359,7 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                         <span class="gi-section-en">Grant Archive</span>
                     </div>
                 </header>
+                <div class="gi-section-body">
                 <?php
                 // ページネーション用の件数計算
                 $current_page = get_query_var('paged') ? get_query_var('paged') : 1;
@@ -393,6 +394,7 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                             ?>
                         </select>
                     </div>
+                </div>
                 </div>
             </section>
             
