@@ -684,51 +684,6 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
             </div>
         </header>
 
-        <!-- メトリクス -->
-        <section class="gi-metrics" aria-label="重要情報">
-            <div class="gi-metric">
-                <div class="gi-metric-label">補助金額</div>
-                <div class="gi-metric-value highlight"><?php echo $amount_display ? esc_html($amount_display) : '要確認'; ?></div>
-                <?php if ($subsidy_rate_display): ?><div class="gi-metric-sub">補助率 <?php echo esc_html($subsidy_rate_display); ?></div><?php endif; ?>
-            </div>
-            <div class="gi-metric">
-                <div class="gi-metric-label">申請締切</div>
-                <div class="gi-metric-value <?php echo ($deadline_status === 'critical' || $deadline_status === 'urgent') ? 'urgent' : ''; ?>">
-                    <?php if ($days_remaining > 0): ?>残り<?php echo $days_remaining; ?>日<?php else: ?><?php echo $deadline_info ? esc_html($deadline_info) : '要確認'; ?><?php endif; ?>
-                </div>
-                <?php if ($deadline_info && $days_remaining > 0): ?><div class="gi-metric-sub"><?php echo esc_html($deadline_info); ?></div><?php endif; ?>
-            </div>
-            <div class="gi-metric">
-                <div class="gi-metric-label">難易度</div>
-                <div class="gi-metric-value"><?php echo esc_html($difficulty['label']); ?></div>
-                <div class="gi-metric-stars" aria-label="難易度 <?php echo $difficulty['level']; ?> / 5">
-                    <?php for ($i = 1; $i <= 5; $i++): ?>
-                    <svg class="gi-metric-star <?php echo $i <= $difficulty['level'] ? 'active' : ''; ?>" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                    <?php endfor; ?>
-                </div>
-            </div>
-            <div class="gi-metric">
-                <div class="gi-metric-label">
-                    採択率
-                    <span class="gi-tooltip-trigger">
-                        <span class="gi-ai-estimate-badge">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-                            AI推定
-                        </span>
-                        <span class="gi-tooltip">この採択率はAIが過去のデータや類似補助金の傾向から推定した参考値です。公式発表の数値ではありません。</span>
-                    </span>
-                </div>
-                <div class="gi-metric-value"><?php echo $grant['adoption_rate'] > 0 ? number_format($grant['adoption_rate'], 1) . '%' : '—'; ?></div>
-                <?php if ($grant['adoption_count'] > 0): ?>
-                <div class="gi-metric-sub"><?php echo number_format($grant['adoption_count']); ?>社採択</div>
-                <?php endif; ?>
-                <div class="gi-metric-ai-note">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                    参考値・公式発表ではありません
-                </div>
-            </div>
-        </section>
-
         <div class="gi-layout">
             <main class="gi-main" id="main-content">
                 
@@ -820,6 +775,17 @@ if (!function_exists('gi_is_seo_plugin_active') || !gi_is_seo_plugin_active()):
                                 
                                 <div class="gi-details-disclaimer">
                                     ご注意：この採択率・統計情報は、AIが過去の公開データや類似補助金の傾向を分析して推定した参考値です。公式機関が発表した数値ではありません。
+                                </div>
+                                
+                                <!-- 申請難易度 -->
+                                <div class="gi-details-difficulty-box">
+                                    <div class="gi-details-label">申請難易度</div>
+                                    <div class="gi-details-difficulty-value"><?php echo esc_html($difficulty['label']); ?></div>
+                                    <div class="gi-details-difficulty-stars" aria-label="難易度 <?php echo $difficulty['level']; ?> / 5">
+                                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                                        <span class="gi-details-star <?php echo $i <= $difficulty['level'] ? 'active' : ''; ?>">★</span>
+                                        <?php endfor; ?>
+                                    </div>
                                 </div>
                             </div>
                         </div>

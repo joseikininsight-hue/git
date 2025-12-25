@@ -100,8 +100,8 @@ function ji_inject_ad_content_middle($content) {
     
     return $content;
 }
-// AdSense自動広告に任せるため無効化
-// add_filter('the_content', 'ji_inject_ad_content_middle', 20);
+// 記事内広告挿入を有効化（最初のH2の前に広告表示）
+add_filter('the_content', 'ji_inject_ad_content_middle', 20);
 
 
 /**
@@ -149,8 +149,8 @@ function ji_inject_additional_ads($content) {
     
     return $content;
 }
-// AdSense自動広告に任せるため無効化
-// add_filter('the_content', 'ji_inject_additional_ads', 21);
+// 記事内広告挿入を有効化（2番目・4番目のH2の前に広告表示）
+add_filter('the_content', 'ji_inject_additional_ads', 21);
 
 
 /**

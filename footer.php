@@ -267,8 +267,12 @@ $footer_js_version = file_exists($footer_js_path) ? filemtime($footer_js_path) :
     </footer>
 
     <?php 
-    // グローバルスティッキーCTAバナーを表示
-    get_template_part('template-parts/global-sticky-cta'); 
+    // サイドバーCTA（縦タブスタイル）を表示
+    // AdSenseアンカー広告との競合なし、閉じ機能付き、AI相談ボタン統合
+    get_template_part('template-parts/sidebar-cta'); 
+    
+    // 旧: 下部固定CTA（AdSense競合の可能性があるため無効化）
+    // get_template_part('template-parts/global-sticky-cta'); 
     ?>
 
     <?php wp_footer(); ?>
