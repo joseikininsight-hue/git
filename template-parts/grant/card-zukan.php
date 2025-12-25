@@ -82,6 +82,36 @@ if ($tags && !is_wp_error($tags)) {
     }
 }
 
+// 都道府県情報を取得
+$prefectures = get_the_terms($post_id, 'grant_prefecture');
+$current_prefecture = null;
+
+// 現在閲覧中の都道府県アーカイブか確認
+if (is_tax('grant_prefecture')) {
+    $current_term = get_queried_object();
+    $current_prefecture = $current_term->name;
+}
+
+// 「全国」タグの処理：都道府県ページで表示する場合は県名を追加
+if (!empty($tag_list)) {
+    foreach ($tag_list as $key => $tag_name) {
+        if ($tag_name === '全国' && $current_prefecture) {
+            $tag_list[$key] = "全国（{$current_prefecture}対応）";
+        }
+    }
+}
+
+// 都道府県タグも同様に処理
+if ($prefectures && !is_wp_error($prefectures) && $current_prefecture) {
+    foreach ($prefectures as $pref) {
+        if ($pref->name === '全国') {
+            // 「全国」の場合、現在の都道府県名を追加
+            $tag_list[] = "全国（{$current_prefecture}対応）";
+            break;
+        }
+    }
+}
+
 // ステータスラベル
 $status_labels = array(
     'open' => '募集中',

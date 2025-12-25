@@ -168,23 +168,31 @@ function gi_optimize_taxonomy_archive_titles($title_parts) {
     $term_name = $queried_object->name;
     $term_count = $queried_object->count;
     $current_year = date('Y');
+    $japanese_year = $current_year - 2018; // 令和年号
     
     // タクソノミーに応じたタイトル生成
     if (is_tax('grant_prefecture')) {
-        // 都道府県アーカイブ
-        $title_parts['title'] = $term_name . '補助金一覧【' . $current_year . '年度最新版】全' . number_format($term_count) . '件';
+        // 都道府県アーカイブ - 「の」を明示的に追加
+        $title_parts['title'] = $term_name . 'の補助金・助成金一覧【令和' . $japanese_year . '年度最新】' . number_format($term_count) . '件掲載';
     } elseif (is_tax('grant_municipality')) {
-        // 市町村アーカイブ
-        $title_parts['title'] = $term_name . '補助金一覧【' . $current_year . '年度最新版】全' . number_format($term_count) . '件';
+        // 市町村アーカイブ - 「の」を明示的に追加
+        $title_parts['title'] = $term_name . 'の補助金・助成金一覧【' . $current_year . '年版】' . number_format($term_count) . '制度完全網羅';
     } elseif (is_tax('grant_category')) {
         // カテゴリアーカイブ
-        $title_parts['title'] = $term_name . '補助金一覧【' . $current_year . '年度最新版】全' . number_format($term_count) . '件';
+        $title_parts['title'] = $term_name . '向け補助金・助成金【' . $current_year . '年最新】' . number_format($term_count) . '件｜採択率UP';
     } elseif (is_tax('grant_purpose')) {
-        // 目的別アーカイブ
-        $title_parts['title'] = $term_name . '向け補助金一覧【' . $current_year . '年度】' . number_format($term_count) . '件';
+        // 目的別アーカイブ - 「の」を明示的に追加
+        $title_parts['title'] = $term_name . 'の補助金・助成金【令和' . $japanese_year . '年度】' . number_format($term_count) . '制度詳細解説';
     } elseif (is_tax('grant_tag')) {
-        // タグアーカイブ
-        $title_parts['title'] = $term_name . '関連の補助金一覧【' . $current_year . '年度】';
+        // タグアーカイブ - 「の」を明示的に追加
+        $title_parts['title'] = '#' . $term_name . 'の補助金・助成金【' . $current_year . '年版】' . number_format($term_count) . '件掲載';
+    }
+    
+    // page_on_frontの場合にsite_titleが重複するのを防ぐ
+    // 「 - 」区切りが不要な場合は削除
+    if (isset($title_parts['site']) && isset($title_parts['title'])) {
+        // サイト名はそのまま保持
+        $title_parts['tagline'] = ''; // タグラインは削除
     }
     
     return $title_parts;
@@ -1924,3 +1932,61 @@ function gi_litespeed_external_image_info() {
         }
     }
 }
+
+/**
+ * =============================================================================
+ * SEO Title Optimization - タイトルタグの最適化
+ * =============================================================================
+ */
+
+/**
+ * タイトルタグから不要なハイフンを除去
+ */
+add_filter('document_title_separator', function($sep) {
+    return '|'; // ハイフンの代わりにパイプを使用
+}, 10, 1);
+
+/**
+ * タイトルタグの最適化
+ */
+add_filter('document_title_parts', function($title) {
+    // 「地域名 - の」パターンを修正
+    if (isset($title['title'])) {
+        // 「〇〇県 - の補助金」→「〇〇県の補助金」
+        $title['title'] = preg_replace('/^(.+?)\s*-\s*の/', '$1の', $title['title']);
+        
+        // 「〇〇市 - の補助金」→「〇〇市の補助金」
+        $title['title'] = preg_replace('/^(.+?[都道府県市区町村])\s*-\s*の/', '$1の', $title['title']);
+    }
+    
+    return $title;
+}, 10, 1);
+
+/**
+ * アーカイブページタイトルの最適化（カスタムタイトル使用）
+ */
+add_filter('get_the_archive_title', function($title) {
+    // カスタムSEOタイトルがある場合は使用
+    if (function_exists('gi_get_archive_custom_title')) {
+        $custom_title = gi_get_archive_custom_title();
+        if ($custom_title) {
+            return $custom_title;
+        }
+    }
+    
+    // デフォルトタイトルの改善
+    if (is_tax()) {
+        $term = get_queried_object();
+        if ($term) {
+            // 「アーカイブ: 東京都」→「東京都」
+            return $term->name;
+        }
+    }
+    
+    if (is_post_type_archive('grant')) {
+        return '補助金・助成金一覧';
+    }
+    
+    // その他のアーカイブ
+    return preg_replace('/^(カテゴリー|タグ|アーカイブ):\s*/', '', $title);
+}, 10, 1);

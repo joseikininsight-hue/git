@@ -201,9 +201,6 @@ if ($parent_prefecture) {
         <div class="yahoo-main-content zukan-main-content">
             
             <?php 
-                gi_output_archive_intro_content();
-            }
-            
             // アーカイブSEOコンテンツ: おすすめ記事（01編集部選定）
             if (function_exists('gi_output_archive_featured_posts')) {
                 gi_output_archive_featured_posts();
