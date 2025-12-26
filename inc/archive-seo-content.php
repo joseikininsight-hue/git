@@ -3214,6 +3214,11 @@ function gi_get_archive_custom_meta_description() {
 
 /**
  * SEO最適化されたデフォルトタイトルを生成
+ * 
+ * 【重要修正 v11.0.11】
+ * get_the_archive_title() を呼び出すと、functions.php のフィルターが
+ * gi_get_archive_custom_title() を呼び、そこから再び gi_generate_seo_default_title() が
+ * 呼ばれて無限ループが発生する。これを防ぐため、空文字を返す。
  */
 function gi_generate_seo_default_title() {
     $current_year = date('Y');
@@ -3254,7 +3259,9 @@ function gi_generate_seo_default_title() {
         return "#{$term->name}の補助金・助成金【{$current_year}年版】{$count}件掲載｜最新情報";
     }
     
-    return get_the_archive_title();
+    // 【修正】無限ループ防止: get_the_archive_title() を呼ばない
+    // 代わりに空文字を返し、呼び出し元（テンプレート）に処理を任せる
+    return '';
 }
 
 /**

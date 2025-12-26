@@ -39,7 +39,7 @@ if (!defined('ABSPATH')) {
 
 // テーマバージョン定数
 if (!defined('GI_THEME_VERSION')) {
-    define('GI_THEME_VERSION', '11.0.10');
+    define('GI_THEME_VERSION', '11.0.11');
 }
 if (!defined('GI_THEME_PREFIX')) {
     define('GI_THEME_PREFIX', 'gi_');
@@ -208,6 +208,15 @@ function gi_output_taxonomy_meta_description() {
     // SEOプラグインがある場合はスキップ
     if (gi_is_seo_plugin_active()) {
         return;
+    }
+    
+    // 【修正 v11.0.11】カスタムSEO設定でメタディスクリプションが設定されている場合はスキップ
+    // inc/archive-seo-content.php または archive-grant.php で出力されるため
+    if (function_exists('gi_get_current_archive_seo_content')) {
+        $seo_content = gi_get_current_archive_seo_content();
+        if ($seo_content && !empty($seo_content['meta_description'])) {
+            return; // カスタム設定があるので、ここでは出力しない
+        }
     }
     
     // タクソノミーアーカイブページでのみ適用
