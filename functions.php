@@ -8,7 +8,7 @@
  * - Eliminated folder over-organization
  * 
  * @package Grant_Insight_Perfect
- * @version 11.0.6 (Memory Optimization - Lazy Loading System)
+ * @version 11.0.7 (Memory Optimization - Simple Approach)
  * 
  * Changelog v11.0.2:
  * - Disabled gi_add_seo_meta_tags to prevent duplicate meta tags (header.php handles this)
@@ -39,16 +39,21 @@ if (!defined('ABSPATH')) {
 
 // テーマバージョン定数
 if (!defined('GI_THEME_VERSION')) {
-    define('GI_THEME_VERSION', '11.0.6');
+    define('GI_THEME_VERSION', '11.0.7');
 }
 if (!defined('GI_THEME_PREFIX')) {
     define('GI_THEME_PREFIX', 'gi_');
 }
 
-// 🔧 MEMORY OPTIMIZATION
-if (is_admin() && !wp_doing_ajax()) {
-    @ini_set('memory_limit', '256M');
-    
+// 🔧 MEMORY OPTIMIZATION - 1GB超えのメモリエラー対策
+// サーバー設定で1GBに制限されている場合、テーマ側で上げることはできない
+// wp-config.php に以下を追加することを推奨:
+// define('WP_MEMORY_LIMIT', '512M');
+// define('WP_MAX_MEMORY_LIMIT', '1024M');
+@ini_set('memory_limit', '512M');
+
+// 管理画面でのメモリ使用量を削減
+if (is_admin()) {
     add_action('init', function() {
         if (!defined('WP_POST_REVISIONS')) {
             define('WP_POST_REVISIONS', 3);
@@ -473,21 +478,21 @@ function gi_get_category_slugs_for_purpose($purpose_slug) {
 
 /**
  * ============================================================================
- * MEMORY OPTIMIZATION: Lazy Loading System (v11.0.6)
+ * MEMORY OPTIMIZATION: Simple Approach (v11.0.7)
  * ============================================================================
  * 
  * メモリ枯渇エラー対策 (Fatal error: Allowed memory size exhausted)
  * 
- * 解決策: 軽量なメニューローダー + 遅延読み込み
- * - メニュー登録のみ行う軽量ファイル (admin-menu-loader.php)
- * - 重いファイルは該当ページアクセス時にのみ読み込む
+ * シンプルな解決策:
+ * - 管理画面: 全ファイルを読み込む（機能優先）
+ * - フロントエンド: 必要最小限のファイルのみ（メモリ節約）
  * 
- * @since 11.0.6
+ * @since 11.0.7
  */
 $inc_dir = get_template_directory() . '/inc/';
 
 /**
- * Core Required Files - 全ページで必須（軽量ファイルのみ）
+ * Core Required Files - 全ページで必須
  */
 $core_required_files = array(
     'theme-foundation.php',           // 78KB - テーマ基盤
@@ -507,81 +512,39 @@ foreach ($core_required_files as $file) {
 
 /**
  * ==========================================================================
- * 管理画面: 軽量メニューローダー + 遅延読み込み
+ * 管理画面: 全ファイルを読み込む（機能優先）
  * ==========================================================================
- * 
- * 重いファイルは読み込まず、メニューのみ登録
- * 実際のページアクセス時に必要なファイルを読み込む
  */
 if (is_admin()) {
-    // 基本管理機能（軽量）
-    $admin_light_files = array(
-        'admin-functions.php',          // 20KB - 管理機能
-        'acf-fields.php',               // 31KB - ACFフィールド
-        'column-admin-ui.php',          // 31KB - コラム管理UI
-        'column-system.php',            // 47KB - コラムシステム
-        'admin-menu-loader.php',        // 10KB - 軽量メニューローダー
+    $admin_files = array(
+        'admin-functions.php',
+        'acf-fields.php',
+        'column-admin-ui.php',
+        'column-system.php',
+        'google-sheets-integration.php',
+        'seo-content-manager.php',
+        'archive-seo-content.php',
+        'grant-article-creator.php',
+        'ai-concierge.php',
     );
     
-    foreach ($admin_light_files as $file) {
+    foreach ($admin_files as $file) {
         $file_path = $inc_dir . $file;
         if (file_exists($file_path)) {
             require_once $file_path;
         }
     }
-    
-    // 特定の管理ページでは重いファイルを即座に読み込む
-    // （AJAX処理が必要なページ）
-    add_action('admin_init', function() {
-        $page = isset($_GET['page']) ? sanitize_text_field($_GET['page']) : '';
-        $inc_dir = get_template_directory() . '/inc/';
-        
-        // Google Sheets関連ページ
-        if (strpos($page, 'gi-google-sheets') !== false || strpos($page, 'gi-sync') !== false) {
-            if (file_exists($inc_dir . 'google-sheets-integration.php')) {
-                require_once $inc_dir . 'google-sheets-integration.php';
-            }
-        }
-        
-        // SEO Manager関連ページ
-        if (strpos($page, 'gi-seo') !== false) {
-            if (file_exists($inc_dir . 'seo-content-manager.php')) {
-                require_once $inc_dir . 'seo-content-manager.php';
-            }
-        }
-        
-        // Archive SEO関連ページ
-        if (strpos($page, 'gi-archive-seo') !== false) {
-            if (file_exists($inc_dir . 'archive-seo-content.php')) {
-                require_once $inc_dir . 'archive-seo-content.php';
-            }
-        }
-        
-        // Grant Article Creator関連ページ
-        if (strpos($page, 'gi-grant-article') !== false) {
-            if (file_exists($inc_dir . 'grant-article-creator.php')) {
-                require_once $inc_dir . 'grant-article-creator.php';
-            }
-        }
-        
-        // AI Concierge関連ページ
-        if (strpos($page, 'gip-') !== false) {
-            if (file_exists($inc_dir . 'ai-concierge.php')) {
-                require_once $inc_dir . 'ai-concierge.php';
-            }
-        }
-    }, 1);
 }
 
 /**
  * ==========================================================================
- * AJAXリクエスト: 必要なファイルのみ読み込む
+ * AJAXリクエスト: 必要なファイルを読み込む
  * ==========================================================================
  */
 if (wp_doing_ajax()) {
     $current_action = isset($_REQUEST['action']) ? sanitize_text_field($_REQUEST['action']) : '';
     
-    // ajax-functions.phpが必要なAJAXアクション
+    // ajax-functions.php
     $ajax_file = $inc_dir . 'ajax-functions.php';
     if (file_exists($ajax_file)) {
         require_once $ajax_file;
