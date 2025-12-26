@@ -39,7 +39,7 @@ if (!defined('ABSPATH')) {
 
 // テーマバージョン定数
 if (!defined('GI_THEME_VERSION')) {
-    define('GI_THEME_VERSION', '11.0.11');
+    define('GI_THEME_VERSION', '11.0.12');
 }
 if (!defined('GI_THEME_PREFIX')) {
     define('GI_THEME_PREFIX', 'gi_');
@@ -531,9 +531,13 @@ if (is_admin()) {
     gi_load_inc('column-admin-ui.php');     // 31KB
     gi_load_inc('column-system.php');       // 47KB
     
+    // 【修正 v11.0.12】広告管理システムを読み込み
+    gi_load_inc('affiliate-ad-manager.php');   // 103KB - ベースクラス
+    gi_load_inc('ad-manager-unified.php');     // 31KB - 統合管理クラス
+    gi_load_inc('adsense-optimization.php');   // 27KB - AdSense最適化
+    
     // Heavy admin files - Load ALL for menu registration
     // Each file registers its own menus via add_action('admin_menu', ...)
-    // Memory: ~1.2MB but required for full admin functionality
     gi_load_inc('google-sheets-integration.php');  // 159KB
     gi_load_inc('safe-sync-manager.php');          // Small
     gi_load_inc('seo-content-manager.php');        // 295KB
@@ -551,6 +555,9 @@ if (is_admin()) {
 elseif (wp_doing_ajax()) {
     gi_load_inc('ajax-functions.php');      // 227KB - AJAX handlers
     
+    // 【修正 v11.0.12】広告トラッキング用AJAX
+    gi_load_inc('affiliate-ad-manager.php');
+    
     // Load AI Concierge for AI-related AJAX actions
     $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : '';
     $ai_actions = array('gi_ai_search', 'gi_ai_chat', 'handle_grant_ai_question', 
@@ -564,6 +571,11 @@ elseif (wp_doing_ajax()) {
         gi_load_inc('google-sheets-integration.php');
         gi_load_inc('safe-sync-manager.php');
     }
+    
+    // 【修正 v11.0.12】Archive SEO AJAX actions
+    if (strpos($action, 'gi_archive') !== false) {
+        gi_load_inc('archive-seo-content.php');
+    }
 }
 
 // =========================================
@@ -573,6 +585,15 @@ else {
     // Frontend-only files (~90KB)
     gi_load_inc('column-system.php');         // 47KB - Column display
     gi_load_inc('performance-optimization.php'); // 46KB - Performance
+    
+    // 【修正 v11.0.12】フロントエンドでも広告表示のために必要
+    gi_load_inc('affiliate-ad-manager.php');   // 広告管理ベース
+    gi_load_inc('ad-manager-unified.php');     // 統合管理
+    gi_load_inc('content-ad-injector.php');    // 記事内広告挿入
+    gi_load_inc('access-tracking.php');        // アクセス追跡
+    gi_load_inc('adsense-optimization.php');   // AdSense
+    gi_load_inc('critical-css-generator.php'); // Critical CSS
+    gi_load_inc('image-optimization.php');     // 画像最適化
     
     // Load AI Concierge only on AI pages
     add_action('wp', function() {
