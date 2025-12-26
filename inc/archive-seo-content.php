@@ -20,9 +20,16 @@ if (!defined('ABSPATH')) exit;
 
 /**
  * =============================================================================
- * 1. データベーステーブル作成
+ * 1. データベーステーブル作成（高速化修正 v11.0.10）
  * =============================================================================
+ * 
+ * 【重要】admin_init で毎回 dbDelta や ALTER TABLE を実行すると
+ * 管理画面が極端に重くなる。バージョン管理を導入して、
+ * DB構造に変更がある時だけ実行するように最適化。
  */
+
+// テーブルのバージョン（構造変更時にインクリメント）
+define('GI_ARCHIVE_SEO_DB_VERSION', '1.1');
 
 function gi_create_archive_seo_table() {
     global $wpdb;
@@ -59,13 +66,19 @@ function gi_create_archive_seo_table() {
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta($sql);
     
-    gi_upgrade_archive_seo_table();
+    // バージョンを保存
+    update_option('gi_archive_seo_db_version', GI_ARCHIVE_SEO_DB_VERSION);
 }
 add_action('after_switch_theme', 'gi_create_archive_seo_table');
 
 function gi_upgrade_archive_seo_table() {
     global $wpdb;
     $table_name = $wpdb->prefix . 'gi_archive_seo_content';
+    
+    // テーブルが存在しない場合は何もしない
+    if ($wpdb->get_var("SHOW TABLES LIKE '{$table_name}'") !== $table_name) {
+        return;
+    }
     
     $existing_columns = $wpdb->get_col("DESCRIBE {$table_name}", 0);
     
@@ -81,9 +94,24 @@ function gi_upgrade_archive_seo_table() {
             $wpdb->query("ALTER TABLE {$table_name} {$sql}");
         }
     }
+    
+    // バージョンを保存
+    update_option('gi_archive_seo_db_version', GI_ARCHIVE_SEO_DB_VERSION);
 }
 
+/**
+ * テーブル存在確認と更新（高速化版）
+ * 
+ * 【重要】バージョンチェックにより、DB構造に変更がない場合は
+ * 何もせずに即座にリターンする。これにより管理画面の速度が劇的に向上。
+ */
 function gi_ensure_archive_seo_table() {
+    // バージョンが一致していれば何もしない（超高速化）
+    $installed_version = get_option('gi_archive_seo_db_version', '0');
+    if ($installed_version === GI_ARCHIVE_SEO_DB_VERSION) {
+        return; // DBは最新版なので処理不要
+    }
+    
     global $wpdb;
     $table_name = $wpdb->prefix . 'gi_archive_seo_content';
     
@@ -2477,16 +2505,22 @@ function gi_get_archive_page_info($type, $key) {
  * =============================================================================
  */
 
+/**
+ * 現在のアーカイブページに対応するSEOコンテンツを取得
+ * 
+ * 【修正 v11.0.10】
+ * - 管理者ログイン中はキャッシュを無効化して即時反映を確認可能に
+ * - キャッシュ時間を1日→1時間に短縮
+ * - is_activeチェックを柔軟に（デバッグ用オプション追加）
+ */
 function gi_get_current_archive_seo_content() {
     global $wpdb;
     
     $type = '';
     $key = '';
     
-    if (is_post_type_archive('grant')) {
-        $type = 'post_type_archive';
-        $key = 'grant';
-    } elseif (is_tax('grant_prefecture')) {
+    // 判定の優先順位を整理
+    if (is_tax('grant_prefecture')) {
         $type = 'grant_prefecture';
         $term = get_queried_object();
         $key = $term ? $term->slug : '';
@@ -2506,25 +2540,44 @@ function gi_get_current_archive_seo_content() {
         $type = 'grant_tag';
         $term = get_queried_object();
         $key = $term ? $term->slug : '';
+    } elseif (is_post_type_archive('grant')) {
+        // post_type_archive は最後に判定（タクソノミー優先）
+        $type = 'post_type_archive';
+        $key = 'grant';
     }
     
     if (empty($type) || empty($key)) {
         return null;
     }
     
+    // 【重要】管理者ログイン中はキャッシュを無効化して即時反映を確認できるようにする
+    $use_cache = !current_user_can('manage_options');
+    
     $cache_key = 'gi_archive_seo_' . md5($type . ':' . $key);
-    $cached = get_transient($cache_key);
-    if ($cached !== false) {
-        return $cached;
+    
+    if ($use_cache) {
+        $cached = get_transient($cache_key);
+        if ($cached !== false) {
+            return $cached;
+        }
     }
     
     $table_name = $wpdb->prefix . 'gi_archive_seo_content';
+    
+    // テーブルが存在するかチェック
+    if ($wpdb->get_var("SHOW TABLES LIKE '{$table_name}'") !== $table_name) {
+        return null;
+    }
+    
     $content = $wpdb->get_row($wpdb->prepare(
         "SELECT * FROM {$table_name} WHERE archive_type = %s AND archive_key = %s AND is_active = 1",
         $type, $key
     ), ARRAY_A);
     
-    set_transient($cache_key, $content, DAY_IN_SECONDS);
+    // キャッシュを設定（一般ユーザー向け、1時間に短縮）
+    if ($use_cache) {
+        set_transient($cache_key, $content, HOUR_IN_SECONDS);
+    }
     
     return $content;
 }

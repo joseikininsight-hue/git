@@ -666,11 +666,13 @@ add_filter('acf/load_field/name=adoption_rate', function($field) {
 });
 
 /**
- * 投稿保存時の自動処理（無限ループ防止対策済み v11.0.8）
+ * 投稿保存時の自動処理（無限ループ完全防止版 v11.0.10）
  * 
- * 【重要】ACFの update_field() は内部で save_post をトリガーするため、
- * フックを一時的に解除しないと「保存→更新→保存→更新...」という
- * 無限ループが発生し、1GBを超えるメモリを消費してクラッシュする。
+ * 【重要な変更】
+ * - ACFの update_field() は内部で save_post を再トリガーする可能性があるため、
+ *   WordPress標準の update_post_meta() を使用してACFを完全にバイパス
+ * - 優先度10を明示的に指定してフックの解除・再登録を確実に行う
+ * - ゴミ箱への移動時もスキップ
  */
 function gi_handle_grant_save_post($post_id) {
     // 助成金投稿タイプのみ対象
@@ -678,65 +680,79 @@ function gi_handle_grant_save_post($post_id) {
         return;
     }
     
-    // 自動保存、リビジョンをスキップ
+    // 自動保存、リビジョン、ゴミ箱への移動時はスキップ
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
     if (wp_is_post_revision($post_id)) return;
+    if (get_post_status($post_id) === 'trash') return;
+    
+    // 【重要】二重実行防止フラグ
+    static $is_processing = array();
+    if (isset($is_processing[$post_id])) {
+        return;
+    }
+    $is_processing[$post_id] = true;
 
-    // 【重要】無限ループ防止のため、一時的にこのフックを解除
-    remove_action('save_post', 'gi_handle_grant_save_post');
+    // 【重要】無限ループ防止：フックを確実に解除（優先度10を明示）
+    remove_action('save_post', 'gi_handle_grant_save_post', 10);
 
     try {
+        $current_time = current_time('Y-m-d H:i:s');
+        
+        // 【ACFをバイパス】update_post_meta を直接使用
+        // ACFフィールドのメタキーは通常フィールド名と同じ
+        
         // 最終更新日を自動設定
-        $last_updated = get_field('last_updated', $post_id);
+        $last_updated = get_post_meta($post_id, 'last_updated', true);
         if (empty($last_updated)) {
-            update_field('last_updated', current_time('Y-m-d H:i:s'), $post_id);
+            update_post_meta($post_id, 'last_updated', $current_time);
         }
         
         // 数値金額から表示用金額を自動生成（表示用が空の場合）
-        $max_amount = get_field('max_amount', $post_id);
-        $max_amount_numeric = get_field('max_amount_numeric', $post_id);
+        $max_amount = get_post_meta($post_id, 'max_amount', true);
+        $max_amount_numeric = get_post_meta($post_id, 'max_amount_numeric', true);
         
         if (empty($max_amount) && !empty($max_amount_numeric)) {
-            // gi_format_amount_unified関数が存在するかチェック
             if (function_exists('gi_format_amount_unified')) {
                 $formatted_amount = gi_format_amount_unified($max_amount_numeric);
-                update_field('max_amount', $formatted_amount, $post_id);
+                update_post_meta($post_id, 'max_amount', $formatted_amount);
             }
         }
         
         // 採択率の検証（0-100の範囲内に制限）
-        $adoption_rate = get_field('adoption_rate', $post_id);
+        $adoption_rate = get_post_meta($post_id, 'adoption_rate', true);
         if (!empty($adoption_rate)) {
             $adoption_rate = max(0, min(100, intval($adoption_rate)));
-            update_field('adoption_rate', $adoption_rate, $post_id);
+            update_post_meta($post_id, 'adoption_rate', $adoption_rate);
         }
         
-        // 新規フィールドのデフォルト値設定
-        if (empty(get_field('difficulty_level', $post_id))) {
-            update_field('difficulty_level', '中級', $post_id);
+        // デフォルト値設定
+        $difficulty = get_post_meta($post_id, 'difficulty_level', true);
+        if (empty($difficulty)) {
+            update_post_meta($post_id, 'difficulty_level', '中級');
         }
         
-        // 完全連携対応：タクソノミーを優先し、重複ACFフィールドは削除
-        // 都道府県・市町村はタクソノミーで管理（ACFフィールド不要）
-        delete_field('prefecture_name', $post_id);
-        delete_field('target_prefecture', $post_id); 
-        delete_field('target_municipality', $post_id);
+        // 不要フィールドの削除（update_post_meta ではなく delete_post_meta を使用）
+        delete_post_meta($post_id, 'prefecture_name');
+        delete_post_meta($post_id, 'target_prefecture'); 
+        delete_post_meta($post_id, 'target_municipality');
         
         // Google Sheets同期用のシート更新日を設定
-        update_field('sheet_updated', current_time('Y-m-d H:i:s'), $post_id);
+        update_post_meta($post_id, 'sheet_updated', $current_time);
 
     } catch (Exception $e) {
-        // エラーログ記録
         if (defined('WP_DEBUG') && WP_DEBUG) {
             error_log('Grant Save Error: ' . $e->getMessage());
         }
     }
 
-    // 【重要】処理完了後にフックを戻す
-    add_action('save_post', 'gi_handle_grant_save_post');
+    // 処理完了フラグを解除
+    unset($is_processing[$post_id]);
+
+    // 【重要】処理完了後にフックを戻す（優先度10を明示）
+    add_action('save_post', 'gi_handle_grant_save_post', 10);
 }
-// 匿名関数ではなく名前付き関数として登録（remove_actionできるようにするため）
-add_action('save_post', 'gi_handle_grant_save_post');
+// 優先度10を明示してフック登録
+add_action('save_post', 'gi_handle_grant_save_post', 10);
 
 /**
  * 都道府県コードから名前を取得するヘルパー関数
