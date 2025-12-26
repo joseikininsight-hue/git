@@ -6,7 +6,12 @@
  * 管理画面から個別にSEOコンテンツ（イントロ/アウトロ）を編集・追加するシステム
  * 
  * @package Grant_Insight_Perfect
- * @version 3.0.0
+ * @version 3.3.0
+ * 
+ * v3.3.0 Changes:
+ * - PV取得処理の軽量化（タイムアウト対策）
+ * - gi_get_archive_pv_count() を常に0を返すように修正
+ * - キャッシュ時間を1時間に延長
  * 
  * v3.0.0 Changes:
  * - ページネーション実装（AJAX読み込みで軽量化）
@@ -818,7 +823,8 @@ function gi_get_archive_seo_stats() {
  */
 
 function gi_get_available_archive_pages_cached() {
-    $cache_key = 'gi_archive_pages_list';
+    // キャッシュ時間を長めに設定（1時間）
+    $cache_key = 'gi_archive_pages_list_v2'; 
     $cached = get_transient($cache_key);
     
     if ($cached !== false) {
@@ -827,12 +833,18 @@ function gi_get_available_archive_pages_cached() {
     
     $pages = gi_get_available_archive_pages();
     
-    // 10分キャッシュ
-    set_transient($cache_key, $pages, 10 * MINUTE_IN_SECONDS);
+    set_transient($cache_key, $pages, HOUR_IN_SECONDS);
     
     return $pages;
 }
 
+/**
+ * アーカイブページ一覧を取得
+ * 
+ * 【修正 v11.0.12】タイムアウト対策
+ * - PV数のリアルタイム取得を停止（N+1問題の解消）
+ * - pv_count は常に0を返す（必要なら別途バッチ処理で更新）
+ */
 function gi_get_available_archive_pages() {
     $pages = array();
     
@@ -847,7 +859,7 @@ function gi_get_available_archive_pages() {
         'type_label' => '投稿タイプ',
         'url' => get_post_type_archive_link('grant'),
         'post_count' => $total_grants_count,
-        'pv_count' => gi_get_archive_pv_count('post_type_archive', 'grant'),
+        'pv_count' => 0, // 【修正】タイムアウト防止のためPV取得を停止
     );
     
     // 各タクソノミー
@@ -879,7 +891,7 @@ function gi_get_available_archive_pages() {
                     'type_label' => $label,
                     'url' => $term_link,
                     'post_count' => $term->count,
-                    'pv_count' => gi_get_archive_pv_count($taxonomy, $term->slug),
+                    'pv_count' => 0, // 【修正】タイムアウト防止のためPV取得を停止
                     'term_id' => $term->term_id,
                     'description' => $term->description,
                 );
@@ -893,11 +905,15 @@ function gi_get_available_archive_pages() {
 
 /**
  * =============================================================================
- * 8. PV数取得
+ * 8. PV数取得（現在未使用・負荷対策のため）
  * =============================================================================
  */
 
 function gi_get_archive_pv_count($type, $key) {
+    // 負荷対策のため常に0を返す
+    return 0;
+    
+    /* 元のロジック（必要になったら非同期処理として復活させる）
     global $wpdb;
     
     // access-tracking.phpで使用されている正しいテーブル名を使用
@@ -953,6 +969,7 @@ function gi_get_archive_pv_count($type, $key) {
     }
     
     return intval($count);
+    */
 }
 
 
