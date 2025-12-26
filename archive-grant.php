@@ -115,6 +115,17 @@ if (!empty($url_params['application_status']) && $url_params['application_status
     $archive_description = '全国の助成金・補助金情報を網羅的に検索。都道府県・市町村・業種・金額で詳細に絞り込み可能。専門家による申請サポート完備。毎日更新。';
 }
 
+// 【修正 v11.0.11】管理画面で設定されたカスタムSEOタイトル/ディスクリプションがあれば優先して上書き
+if (function_exists('gi_get_current_archive_seo_content')) {
+    $seo_content = gi_get_current_archive_seo_content();
+    if ($seo_content && !empty($seo_content['page_title'])) {
+        $archive_title = $seo_content['page_title'];
+    }
+    if ($seo_content && !empty($seo_content['meta_description'])) {
+        $archive_description = $seo_content['meta_description'];
+    }
+}
+
 // カテゴリデータの取得
 $all_categories = get_terms([
     'taxonomy' => 'grant_category',
