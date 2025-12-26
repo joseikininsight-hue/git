@@ -8,7 +8,7 @@
  * - Eliminated folder over-organization
  * 
  * @package Grant_Insight_Perfect
- * @version 11.0.4 (Memory Optimization - Conditional File Loading)
+ * @version 11.0.5 (Memory Optimization - Admin Menu Fix)
  * 
  * Changelog v11.0.2:
  * - Disabled gi_add_seo_meta_tags to prevent duplicate meta tags (header.php handles this)
@@ -39,7 +39,7 @@ if (!defined('ABSPATH')) {
 
 // テーマバージョン定数
 if (!defined('GI_THEME_VERSION')) {
-    define('GI_THEME_VERSION', '11.0.4');
+    define('GI_THEME_VERSION', '11.0.5');
 }
 if (!defined('GI_THEME_PREFIX')) {
     define('GI_THEME_PREFIX', 'gi_');
@@ -473,35 +473,29 @@ function gi_get_category_slugs_for_purpose($purpose_slug) {
 
 /**
  * ============================================================================
- * MEMORY OPTIMIZATION: Conditional File Loading
+ * MEMORY OPTIMIZATION: Conditional File Loading (v11.0.5)
  * ============================================================================
  * 
  * メモリ枯渇エラー対策 (Fatal error: Allowed memory size exhausted)
- * 巨大なファイルは必要な場合にのみ読み込む
  * 
- * @since 11.0.4
+ * 重要: 管理画面のメニュー登録には admin_menu フックが必要
+ * そのため、管理画面では全ファイルを読み込む
+ * フロントエンドでは条件付き読み込みでメモリ節約
  * 
- * 問題の原因:
- * - ai-concierge.php (471KB)
- * - seo-content-manager.php (295KB) 
- * - ajax-functions.php (227KB)
- * - google-sheets-integration.php (159KB)
- * - archive-seo-content.php (133KB)
- * これらが全ページロード時に読み込まれ、多数のフックを登録
- * /wp-includes/plugin.php の add_action() でメモリ枯渇
+ * @since 11.0.5
  */
 $inc_dir = get_template_directory() . '/inc/';
 
 /**
  * Core Required Files - 全ページで必須
- * 軽量ファイルのみ（合計200KB以下）
  */
 $core_required_files = array(
-    'theme-foundation.php',      // 78KB - テーマ基盤
-    'data-processing.php',       // 23KB - データ処理
-    'card-display.php',          // 22KB - カード表示
-    'customizer-error-handler.php', // 5KB - カスタマイザー
+    'theme-foundation.php',           // 78KB - テーマ基盤
+    'data-processing.php',            // 23KB - データ処理
+    'card-display.php',               // 22KB - カード表示
+    'customizer-error-handler.php',   // 5KB - カスタマイザー
     'grant-dynamic-css-generator.php', // 21KB - 動的CSS
+    'ai-assistant-core.php',          // 22KB - AIアシスタントコア
 );
 
 foreach ($core_required_files as $file) {
@@ -512,13 +506,27 @@ foreach ($core_required_files as $file) {
 }
 
 /**
- * Admin-Only Files - 管理画面でのみ読み込む
+ * ==========================================================================
+ * 管理画面: 全ファイルを読み込む（メニュー登録に必要）
+ * ==========================================================================
+ * 
+ * admin_menu フックでメニューを登録するため、
+ * 管理画面では全ファイルを読み込む必要がある
  */
 if (is_admin()) {
     $admin_files = array(
-        'admin-functions.php',       // 20KB - 管理機能
-        'acf-fields.php',            // 31KB - ACFフィールド
-        'column-admin-ui.php',       // 31KB - コラム管理UI
+        // 基本管理機能
+        'admin-functions.php',          // 20KB - 管理機能
+        'acf-fields.php',               // 31KB - ACFフィールド
+        'column-admin-ui.php',          // 31KB - コラム管理UI
+        'column-system.php',            // 47KB - コラムシステム
+        
+        // 重いファイル（メニュー登録に必要）
+        'google-sheets-integration.php', // 159KB - Google連携
+        'seo-content-manager.php',      // 295KB - SEO管理
+        'archive-seo-content.php',      // 133KB - アーカイブSEO
+        'grant-article-creator.php',    // 111KB - 記事作成
+        'ai-concierge.php',             // 471KB - AIコンシェルジュ
     );
     
     foreach ($admin_files as $file) {
@@ -530,81 +538,41 @@ if (is_admin()) {
 }
 
 /**
- * AJAX-Only Files - AJAX リクエスト時のみ読み込む
- * ajax-functions.php (227KB) を条件付きで読み込み
+ * ==========================================================================
+ * AJAXリクエスト: ajax-functions.php を読み込む
+ * ==========================================================================
  */
 if (wp_doing_ajax()) {
     $ajax_file = $inc_dir . 'ajax-functions.php';
     if (file_exists($ajax_file)) {
         require_once $ajax_file;
     }
+    
+    // AI関連AJAXリクエストの場合はai-concierge.phpも読み込む
+    $ai_actions = array('gi_ai_search', 'gi_ai_chat', 'handle_grant_ai_question', 'gi_voice_input', 'gi_generate_checklist');
+    $current_action = isset($_REQUEST['action']) ? sanitize_text_field($_REQUEST['action']) : '';
+    
+    if (in_array($current_action, $ai_actions)) {
+        $ai_file = $inc_dir . 'ai-concierge.php';
+        if (file_exists($ai_file)) {
+            require_once $ai_file;
+        }
+    }
 }
 
 /**
- * Admin Page-Specific Heavy Files - 特定の管理ページでのみ読み込む
- * これらの巨大ファイルは必要なページでのみ読み込む
+ * ==========================================================================
+ * フロントエンド: 条件付き読み込みでメモリ節約
+ * ==========================================================================
+ * 
+ * フロントエンドでは管理画面用の重いファイルは不要
+ * 必要なファイルのみ読み込む
  */
-if (is_admin() && !wp_doing_ajax()) {
-    add_action('admin_init', function() {
-        $inc_dir = get_template_directory() . '/inc/';
-        $current_page = isset($_GET['page']) ? sanitize_text_field($_GET['page']) : '';
-        $current_screen_id = '';
-        
-        // 現在の画面IDを取得（利用可能な場合）
-        if (function_exists('get_current_screen')) {
-            $screen = get_current_screen();
-            if ($screen) {
-                $current_screen_id = $screen->id;
-            }
-        }
-        
-        // Google Sheets Integration (159KB) - 関連ページでのみ
-        if (strpos($current_page, 'google-sheets') !== false || 
-            strpos($current_page, 'gi-sync') !== false ||
-            $current_screen_id === 'toplevel_page_gi-google-sheets') {
-            $gs_file = $inc_dir . 'google-sheets-integration.php';
-            if (file_exists($gs_file)) {
-                require_once $gs_file;
-            }
-        }
-        
-        // SEO Content Manager (295KB) - SEO関連ページでのみ
-        if (strpos($current_page, 'seo') !== false || 
-            strpos($current_page, 'gi-seo') !== false) {
-            $seo_file = $inc_dir . 'seo-content-manager.php';
-            if (file_exists($seo_file)) {
-                require_once $seo_file;
-            }
-        }
-        
-        // Archive SEO Content (133KB) - アーカイブSEOページでのみ
-        if (strpos($current_page, 'archive-seo') !== false ||
-            strpos($current_page, 'gi-archive') !== false) {
-            $archive_seo_file = $inc_dir . 'archive-seo-content.php';
-            if (file_exists($archive_seo_file)) {
-                require_once $archive_seo_file;
-            }
-        }
-        
-        // Grant Article Creator (111KB) - 記事作成ページでのみ
-        if (strpos($current_page, 'grant-article') !== false ||
-            strpos($current_page, 'gi-article') !== false ||
-            $current_screen_id === 'post' && get_post_type() === 'grant') {
-            $article_file = $inc_dir . 'grant-article-creator.php';
-            if (file_exists($article_file)) {
-                require_once $article_file;
-            }
-        }
-    }, 5);
-}
-
-/**
- * Frontend-Only Files - フロントエンドでのみ読み込む（軽量）
- */
-if (!is_admin()) {
+if (!is_admin() && !wp_doing_ajax()) {
     $frontend_files = array(
-        'column-system.php',         // 47KB - コラムシステム
+        'column-system.php',            // 47KB - コラムシステム
         'performance-optimization.php', // 46KB - パフォーマンス最適化
+        'grant-slug-optimizer.php',     // 64KB - URLリダイレクト
     );
     
     foreach ($frontend_files as $file) {
@@ -613,41 +581,23 @@ if (!is_admin()) {
             require_once $file_path;
         }
     }
-}
-
-/**
- * AI Concierge (471KB) - AI機能使用時のみ遅延読み込み
- * フロントエンドのAIコンシェルジュページまたはAJAXリクエストでのみ
- */
-add_action('wp', function() {
-    // AIコンシェルジュページの場合のみ読み込む
-    if (is_page('ai-concierge') || is_page('ai-assistant') || is_page('ai')) {
-        $ai_file = get_template_directory() . '/inc/ai-concierge.php';
-        if (file_exists($ai_file)) {
-            require_once $ai_file;
-        }
-    }
-}, 1);
-
-// AI関連AJAXリクエストの場合のみai-concierge.phpを読み込む
-if (wp_doing_ajax()) {
-    $ai_actions = array('gi_ai_search', 'gi_ai_chat', 'handle_grant_ai_question', 'gi_voice_input', 'gi_generate_checklist');
-    $current_action = isset($_REQUEST['action']) ? sanitize_text_field($_REQUEST['action']) : '';
     
-    if (in_array($current_action, $ai_actions)) {
-        $ai_file = get_template_directory() . '/inc/ai-concierge.php';
-        if (file_exists($ai_file)) {
-            require_once $ai_file;
+    // AIコンシェルジュページの場合のみ読み込む（遅延）
+    add_action('wp', function() {
+        if (is_page('ai-concierge') || is_page('ai-assistant') || is_page('ai')) {
+            $ai_file = get_template_directory() . '/inc/ai-concierge.php';
+            if (file_exists($ai_file)) {
+                require_once $ai_file;
+            }
         }
-    }
+    }, 1);
 }
 
 /**
  * その他の軽量ファイル - 全ページで読み込む
  */
 $other_files = array(
-    'ai-assistant-core.php',     // 22KB - AIアシスタントコア
-    'grant-amount-fixer.php',    // 小さいファイル
+    'grant-amount-fixer.php',  // 小さいファイル
 );
 
 foreach ($other_files as $file) {
