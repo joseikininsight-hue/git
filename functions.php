@@ -1717,8 +1717,9 @@ function gi_litespeed_preload_resources() {
         echo '<link rel="preload" as="image" href="https://joseikin-insight.com/wp-content/uploads/2024/11/dashboard-screenshot.webp" fetchpriority="high">' . "\n";
     }
     
-    // ロゴのプリロード
-    echo '<link rel="preload" as="image" href="https://joseikin-insight.com/gemini_generated_image_19k6yi19k6yi19k6/" fetchpriority="high">' . "\n";
+    // ロゴのプリロード - 無効化（URL不正のため）
+    // Note: プリロードを有効にする場合は、正しい画像URL（.png, .webp等）を指定してください
+    // echo '<link rel="preload" as="image" href="https://joseikin-insight.com/path/to/logo.webp" fetchpriority="high">' . "\n";
     
     // Critical Fontsのプリロード（該当する場合）
     // echo '<link rel="preload" as="font" href="/path/to/font.woff2" type="font/woff2" crossorigin>' . "\n";

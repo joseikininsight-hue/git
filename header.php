@@ -236,7 +236,7 @@ $header_js_version = file_exists($header_js_path) ? filemtime($header_js_path) :
     
     <meta name="format-detection" content="telephone=no, email=no, address=no">
     <meta name="theme-color" content="#fdfbf7">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     
     <?php
     /**

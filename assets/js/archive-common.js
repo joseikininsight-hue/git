@@ -748,6 +748,9 @@
             })
             .then(function(response) {
                 clearTimeout(timeoutId);
+                if (!response.ok) {
+                    throw new Error('HTTP ' + response.status);
+                }
                 return response.json();
             })
             .then(function(data) {
@@ -1107,7 +1110,10 @@
                 method: 'POST',
                 body: formData
             })
-            .then(function(response) { return response.json(); })
+            .then(function(response) {
+                if (!response.ok) throw new Error('HTTP ' + response.status);
+                return response.json();
+            })
             .then(function(data) {
                 if (data.success && data.data.suggestions && data.data.suggestions.length > 0) {
                     self.showSearchSuggestions(data.data.suggestions, query);
@@ -1378,7 +1384,14 @@
                 method: 'POST',
                 body: formData
             })
-            .then(function(response) { return response.json(); })
+            .then(function(response) {
+                // HTTPステータスコードをチェック
+                if (!response.ok) {
+                    console.error('HTTP Error:', response.status, response.statusText);
+                    throw new Error('サーバーエラー (HTTP ' + response.status + ')');
+                }
+                return response.json();
+            })
             .then(function(data) {
                 if (data.success) {
                     self.displayGrants(data.data.grants);
@@ -1386,12 +1399,13 @@
                     self.updatePagination(data.data.pagination);
                     self.updateActiveFiltersDisplay();
                 } else {
+                    console.error('API Error:', data.data || 'Unknown error');
                     self.showError('データの読み込みに失敗しました。');
                 }
             })
             .catch(function(error) {
                 console.error('Fetch Error:', error);
-                self.showError('通信エラーが発生しました。');
+                self.showError('通信エラーが発生しました。ページを再読み込みしてお試しください。');
             })
             .finally(function() {
                 self.state.isLoading = false;
@@ -2289,7 +2303,10 @@
             method: 'POST',
             body: formData
         })
-        .then(function(response) { return response.json(); })
+        .then(function(response) {
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            return response.json();
+        })
         .then(function(data) {
             if (data.success && data.data.categories) {
                 var optionsContainer = document.querySelector('#sidebar-category-filter .sidebar-filter-options');
@@ -2501,7 +2518,10 @@
             body: formData,
             credentials: 'same-origin'
         })
-        .then(function(response) { return response.json(); })
+        .then(function(response) {
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            return response.json();
+        })
         .then(function(data) {
             if (data.success && data.data) {
                 container.innerHTML = data.data;

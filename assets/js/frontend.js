@@ -166,7 +166,10 @@
                     prefectures: prefectures.join(',')
                 })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) throw new Error('HTTP ' + response.status);
+                return response.json();
+            })
             .then(data => {
                 callback(null, { hasHistory: true, grants: data });
             })
@@ -488,7 +491,10 @@
                 per_page: 12
             })
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 grid.innerHTML = data.data.html;

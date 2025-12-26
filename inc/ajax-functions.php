@@ -3957,11 +3957,15 @@ function gi_ajax_load_grants() {
             error_log('gi_ajax_load_grants called with: ' . print_r($_POST, true));
         }
         
-        // nonceチェック
-        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'gi_ajax_nonce')) {
-            wp_send_json_error(['message' => 'セキュリティチェックに失敗しました', 'code' => 'SECURITY_ERROR']);
-            return;
-        }
+        // 【重要】nonce検証をスキップ（読み取り専用操作のため）
+        // 理由: LiteSpeed Cache等でページがキャッシュされると、nonceが古くなり検証に失敗する
+        // この関数は公開データの読み取りのみを行い、書き込み操作は行わないため、
+        // セキュリティリスクは限定的
+        // 
+        // 将来的な改善案:
+        // 1. ESI（Edge Side Include）でnonce部分をキャッシュ除外
+        // 2. REST APIに移行し、認証方式を変更
+        // 3. Cookie認証を使用
 
     // ===== パラメータ取得と検証 =====
     $search = sanitize_text_field($_POST['search'] ?? '');
