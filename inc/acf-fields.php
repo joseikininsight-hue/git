@@ -666,9 +666,13 @@ add_filter('acf/load_field/name=adoption_rate', function($field) {
 });
 
 /**
- * 投稿保存時の自動処理（新規フィールド対応）
+ * 投稿保存時の自動処理（無限ループ防止対策済み v11.0.8）
+ * 
+ * 【重要】ACFの update_field() は内部で save_post をトリガーするため、
+ * フックを一時的に解除しないと「保存→更新→保存→更新...」という
+ * 無限ループが発生し、1GBを超えるメモリを消費してクラッシュする。
  */
-add_action('save_post', function($post_id) {
+function gi_handle_grant_save_post($post_id) {
     // 助成金投稿タイプのみ対象
     if (get_post_type($post_id) !== 'grant') {
         return;
@@ -677,43 +681,62 @@ add_action('save_post', function($post_id) {
     // 自動保存、リビジョンをスキップ
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
     if (wp_is_post_revision($post_id)) return;
-    
-    // 最終更新日を自動設定
-    $last_updated = get_field('last_updated', $post_id);
-    if (empty($last_updated)) {
-        update_field('last_updated', current_time('Y-m-d H:i:s'), $post_id);
+
+    // 【重要】無限ループ防止のため、一時的にこのフックを解除
+    remove_action('save_post', 'gi_handle_grant_save_post');
+
+    try {
+        // 最終更新日を自動設定
+        $last_updated = get_field('last_updated', $post_id);
+        if (empty($last_updated)) {
+            update_field('last_updated', current_time('Y-m-d H:i:s'), $post_id);
+        }
+        
+        // 数値金額から表示用金額を自動生成（表示用が空の場合）
+        $max_amount = get_field('max_amount', $post_id);
+        $max_amount_numeric = get_field('max_amount_numeric', $post_id);
+        
+        if (empty($max_amount) && !empty($max_amount_numeric)) {
+            // gi_format_amount_unified関数が存在するかチェック
+            if (function_exists('gi_format_amount_unified')) {
+                $formatted_amount = gi_format_amount_unified($max_amount_numeric);
+                update_field('max_amount', $formatted_amount, $post_id);
+            }
+        }
+        
+        // 採択率の検証（0-100の範囲内に制限）
+        $adoption_rate = get_field('adoption_rate', $post_id);
+        if (!empty($adoption_rate)) {
+            $adoption_rate = max(0, min(100, intval($adoption_rate)));
+            update_field('adoption_rate', $adoption_rate, $post_id);
+        }
+        
+        // 新規フィールドのデフォルト値設定
+        if (empty(get_field('difficulty_level', $post_id))) {
+            update_field('difficulty_level', '中級', $post_id);
+        }
+        
+        // 完全連携対応：タクソノミーを優先し、重複ACFフィールドは削除
+        // 都道府県・市町村はタクソノミーで管理（ACFフィールド不要）
+        delete_field('prefecture_name', $post_id);
+        delete_field('target_prefecture', $post_id); 
+        delete_field('target_municipality', $post_id);
+        
+        // Google Sheets同期用のシート更新日を設定
+        update_field('sheet_updated', current_time('Y-m-d H:i:s'), $post_id);
+
+    } catch (Exception $e) {
+        // エラーログ記録
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('Grant Save Error: ' . $e->getMessage());
+        }
     }
-    
-    // 数値金額から表示用金額を自動生成（表示用が空の場合）
-    $max_amount = get_field('max_amount', $post_id);
-    $max_amount_numeric = get_field('max_amount_numeric', $post_id);
-    
-    if (empty($max_amount) && !empty($max_amount_numeric)) {
-        $formatted_amount = gi_format_amount_unified($max_amount_numeric);
-        update_field('max_amount', $formatted_amount, $post_id);
-    }
-    
-    // 採択率の検証（0-100の範囲内に制限）
-    $adoption_rate = get_field('adoption_rate', $post_id);
-    if (!empty($adoption_rate)) {
-        $adoption_rate = max(0, min(100, intval($adoption_rate)));
-        update_field('adoption_rate', $adoption_rate, $post_id);
-    }
-    
-    // 新規フィールドのデフォルト値設定
-    if (empty(get_field('difficulty_level', $post_id))) {
-        update_field('difficulty_level', '中級', $post_id);
-    }
-    
-    // 完全連携対応：タクソノミーを優先し、重複ACFフィールドは削除
-    // 都道府県・市町村はタクソノミーで管理（ACFフィールド不要）
-    delete_field('prefecture_name', $post_id);
-    delete_field('target_prefecture', $post_id); 
-    delete_field('target_municipality', $post_id);
-    
-    // Google Sheets同期用のシート更新日を設定
-    update_field('sheet_updated', current_time('Y-m-d H:i:s'), $post_id);
-});
+
+    // 【重要】処理完了後にフックを戻す
+    add_action('save_post', 'gi_handle_grant_save_post');
+}
+// 匿名関数ではなく名前付き関数として登録（remove_actionできるようにするため）
+add_action('save_post', 'gi_handle_grant_save_post');
 
 /**
  * 都道府県コードから名前を取得するヘルパー関数
