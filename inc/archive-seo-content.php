@@ -6,7 +6,15 @@
  * 管理画面から個別にSEOコンテンツ（イントロ/アウトロ）を編集・追加するシステム
  * 
  * @package Grant_Insight_Perfect
- * @version 3.3.0
+ * @version 3.4.0
+ * 
+ * v3.4.0 Changes:
+ * - タイムアウト対策（徹底版）
+ * - get_terms() を直接SQLに置き換え（高速化）
+ * - get_term_link() の呼び出しを廃止（URL文字列結合に変更）
+ * - キャッシュ時間を24時間に延長
+ * - gi_get_archive_seo_stats() をSQL集計に最適化
+ * - テーブル存在確認を追加
  * 
  * v3.3.0 Changes:
  * - PV取得処理の軽量化（タイムアウト対策）
@@ -649,14 +657,24 @@ function gi_ajax_archive_seo_get_pages() {
     $order = isset($_POST['order']) ? sanitize_text_field($_POST['order']) : 'asc';
     $search = isset($_POST['search']) ? sanitize_text_field($_POST['search']) : '';
     
-    // 保存済みコンテンツを取得
-    $saved_contents = $wpdb->get_results(
-        "SELECT * FROM {$table_name}",
-        ARRAY_A
-    );
+    // 保存済みコンテンツを取得（テーブル存在確認付き）
     $saved_map = array();
-    foreach ($saved_contents as $content) {
-        $saved_map[$content['archive_type'] . ':' . $content['archive_key']] = $content;
+    $table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$table_name}'") === $table_name;
+    
+    if ($table_exists) {
+        // 必要な列のみ取得（軽量化）
+        $saved_contents = $wpdb->get_results(
+            "SELECT archive_type, archive_key, page_title, intro_content, outro_content, 
+                    featured_posts, is_noindex, merge_target 
+             FROM {$table_name}",
+            ARRAY_A
+        );
+        
+        if ($saved_contents) {
+            foreach ($saved_contents as $content) {
+                $saved_map[$content['archive_type'] . ':' . $content['archive_key']] = $content;
+            }
+        }
     }
     
     // 利用可能なアーカイブページを取得（キャッシュ使用）
@@ -758,59 +776,77 @@ function gi_get_archive_seo_stats() {
     global $wpdb;
     $table_name = $wpdb->prefix . 'gi_archive_seo_content';
     
-    // キャッシュから取得
-    $cache_key = 'gi_archive_seo_stats';
+    // キャッシュから取得（1時間）
+    $cache_key = 'gi_archive_seo_stats_v2';
     $cached = get_transient($cache_key);
     if ($cached !== false) {
         return $cached;
     }
     
+    // 【最適化】ページ一覧のキャッシュを使用
     $all_pages = gi_get_available_archive_pages_cached();
+    $total_count = count($all_pages);
     
-    $saved_contents = $wpdb->get_results(
-        "SELECT archive_type, archive_key, intro_content, outro_content, featured_posts, is_noindex, merge_target FROM {$table_name}",
-        ARRAY_A
+    // テーブルが存在するか確認
+    $table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$table_name}'") === $table_name;
+    
+    if (!$table_exists) {
+        // テーブルがない場合は簡易統計を返す
+        $merge_candidates = 0;
+        foreach ($all_pages as $page) {
+            if (isset($page['post_count']) && $page['post_count'] <= 100 && $page['post_count'] > 0) {
+                $merge_candidates++;
+            }
+        }
+        
+        $stats = array(
+            'total' => $total_count,
+            'configured' => 0,
+            'unconfigured' => $total_count,
+            'merge_candidates' => $merge_candidates,
+            'noindex' => 0,
+            'merged' => 0
+        );
+        
+        set_transient($cache_key, $stats, HOUR_IN_SECONDS);
+        return $stats;
+    }
+    
+    // 【最適化】SQLで直接集計（PHPループを避ける）
+    $configured_count = (int)$wpdb->get_var(
+        "SELECT COUNT(*) FROM {$table_name} 
+         WHERE (intro_content IS NOT NULL AND intro_content != '') 
+            OR (outro_content IS NOT NULL AND outro_content != '') 
+            OR (featured_posts IS NOT NULL AND featured_posts != '')"
     );
-    $saved_map = array();
-    foreach ($saved_contents as $content) {
-        $saved_map[$content['archive_type'] . ':' . $content['archive_key']] = $content;
+    
+    $noindex_count = (int)$wpdb->get_var(
+        "SELECT COUNT(*) FROM {$table_name} WHERE is_noindex = 1"
+    );
+    
+    $merged_count = (int)$wpdb->get_var(
+        "SELECT COUNT(*) FROM {$table_name} WHERE merge_target IS NOT NULL AND merge_target != ''"
+    );
+    
+    // 統合候補（100件以下）のカウント
+    $merge_candidates = 0;
+    foreach ($all_pages as $page) {
+        if (isset($page['post_count']) && $page['post_count'] <= 100 && $page['post_count'] > 0) {
+            $merge_candidates++;
+        }
     }
     
     $stats = array(
-        'total' => count($all_pages),
-        'configured' => 0,
-        'unconfigured' => 0,
-        'merge_candidates' => 0,
-        'noindex' => 0,
-        'merged' => 0
+        'total' => $total_count,
+        'configured' => $configured_count,
+        'unconfigured' => $total_count - $configured_count,
+        'merge_candidates' => $merge_candidates,
+        'noindex' => $noindex_count,
+        'merged' => $merged_count
     );
     
-    foreach ($all_pages as $page) {
-        $key = $page['type'] . ':' . $page['key'];
-        $saved = isset($saved_map[$key]) ? $saved_map[$key] : null;
-        $has_content = $saved && ($saved['intro_content'] || $saved['outro_content'] || $saved['featured_posts']);
-        
-        if ($has_content) {
-            $stats['configured']++;
-        } else {
-            $stats['unconfigured']++;
-        }
-        
-        if (isset($page['post_count']) && $page['post_count'] <= 100 && $page['post_count'] > 0) {
-            $stats['merge_candidates']++;
-        }
-        
-        if ($saved && !empty($saved['is_noindex'])) {
-            $stats['noindex']++;
-        }
-        
-        if ($saved && !empty($saved['merge_target'])) {
-            $stats['merged']++;
-        }
-    }
-    
-    // 5分キャッシュ
-    set_transient($cache_key, $stats, 5 * MINUTE_IN_SECONDS);
+    // 1時間キャッシュ
+    set_transient($cache_key, $stats, HOUR_IN_SECONDS);
     
     return $stats;
 }
@@ -823,8 +859,8 @@ function gi_get_archive_seo_stats() {
  */
 
 function gi_get_available_archive_pages_cached() {
-    // キャッシュ時間を長めに設定（1時間）
-    $cache_key = 'gi_archive_pages_list_v2'; 
+    // キャッシュ時間を長めに設定（24時間）
+    $cache_key = 'gi_archive_pages_list_v3'; 
     $cached = get_transient($cache_key);
     
     if ($cached !== false) {
@@ -833,36 +869,51 @@ function gi_get_available_archive_pages_cached() {
     
     $pages = gi_get_available_archive_pages();
     
-    set_transient($cache_key, $pages, HOUR_IN_SECONDS);
+    set_transient($cache_key, $pages, DAY_IN_SECONDS);
     
     return $pages;
 }
 
 /**
+ * キャッシュをクリアする関数
+ */
+function gi_clear_archive_pages_cache() {
+    delete_transient('gi_archive_pages_list_v3');
+    delete_transient('gi_archive_seo_stats');
+}
+
+/**
  * アーカイブページ一覧を取得
  * 
- * 【修正 v11.0.12】タイムアウト対策
+ * 【修正 v11.0.13】タイムアウト対策（徹底版）
  * - PV数のリアルタイム取得を停止（N+1問題の解消）
- * - pv_count は常に0を返す（必要なら別途バッチ処理で更新）
+ * - get_term_link() の呼び出しを廃止（URLは遅延生成）
+ * - 直接SQLクエリで高速にターム情報を取得
+ * - pv_count は常に0を返す
  */
 function gi_get_available_archive_pages() {
+    global $wpdb;
+    
     $pages = array();
     
     // 投稿タイプアーカイブ
     $total_grants = wp_count_posts('grant');
     $total_grants_count = isset($total_grants->publish) ? $total_grants->publish : 0;
     
+    // URLは後から生成するため、ここでは空文字
+    $grant_archive_url = get_post_type_archive_link('grant');
+    
     $pages[] = array(
         'type' => 'post_type_archive',
         'key' => 'grant',
         'name' => '助成金・補助金一覧（メイン）',
         'type_label' => '投稿タイプ',
-        'url' => get_post_type_archive_link('grant'),
+        'url' => $grant_archive_url ? $grant_archive_url : home_url('/grant/'),
         'post_count' => $total_grants_count,
-        'pv_count' => 0, // 【修正】タイムアウト防止のためPV取得を停止
+        'pv_count' => 0,
     );
     
-    // 各タクソノミー
+    // 各タクソノミー - 直接SQLで高速に取得
     $taxonomies = array(
         'grant_prefecture' => '都道府県',
         'grant_category' => 'カテゴリ',
@@ -872,30 +923,43 @@ function gi_get_available_archive_pages() {
     );
     
     foreach ($taxonomies as $taxonomy => $label) {
+        // タクソノミーが存在しない場合はスキップ
         if (!taxonomy_exists($taxonomy)) continue;
         
-        $terms = get_terms(array(
-            'taxonomy' => $taxonomy,
-            'hide_empty' => false,
+        // 直接SQLでターム情報を取得（get_terms より高速）
+        $terms_data = $wpdb->get_results($wpdb->prepare(
+            "SELECT t.term_id, t.name, t.slug, tt.count, tt.description
+             FROM {$wpdb->terms} t
+             INNER JOIN {$wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
+             WHERE tt.taxonomy = %s
+             ORDER BY t.name ASC",
+            $taxonomy
         ));
         
-        if (!is_wp_error($terms)) {
-            foreach ($terms as $term) {
-                $term_link = get_term_link($term);
-                if (is_wp_error($term_link)) continue;
-                
-                $pages[] = array(
-                    'type' => $taxonomy,
-                    'key' => $term->slug,
-                    'name' => $term->name . 'の助成金・補助金',
-                    'type_label' => $label,
-                    'url' => $term_link,
-                    'post_count' => $term->count,
-                    'pv_count' => 0, // 【修正】タイムアウト防止のためPV取得を停止
-                    'term_id' => $term->term_id,
-                    'description' => $term->description,
-                );
-            }
+        if (empty($terms_data)) continue;
+        
+        // タクソノミーのベースURLを取得（1回だけ）
+        $taxonomy_obj = get_taxonomy($taxonomy);
+        $taxonomy_slug = $taxonomy_obj && isset($taxonomy_obj->rewrite['slug']) 
+            ? $taxonomy_obj->rewrite['slug'] 
+            : $taxonomy;
+        $base_url = home_url('/' . $taxonomy_slug . '/');
+        
+        foreach ($terms_data as $term) {
+            // URLは単純な文字列結合で生成（get_term_link を使わない）
+            $term_url = $base_url . $term->slug . '/';
+            
+            $pages[] = array(
+                'type' => $taxonomy,
+                'key' => $term->slug,
+                'name' => $term->name . 'の助成金・補助金',
+                'type_label' => $label,
+                'url' => $term_url,
+                'post_count' => (int)$term->count,
+                'pv_count' => 0,
+                'term_id' => (int)$term->term_id,
+                'description' => $term->description,
+            );
         }
     }
     
