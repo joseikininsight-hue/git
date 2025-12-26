@@ -285,11 +285,7 @@ $header_js_version = file_exists($header_js_path) ? filemtime($header_js_path) :
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-    
-    <!-- Google AdSense AMP Auto Ads -->
-    <script async custom-element="amp-auto-ads"
-            src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
-    </script>
+
     
     <!-- LiteSpeed Cache Optimization Hints -->
     <meta name="litespeed-cache" content="cache-control: max-age=3600">
