@@ -65,7 +65,8 @@ class GI_Performance_Optimizer {
         */
         
         // サードパーティスクリプト最適化
-        add_action('wp_footer', [$this, 'lazy_load_third_party_scripts'], 1);
+        // AdSense自動広告の表示を妨げるため無効化 (2024/12 - Issue: lazy loading delays AdSense)
+        // add_action('wp_footer', [$this, 'lazy_load_third_party_scripts'], 1);
         
         // カスタム画像サイズ
         add_action('after_setup_theme', [$this, 'custom_image_sizes']);
@@ -1307,7 +1308,9 @@ function gi_add_resource_hints() {
     // DNS Prefetch for less critical origins
     $dns_prefetch_origins = array(
         '//www.google-analytics.com',
-        // REMOVED: pagead2.googlesyndication.com - not using AdSense, causes unnecessary DNS lookup
+        '//pagead2.googlesyndication.com',
+        '//googleads.g.doubleclick.net',
+        '//tpc.googlesyndication.com',
     );
     
     foreach ($dns_prefetch_origins as $origin) {

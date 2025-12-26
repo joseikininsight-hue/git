@@ -6133,6 +6133,34 @@ ul, ol {
     line-height: 1.6;
 }
 
+/* 申請難易度ボックス */
+.gi-details-difficulty-box {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--gi-gray-200);
+}
+
+.gi-details-difficulty-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--gi-navy);
+    margin: 4px 0;
+}
+
+.gi-details-difficulty-stars {
+    display: flex;
+    gap: 2px;
+}
+
+.gi-details-star {
+    font-size: 14px;
+    color: #d1d5db;
+}
+
+.gi-details-star.active {
+    color: #f59e0b;
+}
+
 /* 対象要件・申請要件の2カラム（1:2比率） */
 .gi-details-requirements-grid {
     display: grid;

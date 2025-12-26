@@ -178,27 +178,28 @@ $schema_data = array(
         <div class="yahoo-main-content zukan-main-content">
             
             <?php 
-            // アーカイブSEOコンテンツ: イントロ（01傾向と対策）を先に表示
-            if (function_exists('gi_output_archive_intro_content')) {
-                gi_output_archive_intro_content();
-            }
-            
-            // アーカイブSEOコンテンツ: おすすめ記事（02編集部選定）
+            // アーカイブSEOコンテンツ: おすすめ記事（01編集部選定）
             if (function_exists('gi_output_archive_featured_posts')) {
                 gi_output_archive_featured_posts();
             }
             ?>
             
             <!-- 統合された検索結果ヘッダー -->
-            <section class="editors-pick-section results-header" id="list">
-                <div class="editors-pick-header">
-                    <div class="flex items-center">
-                        <span class="editors-pick-number">03</span>
-                        <div class="editors-pick-title-wrap">
-                            <h2>#<?php echo esc_html($tag_name); ?>の補助金図鑑一覧</h2>
+            <section class="gi-section" id="list">
+                <header class="gi-section-numbered-header">
+                    <div class="gi-section-number-box">
+                        <div class="gi-section-number-inner">
+                            <span class="gi-section-number-label">Section</span>
+                            <span class="gi-section-number-value">02</span>
                         </div>
                     </div>
-                </div>
+                    <div class="gi-section-title-box">
+                        <svg class="gi-section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                        <h2 class="gi-section-title">#<?php echo esc_html($tag_name); ?>の補助金図鑑一覧</h2>
+                        <span class="gi-section-en">Grant Archive</span>
+                    </div>
+                </header>
+                <div class="gi-section-body">
                 <?php
                 // ページネーション用の件数計算
                 $current_page = get_query_var('paged') ? get_query_var('paged') : 1;
@@ -233,6 +234,7 @@ $schema_data = array(
                             ?>
                         </select>
                     </div>
+                </div>
                 </div>
             </section>
 
@@ -409,8 +411,13 @@ $schema_data = array(
                 </div>
             </section>
             
-            <?php 
-            // アーカイブSEOコンテンツ: アウトロ
+            <?php
+            // アーカイブSEOコンテンツ: イントロ（03傾向と対策）
+            if (function_exists('gi_output_archive_intro_content')) {
+                gi_output_archive_intro_content();
+            }
+            
+            // アーカイブSEOコンテンツ: アウトロ（04申請のまとめ）
             if (function_exists('gi_output_archive_outro_content')) {
                 gi_output_archive_outro_content();
             }
@@ -495,7 +502,6 @@ $js_uri = get_template_directory_uri() . '/assets/js/archive-common.js';
 document.addEventListener('DOMContentLoaded', function() {
     if (typeof ArchiveCommon !== 'undefined') {
         ArchiveCommon.init({
-            ajaxUrl
             ajaxUrl: '<?php echo admin_url("admin-ajax.php"); ?>',
             nonce: '<?php echo wp_create_nonce("gi_ajax_nonce"); ?>',
             postType: 'grant',
@@ -512,11 +518,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
-        
-        // モバイルフィルターの初期化
-        if (typeof ArchiveCommon.initMobileFilter === 'function') {
-            ArchiveCommon.initMobileFilter();
-        }
 </script>
 
 <?php get_footer(); ?>

@@ -271,6 +271,39 @@ class JI_Affiliate_Ad_Manager {
                 ADD COLUMN button_text varchar(100) DEFAULT '詳しく見る' AFTER description"
             );
         }
+        
+        // adsense_client_id カラムを追加（AdSense広告用）
+        $adsense_client_id_column = $wpdb->get_results(
+            "SHOW COLUMNS FROM {$this->table_name_ads} LIKE 'adsense_client_id'"
+        );
+        if (empty($adsense_client_id_column)) {
+            $wpdb->query(
+                "ALTER TABLE {$this->table_name_ads} 
+                ADD COLUMN adsense_client_id varchar(100) DEFAULT '' AFTER button_text"
+            );
+        }
+        
+        // adsense_slot_id カラムを追加（AdSense広告用）
+        $adsense_slot_id_column = $wpdb->get_results(
+            "SHOW COLUMNS FROM {$this->table_name_ads} LIKE 'adsense_slot_id'"
+        );
+        if (empty($adsense_slot_id_column)) {
+            $wpdb->query(
+                "ALTER TABLE {$this->table_name_ads} 
+                ADD COLUMN adsense_slot_id varchar(100) DEFAULT '' AFTER adsense_client_id"
+            );
+        }
+        
+        // adsense_format カラムを追加（AdSense広告用）
+        $adsense_format_column = $wpdb->get_results(
+            "SHOW COLUMNS FROM {$this->table_name_ads} LIKE 'adsense_format'"
+        );
+        if (empty($adsense_format_column)) {
+            $wpdb->query(
+                "ALTER TABLE {$this->table_name_ads} 
+                ADD COLUMN adsense_format varchar(50) DEFAULT 'auto' AFTER adsense_slot_id"
+            );
+        }
     }
     
     /**
@@ -481,7 +514,8 @@ class JI_Affiliate_Ad_Manager {
                 'html': 'HTMLコードをそのまま入力',
                 'image': '画像URLを入力（リンクURLも設定可）',
                 'script': 'アフィリエイトタグなどのスクリプトコードを入力',
-                'article': '商品画像・説明文・CTAボタン付きの記事型広告'
+                'article': '商品画像・説明文・CTAボタン付きの記事型広告',
+                'adsense': 'Google AdSense広告コード（クライアントID・スロットIDを入力）'
             };
             
             // 広告タイプ切り替え
@@ -492,15 +526,33 @@ class JI_Affiliate_Ad_Manager {
                 if (adType === 'article') {
                     $('.ad-field-standard').hide();
                     $('.ad-field-article').show();
+                    $('.ad-field-adsense').hide();
                     $('#content').removeAttr('required');
+                    $('#link_url').attr('required', 'required');
                     $('#image_url').attr('required', 'required');
                     $('#description').attr('required', 'required');
+                    $('#adsense_client_id').removeAttr('required');
+                    $('#adsense_slot_id').removeAttr('required');
+                } else if (adType === 'adsense') {
+                    $('.ad-field-standard').hide();
+                    $('.ad-field-article').hide();
+                    $('.ad-field-adsense').show();
+                    $('#content').removeAttr('required');
+                    $('#link_url').removeAttr('required');
+                    $('#image_url').removeAttr('required');
+                    $('#description').removeAttr('required');
+                    $('#adsense_client_id').attr('required', 'required');
+                    $('#adsense_slot_id').attr('required', 'required');
                 } else {
                     $('.ad-field-standard').show();
                     $('.ad-field-article').hide();
+                    $('.ad-field-adsense').hide();
                     $('#content').attr('required', 'required');
+                    $('#link_url').removeAttr('required');
                     $('#image_url').removeAttr('required');
                     $('#description').removeAttr('required');
+                    $('#adsense_client_id').removeAttr('required');
+                    $('#adsense_slot_id').removeAttr('required');
                 }
             }
             
@@ -595,6 +647,11 @@ class JI_Affiliate_Ad_Manager {
                             if (ad.features) $('#features').val(ad.features);
                             if (ad.price_info) $('#price_info').val(ad.price_info);
                             if (ad.button_text) $('#button_text').val(ad.button_text);
+                            
+                            // AdSenseフィールド
+                            if (ad.adsense_client_id) $('#adsense_client_id').val(ad.adsense_client_id);
+                            if (ad.adsense_slot_id) $('#adsense_slot_id').val(ad.adsense_slot_id);
+                            if (ad.adsense_format) $('#adsense_format').val(ad.adsense_format);
                             
                             // 複数選択の配置位置
                             if (ad.positions_array && ad.positions_array.length > 0) {
@@ -738,7 +795,7 @@ class JI_Affiliate_Ad_Manager {
                                 <td><strong><?php echo esc_html($ad->title); ?></strong></td>
                                 <td>
                                     <?php 
-                                    $types = array('html' => 'HTML', 'image' => '画像', 'script' => 'スクリプト');
+                                    $types = array('html' => 'HTML', 'image' => '画像', 'script' => 'スクリプト', 'article' => '記事型', 'adsense' => 'AdSense');
                                     echo esc_html($types[$ad->ad_type] ?? $ad->ad_type);
                                     ?>
                                 </td>
@@ -814,6 +871,7 @@ class JI_Affiliate_Ad_Manager {
                                     <option value="image">画像バナー</option>
                                     <option value="script">スクリプト</option>
                                     <option value="article">記事型広告（商品紹介）</option>
+                                    <option value="adsense">Google AdSense</option>
                                 </select>
                                 <p class="description" id="ad_type_help">HTMLコードをそのまま入力</p>
                             </td>
@@ -879,9 +937,42 @@ class JI_Affiliate_Ad_Manager {
                             </td>
                         </tr>
                         
+                        <!-- AdSense広告用フィールド -->
+                        <tr class="ad-field-adsense" style="display: none;">
+                            <th><label for="adsense_client_id">AdSenseクライアントID <span class="required">*</span></label></th>
+                            <td>
+                                <input type="text" name="adsense_client_id" id="adsense_client_id" class="regular-text" placeholder="ca-pub-1234567890123456">
+                                <p class="description">例: ca-pub-1430655994298384</p>
+                            </td>
+                        </tr>
+                        
+                        <tr class="ad-field-adsense" style="display: none;">
+                            <th><label for="adsense_slot_id">AdSenseスロットID <span class="required">*</span></label></th>
+                            <td>
+                                <input type="text" name="adsense_slot_id" id="adsense_slot_id" class="regular-text" placeholder="1234567890">
+                                <p class="description">例: 4870183643</p>
+                            </td>
+                        </tr>
+                        
+                        <tr class="ad-field-adsense" style="display: none;">
+                            <th><label for="adsense_format">広告フォーマット</label></th>
+                            <td>
+                                <select name="adsense_format" id="adsense_format">
+                                    <option value="auto">自動（レスポンシブ）</option>
+                                    <option value="rectangle">レクタングル</option>
+                                    <option value="horizontal">横長バナー</option>
+                                    <option value="vertical">縦長バナー</option>
+                                </select>
+                                <p class="description">通常は「自動（レスポンシブ）」を推奨</p>
+                            </td>
+                        </tr>
+                        
                         <tr>
-                            <th><label for="link_url">リンクURL <span class="required">*</span></label></th>
-                            <td><input type="url" name="link_url" id="link_url" class="regular-text" placeholder="https://example.com/affiliate-link"></td>
+                            <th><label for="link_url">リンクURL</label></th>
+                            <td>
+                                <input type="url" name="link_url" id="link_url" class="regular-text" placeholder="https://example.com/affiliate-link">
+                                <p class="description">※AdSenseタイプの場合は不要（自動設定されます）</p>
+                            </td>
                         </tr>
                         
                         <tr>
@@ -1561,6 +1652,9 @@ class JI_Affiliate_Ad_Manager {
             'image_url' => esc_url_raw($_POST['image_url'] ?? ''),
             'description' => sanitize_textarea_field($_POST['description'] ?? ''),
             'button_text' => sanitize_text_field($_POST['button_text'] ?? '詳しく見る'),
+            'adsense_client_id' => sanitize_text_field($_POST['adsense_client_id'] ?? ''),
+            'adsense_slot_id' => sanitize_text_field($_POST['adsense_slot_id'] ?? ''),
+            'adsense_format' => sanitize_text_field($_POST['adsense_format'] ?? 'auto'),
             'positions' => $positions_string,
             'target_pages' => $target_pages_string,
             'target_categories' => $target_categories_string,
@@ -1934,6 +2028,33 @@ class JI_Affiliate_Ad_Manager {
                         </a>
                     </div>
                 </article>
+            <?php elseif ($ad->ad_type === 'adsense'): ?>
+                <?php
+                // AdSense広告の表示
+                $client_id = esc_attr($ad->adsense_client_id);
+                $slot_id = esc_attr($ad->adsense_slot_id);
+                $format = esc_attr($ad->adsense_format ?? 'auto');
+                
+                // フォーマットに応じたdata-ad-format値を設定
+                $ad_format_attr = 'auto';
+                if ($format === 'rectangle') {
+                    $ad_format_attr = 'rectangle';
+                } elseif ($format === 'horizontal') {
+                    $ad_format_attr = 'horizontal';
+                } elseif ($format === 'vertical') {
+                    $ad_format_attr = 'vertical';
+                }
+                ?>
+                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=<?php echo $client_id; ?>" crossorigin="anonymous"></script>
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="<?php echo $client_id; ?>"
+                     data-ad-slot="<?php echo $slot_id; ?>"
+                     data-ad-format="<?php echo $ad_format_attr; ?>"
+                     data-full-width-responsive="true"></ins>
+                <script>
+                     (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
             <?php endif; ?>
         </div>
         

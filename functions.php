@@ -8,7 +8,7 @@
  * - Eliminated folder over-organization
  * 
  * @package Grant_Insight_Perfect
- * @version 11.0.2 (SEO Duplicate Meta Fix)
+ * @version 11.0.8 (Memory Optimization - Conditional Loading)
  * 
  * Changelog v11.0.2:
  * - Disabled gi_add_seo_meta_tags to prevent duplicate meta tags (header.php handles this)
@@ -39,21 +39,21 @@ if (!defined('ABSPATH')) {
 
 // テーマバージョン定数
 if (!defined('GI_THEME_VERSION')) {
-    define('GI_THEME_VERSION', '11.0.2');
+    define('GI_THEME_VERSION', '11.0.9');
 }
 if (!defined('GI_THEME_PREFIX')) {
     define('GI_THEME_PREFIX', 'gi_');
 }
 
-// 🔧 MEMORY OPTIMIZATION
+// 🔧 MEMORY OPTIMIZATION v11.0.8
+// Admin area: 512MB, Frontend: 256MB
+@ini_set('memory_limit', is_admin() ? '512M' : '256M');
+
 if (is_admin() && !wp_doing_ajax()) {
-    @ini_set('memory_limit', '256M');
-    
     add_action('init', function() {
         if (!defined('WP_POST_REVISIONS')) {
             define('WP_POST_REVISIONS', 3);
         }
-        
         if (!defined('AUTOSAVE_INTERVAL')) {
             define('AUTOSAVE_INTERVAL', 300);
         }
@@ -168,23 +168,31 @@ function gi_optimize_taxonomy_archive_titles($title_parts) {
     $term_name = $queried_object->name;
     $term_count = $queried_object->count;
     $current_year = date('Y');
+    $japanese_year = $current_year - 2018; // 令和年号
     
     // タクソノミーに応じたタイトル生成
     if (is_tax('grant_prefecture')) {
-        // 都道府県アーカイブ
-        $title_parts['title'] = $term_name . '補助金一覧【' . $current_year . '年度最新版】全' . number_format($term_count) . '件';
+        // 都道府県アーカイブ - 「の」を明示的に追加
+        $title_parts['title'] = $term_name . 'の補助金・助成金一覧【令和' . $japanese_year . '年度最新】' . number_format($term_count) . '件掲載';
     } elseif (is_tax('grant_municipality')) {
-        // 市町村アーカイブ
-        $title_parts['title'] = $term_name . '補助金一覧【' . $current_year . '年度最新版】全' . number_format($term_count) . '件';
+        // 市町村アーカイブ - 「の」を明示的に追加
+        $title_parts['title'] = $term_name . 'の補助金・助成金一覧【' . $current_year . '年版】' . number_format($term_count) . '制度完全網羅';
     } elseif (is_tax('grant_category')) {
         // カテゴリアーカイブ
-        $title_parts['title'] = $term_name . '補助金一覧【' . $current_year . '年度最新版】全' . number_format($term_count) . '件';
+        $title_parts['title'] = $term_name . '向け補助金・助成金【' . $current_year . '年最新】' . number_format($term_count) . '件｜採択率UP';
     } elseif (is_tax('grant_purpose')) {
-        // 目的別アーカイブ
-        $title_parts['title'] = $term_name . '向け補助金一覧【' . $current_year . '年度】' . number_format($term_count) . '件';
+        // 目的別アーカイブ - 「の」を明示的に追加
+        $title_parts['title'] = $term_name . 'の補助金・助成金【令和' . $japanese_year . '年度】' . number_format($term_count) . '制度詳細解説';
     } elseif (is_tax('grant_tag')) {
-        // タグアーカイブ
-        $title_parts['title'] = $term_name . '関連の補助金一覧【' . $current_year . '年度】';
+        // タグアーカイブ - 「の」を明示的に追加
+        $title_parts['title'] = '#' . $term_name . 'の補助金・助成金【' . $current_year . '年版】' . number_format($term_count) . '件掲載';
+    }
+    
+    // page_on_frontの場合にsite_titleが重複するのを防ぐ
+    // 「 - 」区切りが不要な場合は削除
+    if (isset($title_parts['site']) && isset($title_parts['title'])) {
+        // サイト名はそのまま保持
+        $title_parts['tagline'] = ''; // タグラインは削除
     }
     
     return $title_parts;
@@ -464,52 +472,111 @@ function gi_get_category_slugs_for_purpose($purpose_slug) {
 }
 
 /**
- * Load Required Include Files
+ * ============================================================================
+ * MEMORY OPTIMIZED FILE LOADING (v11.0.8)
+ * ============================================================================
+ * 
+ * Problem: Loading all inc files (~1.4MB) causes memory exhaustion
+ * Solution: Load files conditionally based on context
+ * 
+ * Core files: ~170KB - Always loaded
+ * Admin files: ~230KB - Admin only
+ * AJAX files: ~250KB - AJAX only  
+ * Heavy admin pages: ~1.1MB - Specific admin pages only
+ * Frontend: ~90KB - Frontend only
  */
 $inc_dir = get_template_directory() . '/inc/';
 
-$required_files = array(
-    // Core files
-    'theme-foundation.php',
-    'data-processing.php',
-    
-    // Admin & UI
-    'admin-functions.php',
-    'acf-fields.php',
-    'customizer-error-handler.php',
-    
-    // Core functionality
-    'card-display.php',
-    'ajax-functions.php',
-    
-    // AI Assistant Core
-    'ai-assistant-core.php',
-    
-    // Performance optimization
-    'performance-optimization.php',
-    
-    // Google Sheets integration
-    'google-sheets-integration.php',
-    'safe-sync-manager.php',
-    
-    // Dynamic CSS Generator
-    'grant-dynamic-css-generator.php',
-    
-    // Column System
-    'column-system.php',
-    
-    // Grant Amount Fixer
-    'grant-amount-fixer.php',
-);
+// Helper function to load file
+function gi_load_inc($file) {
+    $path = get_template_directory() . '/inc/' . $file;
+    if (file_exists($path)) {
+        require_once $path;
+        return true;
+    }
+    return false;
+}
 
-foreach ($required_files as $file) {
-    $file_path = $inc_dir . $file;
-    if (file_exists($file_path)) {
-        require_once $file_path;
-    } elseif (defined('WP_DEBUG') && WP_DEBUG) {
-        error_log('Grant Insight: Missing required file: ' . $file);
+// =========================================
+// CORE FILES - Always loaded (~170KB)
+// =========================================
+$core_files = array(
+    'theme-foundation.php',       // 78KB - Base theme functionality
+    'data-processing.php',        // 23KB - Data utilities
+    'card-display.php',           // 22KB - Card templates
+    'customizer-error-handler.php', // 5KB - Error handling
+    'grant-dynamic-css-generator.php', // 21KB - Dynamic CSS
+    'ai-assistant-core.php',      // 22KB - AI core (lightweight)
+);
+foreach ($core_files as $file) {
+    gi_load_inc($file);
+}
+
+// =========================================
+// ADMIN CONTEXT
+// =========================================
+if (is_admin()) {
+    // Admin base files (~80KB)
+    gi_load_inc('admin-functions.php');     // 20KB
+    gi_load_inc('acf-fields.php');          // 31KB
+    gi_load_inc('column-admin-ui.php');     // 31KB
+    gi_load_inc('column-system.php');       // 47KB
+    
+    // Heavy admin files - Load ALL for menu registration
+    // Each file registers its own menus via add_action('admin_menu', ...)
+    // Memory: ~1.2MB but required for full admin functionality
+    gi_load_inc('google-sheets-integration.php');  // 159KB
+    gi_load_inc('safe-sync-manager.php');          // Small
+    gi_load_inc('seo-content-manager.php');        // 295KB
+    gi_load_inc('archive-seo-content.php');        // 133KB
+    gi_load_inc('grant-article-creator.php');      // 111KB
+    gi_load_inc('ai-concierge.php');               // 471KB
+    
+    // Note: Menus are registered by each file's own admin_menu hook
+    // This ensures proper initialization and avoids callback issues
+}
+
+// =========================================
+// AJAX CONTEXT  
+// =========================================
+elseif (wp_doing_ajax()) {
+    gi_load_inc('ajax-functions.php');      // 227KB - AJAX handlers
+    
+    // Load AI Concierge for AI-related AJAX actions
+    $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : '';
+    $ai_actions = array('gi_ai_search', 'gi_ai_chat', 'handle_grant_ai_question', 
+                        'gi_voice_input', 'gi_generate_checklist');
+    if (in_array($action, $ai_actions)) {
+        gi_load_inc('ai-concierge.php');
+    }
+    
+    // Load Google Sheets for sync AJAX actions
+    if (strpos($action, 'gi_sheets') !== false || strpos($action, 'gi_sync') !== false) {
+        gi_load_inc('google-sheets-integration.php');
+        gi_load_inc('safe-sync-manager.php');
     }
 }
+
+// =========================================
+// FRONTEND CONTEXT
+// =========================================
+else {
+    // Frontend-only files (~90KB)
+    gi_load_inc('column-system.php');         // 47KB - Column display
+    gi_load_inc('performance-optimization.php'); // 46KB - Performance
+    
+    // Load AI Concierge only on AI pages
+    add_action('wp', function() {
+        if (is_page(array('ai-concierge', 'ai-assistant', 'ai'))) {
+            gi_load_inc('ai-concierge.php');
+        }
+    });
+}
+
+// =========================================
+// ALWAYS LOAD (small files)
+// =========================================
+gi_load_inc('grant-amount-fixer.php');  // Small utility
 
 /**
  * ============================================================================
@@ -967,75 +1034,30 @@ add_filter('script_loader_src', 'gi_remove_query_strings', 10, 1);
 
 /**
  * ============================================================================
- * ADDITIONAL INCLUDE FILES
+ * ADDITIONAL INCLUDE FILES (Conditional Loading v11.0.8)
  * ============================================================================
+ * Heavy files are loaded conditionally to prevent memory exhaustion.
+ * - SEO/AI/Archive files: Loaded via admin_menu callbacks (see above)
+ * - Ad files: Loaded on frontend only (not needed in admin)
+ * - Small utility files: Always loaded
  */
 
-// Affiliate Ad Manager System
-$affiliate_ad_file = get_template_directory() . '/inc/affiliate-ad-manager.php';
-if (file_exists($affiliate_ad_file)) {
-    require_once $affiliate_ad_file;
+// Small utility files - Always load
+gi_load_inc('grant-slug-optimizer.php');     // 64KB - URL optimization
+
+// Frontend-only ad/tracking files
+if (!is_admin() && !wp_doing_ajax()) {
+    gi_load_inc('affiliate-ad-manager.php');   // 103KB - Ad management
+    gi_load_inc('content-ad-injector.php');    // Small - Ad injection
+    gi_load_inc('access-tracking.php');        // Small - Analytics
+    gi_load_inc('adsense-optimization.php');   // 27KB - AdSense
+    gi_load_inc('critical-css-generator.php'); // Small - Critical CSS
+    gi_load_inc('image-optimization.php');     // Small - Image optimization
 }
 
-// Content Ad Injector - 記事本文中への広告自動挿入
-$content_ad_injector_file = get_template_directory() . '/inc/content-ad-injector.php';
-if (file_exists($content_ad_injector_file)) {
-    require_once $content_ad_injector_file;
-}
-
-// Access Tracking System
-$access_tracking_file = get_template_directory() . '/inc/access-tracking.php';
-if (file_exists($access_tracking_file)) {
-    require_once $access_tracking_file;
-}
-
-// SEO Content Manager
-$seo_content_manager_file = get_template_directory() . '/inc/seo-content-manager.php';
-if (file_exists($seo_content_manager_file)) {
-    require_once $seo_content_manager_file;
-}
-
-// AI補助金コンシェルジュ読み込み
-$ai_concierge_file = get_template_directory() . '/inc/ai-concierge.php';
-if (file_exists($ai_concierge_file)) {
-    require_once $ai_concierge_file;
-}
-
-// 補助金記事作成ツール読み込み
-$grant_article_creator_file = get_template_directory() . '/inc/grant-article-creator.php';
-if (file_exists($grant_article_creator_file)) {
-    require_once $grant_article_creator_file;
-}
-
-// URLスラッグ最適化システム（日本語URL → 投稿IDベースURL + 301リダイレクト）
-$grant_slug_optimizer_file = get_template_directory() . '/inc/grant-slug-optimizer.php';
-if (file_exists($grant_slug_optimizer_file)) {
-    require_once $grant_slug_optimizer_file;
-}
-
-// Phase 3: クリティカルCSS自動生成システム
-$critical_css_file = get_template_directory() . '/inc/critical-css-generator.php';
-if (file_exists($critical_css_file)) {
-    require_once $critical_css_file;
-}
-
-// Phase 3: 画像次世代フォーマット対応強化（WebP/AVIF）
-$image_optimization_file = get_template_directory() . '/inc/image-optimization.php';
-if (file_exists($image_optimization_file)) {
-    require_once $image_optimization_file;
-}
-
-// アーカイブSEOコンテンツ管理システム - 既存アーカイブページの個別編集
-$archive_seo_content_file = get_template_directory() . '/inc/archive-seo-content.php';
-if (file_exists($archive_seo_content_file)) {
-    require_once $archive_seo_content_file;
-}
-
-// AdSense 最適化モジュール - LiteSpeed Cache連携 & 手動広告挿入
-$adsense_optimization_file = get_template_directory() . '/inc/adsense-optimization.php';
-if (file_exists($adsense_optimization_file)) {
-    require_once $adsense_optimization_file;
-}
+// Note: Heavy files (seo-content-manager, ai-concierge, archive-seo-content, 
+// grant-article-creator, google-sheets-integration) are loaded via
+// admin_menu callbacks when their respective pages are accessed.
 
 /**
  * ============================================================================
@@ -1924,3 +1946,61 @@ function gi_litespeed_external_image_info() {
         }
     }
 }
+
+/**
+ * =============================================================================
+ * SEO Title Optimization - タイトルタグの最適化
+ * =============================================================================
+ */
+
+/**
+ * タイトルタグから不要なハイフンを除去
+ */
+add_filter('document_title_separator', function($sep) {
+    return '|'; // ハイフンの代わりにパイプを使用
+}, 10, 1);
+
+/**
+ * タイトルタグの最適化
+ */
+add_filter('document_title_parts', function($title) {
+    // 「地域名 - の」パターンを修正
+    if (isset($title['title'])) {
+        // 「〇〇県 - の補助金」→「〇〇県の補助金」
+        $title['title'] = preg_replace('/^(.+?)\s*-\s*の/', '$1の', $title['title']);
+        
+        // 「〇〇市 - の補助金」→「〇〇市の補助金」
+        $title['title'] = preg_replace('/^(.+?[都道府県市区町村])\s*-\s*の/', '$1の', $title['title']);
+    }
+    
+    return $title;
+}, 10, 1);
+
+/**
+ * アーカイブページタイトルの最適化（カスタムタイトル使用）
+ */
+add_filter('get_the_archive_title', function($title) {
+    // カスタムSEOタイトルがある場合は使用
+    if (function_exists('gi_get_archive_custom_title')) {
+        $custom_title = gi_get_archive_custom_title();
+        if ($custom_title) {
+            return $custom_title;
+        }
+    }
+    
+    // デフォルトタイトルの改善
+    if (is_tax()) {
+        $term = get_queried_object();
+        if ($term) {
+            // 「アーカイブ: 東京都」→「東京都」
+            return $term->name;
+        }
+    }
+    
+    if (is_post_type_archive('grant')) {
+        return '補助金・助成金一覧';
+    }
+    
+    // その他のアーカイブ
+    return preg_replace('/^(カテゴリー|タグ|アーカイブ):\s*/', '', $title);
+}, 10, 1);

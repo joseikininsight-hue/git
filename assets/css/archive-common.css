@@ -344,7 +344,7 @@ body.zukan-theme,
 /* ==========================================================================
    Results Header - 統合検索結果ヘッダー
    ========================================================================== */
-.results-header,
+/* Legacy results header - now handled by .gi-section-numbered-header */
 .zukan-results-header {
     display: flex;
     align-items: center;
@@ -3172,5 +3172,496 @@ body.mobile-filter-open {
     .mobile-filter-overlay,
     .mobile-filter-panel {
         display: none !important;
+    }
+}
+
+/* ==========================================================================
+   Section Numbered Header - 図鑑風セクションヘッダー (from single-grant.css)
+   ========================================================================== */
+
+.gi-section-numbered-header {
+    display: flex;
+    align-items: stretch;
+    border-bottom: 2px solid var(--gi-gov-navy-800);
+    margin-bottom: 24px;
+}
+
+.gi-section-number-box {
+    width: 72px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, #f8f6f1 0%, #f0ede6 100%);
+    border-right: 1px solid var(--gi-gray-200);
+    padding: 16px 0;
+}
+
+.gi-section-number-inner {
+    text-align: center;
+}
+
+.gi-section-number-label {
+    display: block;
+    font-family: var(--gi-font-mono);
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: var(--gi-gray-500);
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+
+.gi-section-number-value {
+    display: block;
+    font-family: var(--gi-font-serif);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--gi-gray-300);
+    line-height: 1;
+}
+
+.gi-section-title-box {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+}
+
+.gi-section-icon {
+    width: 24px;
+    height: 24px;
+    color: var(--gi-gov-navy-600);
+}
+
+.gi-section-title {
+    font-family: var(--gi-font-serif);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--gi-gov-navy-900);
+}
+
+.gi-section-en {
+    font-family: var(--gi-font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--gi-gov-navy-400);
+    text-transform: uppercase;
+}
+
+.gi-section-body {
+    padding: 0 32px 32px;
+}
+
+@media (max-width: 640px) {
+    .gi-section-numbered-header {
+        flex-direction: column;
+    }
+    
+    .gi-section-number-box {
+        width: 100%;
+        flex-direction: row;
+        justify-content: flex-start;
+        padding: 10px 16px;
+        gap: 8px;
+    }
+    
+    .gi-section-number-inner {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .gi-section-number-label {
+        margin-bottom: 0;
+    }
+    
+    .gi-section-number-value {
+        font-size: 22px;
+    }
+    
+    .gi-section-title-box {
+        padding: 12px 16px;
+    }
+    
+    .gi-section-body {
+        padding: 0 16px 24px;
+    }
+}
+
+/* ==========================================================================
+   Archive SEO Content - イントロ・アウトロコンテンツ
+   既存セクション（02 おすすめ、03 一覧）と調和したデザイン
+   ========================================================================== */
+
+/* イントロ・アウトロ共通ラッパー */
+.gi-archive-seo-intro-wrapper,
+.gi-archive-seo-outro-wrapper {
+    margin-bottom: 48px;
+}
+
+/* セクションヘッダー（番号+タイトル） */
+.gi-archive-seo-section-header {
+    margin-bottom: 32px;
+}
+
+.gi-archive-seo-section-header .flex {
+    display: flex;
+    align-items: center;
+}
+
+.gi-archive-seo-section-number {
+    font-size: 2rem;
+    font-family: var(--zukan-font-serif);
+    font-weight: 700;
+    color: #e5e7eb;
+    margin-right: 16px;
+}
+
+.gi-archive-seo-section-title-wrap h2 {
+    font-size: 1.5rem;
+    font-family: var(--zukan-font-serif);
+    font-weight: 700;
+    color: var(--zukan-ink-primary);
+    border-bottom: 1px solid var(--zukan-accent-gold);
+    padding-bottom: 8px;
+    margin: 0;
+}
+
+/* イントロコンテンツ（記事一覧の上部） */
+.gi-archive-seo-intro {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    padding: 32px;
+    box-shadow: var(--zukan-shadow-md);
+    font-family: var(--zukan-font-serif);
+}
+
+.gi-archive-seo-intro h2,
+.gi-archive-seo-intro h3,
+.gi-archive-seo-intro h4 {
+    font-family: var(--zukan-font-serif);
+    color: var(--zukan-ink-primary);
+    font-weight: 700;
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+
+.gi-archive-seo-intro h2 {
+    font-size: 1.5rem;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--zukan-accent-gold);
+    margin-bottom: 24px;
+}
+
+.gi-archive-seo-intro h3 {
+    font-size: 1.25rem;
+    color: var(--zukan-accent-red);
+    margin-top: 28px;
+}
+
+.gi-archive-seo-intro h4 {
+    font-size: 1.125rem;
+    color: var(--zukan-ink-secondary);
+}
+
+.gi-archive-seo-intro p {
+    font-size: 15px;
+    line-height: 1.9;
+    color: var(--zukan-ink-secondary);
+    margin-bottom: 20px;
+    text-align: justify;
+}
+
+.gi-archive-seo-intro ul,
+.gi-archive-seo-intro ol {
+    margin: 20px 0;
+    padding-left: 28px;
+}
+
+.gi-archive-seo-intro li {
+    font-size: 14px;
+    line-height: 1.9;
+    color: var(--zukan-ink-secondary);
+    margin-bottom: 12px;
+}
+
+.gi-archive-seo-intro strong {
+    color: var(--zukan-accent-red);
+    font-weight: 700;
+}
+
+.gi-archive-seo-intro a {
+    color: var(--zukan-link-blue);
+    text-decoration: none;
+    border-bottom: 1px solid var(--zukan-link-blue);
+    transition: var(--zukan-transition);
+}
+
+.gi-archive-seo-intro a:hover {
+    color: var(--zukan-accent-gold);
+    border-bottom-color: var(--zukan-accent-gold);
+}
+
+.gi-archive-seo-intro table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    font-size: 14px;
+}
+
+.gi-archive-seo-intro table th,
+.gi-archive-seo-intro table td {
+    padding: 12px;
+    border: 1px solid var(--zukan-border-color);
+    text-align: left;
+}
+
+.gi-archive-seo-intro table th {
+    background: var(--zukan-paper-shadow);
+    font-weight: 700;
+    color: var(--zukan-ink-primary);
+}
+
+.gi-archive-seo-intro table td {
+    background: #fff;
+    color: var(--zukan-ink-secondary);
+}
+
+/* アウトロコンテンツ（記事一覧の下部） */
+.gi-archive-seo-outro {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    padding: 32px;
+    box-shadow: var(--zukan-shadow-md);
+    font-family: var(--zukan-font-serif);
+}
+
+.gi-archive-seo-outro h2,
+.gi-archive-seo-outro h3,
+.gi-archive-seo-outro h4 {
+    font-family: var(--zukan-font-serif);
+    color: var(--zukan-ink-primary);
+    font-weight: 700;
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+
+.gi-archive-seo-outro h2 {
+    font-size: 1.5rem;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--zukan-accent-gold);
+    margin-bottom: 24px;
+}
+
+.gi-archive-seo-outro h3 {
+    font-size: 1.25rem;
+    color: var(--zukan-accent-red);
+    margin-top: 28px;
+}
+
+.gi-archive-seo-outro h4 {
+    font-size: 1.125rem;
+    color: var(--zukan-ink-secondary);
+}
+
+.gi-archive-seo-outro p {
+    font-size: 15px;
+    line-height: 1.9;
+    color: var(--zukan-ink-secondary);
+    margin-bottom: 20px;
+    text-align: justify;
+}
+
+.gi-archive-seo-outro ul,
+.gi-archive-seo-outro ol {
+    margin: 20px 0;
+    padding-left: 28px;
+}
+
+.gi-archive-seo-outro li {
+    font-size: 14px;
+    line-height: 1.9;
+    color: var(--zukan-ink-secondary);
+    margin-bottom: 12px;
+}
+
+.gi-archive-seo-outro strong {
+    color: var(--zukan-accent-red);
+    font-weight: 700;
+}
+
+.gi-archive-seo-outro a {
+    color: var(--zukan-link-blue);
+    text-decoration: none;
+    border-bottom: 1px solid var(--zukan-link-blue);
+    transition: var(--zukan-transition);
+}
+
+.gi-archive-seo-outro a:hover {
+    color: var(--zukan-accent-gold);
+    border-bottom-color: var(--zukan-accent-gold);
+}
+
+.gi-archive-seo-outro table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    font-size: 14px;
+}
+
+.gi-archive-seo-outro table th,
+.gi-archive-seo-outro table td {
+    padding: 12px;
+    border: 1px solid var(--zukan-border-color);
+    text-align: left;
+}
+
+.gi-archive-seo-outro table th {
+    background: var(--zukan-paper-shadow);
+    font-weight: 700;
+    color: var(--zukan-ink-primary);
+}
+
+.gi-archive-seo-outro table td {
+    background: #fff;
+    color: var(--zukan-ink-secondary);
+}
+
+/* Q&Aスタイル */
+.gi-archive-seo-outro .faq-item {
+    margin: 24px 0;
+    padding: 20px;
+    background: #f9fafb;
+    border-left: 4px solid var(--zukan-accent-gold);
+    border-radius: 4px;
+}
+
+.gi-archive-seo-outro .faq-question {
+    font-weight: 700;
+    color: var(--zukan-accent-red);
+    margin-bottom: 12px;
+    font-size: 15px;
+}
+
+.gi-archive-seo-outro .faq-answer {
+    color: var(--zukan-ink-secondary);
+    line-height: 1.9;
+    font-size: 14px;
+}
+
+/* CTA（コールトゥアクション） */
+.gi-archive-seo-cta {
+    background: linear-gradient(135deg, var(--zukan-accent-gold) 0%, #b8935a 100%);
+    color: #fff;
+    padding: 24px 32px;
+    border-radius: 4px;
+    text-align: center;
+    margin: 32px 0;
+    box-shadow: var(--zukan-shadow-lg);
+}
+
+.gi-archive-seo-cta strong {
+    display: block;
+    font-size: 18px;
+    margin-bottom: 12px;
+}
+
+.gi-archive-seo-cta a {
+    display: inline-block;
+    background: #fff;
+    color: var(--zukan-accent-gold);
+    padding: 12px 32px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 700;
+    transition: var(--zukan-transition);
+    margin-top: 16px;
+    border: none;
+}
+
+.gi-archive-seo-cta a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    .gi-archive-seo-intro,
+    .gi-archive-seo-outro {
+        padding: 20px;
+        margin-bottom: 24px;
+    }
+    
+    .gi-archive-seo-section-number {
+        font-size: 1.5rem;
+        margin-right: 12px;
+    }
+    
+    .gi-archive-seo-section-title-wrap h2 {
+        font-size: 1.25rem;
+    }
+    
+    .gi-archive-seo-intro h2,
+    .gi-archive-seo-outro h2 {
+        font-size: 1.25rem;
+    }
+    
+    .gi-archive-seo-intro h3,
+    .gi-archive-seo-outro h3 {
+        font-size: 1.125rem;
+    }
+    
+    .gi-archive-seo-intro p,
+    .gi-archive-seo-outro p {
+        font-size: 14px;
+        line-height: 1.8;
+    }
+    
+    .gi-archive-seo-cta {
+        padding: 20px;
+    }
+}
+
+/* ==========================================================================
+   Sidebar Ad CLS Prevention - 広告枠のレイアウトシフト防止
+   ========================================================================== */
+
+/* サイドバー広告枠 */
+.yahoo-sidebar .ji-affiliate-ad,
+.zukan-sidebar .ji-affiliate-ad,
+.gi-sidebar-ad {
+    min-height: 250px; /* 標準的な広告サイズ */
+    display: block;
+}
+
+/* AdSense 広告枠 */
+.yahoo-sidebar .adsbygoogle,
+.zukan-sidebar .adsbygoogle {
+    min-height: 250px;
+    display: block;
+}
+
+/* レスポンシブ広告枠 */
+.yahoo-sidebar .ad-placeholder,
+.zukan-sidebar .ad-placeholder {
+    min-height: 250px;
+    background: #f5f5f5;
+    border: 1px dashed #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 12px;
+}
+
+/* モバイル対応 */
+@media (max-width: 768px) {
+    .yahoo-sidebar .ji-affiliate-ad,
+    .zukan-sidebar .ji-affiliate-ad,
+    .gi-sidebar-ad {
+        min-height: 100px; /* モバイル用に調整 */
     }
 }
