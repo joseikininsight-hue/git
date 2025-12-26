@@ -6,7 +6,13 @@
  * 管理画面から個別にSEOコンテンツ（イントロ/アウトロ）を編集・追加するシステム
  * 
  * @package Grant_Insight_Perfect
- * @version 3.4.0
+ * @version 3.5.0
+ * 
+ * v3.5.0 Changes:
+ * - JavaScriptのエラーハンドリング強化（詳細なエラーメッセージ表示）
+ * - AJAXハンドラーのnonce検証をwp_verify_nonceに変更（詳細エラー返却）
+ * - gi_get_available_archive_pages()にtry-catch追加（フェイルセーフ）
+ * - $.postを$.ajaxに変更（タイムアウト設定、エラーハンドラー追加）
  * 
  * v3.4.0 Changes:
  * - タイムアウト対策（徹底版）
@@ -462,23 +468,43 @@ function gi_archive_seo_page() {
             $('#loading-indicator').show();
             $('#archive-table-body').html('');
             
-            $.post(ajaxurl, {
-                action: 'gi_archive_seo_get_pages',
-                nonce: nonce,
-                page: currentPage,
-                per_page: perPage,
-                filter: currentFilter,
-                sort: currentSort,
-                order: currentOrder,
-                search: searchQuery
-            }, function(response) {
-                $('#loading-indicator').hide();
-                
-                if (response.success) {
-                    renderTable(response.data.pages);
-                    renderPagination(response.data.total, response.data.pages_count);
-                } else {
-                    $('#archive-table-body').html('<tr><td colspan="8" style="text-align:center;">読み込みエラー</td></tr>');
+            $.ajax({
+                url: ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'gi_archive_seo_get_pages',
+                    nonce: nonce,
+                    page: currentPage,
+                    per_page: perPage,
+                    filter: currentFilter,
+                    sort: currentSort,
+                    order: currentOrder,
+                    search: searchQuery
+                },
+                timeout: 60000, // 60秒タイムアウト
+                success: function(response) {
+                    $('#loading-indicator').hide();
+                    
+                    if (response.success) {
+                        renderTable(response.data.pages);
+                        renderPagination(response.data.total, response.data.pages_count);
+                    } else {
+                        var errorMsg = response.data ? response.data : '不明なエラー';
+                        $('#archive-table-body').html('<tr><td colspan="8" style="text-align:center;color:#d63638;">エラー: ' + errorMsg + '</td></tr>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $('#loading-indicator').hide();
+                    var errorDetail = 'ステータス: ' + xhr.status + ', エラー: ' + error;
+                    if (xhr.status === 400) {
+                        errorDetail += ' (nonce検証失敗の可能性があります。ページを再読み込みしてください)';
+                    } else if (xhr.status === 0) {
+                        errorDetail = 'サーバーに接続できません。タイムアウトまたはネットワークエラーです。';
+                    } else if (xhr.status === 500) {
+                        errorDetail = 'サーバー内部エラーが発生しました。';
+                    }
+                    $('#archive-table-body').html('<tr><td colspan="8" style="text-align:center;color:#d63638;">読み込み失敗: ' + errorDetail + '</td></tr>');
+                    console.error('AJAX Error:', xhr, status, error);
                 }
             });
         }
@@ -639,7 +665,11 @@ function gi_archive_seo_page() {
  */
 
 function gi_ajax_archive_seo_get_pages() {
-    check_ajax_referer('gi_archive_seo_nonce', 'nonce');
+    // nonce検証（失敗時は詳細なエラーを返す）
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'gi_archive_seo_nonce')) {
+        wp_send_json_error('セキュリティ検証に失敗しました。ページを再読み込みしてください。');
+        return;
+    }
     
     global $wpdb;
     $table_name = $wpdb->prefix . 'gi_archive_seo_content';
@@ -885,23 +915,25 @@ function gi_clear_archive_pages_cache() {
 /**
  * アーカイブページ一覧を取得
  * 
- * 【修正 v11.0.13】タイムアウト対策（徹底版）
+ * 【修正 v11.0.14】タイムアウト対策（徹底版）+ エラーハンドリング強化
  * - PV数のリアルタイム取得を停止（N+1問題の解消）
  * - get_term_link() の呼び出しを廃止（URLは遅延生成）
  * - 直接SQLクエリで高速にターム情報を取得
  * - pv_count は常に0を返す
+ * - エラー時は空配列を返す（フェイルセーフ）
  */
 function gi_get_available_archive_pages() {
     global $wpdb;
     
     $pages = array();
     
-    // 投稿タイプアーカイブ
-    $total_grants = wp_count_posts('grant');
-    $total_grants_count = isset($total_grants->publish) ? $total_grants->publish : 0;
-    
-    // URLは後から生成するため、ここでは空文字
-    $grant_archive_url = get_post_type_archive_link('grant');
+    try {
+        // 投稿タイプアーカイブ
+        $total_grants = wp_count_posts('grant');
+        $total_grants_count = isset($total_grants->publish) ? (int)$total_grants->publish : 0;
+        
+        // URLは後から生成するため、ここでは空文字
+        $grant_archive_url = get_post_type_archive_link('grant');
     
     $pages[] = array(
         'type' => 'post_type_archive',
@@ -961,6 +993,12 @@ function gi_get_available_archive_pages() {
                 'description' => $term->description,
             );
         }
+    }
+    
+    } catch (Exception $e) {
+        // エラー時は空配列を返す（フェイルセーフ）
+        error_log('gi_get_available_archive_pages error: ' . $e->getMessage());
+        return array();
     }
     
     return $pages;
