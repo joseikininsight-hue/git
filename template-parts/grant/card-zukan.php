@@ -1,6 +1,6 @@
 <?php
 /**
- * Template Part: Grant Card - Zukan Dictionary Style (Enhanced v6.0)
+ * Template Part: Grant Card - Zukan Dictionary Style (Enhanced v7.0)
  * 補助金図鑑 - 辞書風カードデザイン（リッチ版）
  * 
  * Design inspiration from paper-sheet style with:
@@ -10,7 +10,7 @@
  * - Ribbon markers for special items
  * 
  * @package Grant_Insight_Perfect
- * @version 6.0.0
+ * @version 7.0.0 - ACFフィールド名修正
  */
 
 // セキュリティチェック
@@ -21,11 +21,13 @@ if (!defined('ABSPATH')) exit;
 // ==================================================
 $post_id = get_the_ID();
 
-// メタデータ取得
+// ACFフィールドからデータ取得（正しいフィールド名を使用）
+// get_field()が使えない場合はget_post_meta()にフォールバック
 $deadline       = get_post_meta($post_id, 'deadline_date', true);
-$amount         = get_post_meta($post_id, 'grant_amount_max', true);
-$rate           = get_post_meta($post_id, 'grant_rate', true);
-$organizer      = get_post_meta($post_id, 'grant_organizer', true);
+$amount_text    = get_post_meta($post_id, 'max_amount', true);           // テキスト形式の金額（例: "300万円"）
+$amount_numeric = get_post_meta($post_id, 'max_amount_numeric', true);   // 数値形式の金額（円単位）
+$rate           = get_post_meta($post_id, 'subsidy_rate_detailed', true); // 補助率詳細
+$organizer      = get_post_meta($post_id, 'organization', true);          // 実施組織
 $is_featured    = get_post_meta($post_id, 'is_featured', true);
 $status         = get_post_meta($post_id, 'application_status', true);
 
@@ -51,20 +53,36 @@ if ($deadline) {
 }
 
 // 金額フォーマット
-$amount_formatted = '金額不明';
+// 優先順位: 1.テキスト形式 → 2.数値形式からフォーマット → 3.デフォルト
+$amount_formatted = '';
 $amount_class = '';
-if ($amount) {
-    if ($amount >= 100000000) {
-        $amount_formatted = ($amount / 100000000) . '億円';
+
+if (!empty($amount_text)) {
+    // テキスト形式がある場合はそのまま使用
+    $amount_formatted = $amount_text;
+    // 大きな金額の場合はクラス追加
+    if (preg_match('/億|[1-9][0-9]{3,}万/', $amount_text)) {
         $amount_class = 'amount-large';
-    } elseif ($amount >= 10000000) {
-        $amount_formatted = number_format($amount / 10000) . '万円';
+    }
+} elseif (!empty($amount_numeric) && $amount_numeric > 0) {
+    // 数値形式から表示用にフォーマット
+    $amount = intval($amount_numeric);
+    if ($amount >= 100000000) {
+        $amount_formatted = number_format($amount / 100000000, 1) . '億円';
         $amount_class = 'amount-large';
     } elseif ($amount >= 10000) {
         $amount_formatted = number_format($amount / 10000) . '万円';
+        if ($amount >= 10000000) {
+            $amount_class = 'amount-large';
+        }
     } else {
         $amount_formatted = number_format($amount) . '円';
     }
+}
+
+// デフォルト値の設定
+if (empty($amount_formatted)) {
+    $amount_formatted = '詳細参照';
 }
 
 // 抜粋文の生成
@@ -117,9 +135,22 @@ $status_labels = array(
     'open' => '募集中',
     'upcoming' => '募集予定',
     'closed' => '募集終了',
+    'suspended' => '一時停止',
 );
 $status_label = isset($status_labels[$status]) ? $status_labels[$status] : '';
 $status_class = $status === 'open' ? 'status-open' : ($status === 'closed' ? 'status-closed' : '');
+
+// 補助率のフォーマット（表示用）
+$rate_display = '';
+if (!empty($rate)) {
+    // すでにフォーマット済みの場合はそのまま使用
+    $rate_display = $rate;
+} else {
+    $rate_display = '詳細参照';
+}
+
+// 組織名のフォーマット
+$organizer_display = !empty($organizer) ? $organizer : '詳細参照';
 
 // ==================================================
 // 2. HTML出力 - Paper Sheet Style Card
@@ -146,7 +177,7 @@ $status_class = $status === 'open' ? 'status-open' : ($status === 'closed' ? 'st
         <div class="card-body-v2">
             <!-- ヘッダー部分 -->
             <div class="card-header-v2">
-                <span class="card-organizer"><?php echo $organizer ? esc_html($organizer) : '情報不明'; ?></span>
+                <span class="card-organizer"><?php echo esc_html($organizer_display); ?></span>
                 <?php if ($status_label): ?>
                 <span class="card-status <?php echo esc_attr($status_class); ?>"><?php echo esc_html($status_label); ?></span>
                 <?php endif; ?>
@@ -175,8 +206,8 @@ $status_class = $status === 'open' ? 'status-open' : ($status === 'closed' ? 'st
                 <span class="meta-value <?php echo esc_attr($amount_class); ?>"><?php echo esc_html($amount_formatted); ?></span>
             </div>
             <div class="meta-item meta-rate">
-                <span class="meta-label">Rate</span>
-                <span class="meta-value"><?php echo $rate ? esc_html($rate) : '要確認'; ?></span>
+                <span class="meta-label">補助率</span>
+                <span class="meta-value"><?php echo esc_html($rate_display); ?></span>
             </div>
             <div class="meta-item meta-deadline">
                 <span class="meta-label">Deadline</span>

@@ -35,15 +35,17 @@ if (empty($excerpt)) {
 }
 
 // ===== ACFフィールド =====
-$organization = get_field('organization', $post_id) ?: '';
+$organization = get_field('organization', $post_id) ?: get_post_meta($post_id, 'organization', true) ?: '';
 $organization_type = get_field('organization_type', $post_id) ?: 'national';
-$deadline_date = get_field('deadline_date', $post_id) ?: '';
-$application_status = get_field('application_status', $post_id) ?: 'open';
+$deadline_date = get_field('deadline_date', $post_id) ?: get_post_meta($post_id, 'deadline_date', true) ?: '';
+$application_status = get_field('application_status', $post_id) ?: get_post_meta($post_id, 'application_status', true) ?: 'open';
 $adoption_rate = floatval(get_field('adoption_rate', $post_id));
-$subsidy_rate_detailed = get_field('subsidy_rate_detailed', $post_id) ?: '';
-$is_featured = get_field('is_featured', $post_id) ?: false;
+$subsidy_rate_detailed = get_field('subsidy_rate_detailed', $post_id) ?: get_post_meta($post_id, 'subsidy_rate_detailed', true) ?: '';
+$is_featured = get_field('is_featured', $post_id) ?: get_post_meta($post_id, 'is_featured', true) ?: false;
 $ai_summary = get_field('ai_summary', $post_id) ?: get_post_meta($post_id, 'ai_summary', true);
-$max_subsidy_amount = get_field('max_subsidy_amount', $post_id) ?: '';
+// 金額フィールド - 正しいフィールド名を使用
+$max_amount_text = get_field('max_amount', $post_id) ?: get_post_meta($post_id, 'max_amount', true) ?: '';
+$max_amount_numeric = get_field('max_amount_numeric', $post_id) ?: get_post_meta($post_id, 'max_amount_numeric', true) ?: 0;
 
 // ===== タクソノミー =====
 $categories = get_the_terms($post_id, 'grant_category');
@@ -143,14 +145,18 @@ $catch_tags = array_slice($catch_tags, 0, 2);
 
 // ===== 助成金額表示 =====
 $amount_display = '';
-if ($max_subsidy_amount) {
-    $amount_num = intval($max_subsidy_amount);
-    if ($amount_num >= 10000) {
-        $amount_display = '最大' . number_format($amount_num / 10000) . '億円';
-    } elseif ($amount_num >= 100) {
-        $amount_display = '最大' . number_format($amount_num) . '万円';
+if (!empty($max_amount_text)) {
+    // テキスト形式がある場合はそのまま使用
+    $amount_display = $max_amount_text;
+} elseif (!empty($max_amount_numeric) && $max_amount_numeric > 0) {
+    // 数値形式からフォーマット（円単位で格納されている）
+    $amount_num = intval($max_amount_numeric);
+    if ($amount_num >= 100000000) {
+        $amount_display = '最大' . number_format($amount_num / 100000000, 1) . '億円';
+    } elseif ($amount_num >= 10000) {
+        $amount_display = '最大' . number_format($amount_num / 10000) . '万円';
     } else {
-        $amount_display = '最大' . number_format($amount_num) . '万円';
+        $amount_display = '最大' . number_format($amount_num) . '円';
     }
 }
 ?>
