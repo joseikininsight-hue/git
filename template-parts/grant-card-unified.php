@@ -34,18 +34,37 @@ if (empty($excerpt)) {
     $excerpt = wp_trim_words(strip_tags($content), 30, '...');
 }
 
-// ===== ACFフィールド =====
-$organization = get_field('organization', $post_id) ?: get_post_meta($post_id, 'organization', true) ?: '';
-$organization_type = get_field('organization_type', $post_id) ?: 'national';
-$deadline_date = get_field('deadline_date', $post_id) ?: get_post_meta($post_id, 'deadline_date', true) ?: '';
-$application_status = get_field('application_status', $post_id) ?: get_post_meta($post_id, 'application_status', true) ?: 'open';
-$adoption_rate = floatval(get_field('adoption_rate', $post_id));
-$subsidy_rate_detailed = get_field('subsidy_rate_detailed', $post_id) ?: get_post_meta($post_id, 'subsidy_rate_detailed', true) ?: '';
-$is_featured = get_field('is_featured', $post_id) ?: get_post_meta($post_id, 'is_featured', true) ?: false;
-$ai_summary = get_field('ai_summary', $post_id) ?: get_post_meta($post_id, 'ai_summary', true);
-// 金額フィールド - 正しいフィールド名を使用
-$max_amount_text = get_field('max_amount', $post_id) ?: get_post_meta($post_id, 'max_amount', true) ?: '';
-$max_amount_numeric = get_field('max_amount_numeric', $post_id) ?: get_post_meta($post_id, 'max_amount_numeric', true) ?: 0;
+// ===== ヘルパー関数 =====
+if (!function_exists('gi_get_meta_with_fallback')) {
+    function gi_get_meta_with_fallback($post_id, $keys) {
+        foreach ((array)$keys as $key) {
+            $value = get_post_meta($post_id, $key, true);
+            if (!empty($value)) return $value;
+            $value = get_post_meta($post_id, '_' . $key, true);
+            if (!empty($value)) return $value;
+        }
+        if (function_exists('get_field')) {
+            foreach ((array)$keys as $key) {
+                $value = get_field($key, $post_id);
+                if (!empty($value)) return $value;
+            }
+        }
+        return '';
+    }
+}
+
+// ===== ACFフィールド（複数キー名でフォールバック） =====
+$organization = gi_get_meta_with_fallback($post_id, ['organization', 'grant_organizer', 'organizer', 'implementing_organization']);
+$organization_type = gi_get_meta_with_fallback($post_id, ['organization_type']) ?: 'national';
+$deadline_date = gi_get_meta_with_fallback($post_id, ['deadline_date', 'deadline', 'application_deadline']);
+$application_status = gi_get_meta_with_fallback($post_id, ['application_status', 'status', 'grant_status']) ?: 'open';
+$adoption_rate = floatval(gi_get_meta_with_fallback($post_id, ['adoption_rate', 'success_rate']));
+$subsidy_rate_detailed = gi_get_meta_with_fallback($post_id, ['subsidy_rate_detailed', 'subsidy_rate', 'grant_rate', 'rate']);
+$is_featured = gi_get_meta_with_fallback($post_id, ['is_featured', 'featured']);
+$ai_summary = gi_get_meta_with_fallback($post_id, ['ai_summary']);
+// 金額フィールド
+$max_amount_text = gi_get_meta_with_fallback($post_id, ['max_amount', 'grant_amount', 'subsidy_amount', 'amount']);
+$max_amount_numeric = gi_get_meta_with_fallback($post_id, ['max_amount_numeric', 'grant_amount_max', 'amount_numeric', 'max_subsidy_amount']);
 
 // ===== タクソノミー =====
 $categories = get_the_terms($post_id, 'grant_category');

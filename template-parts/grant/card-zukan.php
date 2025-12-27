@@ -21,15 +21,41 @@ if (!defined('ABSPATH')) exit;
 // ==================================================
 $post_id = get_the_ID();
 
-// ACFフィールドからデータ取得（正しいフィールド名を使用）
-// get_field()が使えない場合はget_post_meta()にフォールバック
-$deadline       = get_post_meta($post_id, 'deadline_date', true);
-$amount_text    = get_post_meta($post_id, 'max_amount', true);           // テキスト形式の金額（例: "300万円"）
-$amount_numeric = get_post_meta($post_id, 'max_amount_numeric', true);   // 数値形式の金額（円単位）
-$rate           = get_post_meta($post_id, 'subsidy_rate_detailed', true); // 補助率詳細
-$organizer      = get_post_meta($post_id, 'organization', true);          // 実施組織
-$is_featured    = get_post_meta($post_id, 'is_featured', true);
-$status         = get_post_meta($post_id, 'application_status', true);
+// ヘルパー関数：複数のキー名でメタデータを取得
+if (!function_exists('gi_get_meta_with_fallback')) {
+    function gi_get_meta_with_fallback($post_id, $keys) {
+        foreach ((array)$keys as $key) {
+            $value = get_post_meta($post_id, $key, true);
+            if (!empty($value)) {
+                return $value;
+            }
+            // ACF形式のキー（_プレフィックス）も試す
+            $value = get_post_meta($post_id, '_' . $key, true);
+            if (!empty($value)) {
+                return $value;
+            }
+        }
+        // get_field()も試す（ACFが有効な場合）
+        if (function_exists('get_field')) {
+            foreach ((array)$keys as $key) {
+                $value = get_field($key, $post_id);
+                if (!empty($value)) {
+                    return $value;
+                }
+            }
+        }
+        return '';
+    }
+}
+
+// ACFフィールドからデータ取得（複数のキー名でフォールバック）
+$deadline       = gi_get_meta_with_fallback($post_id, ['deadline_date', 'deadline', 'application_deadline']);
+$amount_text    = gi_get_meta_with_fallback($post_id, ['max_amount', 'grant_amount', 'subsidy_amount', 'amount']);
+$amount_numeric = gi_get_meta_with_fallback($post_id, ['max_amount_numeric', 'grant_amount_max', 'amount_numeric', 'max_subsidy_amount']);
+$rate           = gi_get_meta_with_fallback($post_id, ['subsidy_rate_detailed', 'subsidy_rate', 'grant_rate', 'rate']);
+$organizer      = gi_get_meta_with_fallback($post_id, ['organization', 'grant_organizer', 'organizer', 'implementing_organization']);
+$is_featured    = gi_get_meta_with_fallback($post_id, ['is_featured', 'featured']);
+$status         = gi_get_meta_with_fallback($post_id, ['application_status', 'status', 'grant_status']);
 
 // カテゴリラベル
 $categories = get_the_terms($post_id, 'grant_category');
